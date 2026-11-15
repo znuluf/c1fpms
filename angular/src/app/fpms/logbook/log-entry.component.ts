@@ -30,40 +30,6 @@ const DRAFT = 'log-entry';
                         </div>
                     }
 
-                    @if (result) {
-                        <div class="alert" [class.alert-success]="!result.warnings.length" [class.alert-warning]="result.warnings.length" role="status">
-                            <strong>{{ result.wasDuplicate ? 'Already saved' : 'Saved' }}.</strong>
-                            @if (result.wasDuplicate) { This entry was already recorded; no duplicate was created. }
-                            @for (w of result.warnings; track $index) {
-                                <div><i class="fas fa-exclamation-triangle mr-1"></i>{{ w.message }}</div>
-                            }
-                            @if (result.indicators; as i) {
-                                <div class="small mt-1">
-                                    DOC {{ i.doc ?? '—' }} · ABW {{ i.currentAbwG | num: 2 }} g · feed {{ i.cumulativeFeedKg | num: 1 }} kg · FCR to date {{ i.fcrToDate | num: 2 }} · est. population {{ i.estimatedPopulation | num: 0 }}
-                                </div>
-                            }
-                        </div>
-                        @if (isNew) {
-                            <div class="mb-3">
-                                <button class="btn btn-primary mr-2" (click)="another(true)"><i class="fas fa-plus mr-1"></i>Another {{ form.logType | label: L.LogTypes }} log</button>
-                                <button class="btn btn-outline-primary mr-2" (click)="another(false)">Different record</button>
-                                <a class="btn btn-default" [routerLink]="['/app/production/batches', form.batchId]">Back to batch</a>
-                            </div>
-                        }
-                    }
-
-                    @if (log?.isVoided) {
-                        <div class="alert alert-secondary small"><i class="fas fa-ban mr-1"></i>This entry was voided: {{ log.voidReason }}</div>
-                    } @else if (readOnly && !isNew) {
-                        <div class="alert alert-secondary small">
-                            <i class="fas fa-lock mr-1"></i>
-                            @if (batch?.isReadOnly) { The batch is Closed; its logs are read-only. }
-                            @else if (historical) { This is a historical {{ log.logType | label: L.LogTypes }} entry kept for the record; it can no longer be edited. }
-                            @else { You can only edit entries you recorded. Ask a Farm Owner to correct it. }
-                        </div>
-                    }
-
-                    @if (!result || !isNew) {
                         <!-- This pond today (DEC-96, DEC-106): a band above the form, so what is already in for the day is seen first. -->
                         @if (pondDay; as t) {
                             <section class="fpms-summary fpms-today-band" aria-label="This pond today">
@@ -79,10 +45,73 @@ const DRAFT = 'log-entry';
                                 </dl>
                             </section>
                         }
+
+                    @if (result) {
+                        <!-- After saving (DEC-117): what was saved, anything to check, the figures now, and what to do next. -->
+                        <section class="card fpms-saved" [class.fpms-saved-warn]="result.warnings.length" aria-labelledby="saved-h">
+                            <div class="card-body">
+                                <h3 id="saved-h" class="fpms-saved-h" tabindex="-1">
+                                    <i class="fas" [class.fa-check-circle]="!result.wasDuplicate" [class.fa-info-circle]="result.wasDuplicate" aria-hidden="true"></i>
+                                    {{ result.wasDuplicate ? 'Already saved' : isNew ? 'Saved' : 'Changes saved' }}:
+                                    {{ savedType | label: L.LogTypes }}, {{ batch?.pondCode }}
+                                    <span class="fpms-saved-when">{{ savedAt | farmDateTime }}</span>
+                                </h3>
+                                @if (result.wasDuplicate) {
+                                    <p class="mb-2">This entry was already recorded, so no second copy was made.</p>
+                                }
+                                @if (savedRows.length) {
+                                    <dl class="fpms-facts mb-2">
+                                        @for (r of savedRows; track $index) {
+                                            <div><dt>{{ r.label }}</dt><dd>{{ r.after }}</dd></div>
+                                        }
+                                    </dl>
+                                }
+                                @if (result.warnings.length) {
+                                    <h4 class="fpms-section-h mt-3">Check this</h4>
+                                    <ul class="fpms-notices fpms-saved-notices">
+                                        @for (w of result.warnings; track $index) {
+                                            <li class="warn"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i><span>{{ w.message }}</span></li>
+                                        }
+                                    </ul>
+                                }
+                                @if (result.indicators; as i) {
+                                    <h4 class="fpms-section-h mt-3">{{ batch?.pondCode }} now</h4>
+                                    <dl class="fpms-figures fpms-figures-sm">
+                                        <div class="fpms-figure"><dt class="l">Day of culture</dt><dd class="v">{{ i.doc ?? '—' }}</dd></div>
+                                        <div class="fpms-figure"><dt class="l">ABW</dt><dd class="v">{{ i.currentAbwG | num: 2 }}<span class="u">g</span></dd></div>
+                                        <div class="fpms-figure"><dt class="l">FCR to date</dt><dd class="v">{{ i.fcrToDate | num: 2 }}</dd></div>
+                                        <div class="fpms-figure"><dt class="l">Est. population</dt><dd class="v">{{ i.estimatedPopulation | num: 0 }}</dd></div>
+                                        <div class="fpms-figure"><dt class="l">Feed to date</dt><dd class="v">{{ i.cumulativeFeedKg | num: 1 }}<span class="u">kg</span></dd></div>
+                                    </dl>
+                                }
+                                @if (isNew) {
+                                    <div class="fpms-saved-actions">
+                                        <button class="btn btn-primary" (click)="another(true)">Record another {{ (savedType | label: L.LogTypes).toLowerCase() }}</button>
+                                        <button class="btn btn-outline-primary" (click)="another(false)">Record something else</button>
+                                        @if (result.log?.id) { <a class="btn btn-default" [routerLink]="['/app/logbook', result.log.id]">Correct it</a> }
+                                        <a class="btn btn-link" [routerLink]="['/app/production/batches', form.batchId]" [queryParams]="{ tab: 'daily' }">Open the Daily record</a>
+                                    </div>
+                                }
+                            </div>
+                        </section>
+                    }
+
+                    @if (log?.isVoided) {
+                        <div class="alert alert-secondary small"><i class="fas fa-ban mr-1"></i>This entry was voided: {{ log.voidReason }}</div>
+                    } @else if (readOnly && !isNew) {
+                        <div class="alert alert-secondary small">
+                            <i class="fas fa-lock mr-1"></i>
+                            @if (batch?.isReadOnly) { The batch is Closed; its logs are read-only. }
+                            @else if (historical) { This is a historical {{ log.logType | label: L.LogTypes }} entry kept for the record; it can no longer be edited. }
+                            @else { You can only edit entries you recorded. Ask a Farm Owner to correct it. }
+                        </div>
+                    }
+
+                    @if (!result || !isNew) {
                         <div class="fpms-entry-grid" [class.has-side]="!!(pondDay && form.logType && pondDay.recent.length)">
                         <div class="fpms-entry-main">
                         <!-- One panel (DEC-106): the form's parts are sections of it, divided by rules, with Save as its footer. -->
-                        <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="entry" (input)="keepDraft()" (change)="keepDraft()" novalidate>
+                        <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="entry" [fpmsReviewNew]="isNew" (input)="keepDraft()" (change)="keepDraft()" novalidate>
                             <fieldset [disabled]="readOnly">
                                 <!-- Observed at, shown beside the pond (new entries) or on its own; declared inside the form so it is validated with it. -->
                                 <ng-template #observedTpl>
@@ -991,23 +1020,36 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
         return body;
     }
 
+    /** What the last save saved, for the panel after saving (DEC-117). */
+    savedRows: { label: string; after: string }[] = [];
+    savedType: number | null = null;
+    savedAt: string | null = null;
+
     async save(): Promise<void> {
         const body = this.buildBody();
+        const rows = this.feedback.lastRows;
         let res: any;
         const ok = await this.act(async () => (res = this.isNew ? await this.api.post<any>('Log', 'Create', body) : await this.api.put<any>('Log', 'Update', body)));
         if (!ok) {
             return;
         }
         this.result = res;
+        this.savedRows = rows.filter((r) => !/^(Pond|Pond \(batch\)|Record type|Observed at)$/i.test(r.label));
+        this.savedType = this.form.logType;
+        this.savedAt = body.observedAt;
         void this.loadPanel();
         if (this.isNew) {
             FormDrafts.clear(DRAFT);
             this.restoredAt = null;
-            window.scrollTo({ top: 0 });
         } else {
             this.log = res.log;
-            this.notifySaved('Log entry updated.');
         }
+        // Move to the saved panel: also right inside the log drawer, where the window does not scroll.
+        setTimeout(() => {
+            const h = document.getElementById('saved-h');
+            h?.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+            h?.focus({ preventScroll: true });
+        });
     }
 
     async voidEntry(): Promise<void> {

@@ -2965,6 +2965,28 @@ Negative:
 - One more step on every save, unless "Changes only" is chosen.
 ---
 
+## Decision DEC-117: Record operations shows what was saved
+
+Status: Proposed 2026-11-15; built on `feature/page-structure`; checked in a browser at 1,000 px
+Date: 2026-11-15
+Related: DEC-96, DEC-106, DEC-116
+
+### Context
+After saving a new entry in Record operations, the form and the pond's "today" band disappeared and a plain "Saved." box took their place: it did not say what was saved, warnings sat under "Saved." in the same box, the figures were one small line, and the page jumped to the top of the window (not of the log drawer). The DEC-116 review missed the readings (their names are bound through NgModel, not the element) and the choices made with buttons (record type, cause, activity), and called a new entry "your changes" because the observed time starts filled in.
+
+### Decision
+- **After saving:** the pond's "today" band stays, refreshed; under it a saved panel: "Saved: Water quality, HP-01" with the observed time, then what was saved as ruled rows (the same lines as the review), then "Check this" with any warnings, then "HP-01 now" (day of culture, ABW, FCR, est. population, feed). Next steps: Record another (same kind), Record something else, Correct it (opens the saved entry), Open the Daily record. Green edge, gold when there is something to check; the panel's heading takes focus and scrolls into view, below the fixed top bar and inside the log drawer.
+- **Review:** reads fields by name, id or label; reads button choices from their radiogroup (the chosen option); lists rows in screen order; shows a date and time in the farm's format; carries the field's own warning ("Out of range (4–9 mg/L)") under its value. Forms say whether they add a record (`fpmsReviewNew`), so a new entry is reviewed as new.
+- Saving changes to an existing entry shows the same panel with "Changes saved" and the changed fields.
+
+### Consequences
+Positive:
+- The person sees what went in, what to check and where the pond stands, without leaving the page.
+
+Negative:
+- The panel is longer than the old box; the next entry is one tap away (Record another).
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

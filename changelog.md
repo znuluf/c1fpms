@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (Record operations after saving, DEC-117; branch `feature/page-structure`)
+- **Record operations shows what was saved.** After Save, the pond's "today" summary stays and a panel shows what was saved (each reading or field on its own row), any warnings under "Check this", the pond's figures now, and buttons for Record another, Record something else, Correct it and Open the Daily record.
+- **The review before saving lists every reading and choice** (record type, cause, activity) in screen order, and flags an out-of-range reading before you save.
+
 ### Added (review before saving, DEC-116; branch `feature/page-structure`)
 - **Review before saving.** Saving a form first shows what will be saved: everything entered for a new record, or only what changed (old → new) for an existing one. "Back to editing" returns to the form.
 - **Clearer removals.** Removing, voiding or archiving asks with the action's own words on the button, in red.

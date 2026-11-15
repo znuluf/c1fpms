@@ -2987,6 +2987,10 @@ i.wq-key.out {
     .fpms-review-after {
         font-weight: 600;
     }
+    .fpms-review-note {
+        color: var(--fpms-warning-text);
+        font-size: 0.875rem;
+    }
     .fa-arrow-right {
         color: var(--fpms-muted);
         font-size: 0.875rem;
@@ -3063,4 +3067,53 @@ i.wq-key.out {
         right: 1rem;
         width: auto;
     }
+}
+
+// ---- Record operations after saving (DEC-117): a panel that says what was saved, with a green edge (gold when there
+// is something to check), the figures now, and the next steps.
+.fpms-saved {
+    border-left: 4px solid var(--fpms-success);
+    &.fpms-saved-warn {
+        border-left-color: var(--fpms-warning);
+    }
+}
+.fpms-saved-h {
+    scroll-margin-top: 5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+    margin: 0 0 0.75rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--fpms-text);
+    outline: none;
+    > .fas {
+        color: var(--fpms-success);
+    }
+    .fpms-saved-warn & > .fas {
+        color: var(--fpms-warning);
+    }
+}
+.fpms-saved-when {
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--fpms-muted);
+}
+.fpms-saved-notices {
+    margin: 0;
+    border-top: 0;
+    > li {
+        padding: 0.6rem 0.85rem;
+        border-radius: var(--fpms-r-control);
+    }
+}
+.fpms-saved-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--fpms-line);
 }

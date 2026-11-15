@@ -72,7 +72,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="col-xl-4">
                             <div class="card">
                                 <div class="card-header"><h3 class="card-title">Add a crate type</h3></div>
-                                <form class="card-body" #f="ngForm" (ngSubmit)="save(draft, true)" fpmsReview="crate type" novalidate>
+                                <form class="card-body" #f="ngForm" (ngSubmit)="save(draft, true)" fpmsReview="crate type" [fpmsReviewNew]="true" novalidate>
                                     <div class="form-group">
                                         <label for="cn">Name <span class="text-danger">*</span></label>
                                         <input id="cn" class="form-control" name="name" [(ngModel)]="draft.name" required maxlength="40" placeholder="e.g. Banyera 30 kg" />

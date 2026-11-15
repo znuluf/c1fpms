@@ -279,7 +279,7 @@ const CUSTOM = 'custom';
                         <h2 id="formTitle" class="mr-auto">{{ formTitle }}</h2>
                         <button type="button" class="fpms-dialog-close" aria-label="Close" (click)="closeForm()"><span aria-hidden="true">&times;</span></button>
                     </div>
-                    <form #df="ngForm" (ngSubmit)="saveForm()" fpmsReview="permit" novalidate autocomplete="off">
+                    <form #df="ngForm" (ngSubmit)="saveForm()" fpmsReview="permit" [fpmsReviewNew]="form.mode !== 'edit'" novalidate autocomplete="off">
                         <div class="fpms-dialog-body">
                             @if (form.mode === 'renew') {
                                 <div class="alert alert-info py-2 small">

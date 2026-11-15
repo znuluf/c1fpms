@@ -16,7 +16,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
             <div class="container-fluid fpms-narrow">
                 @if (adding) {
                     <!-- One form at a time (DEC-96): name, an optional short code, and what the ponds will be called. -->
-                    <form class="card" #af="ngForm" (ngSubmit)="create()" fpmsReview="prefix" novalidate>
+                    <form class="card" #af="ngForm" (ngSubmit)="create()" fpmsReview="prefix" [fpmsReviewNew]="true" novalidate>
                         <div class="card-header"><h2 class="card-title">Add a prefix</h2></div>
                         <div class="card-body">
                             <div class="form-row">

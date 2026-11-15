@@ -27,6 +27,8 @@ export interface ReviewRow {
     label: string;
     before?: string;
     after: string;
+    /** A warning the form showed for this field ("Out of range (4–9 mg/L)"). */
+    note?: string;
 }
 
 export interface ReviewRequest {
@@ -77,6 +79,8 @@ export class FeedbackService {
     readonly review$ = signal<(ReviewRequest & { resolve: (ok: boolean) => void }) | null>(null);
     readonly toasts = signal<Toast[]>([]);
     reviewMode: ReviewMode = savedReviewMode();
+    /** What the last reviewed form saved, as shown in its review; a page can show it again after saving. */
+    lastRows: ReviewRow[] = [];
     private next = 1;
 
     /** Shows the review; true when the person goes ahead. A second request while one is open declines the first. */
@@ -139,6 +143,7 @@ export class FeedbackService {
                                                 <i class="fas fa-arrow-right mx-2" aria-hidden="true"></i><span class="sr-only">, now </span>
                                             }
                                             <span class="fpms-review-after">{{ row.after }}</span>
+                                            @if (row.note) { <div class="fpms-review-note"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ row.note }}</div> }
                                         </dd>
                                     </div>
                                 }
@@ -214,6 +219,7 @@ interface FieldValue {
     value: string;
     /** Typed in (text, number, date) rather than chosen (list, tick, option), which may start with a default. */
     typed: boolean;
+    note?: string;
 }
 
 /**
@@ -256,10 +262,10 @@ export class ReviewFormDirective implements AfterViewInit, OnDestroy {
             const was = this.before.get(key)?.value ?? '';
             if (isNew) {
                 if (field.value && field.value !== 'No') {
-                    rows.push({ label: field.label, after: field.value });
+                    rows.push({ label: field.label, after: field.value, note: field.note });
                 }
             } else if (field.value !== was) {
-                rows.push({ label: field.label, before: was || '—', after: field.value || '—' });
+                rows.push({ label: field.label, before: was || '—', after: field.value || '—', note: field.note });
             }
         }
         const skip = (!isNew && !rows.length) || (isNew && this.fb.reviewMode === 'changes');
@@ -274,6 +280,7 @@ export class ReviewFormDirective implements AfterViewInit, OnDestroy {
                 cancelText: 'Back to editing',
             }));
         if (ok) {
+            this.fb.lastRows = isNew ? rows : rows.map((r) => ({ label: r.label, after: r.after }));
             this.passing = true;
             try {
                 this.ngForm.onSubmit(e);
@@ -312,24 +319,47 @@ export class ReviewFormDirective implements AfterViewInit, OnDestroy {
     /** Every named field of the form, as the person sees it: its label and its shown value. */
     private read(): Map<string, FieldValue> {
         const out = new Map<string, FieldValue>();
+        const at = new Map<string, Element>();
         const form = this.el.nativeElement;
+        let n = 0;
         for (const node of Array.from(form.elements)) {
             const el = node as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
-            const name = el.getAttribute('name');
+            n++;
+            // [name]="…" bound in a template goes to NgModel, not the element, so fall back on the id or position.
+            const name = el.getAttribute('name') || el.id || (el.matches('input, select, textarea') && el.getAttribute('aria-label') ? `${el.getAttribute('aria-label')}#${n}` : '');
             if (!name || el.closest('[data-review-skip]') || ['submit', 'button', 'hidden', 'search'].includes((el as HTMLInputElement).type)) {
                 continue;
             }
             if ((el as HTMLInputElement).type === 'radio') {
                 if (!out.has(name)) {
-                    const checked = form.querySelector<HTMLInputElement>(`input[type=radio][name="${CSS.escape(name)}"]:checked`);
+                    const checked = el.getAttribute('name')
+                        ? form.querySelector<HTMLInputElement>(`input[type=radio][name="${CSS.escape(name)}"]:checked`)
+                        : (el as HTMLInputElement).checked
+                          ? (el as HTMLInputElement)
+                          : null;
                     out.set(name, { label: groupLabel(el) || name, value: checked ? labelOf(checked) : '', typed: false });
+                    at.set(name, el);
                 }
                 continue;
             }
             const typed = !(el instanceof HTMLSelectElement) && (el as HTMLInputElement).type !== 'checkbox';
-            out.set(name, { label: labelOf(el) || name, value: shown(el), typed });
+            const warn = el.closest('.form-group')?.querySelector('.text-warning-dark, .text-danger:not(label .text-danger)');
+            out.set(name, { label: labelOf(el) || name, value: shown(el), typed, note: clean(warn?.textContent) || undefined });
+            at.set(name, el);
         }
-        return out;
+        // Choices made with buttons (record type, pond, cause): a radiogroup and the option marked as chosen.
+        for (const group of Array.from(form.querySelectorAll<HTMLElement>('[role=radiogroup]'))) {
+            const label = clean(group.getAttribute('aria-label'));
+            if (!label || group.closest('[data-review-skip]') || group.querySelector('input[type=radio]')) {
+                continue;
+            }
+            const chosen = group.querySelector<HTMLElement>('[role=radio][aria-checked=true]');
+            out.set('rg:' + label, { label, value: clean(chosen?.getAttribute('aria-label') || chosen?.textContent), typed: false });
+            at.set('rg:' + label, group);
+        }
+        // In the order the fields appear on screen.
+        const keys = [...out.keys()].sort((a, b) => (at.get(a)!.compareDocumentPosition(at.get(b)!) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+        return new Map(keys.map((k) => [k, out.get(k)!]));
     }
 }
 
@@ -369,7 +399,7 @@ function shown(el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): 
         return FarmTime.date(value);
     }
     if (el instanceof HTMLInputElement && el.type === 'datetime-local') {
-        return FarmTime.date(value.substring(0, 10)) + ' ' + value.substring(11, 16);
+        return FarmTime.dateTime(FarmTime.fromLocalInput(value));
     }
     if (el instanceof HTMLInputElement && el.type === 'password') {
         return '••••••••';

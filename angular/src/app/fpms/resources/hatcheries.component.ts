@@ -20,7 +20,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
                             <div class="card-header"><h3 class="card-title">{{ form.id === empty ? 'New hatchery source' : 'Edit ' + form.name }}</h3></div>
-                            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="hatchery" novalidate>
+                            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="hatchery" [fpmsReviewNew]="form.id === empty" novalidate>
                                 <div class="card-body">
                                     <div class="form-row">
                                         <div class="form-group col-md-5">
@@ -114,7 +114,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                         </tbody>
                                     </table>
                                 </div>
-                                <form class="card-footer" #cf="ngForm" (ngSubmit)="addCertificate()" fpmsReview="certificate" novalidate>
+                                <form class="card-footer" #cf="ngForm" (ngSubmit)="addCertificate()" fpmsReview="certificate" [fpmsReviewNew]="true" novalidate>
                                     <div class="form-row">
                                         <div class="form-group col-md-3">
                                             <label for="ct">Type</label>

@@ -290,7 +290,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
         </section>
 
         <ng-template #formTpl>
-            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="pond" novalidate>
+            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="pond" [fpmsReviewNew]="isNew" novalidate>
                 <fieldset [disabled]="!canManage">
                     <div class="card">
                         <div class="card-header"><h3 class="card-title"><i class="fas fa-water" aria-hidden="true"></i>Pond master data</h3></div>

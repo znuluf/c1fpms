@@ -22,7 +22,7 @@ const ROLES = [
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
                             <div class="card-header"><h3 class="card-title">{{ form.id ? 'Edit account' : 'New account' }}</h3></div>
-                            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="account" novalidate autocomplete="off">
+                            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="account" [fpmsReviewNew]="!form.id" novalidate autocomplete="off">
                                 <div class="card-body">
                                     <div class="form-row">
                                         <div class="form-group col-md-3">

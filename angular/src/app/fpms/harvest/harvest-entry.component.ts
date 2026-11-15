@@ -93,7 +93,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                         <div class="alert alert-warning small"><i class="fas fa-prescription-bottle-alt mr-1"></i>Earliest safe harvest date from treatment withdrawal periods: <strong>{{ batch.earliestSafeHarvestDate | farmDate }}</strong>.</div>
                     }
                     <!-- One panel (DEC-107): the harvest's parts are sections of it, with Save as its footer. -->
-                    <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="harvest" novalidate>
+                    <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="harvest" [fpmsReviewNew]="isNew" novalidate>
                         <fieldset [disabled]="readOnly">
                             <div class="card">
                                 <div class="card-body">
