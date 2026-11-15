@@ -99,7 +99,7 @@ const KINDS = [
                                 <tbody>
                                     @for (r of runs(); track r.id) {
                                         <tr>
-                                            <td class="text-nowrap">{{ r.startedAtUtc | farmDateTime }}</td>
+                                            <td class="text-nowrap">{{ r.startedAtUtc | farmDayOf }}<div class="text-muted">{{ r.startedAtUtc | farmTime }}</div></td>
                                             <td>
                                                 {{ kindLabel(r.kind) }}
                                                 <div class="mt-1"><fpms-badge [text]="r.succeeded ? 'OK' : 'Failed'" [tone]="r.succeeded ? 'success' : 'danger'"></fpms-badge></div>

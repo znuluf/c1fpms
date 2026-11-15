@@ -55,7 +55,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 <tbody>
                                     @for (a of attempts(); track $index) {
                                         <tr>
-                                            <td class="text-nowrap">{{ a.creationTime | farmDateTime }}</td>
+                                            <td class="text-nowrap">{{ a.creationTime | farmDayOf }}<div class="text-muted">{{ a.creationTime | farmTime }}</div></td>
                                             <td>{{ a.userNameOrEmail }}<div class="text-muted">{{ a.farmCode || 'System (no farm)' }}</div></td>
                                             <td><fpms-badge [text]="a.result" [tone]="a.result === 'Success' ? 'success' : 'danger'"></fpms-badge></td>
                                             <td>{{ a.clientIpAddress }}</td>
@@ -71,7 +71,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 <tbody>
                                     @for (e of events(); track $index) {
                                         <tr>
-                                            <td class="text-nowrap">{{ e.executionTime | farmDateTime }}</td>
+                                            <td class="text-nowrap">{{ e.executionTime | farmDayOf }}<div class="text-muted">{{ e.executionTime | farmTime }}</div></td>
                                             <td>{{ farmCode(e.tenantId) }}<div class="text-muted">{{ e.userId != null ? 'User ' + e.userId : 'No user' }}</div></td>
                                             <td class="fpms-break-any">{{ e.method }}<div class="text-muted">{{ e.service }}</div></td>
                                             <td class="text-right">{{ e.durationMs }}</td>
