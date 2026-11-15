@@ -13,6 +13,7 @@ import { ProgressBarComponent } from './layout/progress-bar.component';
 import { SectionTabsComponent } from './layout/section-tabs.component';
 import { LogDrawerComponent } from './layout/log-drawer.component';
 import { ReviewHostComponent, ToastHostComponent } from '@shared/fpms/feedback';
+import { applyNavMode } from '@shared/fpms/nav-mode';
 
 @Component({
     templateUrl: './app.component.html',
@@ -32,6 +33,7 @@ export class AppComponent extends AppComponentBase implements OnInit {
 
     ngOnInit(): void {
         this.renderer.addClass(document.body, 'sidebar-mini');
+        applyNavMode();
         // AdminLTE's fixed layout: the sidebar stays in the window while the page scrolls.
         this.renderer.addClass(document.body, 'layout-fixed');
         // The top bar (farm, page, date and alerts) stays at the top of the window like the sidebar.

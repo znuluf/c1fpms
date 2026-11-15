@@ -903,6 +903,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-116 | Review before saving (proposed): forms list what is entered or changed before saving; removals name their action; reversible changes offer Undo; details shown as ruled rows. |
 | DEC-117 | Record operations after saving (proposed): saved panel with what was saved, warnings, figures now and next steps; review reads every reading and choice. |
 | DEC-118 | Feeding sheet saving (proposed): review per feeding with the day's total; saved tiles marked with their warnings; void reviewed with what returns to stock. |
+| DEC-119 | Collapsible sidebar (proposed): 72 px icon bar with tips, toggled from the top bar or the sidebar foot, remembered per browser; phone drawer opens on the first tap. |
 
 # **Appendix B. Manuscript alignment notes**
 

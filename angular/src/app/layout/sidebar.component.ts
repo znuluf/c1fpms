@@ -1,10 +1,11 @@
-import { Component, ChangeDetectionStrategy, HostListener, Renderer2, OnInit, inject } from '@angular/core';
+import { signal, Component, ChangeDetectionStrategy, HostListener, Renderer2, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppAuthService } from '@shared/auth/app-auth.service';
 import { LayoutStoreService } from '@shared/layout/layout-store.service';
 import { SidebarLogoComponent } from './sidebar-logo.component';
 import { SidebarUserPanelComponent } from './sidebar-user-panel.component';
 import { SidebarMenuComponent } from './sidebar-menu.component';
+import { isDesktopWidth, navMini, setNavMini } from '@shared/fpms/nav-mode';
 
 @Component({
     // tslint:disable-next-line:component-selector
@@ -24,10 +25,42 @@ export class SidebarComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        let first = true;
         this._layoutStore.sidebarExpanded.subscribe((value) => {
             this.sidebarExpanded = value;
+            // The store's first value is only its starting state: on a phone the drawer starts closed (DEC-119).
+            if (first) {
+                first = false;
+                if (!this.isDesktop) {
+                    this.hideSidebar();
+                }
+                return;
+            }
             this.toggleSidebar();
         });
+    }
+
+    readonly navMini = navMini;
+    /** The label of the icon under the pointer or focus while collapsed, beside it (DEC-119). */
+    readonly tip = signal<{ text: string; top: number } | null>(null);
+
+    toggleMini(): void {
+        setNavMini(!navMini());
+        this.tip.set(null);
+    }
+
+    showTip(event: Event): void {
+        if (!navMini() || !isDesktopWidth()) {
+            return;
+        }
+        const link = (event.target as HTMLElement).closest<HTMLElement>('.nav-link, .fpms-user-panel');
+        const text = link?.querySelector('p, span:not(.fpms-avatar), .fpms-user-name')?.textContent?.trim();
+        if (!link || !text) {
+            this.tip.set(null);
+            return;
+        }
+        const r = link.getBoundingClientRect();
+        this.tip.set({ text, top: r.top + r.height / 2 });
     }
 
     logout(): void {
@@ -51,7 +84,8 @@ export class SidebarComponent implements OnInit {
             this.renderer.removeClass(document.body, 'sidebar-collapse');
             return;
         }
-        if (this.sidebarExpanded) {
+        // Each press opens a closed drawer or closes an open one; the store's value only says that it was pressed.
+        if (document.body.classList.contains('sidebar-open')) {
             this.hideSidebar();
         } else {
             this.showSidebar();

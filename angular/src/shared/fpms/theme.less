@@ -207,12 +207,7 @@ small,
     font-variant-numeric: tabular-nums;
 }
 
-// The navigation is always open on desktop widths, so the header menu button only shows on narrow windows
-@media (min-width: 992px) {
-    .main-header .fpms-hamburger {
-        display: none;
-    }
-}
+// The header menu button opens the drawer on narrow windows and collapses the sidebar to icons on desktop (DEC-119).
 
 // ---- Sidebar: the standard pattern. Fixed to the window and always open on desktop; the brand sits on top, the
 // navigation scrolls on its own, and the account block stays at the foot. On narrow windows it is a drawer
@@ -1958,4 +1953,115 @@ body.fpms-account .login-box .card {
 .btn.fpms-auth-secondary:focus {
     background: var(--fpms-line);
     color: var(--fpms-text);
+}
+
+
+// ---- Sidebar collapsed to icons (DEC-119), desktop widths only. The page takes the width back through --fpms-nav-w,
+// which the header, content, footer and the fixed save bar already follow. Labels stay in the page for screen
+// readers and show beside the icon as a tip on hover or focus.
+@media (min-width: 992px) {
+    body.fpms-nav-mini {
+        --fpms-nav-w: 72px;
+    }
+    .main-sidebar.fpms-sidebar,
+    body .wrapper .main-header,
+    body .wrapper > .content-wrapper,
+    body .wrapper .main-footer {
+        transition: width var(--fpms-motion) var(--fpms-ease), margin-left var(--fpms-motion) var(--fpms-ease);
+    }
+    body.fpms-nav-mini .main-sidebar.fpms-sidebar {
+        .fpms-brand {
+            justify-content: center;
+            padding: 0;
+        }
+        // AdminLTE pins the brand at 250px when the top bar is fixed; it follows the sidebar instead.
+        .fpms-brand {
+            width: var(--fpms-nav-w) !important;
+        }
+        .fpms-brand .fpms-logo-wordmark {
+            display: none;
+        }
+        .fpms-brand .fpms-logo-mark {
+            display: block;
+        }
+        .fpms-nav-card .sidebar {
+            padding: 0 0.5rem;
+        }
+        .nav-sidebar > .fpms-nav-label {
+            height: 1px;
+            margin: 0.6rem 0.5rem;
+            padding: 0;
+            overflow: hidden;
+            font-size: 0;
+            background: var(--fpms-line);
+        }
+        .nav-sidebar .nav-link,
+        .fpms-nav-foot .nav-link {
+            width: auto !important;
+            justify-content: center;
+            min-height: 44px;
+            padding: 0.6rem 0;
+        }
+        // Visually hidden, still read out.
+        .nav-sidebar .nav-link p,
+        .fpms-nav-foot .nav-link span,
+        .fpms-user-panel .info {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+        }
+        .fpms-chevron {
+            display: none;
+        }
+        .nav-sidebar .nav-treeview {
+            display: none;
+        }
+        .fpms-nav-foot {
+            padding: 0.5rem;
+        }
+        .fpms-nav-foot .fpms-nav-collapse {
+            width: 100% !important;
+        }
+        .fpms-user-panel {
+            justify-content: center;
+            padding: 0.25rem 0 0.6rem;
+        }
+    }
+}
+.main-sidebar.fpms-sidebar .fpms-nav-foot .fpms-nav-collapse {
+    width: 100%;
+    border: 0;
+    background: none;
+    text-align: left;
+}
+@media (max-width: 991.98px) {
+    .main-sidebar.fpms-sidebar .fpms-nav-foot .fpms-nav-collapse {
+        display: none;
+    }
+}
+.fpms-nav-tip {
+    position: fixed;
+    left: calc(var(--fpms-nav-w) + 0.5rem);
+    z-index: 1080;
+    transform: translateY(-50%);
+    padding: 0.35rem 0.7rem;
+    border-radius: var(--fpms-r-control);
+    background: var(--fpms-tide-900);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: var(--fpms-shadow-1);
+}
+@media (prefers-reduced-motion: reduce) {
+    .main-sidebar.fpms-sidebar,
+    body .wrapper .main-header,
+    body .wrapper > .content-wrapper,
+    body .wrapper .main-footer {
+        transition: none !important;
+    }
 }

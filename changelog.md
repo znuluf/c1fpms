@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added (collapsible sidebar, DEC-119; branch `feature/page-structure`)
+- **The sidebar can collapse to icons.** Use the ☰ button in the top bar or Collapse at the foot of the sidebar; the page gets the width. Hover or focus an icon to see its name. The choice is remembered on this device.
+
+### Fixed
+- **On a phone, the menu button opens the menu on the first tap** (it needed two).
+
 ### Changed (feeding sheet saving, DEC-118; branch `feature/page-structure`)
 - **The feeding sheet shows what it will save.** Save lists each feeding (pond, feeding, kilos and lot, or Not fed and the reason) with the day's total drawn from stock; a correction shows the old entry and the new one.
 - **Saved feedings are marked where you are working.** Each saved tile shows "Saved just now" and its own warnings; the Saved note gives the kilos from stock and how many to check; the panel at the top lists everything saved.

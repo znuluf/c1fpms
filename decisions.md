@@ -3009,6 +3009,30 @@ Negative:
 - One more tap per save unless "Changes only" is chosen.
 ---
 
+## Decision DEC-119: The sidebar collapses to icons
+
+Status: Proposed 2026-11-15; built on `feature/page-structure`; checked in a browser at 1,000 px in both themes and at 390 px
+Date: 2026-11-15
+Related: DEC-99
+
+### Context
+On the Owner's 1,000 px screen the 250 px sidebar leaves a 717 px panel, which is why many tables had to merge columns. The Owner asked for the sidebar to collapse into a narrow bar showing only the icons. AdminLTE's own mini mode was turned off on desktop (DEC-99 fixed the sidebar's geometry), and the header menu button was hidden on desktop. On a phone the menu button also needed two taps the first time: the drawer's open state was read the wrong way round.
+
+### Decision
+- **Collapsed:** 72 px wide. The logo becomes the shrimp mark; menu items, My account, Help and Sign out show their icons only; the current page keeps its highlight; the "Production level" and "Farm level" headings become a thin line; the user panel shows the initials. Labels stay in the page for screen readers and appear as a tip beside the icon on hover or keyboard focus.
+- **Toggles:** the menu button (☰) in the top bar, now shown on desktop too, and a Collapse / Expand button at the foot of the sidebar; both say whether the navigation is open.
+- **Remembered per browser**, like the colour theme; the first visit starts expanded (Owner's choice).
+- The page, header and footer follow the width through `--fpms-nav-w`; the width changes in about 160 ms, without motion when reduced motion is set. Hover does not expand the sidebar.
+- Phones and narrow windows keep the slide-in menu; one tap opens it and the next closes it.
+
+### Consequences
+Positive:
+- About 180 px more for the page on a laptop when collapsed (717 px to about 895 px).
+
+Negative:
+- Collapsed, a menu item is known by its icon until hovered.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.
