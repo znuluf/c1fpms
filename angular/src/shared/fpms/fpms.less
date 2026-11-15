@@ -3071,7 +3071,7 @@ i.wq-key.out {
 
 // ---- Record operations after saving (DEC-117): a panel that says what was saved, with a green edge (gold when there
 // is something to check), the figures now, and the next steps.
-.fpms-saved {
+.card.fpms-saved {
     border-left: 4px solid var(--fpms-success);
     &.fpms-saved-warn {
         border-left-color: var(--fpms-warning);
@@ -3144,5 +3144,61 @@ i.wq-key.out {
 @media (prefers-reduced-motion: no-preference) {
     .fpms-slot.fpms-slot-justsaved {
         transition: box-shadow var(--fpms-motion) var(--fpms-ease);
+    }
+}
+
+// ---- Trace report, items not recorded (DEC-121): a light panel, not a gold slab. A gold edge and icon carry the
+// warning; items are grouped by the sheet's sections, each with a plain button to where it is recorded.
+.card.fpms-gaps {
+    border-left: 4px solid var(--fpms-warning);
+    padding: 1.1rem 1.5rem 0.6rem;
+}
+.fpms-gaps-head {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    > .fas {
+        margin-top: 0.3rem;
+        color: var(--fpms-warning);
+        font-size: 1.15rem;
+    }
+    h2 {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--fpms-text);
+    }
+    p {
+        margin: 0.15rem 0 0;
+        color: var(--fpms-muted);
+    }
+}
+.fpms-gaps-section {
+    margin: 0.9rem 0 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--fpms-muted);
+}
+.fpms-gaps-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    > li {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 1rem;
+        padding: 0.6rem 0;
+        border-top: 1px solid var(--fpms-line);
+    }
+}
+.fpms-gaps-what {
+    flex: 1 1 18rem;
+    min-width: 0;
+    font-weight: 600;
+    > .text-muted {
+        font-weight: 400;
     }
 }

@@ -1,5 +1,6 @@
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
+import { FarmTime } from '@shared/fpms/farm-time';
 import { FPMS_IMPORTS } from '../shared-imports';
 
 /**
@@ -52,18 +53,30 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         </div>
                     </div>
                     @if (!buyerCopy() && gaps().length) {
-                        <div class="alert alert-warning no-print">
-                            <strong>{{ gaps().length }} {{ gaps().length === 1 ? 'item' : 'items' }} not recorded.</strong>
-                            Record {{ gaps().length === 1 ? 'it' : 'them' }} before a buyer or inspector asks. The sheet still prints with "Not recorded" in their place.
-                            <ul class="list-unstyled mb-0 mt-2">
-                                @for (g of gaps(); track $index) {
-                                    <li class="d-flex flex-wrap align-items-center py-1 border-top">
-                                        <span class="flex-fill">{{ g.what }}<span class="small text-muted"> · {{ g.where }}</span></span>
-                                        <a class="btn btn-sm btn-outline-secondary" [routerLink]="g.link">{{ g.action }}</a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
+                        <!-- What the sheet will print as "Not recorded" (DEC-121): grouped by the sheet's sections, repeats merged, each with where to record it. -->
+                        <section class="card fpms-gaps no-print" aria-labelledby="gaps-h">
+                            <div class="fpms-gaps-head">
+                                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                                <div>
+                                    <h2 id="gaps-h">{{ gaps().length }} {{ gaps().length === 1 ? 'item' : 'items' }} not recorded</h2>
+                                    <p>The sheet prints "Not recorded" in {{ gaps().length === 1 ? 'its place' : 'their place' }}. Record {{ gaps().length === 1 ? 'it' : 'them' }} before a buyer or inspector asks.</p>
+                                </div>
+                            </div>
+                            @for (grp of gapGroups(); track grp.section) {
+                                <h3 class="fpms-gaps-section">{{ grp.section }}</h3>
+                                <ul class="fpms-gaps-list">
+                                    @for (g of grp.items; track $index) {
+                                        <li>
+                                            <div class="fpms-gaps-what">
+                                                {{ g.what }}
+                                                @if (g.detail) { <div class="text-muted">{{ g.detail }}</div> }
+                                            </div>
+                                            <a class="btn btn-sm btn-outline-primary text-nowrap" [routerLink]="g.link">{{ g.action }}<i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></a>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </section>
                     }
                     <article class="fpms-paper fpms-print-doc ts">
                         <div class="fpms-doc-head ts-letterhead">
@@ -876,13 +889,13 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
     });
 
     /** Things the sheet prints as "Not recorded", each with the place to record it. */
-    gaps = computed<{ what: string; where: string; action: string; link: any[] }[]>(() => {
+    gaps = computed<{ what: string; where: string; action: string; link: any[]; when?: string }[]>(() => {
         this.tick();
         const t = this.t;
         if (!t) {
             return [];
         }
-        const out: { what: string; where: string; action: string; link: any[] }[] = [];
+        const out: { what: string; where: string; action: string; link: any[]; when?: string }[] = [];
         const f = t.frySource;
         const delivery = f ? ['/app/resources/fry-deliveries', f.deliveryId] : ['/app/resources/fry-deliveries'];
         if (f) {
@@ -896,7 +909,7 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
             if (!l.lotNumber) out.push({ what: `Lot number for ${l.product}`, where: 'Grow-out · feed', action: 'Open inventory', link: ['/app/inventory'] });
         }
         for (const x of t.treatments ?? []) {
-            if (x.withdrawalDays == null) out.push({ what: `Withdrawal period for ${x.product || 'a treatment'}`, where: 'Grow-out · chemicals and supplements', action: 'Open inventory', link: ['/app/inventory'] });
+            if (x.withdrawalDays == null) out.push({ what: `Withdrawal period for ${x.product || 'a treatment'}`, where: 'Grow-out · chemicals and supplements', action: 'Open inventory', link: ['/app/inventory'], when: x.date });
         }
         for (const s of t.sales ?? []) {
             if (!s.transporter && !s.driverName && !s.plateNo && !s.destination && !s.localTransportPermitNo) {
@@ -905,6 +918,40 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
         }
         return out;
     });
+
+    /**
+     * The gaps by section of the sheet (Origin, Farm, Grow-out, Where it went), with the same item for several records
+     * on one line: "4 treatments: Nov 2, Nov 5, Nov 9, Nov 12" (DEC-121).
+     */
+    gapGroups = computed(() => {
+        const sections = new Map<string, { what: string; detail: string; action: string; link: any[]; whens: string[]; count: number; part: string }[]>();
+        for (const g of this.gaps()) {
+            const [section, ...rest] = g.where.split(' · ');
+            const part = rest.join(' · ');
+            const items = sections.get(section) ?? [];
+            const same = items.find((i) => i.what === g.what && i.action === g.action && i.part === part);
+            if (same) {
+                same.count++;
+                if (g.when) same.whens.push(g.when);
+            } else {
+                items.push({ what: g.what, detail: '', action: g.action, link: g.link, whens: g.when ? [g.when] : [], count: 1, part });
+            }
+            sections.set(section, items);
+        }
+        const order = ['Origin', 'Farm profile', 'Grow-out', 'Where it went'];
+        return [...sections.entries()]
+            .sort((a, b) => (order.indexOf(a[0]) + 99) % 99 - (order.indexOf(b[0]) + 99) % 99)
+            .map(([section, items]) => ({
+                section: section === 'Farm profile' ? 'Farm' : section,
+                items: items.map((i) => {
+                    const dates = [...new Set(i.whens)].sort().map((d) => FarmTime.date(String(d).substring(0, 10)));
+                    const records = i.count > 1 ? `${i.count} records` : '';
+                    const when = dates.length ? (dates.length > 4 ? dates.slice(0, 4).join(', ') + ' and more' : dates.join(', ')) : '';
+                    return { ...i, detail: [i.part && i.part !== i.what ? i.part : '', records + (records && when ? ': ' : '') + when].filter(Boolean).join(' · ') };
+                }),
+            }));
+    });
+
 
     setBuyerCopy(): void {
         if (!this.who() || !this.buyers().includes(this.who())) {

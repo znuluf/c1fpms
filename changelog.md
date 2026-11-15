@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (trace report, DEC-121; branch `feature/page-structure`)
+- **"Items not recorded" on the trace report is easier to read.** The list is grouped by the sheet's sections, repeats are merged into one line with their dates, and each line has a visible button to where it is recorded.
+
 ### Changed (sidebar, DEC-120; branch `feature/page-structure`)
 - **The menu button (☰) is gone.** A collapsed sidebar opens over the page while the mouse rests on it and closes when the mouse leaves; Collapse / Expand at its foot keeps it open or closed.
 - **Narrow windows show the icon bar** instead of a slide-in menu, so the navigation is always on screen.

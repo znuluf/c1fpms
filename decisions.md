@@ -3056,6 +3056,26 @@ Negative:
 - On a touch screen narrower than 992 px the labels cannot be shown; the icons are the only cue there.
 ---
 
+## Decision DEC-121: The trace report's "not recorded" list as a light, grouped panel
+
+Status: Proposed 2026-11-15; built on `feature/page-structure`; checked in a browser at 1,000 px in both themes
+Date: 2026-11-15
+Related: DEC-72, DEC-84
+
+### Context
+Above the trace sheet, the items the sheet prints as "Not recorded" were a full gold alert box. Its "Open …" buttons showed as empty boxes (the alert's link colour hid their text), and the same missing item was listed once per record (four identical "Withdrawal period for PB" lines).
+
+### Decision
+- A white panel with a gold left edge and a warning icon; the heading gives the count ("5 items not recorded"), and the explanation is one muted line.
+- Items are grouped under the sheet's sections (Origin, Farm, Grow-out, Where it went). The same item for several records is one line: "Withdrawal period for PB · AquaTest Bacillus probiotic — chemicals and supplements · 4 records: Nov 2, …".
+- Each line ends with a visible button to where it is recorded ("Open inventory →").
+- The saved panel in Record operations and on the feeding sheet gets its coloured edge the same way (it was hidden by the card border).
+
+### Consequences
+Positive:
+- What is missing, and where to fix it, reads at a glance; repeats no longer crowd the list.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.
