@@ -12,14 +12,14 @@ import { FPMS_IMPORTS } from '../shared-imports';
         <fpms-page-header title="Security and error logs" subtitle="Sign-in attempts and the errors the system recorded. No farm records are shown. System Administration."></fpms-page-header>
         <section class="content px-2 pb-3">
             <div class="container-fluid">
-                <div class="card">
-                    <div class="card-body pb-1">
+                <!-- Filters on the page ground (DEC-122). -->
+                <div class="fpms-list-filters">
                         <div class="form-row align-items-end">
-                            <div class="form-group col-6 col-md-2">
+                            <div class="form-group col-6 col-md-3">
                                 <label for="from">From</label>
                                 <input id="from" type="date" class="form-control" [(ngModel)]="from" />
                             </div>
-                            <div class="form-group col-6 col-md-2">
+                            <div class="form-group col-6 col-md-3">
                                 <label for="to">To</label>
                                 <input id="to" type="date" class="form-control" [(ngModel)]="to" />
                             </div>
@@ -32,17 +32,16 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     }
                                 </select>
                             </div>
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-auto">
                                 <div class="custom-control custom-checkbox mb-2">
                                     <input type="checkbox" class="custom-control-input" id="fo" [(ngModel)]="failuresOnly" />
                                     <label class="custom-control-label" for="fo">Failures only</label>
                                 </div>
                             </div>
-                            <div class="form-group col-md-2">
-                                <button class="btn btn-primary btn-block" (click)="apply()" [disabled]="busy()">Apply</button>
+                            <div class="form-group col-auto">
+                                <button class="btn btn-primary" (click)="apply()" [disabled]="busy()">Apply</button>
                             </div>
                         </div>
-                    </div>
                 </div>
                 <ul class="nav nav-tabs">
                     <li class="nav-item"><a class="nav-link" href="javascript:;" [class.active]="tab === 'login'" (click)="tab = 'login'">Sign-in attempts</a></li>
@@ -52,43 +51,40 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <div class="card-body p-0 table-responsive">
                         @if (tab === 'login') {
                             <table class="table table-sm mb-0">
-                                <thead><tr><th>Time</th><th>Farm code</th><th>Username / email</th><th>Result</th><th>IP address</th></tr></thead>
+                                <thead><tr><th>Time</th><th title="Farm code and the username or email typed">Sign-in as</th><th>Result</th><th>IP address</th></tr></thead>
                                 <tbody>
                                     @for (a of attempts(); track $index) {
                                         <tr>
                                             <td class="text-nowrap">{{ a.creationTime | farmDateTime }}</td>
-                                            <td>{{ a.farmCode || '(host)' }}</td>
-                                            <td>{{ a.userNameOrEmail }}</td>
+                                            <td>{{ a.userNameOrEmail }}<div class="text-muted">{{ a.farmCode || 'System (no farm)' }}</div></td>
                                             <td><fpms-badge [text]="a.result" [tone]="a.result === 'Success' ? 'success' : 'danger'"></fpms-badge></td>
-                                            <td class="small">{{ a.clientIpAddress }}</td>
+                                            <td>{{ a.clientIpAddress }}</td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="5" class="text-center text-muted py-3">No sign-in attempts in this range.</td></tr>
+                                        <tr><td colspan="4" class="text-center text-muted py-3">No sign-in attempts in this range.</td></tr>
                                     }
                                 </tbody>
                             </table>
                         } @else {
                             <table class="table table-sm mb-0">
-                                <thead><tr><th>Time</th><th>Farm</th><th>User ID</th><th>Service</th><th>Method</th><th class="text-right">ms</th><th>Result</th></tr></thead>
+                                <thead><tr><th>Time</th><th title="Farm and user ID">Who</th><th title="Service and method">Action</th><th class="text-right">ms</th><th>Result</th></tr></thead>
                                 <tbody>
                                     @for (e of events(); track $index) {
                                         <tr>
                                             <td class="text-nowrap">{{ e.executionTime | farmDateTime }}</td>
-                                            <td>{{ farmCode(e.tenantId) }}</td>
-                                            <td>{{ e.userId ?? '' }}</td>
-                                            <td>{{ e.service }}</td>
-                                            <td>{{ e.method }}</td>
+                                            <td>{{ farmCode(e.tenantId) }}<div class="text-muted">{{ e.userId != null ? 'User ' + e.userId : 'No user' }}</div></td>
+                                            <td class="fpms-break-any">{{ e.method }}<div class="text-muted">{{ e.service }}</div></td>
                                             <td class="text-right">{{ e.durationMs }}</td>
                                             <td>
                                                 @if (e.failed) {
-                                                    <fpms-badge text="Failed" tone="danger"></fpms-badge> <span class="small">{{ e.errorType }}</span>
+                                                    <fpms-badge text="Failed" tone="danger"></fpms-badge><div class="fpms-break-any">{{ e.errorType }}</div>
                                                 } @else {
                                                     <fpms-badge text="OK" tone="success"></fpms-badge>
                                                 }
                                             </td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="7" class="text-center text-muted py-3">No events in this range.</td></tr>
+                                        <tr><td colspan="5" class="text-center text-muted py-3">No events in this range.</td></tr>
                                     }
                                 </tbody>
                             </table>
@@ -100,7 +96,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <fpms-pager [state]="eventPager" (changed)="load()"></fpms-pager>
                     }
                 </div>
-                <p class="small text-muted">These logs never include farm record contents, request parameters or passwords.</p>
+                <p class="text-muted">These logs never include farm record contents, request parameters or passwords.</p>
             </div>
         </section>
     `,

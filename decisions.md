@@ -3076,6 +3076,30 @@ Positive:
 - What is missing, and where to fix it, reads at a glance; repeats no longer crowd the list.
 ---
 
+## Decision DEC-122: The system administration pages fit a 1,000 px screen and ask before account actions
+
+Status: Proposed 2026-11-15; built on `feature/page-structure`; checked in a browser at 1,000 px
+Date: 2026-11-15
+Related: DEC-99, DEC-107, DEC-116
+
+### Context
+At 1,000 px, System health's backup history was 1,012 px wide in a 717 px panel, Reference data 919 px, Farms 849 px and the security logs 735 px. System health showed its figures as loose boxes and its alerts in a separate card. Unlocking an account, issuing a temporary password and opening farm registration happened at a click, with no statement of who or what.
+
+### Decision
+- **System health:** a summary band (database size against its limit, disk free, server errors in the last 24 hours, version) with the alerts as notices under it (Critical in red with a cross, Warning in gold with a triangle), or one line saying all is well. The backup history has its filters on the page ground and five columns: started; job with its result; size; file with its host; message. Long file names break inside their cell.
+- **Reference data:** five columns: the parameter as its code tag and name, with its unit; optimal range; physical limits; frequency, with "Required at stocking" under it; status. The edit dialog is a form, reviewed before saving (DEC-116).
+- **Security logs:** filters on the page ground. Sign-in attempts: time; the name typed with its farm code; result; IP address. System events: time; farm with the user; the method with its service; ms; result with the error type.
+- **Farms:** the farm as its code tag with its name under it; registered; accounts; status; actions stacked. Activating or deactivating a farm and opening or closing registration go through the review; opening registration has a red button.
+- **Account recovery:** the users as person (name, then username), role and status, with a labelled radio. Unlock and Issue temporary password show a review naming the account, the farm, how identity was verified and the note; issuing has a red button.
+
+### Consequences
+Positive:
+- Every table on these pages fits 1,000 px; account and registration actions say exactly what they do before they do it.
+
+Negative:
+- The security logs can no longer show the service and method in separate columns.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

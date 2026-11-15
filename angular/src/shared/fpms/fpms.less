@@ -3202,3 +3202,10 @@ i.wq-key.out {
         font-weight: 400;
     }
 }
+
+// A long unbroken value (a backup file name, a service name) breaks anywhere in its cell instead of widening the
+// table (DEC-122).
+.fpms-break-any {
+    overflow-wrap: anywhere;
+    min-width: 8rem;
+}

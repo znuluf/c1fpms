@@ -906,6 +906,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-119 | Collapsible sidebar (proposed): 72 px icon bar with tips, toggled from the top bar or the sidebar foot, remembered per browser; phone drawer opens on the first tap. |
 | DEC-120 | Collapsed sidebar opens on hover (proposed): no menu button; narrow windows always show the icon bar. Amends DEC-119. |
 | DEC-121 | Trace report not-recorded list (proposed): light panel grouped by section, repeats merged, visible buttons. |
+| DEC-122 | System administration pages (proposed): fit 1,000 px; health summary band; account, farm and registration actions reviewed first. |
 
 # **Appendix B. Manuscript alignment notes**
 
