@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-light-primary no-print fpms-sidebar" (mouseover)="showTip($event)" (focusin)="showTip($event)" (mouseleave)="tip.set(null)" (focusout)="tip.set(null)">
+<aside class="main-sidebar sidebar-light-primary no-print fpms-sidebar" (pointerenter)="enter($event)" (pointerleave)="leave()" (focusin)="peek(true)" (focusout)="focusOut($event)">
     <div class="fpms-nav-card">
         <sidebar-logo></sidebar-logo>
         <div class="sidebar">
@@ -21,7 +21,4 @@
             </button>
         </div>
     </div>
-    @if (tip(); as t) {
-        <div class="fpms-nav-tip" role="tooltip" [style.top.px]="t.top">{{ t.text }}</div>
-    }
 </aside>

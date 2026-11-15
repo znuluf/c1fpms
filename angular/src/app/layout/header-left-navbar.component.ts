@@ -15,7 +15,6 @@ function pageTitleOf(snapshot: ActivatedRouteSnapshot): string {
     return (route.title as string) || '';
 }
 
-import { isDesktopWidth, navMini, setNavMini } from '@shared/fpms/nav-mode';
 
 @Component({
     selector: 'header-left-navbar',
@@ -64,16 +63,5 @@ export class HeaderLeftNavbarComponent implements OnInit {
         this._layoutStore.sidebarExpanded.subscribe((value) => {
             this.sidebarExpanded = value;
         });
-    }
-
-    readonly navMini = navMini;
-
-    /** On a desktop-width window the menu button collapses the sidebar to icons (DEC-119); narrower, it opens the drawer. */
-    toggleSidebar(): void {
-        if (isDesktopWidth()) {
-            setNavMini(!navMini());
-            return;
-        }
-        this._layoutStore.setSidebarExpanded(!this.sidebarExpanded);
     }
 }

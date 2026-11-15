@@ -3033,6 +3033,29 @@ Negative:
 - Collapsed, a menu item is known by its icon until hovered.
 ---
 
+## Decision DEC-120: The collapsed sidebar opens on hover; no menu button
+
+Status: Proposed 2026-11-15; built on `feature/page-structure`; checked in a browser at 1,000 px and 800 px
+Date: 2026-11-15
+Amends: DEC-119
+
+### Context
+The Owner did not want the menu button (☰) in the top bar and asked for the collapsed sidebar to open on hover instead. The system is not used on phones. The menu button was also the only way to open the slide-in menu on any window narrower than 992 px (a laptop window snapped to half the screen, a tablet held upright).
+
+### Decision
+- **No menu button** at any width.
+- **Hover:** collapsed, the sidebar opens to full width over the page when the mouse rests on it for a quarter of a second, with a shadow; the page does not move. It closes when the mouse leaves. Keyboard focus opens it at once. Touch does not hover: a tap opens the page. The tips beside the icons (DEC-119) are removed, since the labels show on hover.
+- **Collapse / Expand** at the foot of the sidebar stays: it is how the sidebar is kept open (giving the page its width) or closed, and how a touch screen expands it.
+- **Narrow windows (under 992 px):** no slide-in menu; the sidebar is always the 72 px icon bar and opens on hover, and the Collapse button is not shown there.
+
+### Consequences
+Positive:
+- No menu button; the navigation is always on screen, at any width.
+
+Negative:
+- On a touch screen narrower than 992 px the labels cannot be shown; the icons are the only cue there.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

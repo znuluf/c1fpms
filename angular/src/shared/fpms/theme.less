@@ -207,7 +207,7 @@ small,
     font-variant-numeric: tabular-nums;
 }
 
-// The header menu button opens the drawer on narrow windows and collapses the sidebar to icons on desktop (DEC-119).
+// No header menu button: the sidebar is always in place, and expands on hover when collapsed (DEC-120).
 
 // ---- Sidebar: the standard pattern. Fixed to the window and always open on desktop; the brand sits on top, the
 // navigation scrolls on its own, and the account block stays at the foot. On narrow windows it is a drawer
@@ -223,22 +223,21 @@ small,
     border: 0;
     overflow: visible;
 }
-@media (min-width: 992px) {
-    // (The sidebar and header sit inside <sidebar> and <app-header>, so these are descendants of .wrapper, not children.)
-    .wrapper .main-sidebar.fpms-sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        height: 100vh;
-        margin: 0;
-        transform: none;
-    }
-    body .wrapper .main-header,
-    body .wrapper > .content-wrapper,
-    body .wrapper .main-footer {
-        margin-left: var(--fpms-nav-w) !important;
-    }
+// (The sidebar and header sit inside <sidebar> and <app-header>, so these are descendants of .wrapper, not children.)
+.wrapper .main-sidebar.fpms-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: 100vh;
+    margin: 0;
+    transform: none;
+}
+// Specific enough to beat AdminLTE's narrow-window rule that puts the page at the left edge (DEC-120).
+html body.sidebar-mini .wrapper .main-header,
+html body.sidebar-mini .wrapper > .content-wrapper,
+html body.sidebar-mini .wrapper .main-footer {
+    margin-left: var(--fpms-nav-w) !important;
 }
 .fpms-nav-card {
     display: flex;
@@ -1958,8 +1957,9 @@ body.fpms-account .login-box .card {
 
 // ---- Sidebar collapsed to icons (DEC-119), desktop widths only. The page takes the width back through --fpms-nav-w,
 // which the header, content, footer and the fixed save bar already follow. Labels stay in the page for screen
-// readers and show beside the icon as a tip on hover or focus.
-@media (min-width: 992px) {
+// readers; hovering or focusing the bar opens it over the page (DEC-120).
+// At every width: a narrow window always has the icon bar (DEC-120).
+@media all {
     body.fpms-nav-mini {
         --fpms-nav-w: 72px;
     }
@@ -1969,7 +1969,7 @@ body.fpms-account .login-box .card {
     body .wrapper .main-footer {
         transition: width var(--fpms-motion) var(--fpms-ease), margin-left var(--fpms-motion) var(--fpms-ease);
     }
-    body.fpms-nav-mini .main-sidebar.fpms-sidebar {
+    body.fpms-nav-mini:not(.fpms-nav-peek) .main-sidebar.fpms-sidebar {
         .fpms-brand {
             justify-content: center;
             padding: 0;
@@ -2031,6 +2031,16 @@ body.fpms-account .login-box .card {
         }
     }
 }
+// Collapsed and hovered or focused (DEC-120): full width over the page, with a shadow; the page does not move.
+@media all {
+    body.fpms-nav-mini.fpms-nav-peek .main-sidebar.fpms-sidebar {
+        width: 250px;
+        box-shadow: var(--fpms-shadow-2);
+        .fpms-brand {
+            width: 250px !important;
+        }
+    }
+}
 .main-sidebar.fpms-sidebar .fpms-nav-foot .fpms-nav-collapse {
     width: 100%;
     border: 0;
@@ -2041,21 +2051,6 @@ body.fpms-account .login-box .card {
     .main-sidebar.fpms-sidebar .fpms-nav-foot .fpms-nav-collapse {
         display: none;
     }
-}
-.fpms-nav-tip {
-    position: fixed;
-    left: calc(var(--fpms-nav-w) + 0.5rem);
-    z-index: 1080;
-    transform: translateY(-50%);
-    padding: 0.35rem 0.7rem;
-    border-radius: var(--fpms-r-control);
-    background: var(--fpms-tide-900);
-    color: #fff;
-    font-size: 0.875rem;
-    font-weight: 500;
-    white-space: nowrap;
-    pointer-events: none;
-    box-shadow: var(--fpms-shadow-1);
 }
 @media (prefers-reduced-motion: reduce) {
     .main-sidebar.fpms-sidebar,

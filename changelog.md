@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (sidebar, DEC-120; branch `feature/page-structure`)
+- **The menu button (☰) is gone.** A collapsed sidebar opens over the page while the mouse rests on it and closes when the mouse leaves; Collapse / Expand at its foot keeps it open or closed.
+- **Narrow windows show the icon bar** instead of a slide-in menu, so the navigation is always on screen.
+
 ### Added (collapsible sidebar, DEC-119; branch `feature/page-structure`)
 - **The sidebar can collapse to icons.** Use the ☰ button in the top bar or Collapse at the foot of the sidebar; the page gets the width. Hover or focus an icon to see its name. The choice is remembered on this device.
 
