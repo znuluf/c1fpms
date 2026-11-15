@@ -2987,6 +2987,28 @@ Negative:
 - The panel is longer than the old box; the next entry is one tap away (Record another).
 ---
 
+## Decision DEC-118: The feeding sheet reviews before saving and marks what was saved
+
+Status: Proposed 2026-11-15; built on `feature/page-structure`; checked in a browser at 1,000 px
+Date: 2026-11-15
+Related: DEC-96, DEC-105, DEC-116, DEC-117
+
+### Context
+The feeding sheet saves several ponds' feedings at once from a save bar at the bottom of the window. Nothing was shown before saving; after saving, a "Saved n feedings" box appeared at the top of the page, out of sight, with the warnings in it rather than on the feedings they concern. A correction did not show what it replaced, and Void did not say what it voided or what went back to stock.
+
+### Decision
+- **Before saving:** a review with one row per feeding ("EP-01 · Feeding 3: 26 kg N313 grower · lot G-2210 · fed 14:00", or "Not fed · Molting") and a line for the day: how many fed, kilos drawn from stock, how many not fed. A correction shows what it was, then what it becomes; a lot short of stock is flagged on its row. The button says "Save 2 feedings". With "Changes only" (My account), new feedings save without the review; corrections are always reviewed.
+- **After saving:** each saved tile has a green outline and "Saved just now", with its warnings on the tile; the Saved note in the corner gives the count, the kilos from stock and how many to check; the panel at the top lists every saved feeding and the warnings, as in Record operations (DEC-117). The marks clear when the date or pond changes.
+- **Void:** the reason is still typed on the tile; the review then shows what was saved and the reason, with a red "Void feeding" button; the note says how many kilos went back to stock.
+
+### Consequences
+Positive:
+- What goes into stock records is seen before it is saved, and the result is seen where the person is working.
+
+Negative:
+- One more tap per save unless "Changes only" is chosen.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (feeding sheet saving, DEC-118; branch `feature/page-structure`)
+- **The feeding sheet shows what it will save.** Save lists each feeding (pond, feeding, kilos and lot, or Not fed and the reason) with the day's total drawn from stock; a correction shows the old entry and the new one.
+- **Saved feedings are marked where you are working.** Each saved tile shows "Saved just now" and its own warnings; the Saved note gives the kilos from stock and how many to check; the panel at the top lists everything saved.
+- **Void feeding asks with what was saved and your reason**, and says how many kilos went back to stock.
+
 ### Changed (Record operations after saving, DEC-117; branch `feature/page-structure`)
 - **Record operations shows what was saved.** After Save, the pond's "today" summary stays and a panel shows what was saved (each reading or field on its own row), any warnings under "Check this", the pond's figures now, and buttons for Record another, Record something else, Correct it and Open the Daily record.
 - **The review before saving lists every reading and choice** (record type, cause, activity) in screen order, and flags an out-of-range reading before you save.

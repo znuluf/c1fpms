@@ -3117,3 +3117,32 @@ i.wq-key.out {
     padding-top: 1rem;
     border-top: 1px solid var(--fpms-line);
 }
+
+// ---- Feeding sheet after saving (DEC-118): the feedings just saved are marked on their tile, in words, with their
+// warnings beside them, so the result is seen where the person was working.
+.fpms-slot.fpms-slot-justsaved {
+    box-shadow: inset 0 0 0 2px var(--fpms-success);
+}
+.fpms-slot-saved {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: var(--fpms-success);
+}
+.fpms-slot-warn {
+    margin-bottom: 0.35rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--fpms-r-control);
+    background: var(--fpms-warn-bg);
+    color: var(--fpms-warning-text);
+    > .fas {
+        color: var(--fpms-warning);
+    }
+}
+@media (prefers-reduced-motion: no-preference) {
+    .fpms-slot.fpms-slot-justsaved {
+        transition: box-shadow var(--fpms-motion) var(--fpms-ease);
+    }
+}

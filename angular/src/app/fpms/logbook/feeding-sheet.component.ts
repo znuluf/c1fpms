@@ -69,14 +69,34 @@ interface Entry {
                 }
 
                 @if (results.length) {
-                    <div class="alert" [class.alert-success]="!hasWarnings" [class.alert-warning]="hasWarnings" role="status">
-                        <strong>Saved {{ results.length }} feeding{{ results.length === 1 ? '' : 's' }}.</strong>
-                        @for (r of results; track $index) {
-                            @for (w of r.warnings; track $index) {
-                                <div><i class="fas fa-exclamation-triangle mr-1"></i>{{ r.session.pondCode }} {{ r.session.session | label: L.FeedingSessions }}: {{ w.message }}</div>
+                    <!-- After saving (DEC-118): what was saved, one feeding per row, and anything to check. Each saved tile is marked too. -->
+                    <section class="card fpms-saved" [class.fpms-saved-warn]="hasWarnings" aria-labelledby="fs-saved-h">
+                        <div class="card-body">
+                            <h3 id="fs-saved-h" class="fpms-saved-h">
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                                Saved {{ results.length }} feeding{{ results.length === 1 ? '' : 's' }}
+                                <span class="fpms-saved-when">{{ feedDate | farmDate }} · {{ savedKg | num: 3 : true }} kg from stock</span>
+                            </h3>
+                            <dl class="fpms-facts mb-0">
+                                @for (r of results; track $index) {
+                                    <div>
+                                        <dt>{{ r.session.pondCode }} · {{ r.session.session | label: L.FeedingSessions }}{{ r.wasUpdate ? ' (corrected)' : '' }}</dt>
+                                        <dd>{{ describeSaved(r.session) }}</dd>
+                                    </div>
+                                }
+                            </dl>
+                            @if (hasWarnings) {
+                                <h4 class="fpms-section-h mt-3">Check this</h4>
+                                <ul class="fpms-notices fpms-saved-notices">
+                                    @for (r of results; track $index) {
+                                        @for (w of r.warnings; track $index) {
+                                            <li class="warn"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i><span>{{ r.session.pondCode }} {{ r.session.session | label: L.FeedingSessions }}: {{ w.message }}</span></li>
+                                        }
+                                    }
+                                </ul>
                             }
-                        }
-                    </div>
+                        </div>
+                    </section>
                 }
 
                 @if (!feedLots.length && !loading) {
@@ -102,7 +122,7 @@ interface Entry {
                                         <div class="fpms-slots-cell">
                                             @let existing = row.sessions[s - 1];
                                             @let e = entry(row.batchId, s);
-                                            <div class="fpms-slot" [class.fpms-slot-open]="e.open" [class.fpms-slot-now]="!existing && !e.open && currentSlot(row) === s" [class.fpms-slot-later]="!existing && !e.open && isLater(s)" [class.fpms-slot-fed]="existing && existing.status !== 2 && !e.open" [class.fpms-slot-skipped]="existing && existing.status === 2 && !e.open">
+                                            <div class="fpms-slot" [class.fpms-slot-justsaved]="!e.open && !!justSaved[row.batchId + '.' + s]" [class.fpms-slot-open]="e.open" [class.fpms-slot-now]="!existing && !e.open && currentSlot(row) === s" [class.fpms-slot-later]="!existing && !e.open && isLater(s)" [class.fpms-slot-fed]="existing && existing.status !== 2 && !e.open" [class.fpms-slot-skipped]="existing && existing.status === 2 && !e.open">
                                                 <div class="d-flex align-items-center mb-1">
                                                     @if (!existing) {
                                                         <div class="custom-control custom-checkbox mr-auto">
@@ -129,6 +149,12 @@ interface Entry {
 
                                                 @if (!existing && !e.open && currentSlot(row) === s) {
                                                     <div class="fpms-slot-tag">Current feeding</div>
+                                                }
+                                                @if (existing && !e.open && justSaved[row.batchId + '.' + s]; as w) {
+                                                    <div class="fpms-slot-saved" role="status"><i class="fas fa-check" aria-hidden="true"></i>Saved just now</div>
+                                                    @for (m of w.warnings; track $index) {
+                                                        <div class="fpms-slot-warn"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ m }}</div>
+                                                    }
                                                 }
                                                 @if (existing && !e.open) {
                                                     <div class="small">
@@ -297,6 +323,7 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
 
     async load(): Promise<void> {
         this.results = [];
+        this.justSaved = {};
         this.voiding = null;
         this.restoredAt = null;
         if (!this.feedDate) {
@@ -449,7 +476,77 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
         return this.pending().every(({ e }) => e.status === 2 || (e.lines.length > 0 && e.lines.every((l) => l.lotId && Number(l.kg) > 0) && this.total(e) <= 1000));
     }
 
+    /** Feedings saved by the last Save, by "batchId.session", with their warnings (DEC-118). */
+    justSaved: Record<string, { warnings: string[] }> = {};
+    savedKg = 0;
+
+    private kgText(kg: number | null | undefined): string {
+        return Number(kg ?? 0).toLocaleString('en-PH', { maximumFractionDigits: 3 });
+    }
+
+    private lotName(lotId: string): string {
+        return this.feedLots.find((o) => o.lotId === lotId)?.label ?? 'feed lot';
+    }
+
+    private feedingName(batchId: string, session: number): string {
+        const pond = this.sheet?.rows?.find((r: any) => r.batchId === batchId)?.pondCode ?? '';
+        return `${pond} · ${this.L.FeedingSessions[session] ?? 'Feeding ' + session}`;
+    }
+
+    /** An entry in words: "27 kg N313 grower · lot G-2210 · fed 10:00", or "Not fed · Molting". */
+    private describeEntry(e: Entry): string {
+        if (e.status === 2) {
+            return 'Not fed' + (e.notes ? ' · ' + e.notes : '');
+        }
+        const lines = e.lines.map((l) => `${this.kgText(Number(l.kg))} kg ${this.lotName(l.lotId)}`).join(' + ');
+        return lines + (e.fedAt ? ' · fed ' + e.fedAt : '') + (e.notes ? ' · ' + e.notes : '');
+    }
+
+    /** A saved feeding in the same words. */
+    describeSaved(x: any): string {
+        if (!x) {
+            return '';
+        }
+        if (x.status === 2) {
+            return 'Not fed' + (x.notes ? ' · ' + x.notes : '');
+        }
+        const lines = (x.lines ?? []).map((l: any) => `${this.kgText(l.kg)} kg ${l.label}`).join(' + ');
+        return lines + (x.fedAtTime ? ' · fed ' + x.fedAtTime : '') + (x.notes ? ' · ' + x.notes : '');
+    }
+
+    private existingOf(batchId: string, session: number): any {
+        return this.sheet?.rows?.find((r: any) => r.batchId === batchId)?.sessions?.[session - 1] ?? null;
+    }
+
     async save(): Promise<void> {
+        // Review (DEC-116, DEC-118): one row per feeding; a correction shows what it was; a lot short of stock is flagged.
+        const items = this.pending();
+        const corrections = items.filter((i) => this.existingOf(i.batchId, i.session));
+        if (this.feedback.reviewMode === 'all' || corrections.length) {
+            const fed = items.filter((i) => i.e.status === 1);
+            const kg = fed.reduce((sum, i) => sum + this.total(i.e), 0);
+            const notFed = items.length - fed.length;
+            const rows = items.map((i) => {
+                const was = this.existingOf(i.batchId, i.session);
+                const short = i.e.status === 1 && i.e.lines.some((l) => this.short(l));
+                return {
+                    label: this.feedingName(i.batchId, i.session),
+                    before: was ? this.describeSaved(was) : undefined,
+                    after: this.describeEntry(i.e),
+                    note: short ? "More than the lot's stock on hand; the lot will be flagged." : undefined,
+                };
+            });
+            const ok = await this.feedback.review({
+                title: corrections.length === items.length ? 'Check your corrections' : 'Check the feedings before saving',
+                message: `${FarmTime.date(this.feedDate)}: ${fed.length} fed, ${this.kgText(kg)} kg drawn from stock${notFed ? `; ${notFed} not fed` : ''}.${corrections.length ? ' A corrected feeding returns its old feed to stock first.' : ''}`,
+                rows,
+                confirmText: `Save ${items.length} feeding${items.length === 1 ? '' : 's'}`,
+                cancelText: 'Back to editing',
+            });
+            if (!ok) {
+                return;
+            }
+        }
         const sessions = this.pending().map(({ batchId, session, e }) => ({
             batchId,
             feedDate: this.feedDate,
@@ -467,10 +564,16 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
         FormDrafts.clear(this.draftKey);
         await this.load();
         this.results = res;
+        this.justSaved = Object.fromEntries(res.map((r) => [`${r.session.batchId}.${r.session.session}`, { warnings: (r.warnings ?? []).map((w: any) => w.message) }]));
+        this.savedKg = res.reduce((sum, r) => sum + (r.session.status === 2 ? 0 : Number(r.session.kg) || 0), 0);
         this.feedLots = await this.api.get<any[]>('Inventory', 'GetLotOptions', { category: 1 });
-        if (!this.hasWarnings) {
-            this.notifySaved('Feeding saved.');
-        }
+        // The note in the corner is seen where Save was pressed; the panel at the top and each saved tile say the rest.
+        const toCheck = res.reduce((n, r) => n + (r.warnings?.length ?? 0), 0);
+        this.notifySaved(
+            `Saved ${res.length} feeding${res.length === 1 ? '' : 's'}.`,
+            undefined,
+            `${this.kgText(this.savedKg)} kg from stock${toCheck ? ` · ${toCheck} to check, marked on the sheet` : ''}.`
+        );
     }
 
     async voidSession(existing: any): Promise<void> {
@@ -478,8 +581,18 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
         if (!reason) {
             return;
         }
+        const name = this.feedingName(existing.batchId, existing.session);
+        const fed = existing.status !== 2;
+        const ok = await this.confirm(
+            fed ? 'Its feed is returned to stock with reversing movements. The feeding stays in the history as voided.' : 'The feeding stays in the history as voided.',
+            `Void ${name}?`,
+            { confirmText: 'Void feeding', rows: [{ label: 'Saved as', after: this.describeSaved(existing) }, { label: 'Reason', after: reason }] }
+        );
+        if (!ok) {
+            return;
+        }
         if (await this.act(() => this.api.post('Feeding', 'Void', { id: existing.id, reason }))) {
-            this.notifySaved('Feeding voided.');
+            this.notifySaved(`${name} voided.`, undefined, fed ? `${this.kgText(existing.kg)} kg returned to stock.` : undefined);
             await this.load();
             this.feedLots = await this.api.get<any[]>('Inventory', 'GetLotOptions', { category: 1 });
         }

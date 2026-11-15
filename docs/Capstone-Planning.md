@@ -902,6 +902,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-115 | Farm admin, harvest setup, reports and account fit 1,000 px (proposed): merged columns and stacked actions; report summary bands; print layouts unchanged. |
 | DEC-116 | Review before saving (proposed): forms list what is entered or changed before saving; removals name their action; reversible changes offer Undo; details shown as ruled rows. |
 | DEC-117 | Record operations after saving (proposed): saved panel with what was saved, warnings, figures now and next steps; review reads every reading and choice. |
+| DEC-118 | Feeding sheet saving (proposed): review per feeding with the day's total; saved tiles marked with their warnings; void reviewed with what returns to stock. |
 
 # **Appendix B. Manuscript alignment notes**
 
