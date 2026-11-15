@@ -51,7 +51,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <!-- The form takes the width on a laptop; the status column sits beside it from 1,200 px (DEC-111). -->
                     <div class="row">
                         <div class="col-xl-8">
-                            <form #f="ngForm" (ngSubmit)="save()" novalidate>
+                            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="delivery" novalidate>
                                 <fieldset [disabled]="!d.canEdit">
                                     <div class="card">
                                         <div class="card-header"><h3 class="card-title">Delivery</h3></div>

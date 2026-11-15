@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added (review before saving, DEC-116; branch `feature/page-structure`)
+- **Review before saving.** Saving a form first shows what will be saved: everything entered for a new record, or only what changed (old → new) for an existing one. "Back to editing" returns to the form.
+- **Clearer removals.** Removing, voiding or archiving asks with the action's own words on the button, in red.
+- **Saved note with Undo.** After a save a note in the corner says what was saved. Deactivating a buyer or hatchery, or archiving a permit, can be undone from the note.
+- **My account > Review before saving:** choose "Changes only" to save new records without the review step.
+
+### Changed (details as ruled rows, DEC-116)
+- **Details read as ruled rows.** Stocking details and the other detail lists show each item as label and value on one line, with a thin line between rows. Daily record water readings show one reading per row.
+
 ### Changed (farm admin, harvest setup, reports and account, DEC-115; branch `feature/page-structure`)
 - **Users, Permits and licenses, Farm standards, Crate types and the Activity log fit a 1,000 px screen.** Users shows each person with their username and email in one column. Permits show the status above the expiry date, and View, Edit, Renew and Archive as stacked buttons with words instead of icons. Farm standards show "Differs from standard" and "Unsaved" under each row's name. Crate types have one Use column with Default and Active ticks. Activity log dates are no longer cut off.
 - **Reports fit a 1,000 px screen.** The trace box, report choice and filters sit above the report. Headline numbers are a summary band. Harvest, sales, water-quality and inventory tables have fewer, merged columns.

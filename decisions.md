@@ -2939,6 +2939,32 @@ Negative:
 - Some report columns can no longer be sorted on their own (sale count, average price, overdue, receipt, paid, unit cost).
 ---
 
+## Decision DEC-116: Review before saving, a Saved note with Undo, and details as ruled rows
+
+Status: Proposed 2026-11-15; built on `feature/page-structure`; checked in a browser at 1,000 px in both themes
+Date: 2026-11-15
+Related: DEC-65, DEC-99, DEC-101
+
+### Context
+Saving showed a brief corner message from the framework; removals asked "Are you sure?" with OK and Cancel; nothing showed what was about to be saved. Long details (Stocking details, readings in the Daily record) sat in a three-column grid where a long value made a tall, uneven cell. The Owner asked for details as a table with clear lines, and a better saving feedback with a review step. The Owner also asked why there is no super-intensive farming system: DEC-65 removed it because PNS/BAFS 197:2025 has no density band for it, and the Owner chose to keep it removed.
+
+### Decision
+- **Review before saving.** Forms that save carry `fpmsReview`. On a valid submit, a review lists what was entered (a new record) or only what changed, old → new (an existing record). Going ahead uses the form's own submit words ("Save", "Add certificate"); "Back to editing" returns to the form. An existing record with nothing changed saves without asking. Fields and labels are read from the form itself, so pages add nothing else.
+- **Removals.** `confirm()` uses the same review panel: the title names the action, the button carries its verb ("Remove certificate", "Void entry", "Archive"), and removals have a red button and a warning icon.
+- **Easy to reverse acts at once.** Deactivating or reactivating a buyer or hatchery, and archiving a permit, act straight away and offer Undo for ten seconds instead of asking first.
+- **Saved note.** A note in the bottom corner says what was saved, read out by screen readers, with Undo where it applies; it leaves after six seconds (ten with Undo), respects reduced motion, and spans the width on a phone.
+- **Preference.** My account > Review before saving: "New records and changes" (default) or "Changes only", per device, for people who enter many new daily records. Removals always ask.
+- **Details as ruled rows.** `fpms-facts` shows label on the left and value on the right, with a thin rule under each row: two columns of rows when there is room, one below. Daily record water readings use the same rows, one reading per row.
+- **Not covered:** sale entry keeps its own review step; inline Save buttons in setup tables (size grades, crate types) and the feeding sheet's quick entries save without a review.
+
+### Consequences
+Positive:
+- What is saved is seen before it is saved; removals say exactly what they remove; reversible changes can be undone.
+
+Negative:
+- One more step on every save, unless "Changes only" is chosen.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

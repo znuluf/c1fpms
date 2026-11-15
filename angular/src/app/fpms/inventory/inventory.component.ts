@@ -22,7 +22,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
                             <div class="card-header"><h3 class="card-title">{{ itemForm.id === empty ? 'New inventory item' : 'Edit ' + itemForm.displayName }}</h3></div>
-                            <form #itf="ngForm" (ngSubmit)="saveItem()" novalidate>
+                            <form #itf="ngForm" (ngSubmit)="saveItem()" fpmsReview="item" novalidate>
                                 <div class="card-body">
                                     <div class="form-row">
                                         <div class="form-group col-md-3">
@@ -112,7 +112,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
                             <div class="card-header"><h3 class="card-title">Record stock receipt</h3></div>
-                            <form #rf="ngForm" (ngSubmit)="saveReceipt()" novalidate>
+                            <form #rf="ngForm" (ngSubmit)="saveReceipt()" fpmsReview="receipt" novalidate>
                                 <div class="card-body">
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
@@ -308,7 +308,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                 @if (adjust) {
                     <div class="card card-outline card-primary">
                         <div class="card-header"><h3 class="card-title">Adjust lot {{ adjust.lot.lotNumber }} (on hand {{ adjust.lot.quantityOnHand | num: 3 }} {{ adjust.lot.unit }})</h3></div>
-                        <form #af="ngForm" (ngSubmit)="saveAdjust()" novalidate>
+                        <form #af="ngForm" (ngSubmit)="saveAdjust()" fpmsReview="adjustment" novalidate>
                             <div class="card-body">
                                 <div class="form-row">
                                     <div class="form-group col-md-3">

@@ -80,7 +80,7 @@ interface CalMonth {
                     @if (failure) {
                         <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-danger mb-0 border-0">
                             <div class="card-header"><h3 class="card-title"><i class="fas fa-ban" aria-hidden="true"></i>Declare batch failed</h3></div>
-                            <form #ff="ngForm" (ngSubmit)="saveFailure()" novalidate>
+                            <form #ff="ngForm" (ngSubmit)="saveFailure()" fpmsReview="failure record" novalidate>
                                 <div class="card-body">
                                     <div class="form-row">
                                         <div class="form-group col-md-3">

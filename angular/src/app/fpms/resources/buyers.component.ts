@@ -18,7 +18,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
                             <div class="card-header"><h3 class="card-title">{{ form.id === empty ? 'New buyer' : 'Edit ' + form.name }}</h3></div>
-                            <form #f="ngForm" (ngSubmit)="save()" novalidate>
+                            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="buyer" novalidate>
                                 <div class="card-body">
                                     <div class="form-group">
                                         <span class="d-block mb-1">Buyer type <span class="text-danger">*</span></span>
@@ -199,8 +199,12 @@ export class BuyersComponent extends FpmsPage implements OnInit {
         }
     }
 
-    async toggle(b: any): Promise<void> {
+    /** Deactivate or reactivate; easy to reverse, so it acts at once and offers Undo (DEC-116). */
+    async toggle(b: any, undoing = false): Promise<void> {
         if (await this.act(() => this.api.post('Buyer', 'SetActive', { id: b.id, isActive: !b.isActive }))) {
+            if (!undoing) {
+                this.notifySaved(`${b.name} ${b.isActive ? 'deactivated' : 'reactivated'}.`, () => this.toggle({ ...b, isActive: !b.isActive }, true));
+            }
             this.load();
         }
     }

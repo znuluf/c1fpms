@@ -279,7 +279,7 @@ const CUSTOM = 'custom';
                         <h2 id="formTitle" class="mr-auto">{{ formTitle }}</h2>
                         <button type="button" class="fpms-dialog-close" aria-label="Close" (click)="closeForm()"><span aria-hidden="true">&times;</span></button>
                     </div>
-                    <form #df="ngForm" (ngSubmit)="saveForm()" novalidate autocomplete="off">
+                    <form #df="ngForm" (ngSubmit)="saveForm()" fpmsReview="permit" novalidate autocomplete="off">
                         <div class="fpms-dialog-body">
                             @if (form.mode === 'renew') {
                                 <div class="alert alert-info py-2 small">
@@ -650,7 +650,7 @@ export class DocumentsComponent extends FpmsPage implements OnInit {
         }
         if (this.formDirty) {
             this.confirming = true;
-            const discard = await this.confirm('Your changes have not been saved.', 'Discard changes?');
+            const discard = await this.confirm('Your changes have not been saved.', 'Discard changes?', { confirmText: 'Discard changes' });
             this.confirming = false;
             if (!discard) {
                 return;
@@ -693,11 +693,17 @@ export class DocumentsComponent extends FpmsPage implements OnInit {
         return d.toISOString().slice(0, 10);
     }
 
-    async archive(d: any): Promise<void> {
-        if (!d.isArchived && !(await this.confirm('The record is kept as history but no longer counts as current or sends reminders.', 'Archive record?'))) {
-            return;
-        }
-        if (await this.act(() => this.api.post('Compliance', 'SetArchived', { id: d.id, isArchived: !d.isArchived }))) {
+    /** Archive or restore; easy to reverse, so it acts at once and offers Undo instead of asking first (DEC-116). */
+    async archive(d: any, undoing = false): Promise<void> {
+        const archiving = !d.isArchived;
+        if (await this.act(() => this.api.post('Compliance', 'SetArchived', { id: d.id, isArchived: archiving }))) {
+            if (!undoing) {
+                this.notifySaved(
+                    `${d.title} ${archiving ? 'archived' : 'restored'}.`,
+                    () => this.archive({ ...d, isArchived: archiving }, true),
+                    archiving ? 'Kept as history; no longer current and sends no reminders.' : undefined
+                );
+            }
             this.refresh();
         }
     }

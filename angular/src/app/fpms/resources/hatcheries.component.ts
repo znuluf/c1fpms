@@ -20,7 +20,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
                             <div class="card-header"><h3 class="card-title">{{ form.id === empty ? 'New hatchery source' : 'Edit ' + form.name }}</h3></div>
-                            <form #f="ngForm" (ngSubmit)="save()" novalidate>
+                            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="hatchery" novalidate>
                                 <div class="card-body">
                                     <div class="form-row">
                                         <div class="form-group col-md-5">
@@ -114,7 +114,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                         </tbody>
                                     </table>
                                 </div>
-                                <form class="card-footer" #cf="ngForm" (ngSubmit)="addCertificate()" novalidate>
+                                <form class="card-footer" #cf="ngForm" (ngSubmit)="addCertificate()" fpmsReview="certificate" novalidate>
                                     <div class="form-row">
                                         <div class="form-group col-md-3">
                                             <label for="ct">Type</label>
@@ -305,7 +305,7 @@ export class HatcheriesComponent extends FpmsPage implements OnInit {
     }
 
     async removeCertificate(c: any): Promise<void> {
-        if (!(await this.confirm(`Remove certificate ${c.certificateNo}? Use this only for a certificate entered by mistake.`))) {
+        if (!(await this.confirm('Use this only for a certificate entered by mistake. Renewals are added as new certificates.', `Remove certificate ${c.certificateNo}?`, { confirmText: 'Remove certificate' }))) {
             return;
         }
         if (await this.act(() => this.api.delete('Hatchery', 'DeleteCertificate', { id: c.id }))) {
@@ -314,8 +314,12 @@ export class HatcheriesComponent extends FpmsPage implements OnInit {
         }
     }
 
-    async toggle(h: any): Promise<void> {
+    /** Deactivate or reactivate; easy to reverse, so it acts at once and offers Undo (DEC-116). */
+    async toggle(h: any, undoing = false): Promise<void> {
         if (await this.act(() => this.api.post('Hatchery', 'SetActive', { id: h.id, isActive: !h.isActive }))) {
+            if (!undoing) {
+                this.notifySaved(`${h.name} ${h.isActive ? 'deactivated' : 'reactivated'}.`, () => this.toggle({ ...h, isActive: !h.isActive }, true));
+            }
             this.load();
         }
     }

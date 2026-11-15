@@ -82,7 +82,7 @@ const DRAFT = 'log-entry';
                         <div class="fpms-entry-grid" [class.has-side]="!!(pondDay && form.logType && pondDay.recent.length)">
                         <div class="fpms-entry-main">
                         <!-- One panel (DEC-106): the form's parts are sections of it, divided by rules, with Save as its footer. -->
-                        <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" (input)="keepDraft()" (change)="keepDraft()" novalidate>
+                        <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="entry" (input)="keepDraft()" (change)="keepDraft()" novalidate>
                             <fieldset [disabled]="readOnly">
                                 <!-- Observed at, shown beside the pond (new entries) or on its own; declared inside the form so it is validated with it. -->
                                 <ng-template #observedTpl>
@@ -1011,7 +1011,7 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
     }
 
     async voidEntry(): Promise<void> {
-        if (!(await this.confirm(`Void this ${this.L.LogTypes[this.log.logType]} entry? Reason: "${this.voidReason.trim()}".`, 'Void entry?'))) {
+        if (!(await this.confirm(`Void this ${this.L.LogTypes[this.log.logType]} entry? Reason: "${this.voidReason.trim()}".`, 'Void entry?', { confirmText: 'Void entry' }))) {
             return;
         }
         if (await this.act(() => this.api.post('Log', 'Void', { id: this.log.id, reason: this.voidReason.trim() }))) {

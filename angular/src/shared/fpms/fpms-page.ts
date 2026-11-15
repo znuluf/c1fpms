@@ -11,6 +11,7 @@ import * as L from './labels';
 import { FarmTime } from './farm-time';
 import { PagerState } from './pager';
 import { EMBEDDED_QUERY, LogDrawerService } from './log-drawer.service';
+import { FeedbackService, ReviewRow } from './feedback';
 
 /** How a list filter is written in the address. */
 export type FilterKind = 'string' | 'number' | 'boolean';
@@ -27,6 +28,7 @@ export abstract class FpmsPage {
     protected session = inject(AppSessionService);
     private permissions = inject(PermissionCheckerService);
     private browserTitle = inject(Title);
+    protected readonly feedback = inject(FeedbackService);
 
     readonly L = L;
     readonly Options = L.Options;
@@ -93,8 +95,12 @@ export abstract class FpmsPage {
         return !!this.session.tenant?.usesSizeGrading;
     }
 
-    notifySaved(message = 'Saved.'): void {
-        abp.notify.success(message);
+    /**
+     * The "Saved" note after an action (DEC-116). Give undo when the action has a safe opposite (deactivate,
+     * archive); the note then offers Undo for ten seconds.
+     */
+    notifySaved(message = 'Saved.', undo?: () => unknown, detail?: string): void {
+        this.feedback.toast({ text: message, detail, action: undo, actionText: undo ? 'Undo' : undefined });
     }
 
     /** Non-blocking server warnings after a save that leaves the page: one dialog, one wording everywhere. */
@@ -106,8 +112,15 @@ export abstract class FpmsPage {
         abp.message.warn(warnings.map((w) => '• ' + w.message).join('\n'), title);
     }
 
-    confirm(message: string, title?: string): Promise<boolean> {
-        return new Promise((resolve) => abp.message.confirm(message, title, (ok: boolean) => resolve(!!ok)));
+    /**
+     * Asks before an action (DEC-116). The button carries the action's own verb ("Archive", "Void"), taken from the
+     * title unless given; removals and anything that cannot be undone here get a red button.
+     */
+    confirm(message: string, title?: string, options?: { confirmText?: string; danger?: boolean; rows?: ReviewRow[] }): Promise<boolean> {
+        const verb = (title ?? message).match(/^(Archive|Remove|Void|Delete|Discard|Deactivate|Activate|Reactivate|Restore|Close|Reopen|Mark|Finish|Reset|Unarchive)\b/i)?.[1];
+        const confirmText = options?.confirmText ?? (verb ? verb.charAt(0).toUpperCase() + verb.slice(1).toLowerCase() : 'Continue');
+        const danger = options?.danger ?? /^(Archive|Remove|Void|Delete|Discard|Deactivate|Close)\b/i.test(confirmText);
+        return this.feedback.review({ title: title ?? 'Are you sure?', message, rows: options?.rows, confirmText, danger, cancelText: 'Cancel' });
     }
 
     /** Runs an API call with the busy flag set; errors are already shown by the HTTP interceptor. */
@@ -232,7 +245,7 @@ export abstract class FpmsPage {
         a.click();
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
-        abp.notify.success(`${file.fileName}: ${file.rowCount} row${file.rowCount === 1 ? '' : 's'} exported.`);
+        this.feedback.toast({ text: 'Exported', detail: `${file.fileName}: ${file.rowCount} row${file.rowCount === 1 ? '' : 's'}.`, tone: 'info' });
     }
 
     print(): void {

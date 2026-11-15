@@ -900,6 +900,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-113 | Batches list fits 1,000 px (proposed): six columns like a cycle's batches (pond tag and Batch A with cycle and status, stocked with PL, DOC, ABW, FCR, survival); sort by pond or stocking date. |
 | DEC-114 | Stock a batch and Logbook fit 1,000 px (proposed): deliveries as choice tiles; four-column ponds step; five-column Logbook with readings kept whole. |
 | DEC-115 | Farm admin, harvest setup, reports and account fit 1,000 px (proposed): merged columns and stacked actions; report summary bands; print layouts unchanged. |
+| DEC-116 | Review before saving (proposed): forms list what is entered or changed before saving; removals name their action; reversible changes offer Undo; details shown as ruled rows. |
 
 # **Appendix B. Manuscript alignment notes**
 

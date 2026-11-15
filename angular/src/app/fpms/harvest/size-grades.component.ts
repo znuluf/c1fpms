@@ -54,7 +54,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="col-xl-4">
                             <div class="card">
                                 <div class="card-header"><h3 class="card-title">Add a size grade</h3></div>
-                                <form class="card-body" #f="ngForm" (ngSubmit)="save(draft, true)" novalidate>
+                                <form class="card-body" #f="ngForm" (ngSubmit)="save(draft, true)" fpmsReview="size grade" novalidate>
                                     <div class="form-group">
                                         <label for="gl">Label <span class="text-danger">*</span></label>
                                         <input id="gl" class="form-control" name="label" [(ngModel)]="draft.label" required maxlength="20" placeholder="e.g. 20/30" />

@@ -22,7 +22,7 @@ const ROLES = [
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
                             <div class="card-header"><h3 class="card-title">{{ form.id ? 'Edit account' : 'New account' }}</h3></div>
-                            <form #f="ngForm" (ngSubmit)="save()" novalidate autocomplete="off">
+                            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="account" novalidate autocomplete="off">
                                 <div class="card-body">
                                     <div class="form-row">
                                         <div class="form-group col-md-3">
@@ -248,10 +248,11 @@ export class FarmUsersComponent extends FpmsPage implements OnInit {
         const message = u.isActive
             ? `${u.name} ${u.surname} will no longer be able to sign in. Their records are kept.`
             : `${u.name} ${u.surname} will be able to sign in again.`;
-        if (!(await this.confirm(message, `${action} account?`))) {
+        if (!(await this.confirm(message, `${action} account?`, { confirmText: `${action} account`, danger: u.isActive }))) {
             return;
         }
         if (await this.act(() => this.api.post('FarmUser', 'SetActive', { id: u.id, isActive: !u.isActive }))) {
+            this.notifySaved(`${u.name} ${u.surname}: account ${u.isActive ? 'deactivated' : 'reactivated'}.`);
             this.load();
         }
     }

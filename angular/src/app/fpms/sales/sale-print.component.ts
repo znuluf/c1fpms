@@ -265,7 +265,7 @@ export class SalePrintComponent extends FpmsPage implements OnInit {
     }
 
     async removePayment(p: any): Promise<void> {
-        if (!(await this.confirm(`Remove the ${p.paidOn} payment of ₱${p.amount}?`))) return;
+        if (!(await this.confirm('The sale\'s balance goes up by this amount.', 'Remove payment?', { confirmText: 'Remove payment', rows: [{ label: 'Paid on', after: p.paidOn }, { label: 'Amount', after: '₱' + p.amount }] }))) return;
         let sale: any;
         if (await this.act(async () => (sale = await this.api.delete<any>('Sale', 'RemovePayment', { id: p.id })))) {
             this.notifySaved('Payment removed.');

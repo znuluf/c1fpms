@@ -22,7 +22,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 @if (editing) {
                     <div class="card card-outline card-primary">
                         <div class="card-header"><h3 class="card-title">{{ editing.id === emptyId ? 'New price table' : 'Edit ' + editing.name }}</h3></div>
-                        <form class="card-body" #f="ngForm" (ngSubmit)="save()" novalidate>
+                        <form class="card-body" #f="ngForm" (ngSubmit)="save()" fpmsReview="price table" novalidate>
                             <div class="form-row">
                                 <div class="form-group col-md-5">
                                     <label for="tn">Name <span class="text-danger">*</span></label>

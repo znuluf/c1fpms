@@ -139,7 +139,7 @@ function daysBetween(a: string, b: string): number {
                             </div>
                             <div class="card-body p-0 table-responsive">
                                 <table class="table table-sm mb-0">
-                                    <thead><tr><th class="text-nowrap">Feeding</th><th class="text-right">Kg</th><th>Feed lot</th><th>Entered by</th></tr></thead>
+                                    <thead><tr><th class="text-nowrap">Feeding</th><th class="text-right">Kg</th><th>Feed lot</th><th title="Who entered it, and when">Entered</th></tr></thead>
                                     <tbody>
                                         @for (n of slots(); track n) {
                                             @let s = sessionOf(day(), n);
@@ -161,7 +161,7 @@ function daysBetween(a: string, b: string): number {
                                                 <td>
                                                     @if (s) {
                                                         {{ s.recordedBy }}
-                                                        <div class="text-muted">entered {{ entered(s.creationTime, day()) }}</div>
+                                                        <div class="text-muted text-nowrap">{{ entered(s.creationTime, day()) }}</div>
                                                     }
                                                 </td>
                                             </tr>
@@ -182,13 +182,18 @@ function daysBetween(a: string, b: string): number {
                                 @for (l of byType(ls, WATER); track l.id) {
                                     <div class="fpms-dr-entry">
                                         <div class="text-muted">{{ time(l.observedAtUtc) }} · {{ l.recordedBy }}</div>
-                                        <div class="fpms-dr-readings">
+                                        <!-- Each reading on its own ruled row (DEC-116). -->
+                                        <dl class="fpms-facts mt-1">
                                             @for (m of l.measurements; track m.parameterCode) {
-                                                <span [class.fpms-dr-warn]="m.isOutOfRange">
-                                                    {{ m.parameterName ?? m.parameterCode }} {{ m.value }} {{ m.unitCode }}{{ m.isOutOfRange ? ' · ' + sideText(m) : '' }}
-                                                </span>
+                                                <div>
+                                                    <dt>{{ m.parameterName ?? m.parameterCode }}</dt>
+                                                    <dd>
+                                                        {{ m.value }} {{ m.unitCode }}
+                                                        @if (m.isOutOfRange) { <span class="fpms-dr-warn ml-1"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ sideText(m) }}</span> }
+                                                    </dd>
+                                                </div>
                                             }
-                                        </div>
+                                        </dl>
                                     </div>
                                 } @empty {
                                     <p class="text-muted px-3 py-2 mb-0">{{ isPast(day()) ? 'No water quality entered for this day.' : 'None entered yet.' }}</p>

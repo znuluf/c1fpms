@@ -87,7 +87,7 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
 
                     @if (tab() === 'details' && canEdit) {
                         <!-- One panel (DEC-109): the profile's parts are sections of it, with Save as its footer. -->
-                        <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" novalidate>
+                        <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="farm profile" novalidate>
                             <fieldset [disabled]="!canEdit">
                                 <div class="card">
                                     <div class="card-header"><h3 class="card-title">Farm details</h3></div>
@@ -436,7 +436,7 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                             <button type="button" class="btn btn-primary" (click)="closeCodeDlg()">Done</button>
                         </div>
                     } @else {
-                        <form (ngSubmit)="saveCode()" novalidate autocomplete="off">
+                        <form (ngSubmit)="saveCode()" fpmsReview="farm code" novalidate autocomplete="off">
                             <div class="fpms-dialog-body">
                                 <div class="alert alert-warning small">
                                     <i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>

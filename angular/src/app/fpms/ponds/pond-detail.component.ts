@@ -290,7 +290,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
         </section>
 
         <ng-template #formTpl>
-            <form #f="ngForm" (ngSubmit)="save()" novalidate>
+            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="pond" novalidate>
                 <fieldset [disabled]="!canManage">
                     <div class="card">
                         <div class="card-header"><h3 class="card-title"><i class="fas fa-water" aria-hidden="true"></i>Pond master data</h3></div>
@@ -741,7 +741,7 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
     }
 
     async markPrepared(): Promise<void> {
-        if (!(await this.confirm(`Pond ${this.pond.pondCode} will show as Prepared and can be chosen in Stock a batch (Stocking).`, 'Mark Prepared?'))) {
+        if (!(await this.confirm(`Pond ${this.pond.pondCode} will show as Prepared and can be chosen in Stock a batch (Stocking).`, 'Mark Prepared?', { confirmText: 'Mark Prepared' }))) {
             return;
         }
         if (await this.act(() => this.api.post('Pond', 'MarkPrepared', { id: this.pond.id }))) {

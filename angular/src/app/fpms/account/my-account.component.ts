@@ -4,6 +4,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
 import { signOutLocally } from '@shared/fpms/session';
 import { applyTheme, savedTheme, THEME_MODES, ThemeMode } from '@shared/fpms/theme-mode';
 
+import { ReviewMode, saveReviewMode, savedReviewMode } from '@shared/fpms/feedback';
+
 /** Own profile and password, for every signed-in user. */
 @Component({
     standalone: true,
@@ -19,7 +21,7 @@ import { applyTheme, savedTheme, THEME_MODES, ThemeMode } from '@shared/fpms/the
                             @if (!p) {
                                 <fpms-loading></fpms-loading>
                             } @else {
-                                <form #pf="ngForm" (ngSubmit)="saveProfile()" novalidate>
+                                <form #pf="ngForm" (ngSubmit)="saveProfile()" fpmsReview="profile" novalidate>
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="un">Username</label>
@@ -60,6 +62,22 @@ import { applyTheme, savedTheme, THEME_MODES, ThemeMode } from '@shared/fpms/the
                                 <small class="form-text text-muted">Saved on this device only.</small>
                             </div>
                         </div>
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title">Review before saving</h3></div>
+                            <div class="card-body" role="radiogroup" aria-label="Review before saving">
+                                <div class="custom-control custom-radio mb-2">
+                                    <input type="radio" class="custom-control-input" name="review" id="review-all" [checked]="reviewMode === 'all'" (change)="setReviewMode('all')" />
+                                    <label class="custom-control-label" for="review-all">New records and changes</label>
+                                    <small class="form-text text-muted mt-0">Every save shows what will be saved first.</small>
+                                </div>
+                                <div class="custom-control custom-radio mb-2">
+                                    <input type="radio" class="custom-control-input" name="review" id="review-changes" [checked]="reviewMode === 'changes'" (change)="setReviewMode('changes')" />
+                                    <label class="custom-control-label" for="review-changes">Changes only</label>
+                                    <small class="form-text text-muted mt-0">New records save straight away; changes to saved records are still shown first.</small>
+                                </div>
+                                <small class="form-text text-muted">Removals always ask first. Saved on this device only.</small>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="card">
@@ -97,6 +115,14 @@ import { applyTheme, savedTheme, THEME_MODES, ThemeMode } from '@shared/fpms/the
 })
 export class MyAccountComponent extends FpmsPage implements OnInit {
     readonly themeModes = THEME_MODES;
+    reviewMode: ReviewMode = savedReviewMode();
+
+    setReviewMode(mode: ReviewMode): void {
+        this.reviewMode = mode;
+        this.feedback.reviewMode = mode;
+        saveReviewMode(mode);
+        this.notifySaved(mode === 'all' ? 'New records and changes are reviewed before saving.' : 'Only changes are reviewed before saving.');
+    }
     theme: ThemeMode = savedTheme();
     p: any = null;
     pw = { current: '', next: '', confirm: '' };

@@ -12,11 +12,12 @@ import { BRAND } from '@shared/fpms/brand';
 import { ProgressBarComponent } from './layout/progress-bar.component';
 import { SectionTabsComponent } from './layout/section-tabs.component';
 import { LogDrawerComponent } from './layout/log-drawer.component';
+import { ReviewHostComponent, ToastHostComponent } from '@shared/fpms/feedback';
 
 @Component({
     templateUrl: './app.component.html',
     standalone: true,
-    imports: [HeaderComponent, SidebarComponent, RouterOutlet, FooterComponent, HealthBannerComponent, ProgressBarComponent, SectionTabsComponent, LogDrawerComponent],
+    imports: [HeaderComponent, SidebarComponent, RouterOutlet, FooterComponent, HealthBannerComponent, ProgressBarComponent, SectionTabsComponent, LogDrawerComponent, ReviewHostComponent, ToastHostComponent],
 })
 export class AppComponent extends AppComponentBase implements OnInit {
     sidebarExpanded: boolean;

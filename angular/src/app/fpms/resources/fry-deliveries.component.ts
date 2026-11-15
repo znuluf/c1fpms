@@ -56,7 +56,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                     </fpms-empty>
                                 </div>
                             } @else {
-                                <form #f="ngForm" (ngSubmit)="save()" novalidate>
+                                <form #f="ngForm" (ngSubmit)="save()" fpmsReview="delivery" novalidate>
                                     <div class="card-body">
                                         <div class="form-row">
                                             <div class="form-group col-md-4">

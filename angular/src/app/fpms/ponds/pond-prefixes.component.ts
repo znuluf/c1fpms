@@ -16,7 +16,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
             <div class="container-fluid fpms-narrow">
                 @if (adding) {
                     <!-- One form at a time (DEC-96): name, an optional short code, and what the ponds will be called. -->
-                    <form class="card" #af="ngForm" (ngSubmit)="create()" novalidate>
+                    <form class="card" #af="ngForm" (ngSubmit)="create()" fpmsReview="prefix" novalidate>
                         <div class="card-header"><h2 class="card-title">Add a prefix</h2></div>
                         <div class="card-body">
                             <div class="form-row">
@@ -53,7 +53,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             @for (x of sorted(); track x.id; let i = $index; let last = $last) {
                                 <li [class.is-hidden]="!x.isActive">
                                     @if (editingId === x.id) {
-                                        <form class="fpms-prefix-edit" #ef="ngForm" (ngSubmit)="saveEdit(x)" novalidate>
+                                        <form class="fpms-prefix-edit" #ef="ngForm" (ngSubmit)="saveEdit(x)" fpmsReview="prefix" novalidate>
                                             <div class="form-row align-items-end">
                                                 <div class="form-group col-md-6 mb-2">
                                                     <label [for]="'en' + x.id">Name</label>
