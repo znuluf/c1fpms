@@ -26,7 +26,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             <div class="form-group col-md-3">
                                 <label for="farm">Farm</label>
                                 <select id="farm" class="form-control" [(ngModel)]="tenantId">
-                                    <option [ngValue]="null">All (including host)</option>
+                                    <option [ngValue]="null">All, with system</option>
                                     @for (x of farms(); track x.tenantId) {
                                         <option [ngValue]="x.tenantId">{{ x.farmCode }}</option>
                                     }
