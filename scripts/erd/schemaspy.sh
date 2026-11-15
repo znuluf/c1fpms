@@ -112,4 +112,8 @@ docker run --rm \
 [ -f "$OUT/index.html" ] || fail "SchemaSpy finished without writing $OUT/index.html; see its output above."
 echo
 echo "Done: ${OUT#"$ROOT"/}/index.html"
-echo "To browse it in the Codespace: python3 -m http.server 8090 -d ${OUT#"$ROOT"/}  (then open the forwarded port 8090)"
+if python3 -c 'import http.server' >/dev/null 2>&1; then
+  echo "To browse it in the Codespace: python3 -m http.server 8090 -d ${OUT#"$ROOT"/}  (then open the forwarded port 8090)"
+else
+  echo "To browse it in the Codespace: bash scripts/erd/serve.sh ${OUT#"$ROOT"/} 8090  (then open the forwarded port 8090)"
+fi

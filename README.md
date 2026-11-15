@@ -145,6 +145,7 @@ The start script sets these for the Codespace; you normally do not set them your
 - `cd angular && yarn start`: run the client alone.
 - `cd angular && npx ng build --configuration production`: production build of the client.
 - `cd angular && npx eslint . && npx prettier --check .`: lint and format check.
+- `bash scripts/erd/schemaspy.sh`: generate the database ERD; browse it with the command it prints.
 - `scripts/backup/`: backup, restore and restore rehearsal for a farm server (see docs/backup-restore.md and docs/runbook.md). Not used in a Codespace.
 
 ## Current status
