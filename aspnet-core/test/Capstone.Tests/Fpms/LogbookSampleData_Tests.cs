@@ -58,6 +58,8 @@ public class LogbookSampleData_Tests : FpmsTestBase
         batches.ShouldAllBe(b => b.DensityFlag == DensityFlag.Within);
         batches.Count(b => b.Status == BatchStatus.Closed).ShouldBe(3);
         batches.Count(b => b.Status == BatchStatus.Stocked).ShouldBe(3);
+
+        Q(c => c.Users.IgnoreQueryFilters().Where(u => u.TenantId == _farm).Select(u => u.Name).ToList()).OrderBy(n => n).ShouldBe(new[] { "Iba", "Mas", "Mik" });
     }
 
     [Fact]

@@ -14,8 +14,9 @@ export const environment = {
         { group: 'Simple sample (FPMS_Simple)', label: 'Abi (owner)', farmCode: 'rkabubba-aqua', userName: 'arkabubba', password: 'Fpms@2026' },
         { group: 'Simple sample (FPMS_Simple)', label: 'Sam (owner)', farmCode: 'rkabubba-aqua', userName: 'samsedel', password: 'Fpms@2026' },
         { group: 'Simple sample (FPMS_Simple)', label: 'Kim (tech)', farmCode: 'rkabubba-aqua', userName: 'konacsus', password: 'Fpms@2026' },
-        { group: 'Logbook sample (FPMS_Logbook)', label: 'Nena (owner)', farmCode: 'logbook-farm', userName: 'ndalisay', password: 'Fpms@2026' },
-        { group: 'Logbook sample (FPMS_Logbook)', label: 'Jun (tech)', farmCode: 'logbook-farm', userName: 'jmarasigan', password: 'Fpms@2026' },
+        { group: 'Logbook sample (FPMS_Logbook)', label: 'Iba (owner)', farmCode: 'logbook-farm', userName: 'idalisay', password: 'Fpms@2026' },
+        { group: 'Logbook sample (FPMS_Logbook)', label: 'Mas (owner)', farmCode: 'logbook-farm', userName: 'mdalisay', password: 'Fpms@2026' },
+        { group: 'Logbook sample (FPMS_Logbook)', label: 'Mik (tech)', farmCode: 'logbook-farm', userName: 'mmarasigan', password: 'Fpms@2026' },
         { group: 'System Administrator', label: 'Admin', farmCode: '', userName: 'admin', password: 'Fpms@2026' },
     ] as DevAccount[],
 };

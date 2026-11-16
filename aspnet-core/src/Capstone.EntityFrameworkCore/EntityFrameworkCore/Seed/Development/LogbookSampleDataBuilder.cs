@@ -48,7 +48,7 @@ namespace Capstone.EntityFrameworkCore.Seed.Development;
 public class LogbookSampleDataBuilder
 {
     public const string FarmCode = "logbook-farm";
-    public const string OwnerUserName = "ndalisay";
+    public const string OwnerUserName = "idalisay";
 
     private static readonly DateOnly Stocking1 = new(2026, 3, 18);
     private static readonly DateOnly Harvest1 = new(2026, 6, 13); // DOC 87
@@ -102,8 +102,9 @@ public class LogbookSampleDataBuilder
         var farms = new FarmSeedBuilder(_context);
         var pw = SeedOptions.DevelopmentPassword;
         var farm = farms.EnsureFarm(FarmCode, "Dalisay Shrimp Farm (test)", "Purok 5 (test data)", "General Santos City", "South Cotabato", "Tambler");
-        var owner = farms.EnsureUser(farm.Id, OwnerUserName, "Nena", "Dalisay", StaticRoleNames.Tenants.FarmOwner, pw);
-        var tech = farms.EnsureUser(farm.Id, "jmarasigan", "Jun", "Marasigan", StaticRoleNames.Tenants.FarmTechnician, pw);
+        var owner = farms.EnsureUser(farm.Id, OwnerUserName, "Iba", "Dalisay", StaticRoleNames.Tenants.FarmOwner, pw);
+        farms.EnsureUser(farm.Id, "mdalisay", "Mas", "Dalisay", StaticRoleNames.Tenants.FarmOwner, pw);
+        var tech = farms.EnsureUser(farm.Id, "mmarasigan", "Mik", "Marasigan", StaticRoleNames.Tenants.FarmTechnician, pw);
 
         if (_context.Ponds.IgnoreQueryFilters().Any(p => p.TenantId == farm.Id))
         {
@@ -118,7 +119,7 @@ public class LogbookSampleDataBuilder
         var profile = _context.FarmProfiles.IgnoreQueryFilters().First(p => p.Id == _t);
         profile.FarmingSystem = FarmingSystem.Intensive;
         profile.PostalCode = "9500";
-        profile.ContactName = "Nena Dalisay";
+        profile.ContactName = "Iba Dalisay";
         profile.ContactPhone = "0917 000 2222";
         profile.TotalAreaHectares = 0.35m;
         profile.WaterQualityDaily = false; // the farm tests water a few times a week (DEC-94)
