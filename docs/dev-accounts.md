@@ -32,11 +32,11 @@ Started with `SEED_SAMPLE_DATA=logbook bash .devcontainer/start-fpms.sh` (or the
 
 | Farm code | User | Role |
 |---|---|---|
-| `logbook-farm` | `idalisay` (Iba Dalisay) | Farm Owner |
-| `logbook-farm` | `mdalisay` (Mas Dalisay) | Farm Owner |
-| `logbook-farm` | `mmarasigan` (Mik Marasigan) | Farm Technician |
+| `logbook-farm` | `iabi` (Iba Abi) | Farm Owner |
+| `logbook-farm` | `msam` (Mas Sam) | Farm Owner |
+| `logbook-farm` | `mkim` (Mik Kim) | Farm Technician |
 
-Dalisay Shrimp Farm (test), Tambler, General Santos City; Intensive; water tested a few times a week; sold ungraded.
+Abi Aqua Farm (test), Tambler, General Santos City; Intensive; water tested a few times a week; sold ungraded.
 
 | Pond | Construction | Area | Cycle 1 fry counted (bag × bags) | Density |
 |---|---|---|---|---|
