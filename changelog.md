@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added (logbook sample database)
+- **A third development database, `FPMS_Logbook`, built from the partner farm's paper grow-out logbook.** `SEED_SAMPLE_DATA=logbook bash .devcontainer/start-fpms.sh` starts it (migrator `--logbook`, setting `Seed:LogbookSampleData`). Farm `logbook-farm` (`ndalisay` owner, `jmarasigan` technician, password `Fpms@2026`, with sign-in buttons in development): one earthen pond with the logbook's March to June 2026 cycle (fry count, four feedings a day as written, feed sacks, typed ABW, tray remarks, losses, one buyer) and a running cycle logged the same way. Where the logbook is blank or does not add up (pond area, feed after DOC 60, the overwritten harvest figure) the choice is listed in `docs/dev-accounts.md`. Test `LogbookSampleData_Tests`.
+
 ### Changed (system administration, DEC-122; branch `feature/page-structure`)
 - **System health, Reference data, Security logs, Farms and Account recovery fit a 1,000 px screen.** System health opens with its figures and alerts in one band; the backup history and the logs have fewer, merged columns, and filters above the lists.
 - **Account and registration actions ask first.** Unlocking an account or issuing a temporary password shows the account, farm, verification and note before it goes ahead; opening farm registration and deactivating a farm do too. Editing a water-quality parameter is reviewed before saving.

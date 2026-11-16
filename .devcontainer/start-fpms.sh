@@ -35,10 +35,12 @@ fi
 
 # Two separate databases live in the same SQL Server: the development database (FPMS_Simple: the rkabubba-aqua
 # sample farm, the default) and a clean one (FPMS: admin account only). SEED_SAMPLE_DATA=0 (or clean) selects the
-# clean one; switch by running this script again with or without it. Both keep their data in the Docker volume.
+# clean one, and SEED_SAMPLE_DATA=logbook a third (FPMS_Logbook: the logbook-farm sample, one pond run as the partner
+# farm's paper logbook shows it); switch by running this script again with or without it. Both keep their data in the Docker volume.
 case "${SEED_SAMPLE_DATA:-1}" in
-  0|clean|off) DB_NAME="FPMS"; export Seed__SimpleSampleData=false ;;
-  *) DB_NAME="FPMS_Simple"; export Seed__SimpleSampleData=true ;;
+  0|clean|off) DB_NAME="FPMS"; export Seed__SimpleSampleData=false Seed__LogbookSampleData=false ;;
+  logbook) DB_NAME="FPMS_Logbook"; export Seed__SimpleSampleData=false Seed__LogbookSampleData=true ;;
+  *) DB_NAME="FPMS_Simple"; export Seed__SimpleSampleData=true Seed__LogbookSampleData=false ;;
 esac
 
 # Environment variables override appsettings.json for the .NET apps.
@@ -70,8 +72,8 @@ if [ ! -d "$ROOT/aspnet-core/src/Capstone.EntityFrameworkCore/Migrations" ]; the
       /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$SA_PASSWORD" -b -Q "$1")
   }
   for _ in $(seq 1 30); do sqlcmd_q "SELECT 1" >/dev/null 2>&1 && break; sleep 2; done
-  echo "Generated a new Initial migration; dropping the old FPMS and FPMS_Simple databases."
-  for db in FPMS FPMS_Simple; do
+  echo "Generated a new Initial migration; dropping the old FPMS, FPMS_Simple and FPMS_Logbook databases."
+  for db in FPMS FPMS_Simple FPMS_Logbook; do
     sqlcmd_q "IF DB_ID('$db') IS NOT NULL BEGIN ALTER DATABASE [$db] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [$db]; END" \
       >/dev/null || { echo "Could not drop database $db."; exit 1; }
   done

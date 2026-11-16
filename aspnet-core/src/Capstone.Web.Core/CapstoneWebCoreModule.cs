@@ -59,6 +59,8 @@ namespace Capstone
             // The Simple sample farm (FPMS_Simple) is the development data: seeded in the Development environment, or when
             // Seed:SimpleSampleData=true. An explicit Seed:SimpleSampleData=false wins over the environment. Never on the farm server.
             SeedOptions.SeedSimpleSampleData = _appConfiguration.GetValue<bool?>("Seed:SimpleSampleData") ?? _env.IsDevelopment();
+            // The logbook sample farm (FPMS_Logbook) only when Seed:LogbookSampleData=true.
+            SeedOptions.SeedLogbookSampleData = _appConfiguration.GetValue<bool?>("Seed:LogbookSampleData") ?? false;
             SeedOptions.SystemAdminInitialPassword = _appConfiguration["SystemAdmin:InitialPassword"];
         }
 

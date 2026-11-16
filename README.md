@@ -83,22 +83,24 @@ The same script runs locally: when `CODESPACE_NAME` is not set it uses `https://
 (cd angular && yarn install)
 bash .devcontainer/start-fpms.sh                          # FPMS_Simple, the sample farm (default)
 SEED_SAMPLE_DATA=0 bash .devcontainer/start-fpms.sh       # the clean database
+SEED_SAMPLE_DATA=logbook bash .devcontainer/start-fpms.sh # FPMS_Logbook, one pond from the farm's paper logbook
 ```
 Secrets come from the environment (`SQL_SA_PASSWORD`, `ADMIN_INITIAL_PASSWORD`) or are generated into `.devcontainer/local.env`. Opening the folder in a local VS Code Dev Container also works and needs no extra steps.
 
-### Two databases
+### Three databases
 | Database | When | Content |
 | :---- | :---- | :---- |
 | `FPMS_Simple` (default, the development database) | `bash .devcontainer/start-fpms.sh` | The `admin` account plus the small `rkabubba-aqua` farm: one closed and one running intensive cycle (see [docs/dev-accounts.md](docs/dev-accounts.md)). |
+| `FPMS_Logbook` | `SEED_SAMPLE_DATA=logbook bash .devcontainer/start-fpms.sh` | The `admin` account plus the `logbook-farm` farm: one earthen pond with a closed cycle transcribed from the partner farm's paper logbook (March to June 2026) and a running cycle logged the same way (see [docs/dev-accounts.md](docs/dev-accounts.md)). |
 | `FPMS` | `SEED_SAMPLE_DATA=0 bash .devcontainer/start-fpms.sh` | Clean: the `admin` account and reference data only. |
 
-Both live in the same SQL Server volume. Run the script again with or without `SEED_SAMPLE_DATA=0` to switch. Logs: `/tmp/api.log`, `/tmp/angular.log`, `/tmp/migrator.log`.
+All three live in the same SQL Server volume. Run the script again with a different `SEED_SAMPLE_DATA` (or none) to switch. Logs: `/tmp/api.log`, `/tmp/angular.log`, `/tmp/migrator.log`.
 
 If the data model changes after the `Initial` migration was generated, stop the servers, delete `aspnet-core/src/Capstone.EntityFrameworkCore/Migrations`, drop the database (or remove the Docker volume) and run the script again.
 
 ## Environment variables
 The start script sets these for the Codespace; you normally do not set them yourself. They override `appsettings.json` (use `__` as the section separator).
-- `ConnectionStrings__Default`: SQL Server connection string (database `FPMS` or `FPMS_Simple`).
+- `ConnectionStrings__Default`: SQL Server connection string (database `FPMS`, `FPMS_Simple` or `FPMS_Logbook`).
 - `Authentication__JwtBearer__SecurityKey`: JWT signing key (generated into `.devcontainer/local.env`).
 - `App__ServerRootAddress`, `App__ClientRootAddress`, `App__CorsOrigins`: the Codespace API and app URLs.
 - `SystemAdmin__InitialPassword`: first System Administrator password.

@@ -14,6 +14,9 @@ public class Program
     /// <summary>--sample: also seed the Simple sample farm (rkabubba-aqua).</summary>
     public static bool SampleData { get; private set; }
 
+    /// <summary>--logbook: also seed the logbook sample farm (logbook-farm).</summary>
+    public static bool LogbookData { get; private set; }
+
     public static void Main(string[] args)
     {
         ParseArgs(args);
@@ -62,6 +65,9 @@ public class Program
                     break;
                 case "--sample":
                     SampleData = true;
+                    break;
+                case "--logbook":
+                    LogbookData = true;
                     break;
             }
         }

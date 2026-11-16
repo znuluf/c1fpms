@@ -42,6 +42,9 @@ public class CapstoneMigratorModule : AbpModule
             || (bool.TryParse(_appConfiguration["Seed:SimpleSampleData"], out var simpleData)
                 ? simpleData
                 : string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase));
+        // The logbook sample farm (FPMS_Logbook): --logbook or Seed:LogbookSampleData=true.
+        SeedOptions.SeedLogbookSampleData = Program.LogbookData
+            || (bool.TryParse(_appConfiguration["Seed:LogbookSampleData"], out var logbookData) && logbookData);
         SeedOptions.SystemAdminInitialPassword = _appConfiguration["SystemAdmin:InitialPassword"];
         Configuration.ReplaceService(
             typeof(IEventBus),
