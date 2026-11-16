@@ -3127,10 +3127,10 @@ Sentence case for buttons, titles and report names. "Farm Owner" and "Farm Techn
 
 ## Note: logbook sample database (FPMS_Logbook)
 
-Date: 2026-11-16. A third development database, `FPMS_Logbook` (`LogbookSampleDataBuilder`, farm `logbook-farm`), holds one earthen pond run as the partner farm's paper grow-out logbook shows it: the March to June 2026 cycle transcribed (117,810 PL counted against 100,000 on the papers, four feedings a day for DOC 0 to 60 as written, the feed sacks bought, ABW as written in the remarks, tray remarks, the losses on the back page, one buyer) and a running cycle logged the same way. Not a decision; recorded so the sample's contents are known. FPMS_Simple stays the default.
-- **Read, not written:** pond area 1,500 m² (78.5 PL/m², inside the intensive earthen band); feed after DOC 60 continued at 15 kg a feeding until the sacks bought run out (DOC 81); fry mash not listed, so N310 from DOC 0.
+Date: 2026-11-16. A third development database, `FPMS_Logbook` (`LogbookSampleDataBuilder`, farm `logbook-farm`), holds three ponds, one per construction type and named as in FPMS_Simple (EP-01, CP-01, HP-01), run as the partner farm's paper grow-out logbook shows it: in EP-01 the March to June 2026 cycle transcribed (117,810 PL counted against 100,000 on the papers, four feedings a day for DOC 0 to 60 as written, the feed sacks bought, ABW as written in the remarks, tray remarks, the losses on the back page, one buyer), in CP-01 and HP-01 the same scaled to their fry, and a running cycle logged the same way. Not a decision; recorded so the sample's contents are known. FPMS_Simple stays the default.
+- **Read, not written:** EP-01's area 1,500 m² (78.5 PL/m², inside the intensive earthen band; CP-01 and HP-01 take FPMS_Simple's areas at 130 PL/m²); the feed sacks are bought scaled to the three ponds; feed after DOC 60 continued at 15 kg a feeding until the sacks bought run out (DOC 81); fry mash not listed, so N310 from DOC 0.
 - **Does not add up:** "2,827 kg total sold" (the 8 written over another digit) would be about 145,700 shrimp at 19.4 g, more than were stocked. The sample uses 2,027 kg, which fits the fry count, the 87% survival and the 19.4 g on the cover (FCR 1.44, survival 88.7%). To confirm with the farm.
-- **Feed codes by sacks:** drawn in purchase order, the sacks the logbook lists change code at DOC 7, 14, 30, 46 and 58, close to the stages in DEC-61.
+- **Feed codes by sacks:** drawn in purchase order by the logbook pond alone, the sacks the logbook lists change code at DOC 7, 14, 30, 46 and 58, close to the stages in DEC-61.
 
 ---
 

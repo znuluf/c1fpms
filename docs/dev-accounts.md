@@ -28,26 +28,38 @@ Ready to try "Stock a batch": two newer ponds, EP-02 (earthen, 2,000 m²) and HP
 
 ## Logbook sample database (FPMS_Logbook)
 
-Started with `SEED_SAMPLE_DATA=logbook bash .devcontainer/start-fpms.sh` (or the migrator's `--logbook`, or `Seed:LogbookSampleData=true`). One farm and one pond, run the way the partner farm's paper grow-out logbook shows it, so screens can be tried on data shaped like the farm's own. All passwords `Fpms@2026`. Built by `LogbookSampleDataBuilder`.
+Started with `SEED_SAMPLE_DATA=logbook bash .devcontainer/start-fpms.sh` (or the migrator's `--logbook`, or `Seed:LogbookSampleData=true`). Three ponds, one per construction type and named as in the Simple sample, run the way the partner farm's paper grow-out logbook shows it, so screens can be tried on data shaped like the farm's own. All passwords `Fpms@2026`. Built by `LogbookSampleDataBuilder`.
 
 | Farm code | User | Role |
 |---|---|---|
 | `logbook-farm` | `ndalisay` (Nena Dalisay) | Farm Owner |
 | `logbook-farm` | `jmarasigan` (Jun Marasigan) | Farm Technician |
 
-Dalisay Shrimp Farm (test), Tambler, General Santos City; Intensive; water tested a few times a week; sold ungraded. One earthen pond, EP-01, 1,500 m².
+Dalisay Shrimp Farm (test), Tambler, General Santos City; Intensive; water tested a few times a week; sold ungraded.
 
-**Cycle `2026-03-GSH-01`, from the logbook (closed).** Stocked 18 Mar 2026: 100,000 PL on the papers, 117,810 counted (3,570 a bag × 33 bags), 78.5 PL/m². Four feedings a day (6 AM, 10 AM, 2 PM, 6 PM) with the kilograms written in the logbook for DOC 0 to 60 (0.5 kg a feeding at the start, 15 kg by DOC 59; 1,662 kg). Feed drawn from the sacks the logbook lists, in order: N310 2 × 10 kg, N311 5 × 10, N312 20 × 10, N313 25 + 4 × 20, N314 30 + 4 × 20, N315 40 + 17 + 13 × 20 (2,930 kg); the codes then change at DOC 7, 14, 30, 46 and 58. ABW typed as the remarks write it: 3.1 g (DOC 28), 4.1, 6.5, 9.1, 11.7, 14.9 and 17.4 g (DOC 72); survival 87% from the survival net. Feeding-tray remarks on the 6 PM feeding; one water change (DOC 43, "CW"). Losses from the back page: 556 taken out for a DOST test (23 Apr), shrimp jumping out at the dike after disturbances (28, 43, 7) and 35, 39 and 15 collected later; 723 in all. Total harvest 13 Jun 2026 (DOC 87), 2,027 kg at 19.4 g, ungraded, weighed by the buyer and sold to one buyer at the tally sheet's terms (₱210 at 10 g plus ₱5 a gram: ₱257/kg), cash. Feed 2,922 kg, FCR 1.44, survival 88.7%.
+| Pond | Construction | Area | Cycle 1 fry counted (bag × bags) | Density |
+|---|---|---|---|---|
+| EP-01 | Earthen, the logbook's pond | 1,500 m² | 117,810 (3,570 × 33) | 78.5 PL/m² |
+| CP-01 | Concrete | 600 m² | 78,100 (3,550 × 22) | 130 PL/m² |
+| HP-01 | HDPE-lined | 1,000 m² | 129,600 (3,600 × 36) | 130 PL/m² |
+
+**Cycle `2026-03-GSH-01` (closed).** One delivery for the three ponds, stocked 18 Mar 2026: 276,000 PL on the papers, 325,510 counted (EP-01's 100,000 and 117,810 are the logbook's).
+- **EP-01 is the logbook, transcribed.** Four feedings a day (6 AM, 10 AM, 2 PM, 6 PM) with the kilograms written for DOC 0 to 60 (0.5 kg a feeding at the start, 15 kg by DOC 59; 1,662 kg). ABW typed as the remarks write it: 3.1 g (DOC 28), 4.1, 6.5, 9.1, 11.7, 14.9 and 17.4 g (DOC 72); survival 87% from the survival net. Feeding-tray remarks on the 6 PM feeding; one water change (DOC 43, "CW"). Losses from the back page: 556 taken out for a DOST test (23 Apr), shrimp jumping out at the dike after disturbances (28, 43, 7) and 35, 39 and 15 collected later; 723 in all. Harvest 13 Jun (DOC 87): 2,027 kg at 19.4 g; feed 2,922 kg, FCR 1.44, survival 88.7%.
+- **CP-01 and HP-01** follow the logbook's feeding and growth scaled to their fry count, with dead shrimp collected at the drain on the same days. Harvests: CP-01 1,235 kg at 18.6 g (survival 85%), HP-01 2,310 kg at 19.8 g (survival 90%).
+- **Feed** is bought for the farm: the sacks the logbook lists (N310 2 × 10 kg, N311 5 × 10, N312 20 × 10, N313 25 + 4 × 20, N314 30 + 4 × 20, N315 40 + 17 + 13 × 20), scaled to the three ponds' fry, received two days before they are needed and drawn in purchase order by every pond. What is left in opened sacks is written off at close.
+- **Sales:** each harvest is weighed by the one buyer and sold at the tally sheet's terms (₱210 at 10 g plus ₱5 a gram: ₱253, ₱257 and ₱259/kg), cash.
 
 What the logbook does not give, and how the seed settles it:
-- Pond area: not written; 1,500 m² keeps the density inside the intensive earthen band.
-- Feed after DOC 60: blank in the logbook. The arrow is continued at 15 kg a feeding from the sacks bought, which run out at DOC 81 (8 kg left, written off at close); DOC 82 to 86 stay blank.
+- Pond area: not written; 1,500 m² keeps EP-01 inside the intensive earthen band. CP-01 and HP-01 take the Simple sample's areas.
+- Feed after DOC 60: blank in the logbook. The arrow is continued at 15 kg a feeding to DOC 81, when the logbook's sacks run out for EP-01 alone (8 kg left); DOC 82 to 86 stay blank.
 - Harvest: the logbook reads "2,827 kg total sold" with the 8 written over another digit. 2,827 kg at 19.4 g is about 145,700 shrimp, more than the 117,810 counted; 2,027 kg fits the fry count, the 87% survival and the 19.4 g on the cover, so the seed uses it and the harvest's quality note says so. Change `HarvestKg` in the builder if the farm confirms otherwise.
 - Fry mash is not in the logbook's feed list, so the first days draw on N310. Feed costs, certificate numbers and names are test values.
 
-**Cycle `2026-09-GSH-01`, running.** The same pond prepared 8 to 24 Sep and restocked 26 Sep 2026 (119,130 counted against 100,000 on the papers), logged the same way up to the day before the database is seeded: the logbook's feeding table, typed ABW weekly from DOC 28 (survival 85% from the net), tray remarks, one rainy evening Not fed (DOC 33), 31 shrimp jumping out (DOC 41), water tested Monday, Wednesday and Friday at dawn and about a fifth changed every two days from DOC 30. The afternoon feedings of the last day are not entered yet, so Catch up on entry has something to show. Feed is bought two days before each sack is needed, as in cycle 1.
+**Cycle `2026-09-GSH-01`, running.** The three ponds prepared 8 to 24 Sep and restocked 26 Sep 2026 (EP-01 119,130, CP-01 78,760, HP-01 130,320 counted against 276,000 on the papers), logged the same way up to the day before the database is seeded: the logbook's feeding table (scaled per pond), typed ABW weekly from DOC 28 with the survival net, tray remarks, one rainy evening Not fed (DOC 33), 31 shrimp jumping out of EP-01 (DOC 41), water tested Monday, Wednesday and Friday at dawn and about a fifth changed every two days from DOC 30. EP-01's afternoon feedings of the last day are not entered yet, so Catch up on entry has something to show.
 
 No permits are on file, so the dashboard reminds the Owner of the required BFAR certification.
+
+**Same pond names in two farms.** Both samples have ponds EP-01, CP-01 and HP-01. That is fine: every record belongs to one farm (tenant), pond codes and usernames only need to be unique within a farm, and a signed-in user only sees their own farm. `TwoSampleFarms_Tests` seeds both farms into one database and checks this.
 
  (development only)
 
