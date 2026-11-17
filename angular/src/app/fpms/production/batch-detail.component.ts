@@ -4,6 +4,7 @@ import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime } from '@shared/fpms/farm-time';
 import { PagerState } from '@shared/fpms/pager';
 import { logSummary } from '@shared/fpms/log-summary';
+import { joinNames } from '@shared/fpms/labels';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { BatchDailyRecordComponent } from './batch-daily-record.component';
 import { BatchFiguresComponent } from './batch-figures.component';
@@ -62,26 +63,32 @@ interface CalMonth {
                     @if (assigning) {
                         <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-primary mb-0 border-0">
                             <div class="card-header"><h3 class="card-title"><i class="fas fa-user" aria-hidden="true"></i>Who looks after {{ b.pondCode }}</h3></div>
-                            <form #af="ngForm" (ngSubmit)="saveAssign()" fpmsReview="technician" novalidate>
+                            <form #af="ngForm" (ngSubmit)="saveAssign()" fpmsReview="names" novalidate>
                                 <div class="card-body">
                                     @if (!people) {
                                         <fpms-loading></fpms-loading>
                                     } @else {
-                                        <div class="form-group">
-                                            <label for="at">Technician</label>
-                                            <select id="at" name="technician" class="form-control" [(ngModel)]="assigning.technicianUserId" (ngModelChange)="techChanged($event)">
-                                                <option [ngValue]="null">No one named</option>
-                                                @for (p of people; track p.id) { <option [ngValue]="p.id">{{ p.name }} · {{ p.roleName }}</option> }
-                                            </select>
-                                            <small class="form-text text-muted">Their pond opens first for them, and their name shows on the dashboard and Daily log status. Anyone with access can still record for it.</small>
-                                        </div>
+                                        <!-- DEC-127: one or more people, as equals; a tick each. -->
+                                        <fieldset class="form-group" role="group" aria-labelledby="at-l" data-review-list="Looked after by">
+                                            <legend id="at-l" class="col-form-label pt-0 font-weight-bold">Looked after by</legend>
+                                            <div class="fpms-people">
+                                                @for (p of people; track p.id) {
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" [id]="'at' + p.id" [checked]="assigning.technicianUserIds.includes(p.id)" (change)="toggleTech(p.id)"
+                                                            [disabled]="!assigning.technicianUserIds.includes(p.id) && assigning.technicianUserIds.length >= maxTechnicians" />
+                                                        <label class="custom-control-label" [for]="'at' + p.id">{{ p.name }} <span class="text-muted">· {{ p.roleName }}</span></label>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <small class="form-text text-muted">Tick one person, or two who share the pond (up to {{ maxTechnicians }}). It opens first for each of them. Anyone with access can still record for it.</small>
+                                        </fieldset>
                                         <div class="form-row">
                                             <div class="form-group col-sm-7">
                                                 <label for="ac">Cover for days off</label>
-                                                <select id="ac" name="cover" class="form-control" [(ngModel)]="assigning.coverUserId" [disabled]="!assigning.technicianUserId">
+                                                <select id="ac" name="cover" class="form-control" [(ngModel)]="assigning.coverUserId" [disabled]="!assigning.technicianUserIds.length">
                                                     <option [ngValue]="null">No cover</option>
                                                     @for (p of people; track p.id) {
-                                                        @if (p.id !== assigning.technicianUserId) { <option [ngValue]="p.id">{{ p.name }} · {{ p.roleName }}</option> }
+                                                        @if (!assigning.technicianUserIds.includes(p.id)) { <option [ngValue]="p.id">{{ p.name }} · {{ p.roleName }}</option> }
                                                     }
                                                 </select>
                                             </div>
@@ -242,10 +249,10 @@ interface CalMonth {
                                                     @if (b.isMine) { <span class="badge badge-info ml-1">You</span> }
                                                 }
                                             } @else {
-                                                No technician named for this batch yet.
+                                                No one named to look after this batch yet.
                                             }
                                             @if (canManage && !b.isReadOnly) {
-                                                · <button type="button" class="btn btn-link p-0 align-baseline" (click)="startAssign()">{{ b.technicianName ? 'Change' : 'Name a technician' }}</button>
+                                                · <button type="button" class="btn btn-link p-0 align-baseline" (click)="startAssign()">{{ b.technicianName ? 'Change' : 'Name who looks after it' }}</button>
                                             }
                                         </span>
                                     </li>
@@ -724,25 +731,29 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
             : `PCR health check suggested at DOC 30, 45, 60 and 75. Next: DOC ${next}${next - doc > 0 ? `, in ${next - doc} day${next - doc === 1 ? '' : 's'}` : ', now'}.`;
     }
 
-    assigning: { technicianUserId: number | null; coverUserId: number | null; coverUntil: string | null } | null = null;
+    assigning: { technicianUserIds: number[]; coverUserId: number | null; coverUntil: string | null } | null = null;
     people: any[] | null = null;
+    /** The server's PondBatch.MaxTechnicians. */
+    readonly maxTechnicians = 4;
 
     /** The cover is named and today is on or before their last day. */
     coverActive(): boolean {
         return !!this.b?.coverActive;
     }
 
-    /** A cover cannot be the technician, and needs one. */
-    techChanged(id: number | null): void {
-        if (this.assigning && (!id || this.assigning.coverUserId === id)) {
-            this.assigning.coverUserId = null;
-            this.assigning.coverUntil = null;
+    /** Ticks or unticks a person. A cover cannot also be ticked, and needs someone ticked to stand in for. */
+    toggleTech(id: number): void {
+        const a = this.assigning!;
+        a.technicianUserIds = a.technicianUserIds.includes(id) ? a.technicianUserIds.filter((x) => x !== id) : [...a.technicianUserIds, id];
+        if (!a.technicianUserIds.length || (a.coverUserId != null && a.technicianUserIds.includes(a.coverUserId))) {
+            a.coverUserId = null;
+            a.coverUntil = null;
         }
     }
 
     async startAssign(): Promise<void> {
         this.assigning = {
-            technicianUserId: this.b.technicianUserId ?? null,
+            technicianUserIds: [...(this.b.technicianUserIds ?? [])],
             coverUserId: this.coverActive() ? (this.b.coverUserId ?? null) : null,
             coverUntil: this.coverActive() && this.b.coverUntil ? String(this.b.coverUntil).substring(0, 10) : null,
         };
@@ -751,10 +762,11 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
 
     async saveAssign(): Promise<void> {
         const a = this.assigning!;
-        const input = { id: this.b.id, technicianUserId: a.technicianUserId, coverUserId: a.technicianUserId ? a.coverUserId : null, coverUntil: a.coverUserId ? a.coverUntil || null : null };
+        const has = a.technicianUserIds.length > 0;
+        const input = { id: this.b.id, technicianUserIds: a.technicianUserIds, coverUserId: has ? a.coverUserId : null, coverUntil: has && a.coverUserId ? a.coverUntil || null : null };
         if (await this.act(() => this.api.post('Batch', 'SetTechnician', input))) {
-            const name = this.people?.find((p) => p.id === a.technicianUserId)?.name;
-            this.notifySaved(name ? `${name} looks after ${this.b.pondCode}.` : `No technician named for ${this.b.pondCode}.`);
+            const names = joinNames((this.people ?? []).filter((p) => a.technicianUserIds.includes(p.id)).map((p) => p.name));
+            this.notifySaved(names ? `${names} ${a.technicianUserIds.length > 1 ? 'look' : 'looks'} after ${this.b.pondCode}.` : `No one named for ${this.b.pondCode}.`);
             this.assigning = null;
             this.load();
         }

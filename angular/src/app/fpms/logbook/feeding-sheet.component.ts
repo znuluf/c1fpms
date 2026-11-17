@@ -578,7 +578,7 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
         }
         const b = this.batches.find((x) => x.id === batchId);
         const who = b?.lookingAfterName;
-        return b && !b.isMine && who ? `This is ${who}'s pond.` : '';
+        return b && !b.isMine && who ? `${who} ${b.coverActive || (b.technicianNames?.length ?? 1) < 2 ? 'looks' : 'look'} after this pond.` : '';
     }
 
     private existingOf(batchId: string, session: number): any {
@@ -623,6 +623,8 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
             notes: e.notes,
             fedAtTime: e.status === 1 && e.fedAt ? e.fedAt : null,
             clientRequestId: e.clientRequestId,
+            // DEC-127: a feeding the sheet showed as not recorded; if someone saved it meanwhile, the server names them.
+            expectNew: !this.existingOf(batchId, session),
             status: e.status,
             lines: e.status === 2 ? [] : e.lines.map((l) => ({ lotId: l.lotId, kg: Number(l.kg) })),
         }));

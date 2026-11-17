@@ -1,6 +1,6 @@
 import { Component, OnInit, effect, signal, untracked } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
-import { batchShort } from '@shared/fpms/labels';
+import { batchShort, joinNames } from '@shared/fpms/labels';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { BatchDailyRecordComponent } from './batch-daily-record.component';
 import { BatchFiguresComponent } from './batch-figures.component';
@@ -62,10 +62,8 @@ import { BatchFiguresComponent } from './batch-figures.component';
                                     <span>
                                         @if (x.coverActive) {
                                             <strong>{{ x.coverName }}</strong> covers{{ x.coverUntil ? ' until ' + (x.coverUntil | farmDate) : '' }} for {{ x.technicianName }}.
-                                        } @else if (mine()!.length > 1) {
-                                            You look after {{ mine()!.length }} ponds; this is {{ x.pondCode }}.
                                         } @else {
-                                            You look after this batch.
+                                            {{ mine()!.length > 1 ? 'You look after ' + mine()!.length + ' ponds; this is ' + x.pondCode : 'You look after this batch' }}{{ partners(x) ? ', with ' + partners(x) : '' }}.
                                         }
                                         Anyone on the farm can still record for it.
                                     </span>
@@ -115,6 +113,12 @@ export class MyPondComponent extends FpmsPage implements OnInit {
             });
         });
     })();
+
+    /** The others who look after this batch with the signed-in person (DEC-127), as one phrase. */
+    partners(x: any): string {
+        const me = `${this.session.user?.name ?? ''} ${this.session.user?.surname ?? ''}`.trim();
+        return joinNames((x.technicianNames ?? []).filter((n: string) => n !== me));
+    }
 
     ngOnInit(): void {
         void this.init();

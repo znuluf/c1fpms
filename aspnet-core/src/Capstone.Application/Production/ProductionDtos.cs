@@ -228,8 +228,10 @@ public class BatchListDto
     public decimal? FcrToDate { get; set; }
     public decimal? EstimatedSurvivalPct { get; set; }
 
-    /// <summary>Who looks after the batch, and who covers for them until when (DEC-127).</summary>
-    public long? TechnicianUserId { get; set; }
+    /// <summary>Who looks after the batch, as equals, and who covers until when (DEC-127).</summary>
+    public List<long> TechnicianUserIds { get; set; } = new();
+    public List<string> TechnicianNames { get; set; } = new();
+    /// <summary>The names as one phrase: "Tomas Reyes and Jun Cruz".</summary>
     public string TechnicianName { get; set; }
     public long? CoverUserId { get; set; }
     public string CoverName { get; set; }
@@ -237,7 +239,7 @@ public class BatchListDto
 
     /// <summary>The signed-in user looks after this batch today, as its technician or covering (DEC-127).</summary>
     public bool IsMine { get; set; }
-    /// <summary>The cover while covering, else the technician: the name to show as who looks after the batch today.</summary>
+    /// <summary>The cover while covering, else the technicians: the name to show as who looks after the batch today.</summary>
     public string LookingAfterName { get; set; }
     /// <summary>A cover is named and today is on or before their last day.</summary>
     public bool CoverActive { get; set; }
@@ -247,8 +249,8 @@ public class SetBatchTechnicianInput
 {
     public Guid Id { get; set; }
 
-    /// <summary>Null leaves the batch without a technician.</summary>
-    public long? TechnicianUserId { get; set; }
+    /// <summary>Everyone who looks after the batch, as equals; empty leaves it without anyone named.</summary>
+    public List<long> TechnicianUserIds { get; set; } = new();
 
     public long? CoverUserId { get; set; }
     public DateOnly? CoverUntil { get; set; }
@@ -418,8 +420,8 @@ public class BatchStockingInput
     [Range(0, 10000000)]
     public long? DeadAtStocking { get; set; }
 
-    /// <summary>The technician who will look after the batch (DEC-127); optional.</summary>
-    public long? TechnicianUserId { get; set; }
+    /// <summary>Who will look after the batch (DEC-127); optional. A technician who stocks is named whatever this says.</summary>
+    public List<long> TechnicianUserIds { get; set; } = new();
 
     /// <summary>Pre-stocking water quality: DO, temperature, pH and salinity required; others optional.</summary>
     public List<ReadingInput> Readings { get; set; } = new();

@@ -134,7 +134,7 @@ public class CycleAppService : CapstoneAppServiceBase
     {
         var c = await _cycles.GetAll().AsNoTracking().Include(x => x.FryDelivery).ThenInclude(d => d.Hatchery).FirstOrDefaultAsync(x => x.Id == id)
                 ?? throw new UserFriendlyException("Production cycle not found.");
-        var batches = await _batches.GetAll().AsNoTracking().Include(b => b.Pond).Where(b => b.CycleId == id).OrderBy(b => b.Letter).ToListAsync();
+        var batches = await _batches.GetAll().AsNoTracking().Include(b => b.Pond).Include(b => b.Technicians).Where(b => b.CycleId == id).OrderBy(b => b.Letter).ToListAsync();
         var zone = await Farm.GetTimeZoneAsync();
         var today = await Farm.GetTodayAsync();
         var facts = await _loader.LoadAsync(batches.Select(b => b.Id).ToList(), zone);
@@ -422,12 +422,17 @@ public class CycleAppService : CapstoneAppServiceBase
         {
             foreach (var b in input.Batches)
             {
-                b.TechnicianUserId = AbpSession.UserId;
+                b.TechnicianUserIds = AbpSession.UserId.HasValue ? new() { AbpSession.UserId.Value } : new();
             }
         }
 
         // The technician chosen for a pond must be an active account of the farm (DEC-127).
-        var technicianIds = input.Batches.Where(x => x.TechnicianUserId.HasValue).Select(x => x.TechnicianUserId!.Value).Distinct().ToList();
+        if (input.Batches.Any(x => (x.TechnicianUserIds?.Distinct().Count() ?? 0) > PondBatch.MaxTechnicians))
+        {
+            throw new UserFriendlyException($"Name up to {PondBatch.MaxTechnicians} people for one batch.");
+        }
+
+        var technicianIds = input.Batches.SelectMany(x => x.TechnicianUserIds ?? new()).Distinct().ToList();
         if (technicianIds.Count > 0)
         {
             var active = await UserRepository.GetAll().AsNoTracking().Where(u => technicianIds.Contains(u.Id) && u.IsActive).CountAsync();
@@ -450,7 +455,7 @@ public class CycleAppService : CapstoneAppServiceBase
                 PondAreaM2AtStocking = pond.AreaM2, TransportMode = b.TransportMode, TimeProcessedUtc = processedUtc,
                 AcclimationMinutes = b.AcclimationMinutes, InitialSurvivalEstimatePct = b.InitialSurvivalEstimatePct, DeadAtStocking = b.DeadAtStocking,
                 FarmingSystemAtStocking = pond.EffectiveFarmingSystem(profile.FarmingSystem), ConstructionTypeAtStocking = pond.ConstructionType,
-                TechnicianUserId = b.TechnicianUserId,
+                Technicians = (b.TechnicianUserIds ?? new()).Distinct().Select(id => new BatchTechnician { UserId = id }).ToList(),
             };
             var judgement = await _density.JudgeAsync(batch.FarmingSystemAtStocking.Value, pond.ConstructionType, batch.StockingDensityPerM2);
             batch.DensityFlag = judgement.Flag;

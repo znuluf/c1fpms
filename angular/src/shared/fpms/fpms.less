@@ -2902,6 +2902,21 @@ i.wq-key.out {
     background-color: var(--fpms-accent-50);
 }
 
+// ---- People checklist (DEC-127): who looks after a batch, one tick per person; each row is a full touch target.
+.fpms-people {
+    display: grid;
+    gap: 0;
+    .custom-control {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+    }
+    .custom-control-label {
+        font-weight: 400;
+        cursor: pointer;
+    }
+}
+
 // ---- Choices (DEC-114): a radio list where each option is a tile, so the chosen one is marked by its border and tint
 // as well as its radio. Used for the fry delivery in Stock a batch.
 .fpms-choices {

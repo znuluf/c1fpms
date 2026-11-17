@@ -62,7 +62,7 @@ public class BatchAppService : CapstoneAppServiceBase
         CurrentAbwG = b.Status == BatchStatus.Closed ? b.FinalAbwG : ind.CurrentAbwG,
         FcrToDate = b.Status == BatchStatus.Closed ? b.FinalFcr : ind.FcrToDate,
         EstimatedSurvivalPct = b.Status == BatchStatus.Closed ? b.SurvivalRatePct : ind.EstimatedSurvivalPct,
-        TechnicianUserId = b.TechnicianUserId, CoverUserId = b.CoverUserId, CoverUntil = b.CoverUntil,
+        TechnicianUserIds = b.Technicians.Select(t => t.UserId).ToList(), CoverUserId = b.CoverUserId, CoverUntil = b.CoverUntil,
     };
 
     /// <summary>Fills the technician's and the cover's names, and whether the signed-in user looks after each batch today (DEC-127).</summary>
@@ -73,16 +73,18 @@ public class BatchAppService : CapstoneAppServiceBase
             return;
         }
 
-        var names = await GetUserNamesAsync(list.SelectMany(x => new[] { x.TechnicianUserId, x.CoverUserId }));
+        var names = await GetUserNamesAsync(list.SelectMany(x => x.TechnicianUserIds.Select(i => (long?)i).Append(x.CoverUserId)));
         var me = AbpSession.UserId;
         var today = await Farm.GetTodayAsync();
         foreach (var x in list)
         {
-            x.TechnicianName = NameOf(names, x.TechnicianUserId);
+            x.TechnicianNames = x.TechnicianUserIds.Select(i => NameOf(names, i)).Where(n => n != null).OrderBy(n => n).ToList();
+            x.TechnicianName = PeopleText.Join(x.TechnicianNames);
             x.CoverName = NameOf(names, x.CoverUserId);
-            x.CoverActive = x.CoverUserId.HasValue && (!x.CoverUntil.HasValue || today <= x.CoverUntil.Value);
+            var batch = new PondBatch { Technicians = x.TechnicianUserIds.Select(i => new BatchTechnician { UserId = i }).ToList(), CoverUserId = x.CoverUserId, CoverUntil = x.CoverUntil };
+            x.CoverActive = batch.IsCoveredOn(today);
             x.LookingAfterName = x.CoverActive ? x.CoverName : x.TechnicianName;
-            x.IsMine = new PondBatch { TechnicianUserId = x.TechnicianUserId, CoverUserId = x.CoverUserId, CoverUntil = x.CoverUntil }.IsLookedAfterBy(me, today);
+            x.IsMine = batch.IsLookedAfterBy(me, today);
         }
     }
 
@@ -95,7 +97,7 @@ public class BatchAppService : CapstoneAppServiceBase
 
     public virtual async Task<List<BatchListDto>> GetAll(GetBatchesInput input)
     {
-        var batches = await Matching(_batches.GetAll().AsNoTracking().Include(b => b.Pond).Include(b => b.Cycle), input.Search)
+        var batches = await Matching(_batches.GetAll().AsNoTracking().Include(b => b.Pond).Include(b => b.Cycle).Include(b => b.Technicians), input.Search)
             .Where(b => !input.CycleId.HasValue || b.CycleId == input.CycleId)
             .Where(b => !input.PondId.HasValue || b.PondId == input.PondId)
             .Where(b => !input.Status.HasValue || b.Status == input.Status)
@@ -117,7 +119,7 @@ public class BatchAppService : CapstoneAppServiceBase
     /// </summary>
     public virtual async Task<PagedResultDto<BatchListDto>> GetPage(GetBatchPageInput input)
     {
-        var query = Matching(_batches.GetAll().AsNoTracking().Include(b => b.Pond).Include(b => b.Cycle), input.Search)
+        var query = Matching(_batches.GetAll().AsNoTracking().Include(b => b.Pond).Include(b => b.Cycle).Include(b => b.Technicians), input.Search)
             .Where(b => !input.CycleId.HasValue || b.CycleId == input.CycleId)
             .Where(b => !input.PondId.HasValue || b.PondId == input.PondId)
             .Where(b => !input.Status.HasValue || b.Status == input.Status)
@@ -166,7 +168,7 @@ public class BatchAppService : CapstoneAppServiceBase
 
     public virtual async Task<BatchDetailDto> Get(Guid id)
     {
-        var b = await _batches.GetAll().AsNoTracking().Include(x => x.Pond).Include(x => x.Cycle).ThenInclude(c => c.FryDelivery).ThenInclude(d => d.Hatchery)
+        var b = await _batches.GetAll().AsNoTracking().Include(x => x.Technicians).Include(x => x.Pond).Include(x => x.Cycle).ThenInclude(c => c.FryDelivery).ThenInclude(d => d.Hatchery)
                     .FirstOrDefaultAsync(x => x.Id == id) ?? throw new UserFriendlyException("Batch not found.");
         var zone = await Farm.GetTimeZoneAsync();
         var facts = await _loader.LoadAsync(b.Id, zone);
@@ -204,7 +206,7 @@ public class BatchAppService : CapstoneAppServiceBase
             HasRecords = counts.Count > 0 || hasHarvest,
             AllowedLogTypes = Enum.GetValues<LogType>().Where(b.AllowsNewLog).Select(t => t.ToString()).ToList(),
             IsReadOnly = b.Status == BatchStatus.Closed,
-            TechnicianUserId = b.TechnicianUserId, CoverUserId = b.CoverUserId, CoverUntil = b.CoverUntil,
+            TechnicianUserIds = b.Technicians.Select(t => t.UserId).ToList(), CoverUserId = b.CoverUserId, CoverUntil = b.CoverUntil,
         };
         await FillPeopleAsync(new BatchListDto[] { dto });
 
@@ -227,20 +229,26 @@ public class BatchAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.Production_Manage)]
     public virtual async Task SetTechnician(SetBatchTechnicianInput input)
     {
-        var batch = await _batches.FirstOrDefaultAsync(b => b.Id == input.Id) ?? throw new UserFriendlyException("Batch not found.");
+        var batch = await _batches.GetAll().Include(b => b.Technicians).FirstOrDefaultAsync(b => b.Id == input.Id) ?? throw new UserFriendlyException("Batch not found.");
         if (batch.Status == BatchStatus.Closed)
         {
             throw new UserFriendlyException("This batch is closed; reopen it to change who looks after it.");
         }
 
-        if (input.CoverUserId.HasValue && !input.TechnicianUserId.HasValue)
+        var technicians = (input.TechnicianUserIds ?? new()).Distinct().ToList();
+        if (technicians.Count > PondBatch.MaxTechnicians)
         {
-            throw new UserFriendlyException("Choose the technician first; a cover stands in for them.");
+            throw new UserFriendlyException($"Name up to {PondBatch.MaxTechnicians} people for one batch.");
         }
 
-        if (input.CoverUserId.HasValue && input.CoverUserId == input.TechnicianUserId)
+        if (input.CoverUserId.HasValue && technicians.Count == 0)
         {
-            throw new UserFriendlyException("The cover must be someone other than the technician.");
+            throw new UserFriendlyException("Choose who looks after the batch first; a cover stands in for them.");
+        }
+
+        if (input.CoverUserId.HasValue && technicians.Contains(input.CoverUserId.Value))
+        {
+            throw new UserFriendlyException("The cover must be someone who does not already look after the batch.");
         }
 
         var today = await Farm.GetTodayAsync();
@@ -249,14 +257,19 @@ public class BatchAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("The cover's last day cannot be in the past.");
         }
 
-        var ids = new[] { input.TechnicianUserId, input.CoverUserId }.Where(i => i.HasValue).Select(i => i!.Value).ToList();
+        var ids = technicians.Concat(input.CoverUserId.HasValue ? new[] { input.CoverUserId.Value } : Array.Empty<long>()).ToList();
         var active = await UserRepository.GetAll().AsNoTracking().Where(u => ids.Contains(u.Id) && u.IsActive).Select(u => u.Id).ToListAsync();
         if (active.Count != ids.Distinct().Count())
         {
             throw new UserFriendlyException("Choose an active account of this farm.");
         }
 
-        batch.TechnicianUserId = input.TechnicianUserId;
+        batch.Technicians.RemoveAll(t => !technicians.Contains(t.UserId));
+        foreach (var id in technicians.Where(id => batch.Technicians.All(t => t.UserId != id)))
+        {
+            batch.Technicians.Add(new BatchTechnician { BatchId = batch.Id, UserId = id });
+        }
+
         batch.CoverUserId = input.CoverUserId;
         batch.CoverUntil = input.CoverUserId.HasValue ? input.CoverUntil : null;
     }

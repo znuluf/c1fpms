@@ -1,7 +1,9 @@
 using Capstone.Domain;
 using Capstone.Ponds;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Capstone.Production;
@@ -71,17 +73,26 @@ public class PondBatch : FarmEntity
     public DateTime? ClosedAtUtc { get; set; }
     public long? ClosedByUserId { get; set; }
 
-    /// <summary>The technician who looks after this batch (DEC-127). Sets defaults only; nothing is blocked by it.</summary>
-    public long? TechnicianUserId { get; set; }
+    /// <summary>The people who look after this batch, as equals (DEC-127). Sets defaults only; nothing is blocked by it.</summary>
+    public List<BatchTechnician> Technicians { get; set; } = new();
+
+    /// <summary>At most this many people look after one batch.</summary>
+    public const int MaxTechnicians = 4;
 
     /// <summary>Someone covering for the technician (days off), until and including CoverUntil, or open-ended when null (DEC-127).</summary>
     public long? CoverUserId { get; set; }
 
     public DateOnly? CoverUntil { get; set; }
 
-    /// <summary>True when the user is the batch's technician, or is covering for them on the given farm day (DEC-127).</summary>
+    /// <summary>A cover is named and the farm day is on or before their last day.</summary>
+    public bool IsCoveredOn(DateOnly today) => CoverUserId.HasValue && (!CoverUntil.HasValue || today <= CoverUntil.Value);
+
+    /// <summary>
+    /// True when the user is one of the batch's technicians, or is covering on the given farm day (DEC-127).
+    /// Needs <see cref="Technicians"/> loaded.
+    /// </summary>
     public bool IsLookedAfterBy(long? userId, DateOnly today) =>
-        userId.HasValue && (TechnicianUserId == userId || (CoverUserId == userId && (!CoverUntil.HasValue || today <= CoverUntil.Value)));
+        userId.HasValue && (Technicians.Any(t => t.UserId == userId) || (CoverUserId == userId && IsCoveredOn(today)));
 
     [Timestamp]
     public byte[] RowVersion { get; set; }
@@ -122,4 +133,11 @@ public class BatchFailure : FarmEntity
     public DateOnly FailedOn { get; set; }
     public string Reason { get; set; }
     public decimal? EstimatedLossPhp { get; set; }
+}
+
+/// <summary>One person who looks after a batch (DEC-127). Two technicians on one pond are two rows, as equals.</summary>
+public class BatchTechnician : FarmChildEntity
+{
+    public Guid BatchId { get; set; }
+    public long UserId { get; set; }
 }

@@ -386,6 +386,16 @@ public static class FpmsModelConfiguration
             e.HasIndex(x => new { x.TenantId, x.Status });
         });
 
+        // DEC-127: who looks after a batch, one row per person.
+        b.Entity<BatchTechnician>(e =>
+        {
+            e.ToTable("FpmsBatchTechnicians");
+            e.HasOne<PondBatch>().WithMany(x => x.Technicians).HasForeignKey(x => x.BatchId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(x => new { x.BatchId, x.UserId }).IsUnique();
+            e.HasIndex(x => new { x.TenantId, x.UserId });
+        });
+
         b.Entity<PondBatch>(e =>
         {
             e.ToTable("FpmsPondBatches");

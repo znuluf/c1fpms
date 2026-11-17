@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { WizardSteps } from '@shared/fpms/wizard-steps';
+import { joinNames } from '@shared/fpms/labels';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { optimalState } from './water-quality';
 
@@ -13,7 +14,7 @@ interface Allocation {
     transportMode: number;
     timeProcessed: string;
     acclimationMinutes: number | null;
-    technicianUserId: number | null;
+    technicianUserIds: number[];
     initialSurvivalEstimatePct: number | null;
     deadAtStocking: number | null;
     readings: Record<string, number | null>;
@@ -178,14 +179,19 @@ interface Allocation {
                                                 </select>
                                             </div>
                                             @if (people.length) {
-                                                <div class="form-group col-md-6">
-                                                    <label [for]="'tu' + a.pond.id">Looked after by</label>
-                                                    <select [id]="'tu' + a.pond.id" class="form-control" [(ngModel)]="a.technicianUserId">
-                                                        <option [ngValue]="null">No one named</option>
-                                                        @for (p of people; track p.id) { <option [ngValue]="p.id">{{ p.name }} · {{ p.roleName }}</option> }
-                                                    </select>
-                                                    <small class="form-text text-muted">Their pond opens first for them. You can change it, or add a cover, on the batch page.</small>
-                                                </div>
+                                                <fieldset class="form-group col-md-6" role="group" [attr.aria-labelledby]="'tu' + a.pond.id">
+                                                    <legend [id]="'tu' + a.pond.id" class="col-form-label pt-0 font-weight-bold">Looked after by</legend>
+                                                    <div class="fpms-people">
+                                                        @for (p of people; track p.id) {
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input" [id]="'tu' + a.pond.id + '-' + p.id" [checked]="a.technicianUserIds.includes(p.id)" (change)="toggleTech(a, p.id)"
+                                                                    [disabled]="!a.technicianUserIds.includes(p.id) && a.technicianUserIds.length >= 4" />
+                                                                <label class="custom-control-label" [for]="'tu' + a.pond.id + '-' + p.id">{{ p.name }}</label>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                    <small class="form-text text-muted">One person, or two who share the pond. You can change it, or add a cover, on the batch page.</small>
+                                                </fieldset>
                                             } @else if (!can('Farm.Production.Manage')) {
                                                 <div class="form-group col-md-6">
                                                     <span class="d-block font-weight-bold mb-2">Looked after by</span>
@@ -270,7 +276,7 @@ interface Allocation {
                                         <tbody>
                                             @for (a of selected; track a.pond.id) {
                                                 <tr>
-                                                    <td><span class="fpms-pond-tag">{{ a.pond.pondCode }}</span><div class="text-muted text-nowrap">{{ a.stockedAt.replace('T', ' ') }}</div>@if (people.length) { <div class="text-muted">{{ personName(a.technicianUserId) }}</div> } @else if (!can('Farm.Production.Manage')) { <div class="text-muted">Looked after by you</div> }</td>
+                                                    <td><span class="fpms-pond-tag">{{ a.pond.pondCode }}</span><div class="text-muted text-nowrap">{{ a.stockedAt.replace('T', ' ') }}</div>@if (people.length) { <div class="text-muted">{{ peopleNames(a.technicianUserIds) }}</div> } @else if (!can('Farm.Production.Manage')) { <div class="text-muted">Looked after by you</div> }</td>
                                                     <td class="text-right">
                                                         {{ a.plCount | num: 0 }}
                                                         <div class="text-nowrap" [class.text-muted]="densityState(a) === 'within'" [class.text-warning-dark]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle ml-1" aria-hidden="true"></i><span class="sr-only">outside the band</span> }</div>
@@ -458,7 +464,7 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
             transportMode: 1,
             timeProcessed: '',
             acclimationMinutes: null,
-            technicianUserId: null,
+            technicianUserIds: [],
             initialSurvivalEstimatePct: null,
             deadAtStocking: null,
             readings: Object.fromEntries(this.stockingParams.map((p) => [p.code, null])),
@@ -468,14 +474,18 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
         this.people = this.can('Farm.Production.Manage') ? ((await this.run(() => this.api.get<any[]>('Batch', 'GetTechnicianOptions'))) ?? []) : [];
         const techs = this.people.filter((x) => x.isTechnician);
         if (techs.length === 1) {
-            this.allocations.forEach((a) => (a.technicianUserId = techs[0].id));
+            this.allocations.forEach((a) => (a.technicianUserIds = [techs[0].id]));
         }
     }
 
     people: any[] = [];
 
-    personName(id: number | null): string {
-        return this.people.find((x) => x.id === id)?.name ?? 'No one named';
+    peopleNames(ids: number[]): string {
+        return joinNames(this.people.filter((x) => ids.includes(x.id)).map((x) => x.name)) || 'No one named';
+    }
+
+    toggleTech(a: Allocation, id: number): void {
+        a.technicianUserIds = a.technicianUserIds.includes(id) ? a.technicianUserIds.filter((x) => x !== id) : [...a.technicianUserIds, id];
     }
 
     go(step: number): void {
@@ -518,7 +528,7 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
         a.acclimationMinutes = f.acclimationMinutes;
         a.initialSurvivalEstimatePct = f.initialSurvivalEstimatePct;
         a.deadAtStocking = f.deadAtStocking;
-        a.technicianUserId = f.technicianUserId;
+        a.technicianUserIds = [...f.technicianUserIds];
         a.readings = { ...f.readings };
     }
 
@@ -540,7 +550,7 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
                 acclimationMinutes: a.acclimationMinutes,
                 initialSurvivalEstimatePct: a.initialSurvivalEstimatePct,
                 deadAtStocking: a.deadAtStocking,
-                technicianUserId: a.technicianUserId,
+                technicianUserIds: a.technicianUserIds,
                 readings: this.stockingParams.map((p) => ({ parameterCode: p.code, value: a.readings[p.code] })),
             })),
         };

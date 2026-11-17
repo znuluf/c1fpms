@@ -230,9 +230,18 @@ public class FeedingAppService : CapstoneAppServiceBase
         var isUpdate = session != null;
         if (isUpdate)
         {
+            // Two people can look after one pond (DEC-127): a feeding the other already saved is named, never overwritten unseen.
+            var by = NameOf(await GetUserNamesAsync(new long?[] { session.CreatorUserId }), session.CreatorUserId) ?? "someone else";
+            var at = FarmClock.ToLocal(FarmClock.ToUtc(session.CreationTime), zone);
+            var label = $"{FeedingSchedule.Label(input.Session)} of {input.FeedDate:MMM d}";
+            if (input.ExpectNew)
+            {
+                throw new UserFriendlyException($"{label} was already recorded by {(session.CreatorUserId == AbpSession.UserId ? "you" : by)} at {at:h:mm tt}. Reload the sheet to see it, then correct it if needed.");
+            }
+
             if (session.CreatorUserId != AbpSession.UserId && !await IsGrantedAsync(PermissionNames.Logs_EditAny))
             {
-                throw new UserFriendlyException($"{FeedingSchedule.Label(input.Session)} of {input.FeedDate:yyyy-MM-dd} was recorded by someone else. Ask the Owner to correct it.");
+                throw new UserFriendlyException($"{label} was recorded by {by}. Ask them or the Owner to correct it.");
             }
 
             await _inventory.ReverseUsageForSessionAsync(session.Id, DateTime.UtcNow, $"Correction of {FeedingSchedule.Label(input.Session).ToLowerInvariant()} of {input.FeedDate:yyyy-MM-dd}");
@@ -300,7 +309,7 @@ public class FeedingAppService : CapstoneAppServiceBase
 
         var days = Math.Clamp(input.Days, 1, 31);
         var from = to.AddDays(-(days - 1));
-        var batches = await _batches.GetAll().AsNoTracking().Include(b => b.Pond).Include(b => b.Cycle)
+        var batches = await _batches.GetAll().AsNoTracking().Include(b => b.Pond).Include(b => b.Cycle).Include(b => b.Technicians)
             .Where(b => b.Status == BatchStatus.Stocked && (b.StockingDate == null || b.StockingDate <= to))
             .OrderBy(b => b.Pond.PondCode).ThenBy(b => b.BatchCode).ToListAsync();
         var grid = await _daily.LoadAsync(batches, from, to, zone, (await Farm.GetFeedingTimesAsync()).Count, await Farm.GetWaterQualityDailyAsync());
@@ -343,10 +352,11 @@ public class FeedingAppService : CapstoneAppServiceBase
         }
 
         // Who looks after each batch today (DEC-127): the cover while covering, else the technician; the user's own first.
-        var people = await GetUserNamesAsync(batches.SelectMany(b => new[] { b.TechnicianUserId, b.CoverUserId }));
+        var people = await GetUserNamesAsync(batches.SelectMany(b => b.Technicians.Select(t => (long?)t.UserId).Append(b.CoverUserId)));
         var me = AbpSession.UserId;
-        string LookingAfter(PondBatch b) =>
-            b.CoverUserId.HasValue && (!b.CoverUntil.HasValue || today <= b.CoverUntil.Value) ? NameOf(people, b.CoverUserId) : NameOf(people, b.TechnicianUserId);
+        List<string> LookingAfter(PondBatch b) => b.IsCoveredOn(today)
+            ? new List<string> { NameOf(people, b.CoverUserId) }
+            : b.Technicians.Select(t => NameOf(people, t.UserId)).Where(n => n != null).OrderBy(n => n).ToList();
         batches = batches.OrderByDescending(b => b.IsLookedAfterBy(me, today)).ToList();
 
         return new DailyLogStatusDto
@@ -354,7 +364,7 @@ public class FeedingAppService : CapstoneAppServiceBase
             From = from, To = to,
             Rows = batches.Select(b => new DailyLogStatusRowDto
             {
-                TechnicianName = LookingAfter(b), IsMine = b.IsLookedAfterBy(me, today),
+                TechnicianName = PeopleText.Join(LookingAfter(b)), TechnicianNames = LookingAfter(b), IsMine = b.IsLookedAfterBy(me, today),
                 BatchId = b.Id, BatchCode = b.BatchCode, PondId = b.PondId, PondCode = b.Pond?.PondCode, CycleCode = b.Cycle?.CycleCode, StockingDate = b.StockingDate,
                 Days = grid[b.Id].Select(d => new DailyLogCellDto
                 {

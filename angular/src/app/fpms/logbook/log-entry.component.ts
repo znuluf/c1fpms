@@ -624,7 +624,7 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
         }
         const b = this.openBatches.find((x) => x.id === this.form?.batchId);
         const who = b?.lookingAfterName;
-        return b && !b.isMine && who ? `This is ${who}'s pond. You can still record for it.` : '';
+        return b && !b.isMine && who ? `${who} ${b.coverActive || (b.technicianNames?.length ?? 1) < 2 ? 'looks' : 'look'} after this pond. You can still record for it.` : '';
     }
 
     private async initNew(): Promise<void> {

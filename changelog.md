@@ -9,6 +9,7 @@ All notable changes to this project are documented here.
 - **My pond.** A technician's own batch on one page: its figures, who covers, and today's Daily record ready to record.
 - **Your pond first.** The feeding sheet, Record operations and the side drawer start on your pond and mark it "yours". Recording for someone else's pond shows a short note, never a block.
 - **Stock it, look after it.** A technician who stocks a batch is named on it automatically; only the Owner can name someone else.
+- **Two people on one pond.** Tick one or more people on the batch page or when stocking; the pond is "yours" for each of them, and both names show on the dashboard and Daily log status. If both record the same feeding, the second save is refused with who recorded it and when, instead of overwriting it.
 - **More than one pond.** A technician with several ponds gets "Your ponds" on the feeding sheet and one button per pond on My ponds.
 - **Same as the last feeding.** One tap copies the previous feeding's lots and kilos, to adjust before saving.
 - **Names for the Owner.** The dashboard and Daily log status show who looks after each pond; the dashboard can filter by technician.

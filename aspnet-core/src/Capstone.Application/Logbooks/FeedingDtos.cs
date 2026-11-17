@@ -39,6 +39,12 @@ public class SaveFeedingSessionInput
 
     /// <summary>Client-generated id that makes retries duplicate-safe.</summary>
     public Guid ClientRequestId { get; set; }
+
+    /// <summary>
+    /// The sheet showed this feeding as not yet recorded (DEC-127). When someone else has recorded it meanwhile, the save is
+    /// refused with their name instead of correcting their entry unseen. False keeps the older correct-or-create behaviour.
+    /// </summary>
+    public bool ExpectNew { get; set; }
 }
 
 public class FeedingLineDto
@@ -181,6 +187,8 @@ public class DailyLogStatusRowDto
 
     /// <summary>Who looks after the batch today (the cover while covering), and whether that is the signed-in user (DEC-127).</summary>
     public string TechnicianName { get; set; }
+    /// <summary>Each person who looks after the batch today, for a filter by person (DEC-127).</summary>
+    public List<string> TechnicianNames { get; set; } = new();
     public bool IsMine { get; set; }
 }
 

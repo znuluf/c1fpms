@@ -115,11 +115,11 @@ public class V26Production_Tests : FpmsTestBase
 
         LoginAsPilotTechnician();
         var stocking = Stocking("GP-03", 100000);
-        stocking.TechnicianUserId = owner; // ignored: only the Owner names someone else
+        stocking.TechnicianUserIds = new() { owner }; // ignored: only the Owner names someone else
         var created = await Resolve<CycleAppService>().CreateBatches(new CreateBatchesInput { FryDeliveryId = DeliveryId(NewDelivery), Batches = new() { stocking } });
 
         var batch = (await Resolve<BatchAppService>().GetAll(new GetBatchesInput { OpenOnly = true })).Single(b => b.Id == created.Batches.Single().Id);
-        batch.TechnicianUserId.ShouldBe(tech);
+        batch.TechnicianUserIds.ShouldBe(new[] { tech });
         batch.IsMine.ShouldBeTrue();
     }
 

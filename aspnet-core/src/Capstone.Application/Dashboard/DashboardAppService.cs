@@ -257,7 +257,7 @@ public class DashboardAppService : CapstoneAppServiceBase
 
         // Ponds and open batches
         var ponds = await _ponds.GetAll().AsNoTracking().Include(p => p.Prefix).Where(p => p.ManualStatus != PondManualStatus.Inactive && !p.IsArchived).OrderBy(p => p.PondCode).ToListAsync();
-        var open = await _batches.GetAll().AsNoTracking().Where(b => b.Status != BatchStatus.Closed).ToListAsync();
+        var open = await _batches.GetAll().AsNoTracking().Include(b => b.Technicians).Where(b => b.Status != BatchStatus.Closed).ToListAsync();
         var facts = await _loader.LoadAsync(open.Select(b => b.Id).ToList(), zone);
 
         // Water-quality alerts in the last 7 farm days
@@ -324,7 +324,7 @@ public class DashboardAppService : CapstoneAppServiceBase
 
         var stockedIndicators = new List<BatchIndicators>();
         var openRounds = await _rounds.GetAll().AsNoTracking().Where(r => r.UsedAtUtc == null).Select(r => new { r.PondId, r.PreparedAtUtc }).ToListAsync();
-        var people = await GetUserNamesAsync(open.SelectMany(b => new[] { b.TechnicianUserId, b.CoverUserId }));
+        var people = await GetUserNamesAsync(open.SelectMany(b => b.Technicians.Select(t => (long?)t.UserId).Append(b.CoverUserId)));
         var me = AbpSession.UserId;
         foreach (var pond in ponds)
         {
@@ -337,7 +337,8 @@ public class DashboardAppService : CapstoneAppServiceBase
                 BatchId = batch?.Id, BatchCode = batch?.BatchCode, BatchStatus = batch?.Status,
                 HasWaterQualityAlert = batch != null && wq.Any(w => w.BatchId == batch.Id),
                 TechnicianName = batch == null ? null
-                    : batch.CoverUserId.HasValue && (!batch.CoverUntil.HasValue || today <= batch.CoverUntil.Value) ? NameOf(people, batch.CoverUserId) : NameOf(people, batch.TechnicianUserId),
+                    : batch.IsCoveredOn(today) ? NameOf(people, batch.CoverUserId)
+                    : Production.PeopleText.Join(batch.Technicians.Select(t => NameOf(people, t.UserId)).OrderBy(n => n)),
                 IsMine = batch != null && batch.IsLookedAfterBy(me, today),
             };
             if (batch != null && batch.StockingDate.HasValue)

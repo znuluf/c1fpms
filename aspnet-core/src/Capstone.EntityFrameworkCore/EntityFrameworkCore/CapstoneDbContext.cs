@@ -44,6 +44,7 @@ public class CapstoneDbContext : AbpZeroDbContext<Tenant, Role, User, CapstoneDb
     public DbSet<StockMovement> StockMovements { get; set; }
     public DbSet<ProductionCycle> ProductionCycles { get; set; }
     public DbSet<PondBatch> PondBatches { get; set; }
+    public DbSet<BatchTechnician> BatchTechnicians { get; set; }
     public DbSet<ProductionLog> ProductionLogs { get; set; }
     public DbSet<PondPreparationDetail> PondPreparationDetails { get; set; }
     public DbSet<FeedingSession> FeedingSessions { get; set; }

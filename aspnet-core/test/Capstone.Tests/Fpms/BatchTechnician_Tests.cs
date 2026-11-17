@@ -30,7 +30,7 @@ public class BatchTechnician_Tests : FpmsTestBase
     {
         var batchId = BatchId(CurrentBatch);
         var tech = UserId("tech");
-        await Resolve<BatchAppService>().SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserId = tech });
+        await Resolve<BatchAppService>().SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserIds = new() { tech } });
 
         var asOwner = await Resolve<BatchAppService>().Get(batchId);
         asOwner.TechnicianName.ShouldBe("Tomas Technician");
@@ -52,15 +52,64 @@ public class BatchTechnician_Tests : FpmsTestBase
         var batchId = BatchId(CurrentBatch);
         var owner = UserId("owner");
         var tech = UserId("tech");
-        await Resolve<BatchAppService>().SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserId = tech, CoverUserId = owner, CoverUntil = Today });
+        await Resolve<BatchAppService>().SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserIds = new() { tech }, CoverUserId = owner, CoverUntil = Today });
 
         var dto = await Resolve<BatchAppService>().Get(batchId);
         dto.CoverName.ShouldNotBeNull();
         dto.IsMine.ShouldBeTrue(); // the owner is covering today
 
-        var batch = Q(c => c.PondBatches.IgnoreQueryFilters().Single(b => b.Id == batchId));
+        var batch = Q(c => c.PondBatches.IgnoreQueryFilters().Include(b => b.Technicians).Single(b => b.Id == batchId));
         batch.IsLookedAfterBy(owner, Today.AddDays(1)).ShouldBeFalse(); // the cover ends after its last day
         batch.IsLookedAfterBy(tech, Today.AddDays(1)).ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Two_people_look_after_one_pond_as_equals()
+    {
+        var batchId = BatchId(CurrentBatch);
+        var owner = UserId("owner");
+        var tech = UserId("tech");
+        await Resolve<BatchAppService>().SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserIds = new() { tech, owner } });
+
+        var dto = await Resolve<BatchAppService>().Get(batchId);
+        dto.TechnicianUserIds.OrderBy(i => i).ShouldBe(new[] { owner, tech }.OrderBy(i => i));
+        dto.TechnicianNames.Count.ShouldBe(2);
+        dto.TechnicianName.ShouldContain(" and ");
+        dto.IsMine.ShouldBeTrue(); // the owner is one of the two
+
+        LoginAsPilotTechnician();
+        (await Resolve<BatchAppService>().Get(batchId)).IsMine.ShouldBeTrue(); // and so is the technician
+        var row = (await Resolve<FeedingAppService>().GetDailyStatus(new GetDailyLogStatusInput())).Rows.Single(r => r.BatchId == batchId);
+        row.TechnicianNames.Count.ShouldBe(2);
+
+        // Removing one keeps the other.
+        LoginAsPilotOwner();
+        await Resolve<BatchAppService>().SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserIds = new() { tech } });
+        (await Resolve<BatchAppService>().Get(batchId)).TechnicianUserIds.ShouldBe(new[] { tech });
+    }
+
+    [Fact]
+    public async Task A_feeding_the_other_person_saved_meanwhile_is_named_not_overwritten()
+    {
+        var batchId = BatchId(CurrentBatch);
+        SaveFeedingSessionInput Feeding(decimal kg) => new()
+        {
+            BatchId = batchId, FeedDate = Today, Session = 1, ClientRequestId = Guid.NewGuid(), ExpectNew = true,
+            Lines = new() { new() { LotId = LotId(FeedLot), Kg = kg } },
+        };
+
+        LoginAsPilotTechnician();
+        await Resolve<FeedingAppService>().Save(Feeding(5));
+
+        // The Owner's sheet still showed Feeding 1 as not recorded: refused, naming who saved it.
+        LoginAsPilotOwner();
+        var clash = await Should.ThrowAsync<UserFriendlyException>(() => Resolve<FeedingAppService>().Save(Feeding(6)));
+        clash.Message.ShouldContain("already recorded by Tomas Technician");
+
+        // A correction made on purpose (ExpectNew false) still works for the Owner.
+        var fix = Feeding(6);
+        fix.ExpectNew = false;
+        (await Resolve<FeedingAppService>().Save(fix)).Session.Kg.ShouldBe(6);
     }
 
     [Fact]
@@ -71,11 +120,12 @@ public class BatchTechnician_Tests : FpmsTestBase
         var tech = UserId("tech");
 
         await Should.ThrowAsync<UserFriendlyException>(() => service.SetTechnician(new SetBatchTechnicianInput { Id = batchId, CoverUserId = tech }));
-        await Should.ThrowAsync<UserFriendlyException>(() => service.SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserId = tech, CoverUserId = tech }));
-        await Should.ThrowAsync<UserFriendlyException>(() => service.SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserId = tech, CoverUserId = UserId("owner"), CoverUntil = Today.AddDays(-1) }));
-        await Should.ThrowAsync<UserFriendlyException>(() => service.SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserId = 999999 }));
+        await Should.ThrowAsync<UserFriendlyException>(() => service.SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserIds = new() { tech }, CoverUserId = tech }));
+        await Should.ThrowAsync<UserFriendlyException>(() => service.SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserIds = new() { tech }, CoverUserId = UserId("owner"), CoverUntil = Today.AddDays(-1) }));
+        await Should.ThrowAsync<UserFriendlyException>(() => service.SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserIds = new() { 999999 } }));
+        await Should.ThrowAsync<UserFriendlyException>(() => service.SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserIds = new() { 1, 2, 3, 4, 5 } }));
 
         LoginAsPilotTechnician();
-        await Should.ThrowAsync<AbpAuthorizationException>(() => Resolve<BatchAppService>().SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserId = tech }));
+        await Should.ThrowAsync<AbpAuthorizationException>(() => Resolve<BatchAppService>().SetTechnician(new SetBatchTechnicianInput { Id = batchId, TechnicianUserIds = new() { tech } }));
     }
 }

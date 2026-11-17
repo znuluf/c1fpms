@@ -911,7 +911,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-124 | Super-intensive restored (proposed): open band per construction type until the farm sets its own in Farm Standards. Amends DEC-65. |
 | DEC-125 | Daily record actions (proposed): row actions open the existing forms in the drawer; drawer day checklist. |
 | DEC-126 | Daily record View and Edit (proposed): starts in View; Edit shows the row actions. Amends DEC-125. |
-| DEC-127 | Technician per batch (proposed): a named technician and cover per batch, My pond, defaults to one's own pond, Same as last feeding, names for the Owner. A name, never a lock; no tasks (DEC-31). |
+| DEC-127 | Technician per batch (proposed): one or more people (as equals) and a cover per batch, My pond, defaults to one's own pond, Same as last feeding, names for the Owner. A name, never a lock; no tasks (DEC-31). |
 
 # **Appendix B. Manuscript alignment notes**
 

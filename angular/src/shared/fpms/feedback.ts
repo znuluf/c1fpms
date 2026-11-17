@@ -327,7 +327,7 @@ export class ReviewFormDirective implements AfterViewInit, OnDestroy {
             n++;
             // [name]="…" bound in a template goes to NgModel, not the element, so fall back on the id or position.
             const name = el.getAttribute('name') || el.id || (el.matches('input, select, textarea') && el.getAttribute('aria-label') ? `${el.getAttribute('aria-label')}#${n}` : '');
-            if (!name || el.closest('[data-review-skip]') || ['submit', 'button', 'hidden', 'search'].includes((el as HTMLInputElement).type)) {
+            if (!name || el.closest('[data-review-skip], [data-review-list]') || ['submit', 'button', 'hidden', 'search'].includes((el as HTMLInputElement).type)) {
                 continue;
             }
             if ((el as HTMLInputElement).type === 'radio') {
@@ -356,6 +356,16 @@ export class ReviewFormDirective implements AfterViewInit, OnDestroy {
             const chosen = group.querySelector<HTMLElement>('[role=radio][aria-checked=true]');
             out.set('rg:' + label, { label, value: clean(chosen?.getAttribute('aria-label') || chosen?.textContent), typed: false });
             at.set('rg:' + label, group);
+        }
+        // A checklist (who looks after a batch, DEC-127): one row with the ticked choices, not a Yes/No row per box.
+        for (const group of Array.from(form.querySelectorAll<HTMLElement>('[data-review-list]'))) {
+            const label = clean(group.getAttribute('data-review-list'));
+            if (!label || group.closest('[data-review-skip]')) {
+                continue;
+            }
+            const ticked = Array.from(group.querySelectorAll<HTMLInputElement>('input[type=checkbox]:checked')).map((c) => labelOf(c));
+            out.set('list:' + label, { label, value: ticked.join(', ') || 'None', typed: false });
+            at.set('list:' + label, group);
         }
         // In the order the fields appear on screen.
         const keys = [...out.keys()].sort((a, b) => (at.get(a)!.compareDocumentPosition(at.get(b)!) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));

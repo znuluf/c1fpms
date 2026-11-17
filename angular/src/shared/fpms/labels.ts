@@ -166,3 +166,9 @@ export function batchShort(code: string | null | undefined): string {
 export function unbroken(code: string | null | undefined): string {
     return (code ?? '').replace(/-/g, '\u2011');
 }
+
+/** Names as one phrase (DEC-127): "Tomas", "Tomas and Jun", "Tomas, Jun and Ana"; empty for none. */
+export function joinNames(names: string[]): string {
+    const list = names.filter((n) => !!n);
+    return list.length < 2 ? (list[0] ?? '') : `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`;
+}

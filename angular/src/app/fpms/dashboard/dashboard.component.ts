@@ -23,6 +23,8 @@ interface CalendarRow {
     sampleDays: number | null;
     hasAlert: boolean;
     person: string;
+    /** Each person who looks after the pond today (DEC-127), for the Technician filter. */
+    people: string[];
     isMine: boolean;
 }
 
@@ -479,6 +481,7 @@ export class DashboardComponent extends FpmsPage implements OnInit {
                 sampleDays: r.daysSinceGrowthSampling ?? null,
                 hasAlert: !!t?.hasWaterQualityAlert,
                 person: r.technicianName ?? '',
+                people: r.technicianNames ?? (r.technicianName ? [r.technicianName] : []),
                 isMine: !!r.isMine,
             };
         });
@@ -491,8 +494,8 @@ export class DashboardComponent extends FpmsPage implements OnInit {
     cycles = computed(() => [...new Set(this.rows().map((r) => r.cycleCode).filter(Boolean))].sort());
     /** DEC-127: the Owner sees one technician's ponds at a time; '-' is the ponds with no one named. */
     person = signal<string>('');
-    people = computed(() => [...new Set(this.rows().map((r) => r.person).filter(Boolean))].sort());
-    showPeople = computed(() => this.people().length > 1 || (this.people().length > 0 && this.rows().some((r) => !r.person)));
+    people = computed(() => [...new Set(this.rows().flatMap((r) => r.people))].sort());
+    showPeople = computed(() => this.people().length > 1 || (this.people().length > 0 && this.rows().some((r) => !r.people.length)));
 
     visible = computed<CalendarRow[]>(() => {
         const q = this.q().trim().toLowerCase();
@@ -502,7 +505,7 @@ export class DashboardComponent extends FpmsPage implements OnInit {
                 (r) =>
                     (this.group() === 'all' || r.hasAlert) &&
                     (!this.cycle() || r.cycleCode === this.cycle()) &&
-                    (!this.person() || r.person === this.person() || (this.person() === '-' && !r.person)) &&
+                    (!this.person() || r.people.includes(this.person()) || (this.person() === '-' && !r.people.length)) &&
                     (!q || `${r.pondCode} ${r.batchCode} ${r.cycleCode} ${r.person}`.toLowerCase().includes(q))
             )
             .sort((a, b) => {
