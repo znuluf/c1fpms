@@ -11,6 +11,7 @@ namespace Capstone.EntityFrameworkCore.Seed.Host;
 public class DensityBandCreator
 {
     public const string Source = "PNS/BAFS 197:2025 Annex C";
+    public const string NoStandardSource = "No value in PNS/BAFS 197:2025; set the farm's own in Farm Standards";
 
     private readonly CapstoneDbContext _context;
 
@@ -33,18 +34,21 @@ public class DensityBandCreator
             {
                 Add(FarmingSystem.Intensive, construction, 100m, 140m);
             }
+
+            // No national value (DEC-124): an open band, so nothing is judged until the farm sets its own in Farm Standards.
+            Add(FarmingSystem.SuperIntensive, construction, null, null, NoStandardSource);
         }
 
         _context.SaveChanges();
     }
 
-    private void Add(FarmingSystem system, PondConstructionType construction, decimal? min, decimal? max)
+    private void Add(FarmingSystem system, PondConstructionType construction, decimal? min, decimal? max, string source = Source)
     {
         if (_context.DensityBands.Any(b => b.FarmingSystem == system && b.ConstructionType == construction))
         {
             return;
         }
 
-        _context.DensityBands.Add(new DensityBand { FarmingSystem = system, ConstructionType = construction, MinPlM2 = min, MaxPlM2 = max, Source = Source });
+        _context.DensityBands.Add(new DensityBand { FarmingSystem = system, ConstructionType = construction, MinPlM2 = min, MaxPlM2 = max, Source = source });
     }
 }

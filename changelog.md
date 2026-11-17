@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added (super-intensive, DEC-124; branch `feature/page-structure`)
+- **Super-intensive is a farming system again.** The national standard gives it no stocking density band, so Farm standards asks for the farm's own; until it is set, super-intensive stockings are not checked for density.
+
 ### Changed (feeding schedule, DEC-123; branch `feature/page-structure`)
 - **Farm profile: set feeding times with a time picker.** Each feeding has its own row and picker; Add feeding and × change how many there are (1 to 8). The list keeps itself in time order, and a time used twice is flagged before saving.
 

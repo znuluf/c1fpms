@@ -359,7 +359,7 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
 
     bandText(p: any): string {
         if (p.bandMinPlM2 == null && p.bandMaxPlM2 == null) {
-            return 'no band';
+            return 'no band set (Farm standards)';
         }
         return `band ${p.bandMinPlM2 ?? 0}–${p.bandMaxPlM2 ?? '∞'} PL/m² (${p.bandSource ?? 'standard'})`;
     }

@@ -12,7 +12,7 @@ function opts(map: Record<number, string>): Option[] {
 
 export const PondPurposes = { 1: 'Grow-out', 2: 'Nursery', 3: 'Reservoir', 4: 'Treatment' };
 export const ConstructionTypes = { 1: 'Earthen', 2: 'Concrete', 3: 'HDPE-lined' };
-export const FarmingSystems = { 1: 'Extensive', 2: 'Semi-intensive', 3: 'Intensive' };
+export const FarmingSystems = { 1: 'Extensive', 2: 'Semi-intensive', 3: 'Intensive', 4: 'Super-intensive' };
 export const PondManualStatuses = { 1: 'Active', 2: 'Under maintenance', 3: 'Inactive' };
 export const PondDisplayStatuses = { 1: 'Available', 2: 'Under preparation', 7: 'Prepared', 3: 'In production', 4: 'Post-harvest', 5: 'Under maintenance', 6: 'Inactive', 8: 'Archived' };
 export const PondChangeTypes = { 1: 'Created', 2: 'Status change', 3: 'Infrastructure modification', 4: 'Preparation change', 5: 'Archived', 6: 'Restored' };

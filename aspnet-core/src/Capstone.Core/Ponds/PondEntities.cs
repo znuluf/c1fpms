@@ -9,8 +9,11 @@ public enum PondPurpose { GrowOut = 1, Nursery = 2, Reservoir = 3, Treatment = 4
 /// <summary>Pond construction (DEC-65). Value 4 (Other) was removed in v2.6; old rows were reassigned by the Fpms_V26Production migration.</summary>
 public enum PondConstructionType { Earthen = 1, Concrete = 2, HdpeLined = 3 }
 
-/// <summary>Farming system (DEC-65). Value 4 (Super-intensive) was removed in v2.6; old rows became Intensive.</summary>
-public enum FarmingSystem { Extensive = 1, SemiIntensive = 2, Intensive = 3 }
+/// <summary>
+/// Farming system (DEC-65, DEC-124). Super-intensive was removed in v2.6 and is back as 4: PNS/BAFS 197:2025 gives it no
+/// density band, so the farm sets its own in Farm Standards; until then its densities are not judged.
+/// </summary>
+public enum FarmingSystem { Extensive = 1, SemiIntensive = 2, Intensive = 3, SuperIntensive = 4 }
 
 public enum PondManualStatus { Active = 1, UnderMaintenance = 2, Inactive = 3 }
 

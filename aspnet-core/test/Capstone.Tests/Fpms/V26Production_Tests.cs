@@ -287,7 +287,23 @@ public class V26Production_Tests : FpmsTestBase
         (await Judge(FarmingSystem.Intensive, PondConstructionType.HdpeLined, 141m)).ShouldBe(DensityFlag.Above);
         (await Judge(FarmingSystem.SemiIntensive, PondConstructionType.Earthen, 35m)).ShouldBe(DensityFlag.Below); // between bands
         (await Judge(FarmingSystem.Extensive, PondConstructionType.Earthen, 30m)).ShouldBe(DensityFlag.Within);
-        Q(c => c.DensityBands.Count()).ShouldBe(9);
+        Q(c => c.DensityBands.Count()).ShouldBe(12);
+    }
+
+    // ---------------------------------------------------------------- DEC-124 super-intensive, farm-set band
+    [Fact]
+    public async Task Super_intensive_is_not_judged_until_the_farm_sets_its_band()
+    {
+        async Task<DensityFlag?> Judge(decimal value) =>
+            await InUow(async () => (await Resolve<DensityEvaluator>().JudgeAsync(FarmingSystem.SuperIntensive, PondConstructionType.HdpeLined, value)).Flag);
+        (await Judge(400m)).ShouldBe(DensityFlag.Within); // open band: no national value
+
+        await Resolve<FarmStandardsAppService>().SetDensityBand(new SetDensityBandInput
+        {
+            FarmingSystem = FarmingSystem.SuperIntensive, ConstructionType = PondConstructionType.HdpeLined, MinPlM2 = 150m, MaxPlM2 = 300m,
+        });
+        (await Judge(400m)).ShouldBe(DensityFlag.Above);
+        (await Judge(200m)).ShouldBe(DensityFlag.Within);
     }
 
     // ---------------------------------------------------------------- DEC-58 Farm Standards

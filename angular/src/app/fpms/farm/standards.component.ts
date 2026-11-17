@@ -85,7 +85,14 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     </div>
                                                 }
                                             </td>
-                                            <td>{{ b.standardMin ?? '—' }}–{{ b.standardMax ?? '—' }}@if (b.source !== commonSource(x.densityBands)) { <div class="text-muted">{{ b.source }}</div> }</td>
+                                            <td>
+                                                @if (b.standardMin == null && b.standardMax == null) {
+                                                    <span class="text-muted">None in the national standard</span>
+                                                    @if (!b.differs) { <div class="text-warning-dark"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>Set the farm's own; until then densities are not checked.</div> }
+                                                } @else {
+                                                    {{ b.standardMin ?? '—' }}–{{ b.standardMax ?? '—' }}@if (b.source !== commonSource(x.densityBands)) { <div class="text-muted">{{ b.source }}</div> }
+                                                }
+                                            </td>
                                             <td><input type="number" min="0" step="any" class="form-control form-control-sm" [(ngModel)]="bandEdit[bandKey(b)].min" [disabled]="!x.canEdit" aria-label="Farm minimum" [placeholder]="b.standardMin ?? ''" /></td>
                                             <td><input type="number" min="0" step="any" class="form-control form-control-sm" [(ngModel)]="bandEdit[bandKey(b)].max" [disabled]="!x.canEdit" aria-label="Farm maximum" [placeholder]="b.standardMax ?? ''" /></td>
                                             <td class="text-right">

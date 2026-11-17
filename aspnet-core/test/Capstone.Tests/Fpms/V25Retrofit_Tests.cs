@@ -207,6 +207,6 @@ public class V25Retrofit_Tests : FpmsTestBase
     [Fact]
     public void Density_bands_are_seeded_for_every_system_and_construction_type()
     {
-        Q(c => c.DensityBands.Count()).ShouldBe(9); // 3 systems × 3 construction types (DEC-65)
+        Q(c => c.DensityBands.Count()).ShouldBe(12); // 4 systems × 3 construction types (DEC-65, DEC-124)
     }
 }

@@ -101,6 +101,7 @@ public class DensityEvaluator : ITransientDependency
     public static string Label(FarmingSystem s) => s switch
     {
         FarmingSystem.SemiIntensive => "semi-intensive",
+        FarmingSystem.SuperIntensive => "super-intensive",
         _ => s.ToString().ToLowerInvariant(),
     };
 

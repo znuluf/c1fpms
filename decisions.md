@@ -3121,6 +3121,30 @@ Positive:
 - No typing of separators; mistakes are caught before saving.
 ---
 
+## Decision DEC-124: Super-intensive is back, with a band the farm sets
+
+Status: Proposed 2026-11-17; built on `feature/page-structure`
+Date: 2026-11-17
+Amends: DEC-65
+
+### Context
+DEC-65 removed super-intensive because PNS/BAFS 197:2025 gives it no density band. The Owner farms at super-intensive densities and has no published values, but Farm Standards (DEC-58) already lets the Farm Owner set the farm's own band for any farming system and construction type.
+
+### Decision
+- **Farming systems:** Extensive, Semi-intensive, Intensive and Super-intensive (value 4).
+- **Its band:** one row per construction type (earthen, concrete, HDPE-lined) with no minimum and no maximum, and the source "No value in PNS/BAFS 197:2025; set the farm's own in Farm Standards". An open band judges every density as within, so a super-intensive stocking saves without a density warning until the farm sets its own values.
+- **Farm Standards** shows "None in the national standard" for those rows and, until the farm sets values, "Set the farm's own; until then densities are not checked." Once set, the farm's band warns as for any other system.
+- Stock a batch says "no band set (Farm standards)" for such a pond.
+- The rows are added by the host seed at start-up (existing rows are left alone); no schema change, since the system is stored as a number.
+
+### Consequences
+Positive:
+- Super-intensive ponds are named as what they are, and the farm can give them a band.
+
+Negative:
+- Until the Farm Owner sets the band, super-intensive densities are not checked at all.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

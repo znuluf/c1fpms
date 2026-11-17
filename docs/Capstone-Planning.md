@@ -908,6 +908,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-121 | Trace report not-recorded list (proposed): light panel grouped by section, repeats merged, visible buttons. |
 | DEC-122 | System administration pages (proposed): fit 1,000 px; health summary band; account, farm and registration actions reviewed first. |
 | DEC-123 | Feeding schedule picker (proposed): one time picker per feeding, add and remove, kept in order, duplicates blocked; stored value unchanged. |
+| DEC-124 | Super-intensive restored (proposed): open band per construction type until the farm sets its own in Farm Standards. Amends DEC-65. |
 
 # **Appendix B. Manuscript alignment notes**
 
