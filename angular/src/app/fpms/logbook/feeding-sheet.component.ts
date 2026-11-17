@@ -28,6 +28,9 @@ interface Entry {
  * lots, or Not fed. Saving a session that already exists corrects it (stock is reversed and drawn again). Unsaved entries
  * are kept as a per-user draft in the browser.
  */
+
+/** The pond filter's value for every pond the person looks after (DEC-127). */
+const MINE = 'mine';
 @Component({
     standalone: true,
     imports: FPMS_IMPORTS,
@@ -44,6 +47,9 @@ interface Entry {
                             <span>Pond</span>
                             <select class="form-control form-control-sm" [(ngModel)]="batchFilter" (ngModelChange)="load()">
                                 <option [ngValue]="null">All stocked ponds</option>
+                                @if (mineCount() > 1) {
+                                    <option [ngValue]="MINE">Your ponds ({{ mineCount() }})</option>
+                                }
                                 @for (b of batches; track b.id) {
                                     <option [ngValue]="b.id">{{ b.pondCode }} · {{ b.letter ? 'Batch ' + b.letter : b.batchCode }}{{ b.isMine ? ' (yours)' : '' }}</option>
                                 }
@@ -309,6 +315,11 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
     loading = true;
     batches: any[] = [];
     batchFilter: string | null = null;
+    readonly MINE = MINE;
+
+    mineCount(): number {
+        return this.batches.filter((b) => b.isMine).length;
+    }
     feedDate = FarmTime.today();
     focusBatchId: string | null = null;
     /** Shown in the logging wizard, which has already fixed the pond. */
@@ -344,8 +355,8 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
         } else if (!this.focusBatchId) {
             // A technician starts on the pond they look after (DEC-127); "All stocked ponds" is one choice away.
             const mine = this.batches.filter((b) => b.isMine);
-            if (mine.length === 1) {
-                this.batchFilter = mine[0].id;
+            if (mine.length) {
+                this.batchFilter = mine.length === 1 ? mine[0].id : MINE;
             }
         }
         const date = this.query('date');
@@ -371,14 +382,18 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
             return;
         }
         this.loading = true;
-        if (this.batchFilter) {
-            OpsMemory.set({ ...OpsMemory.get(), batchId: this.batchFilter });
+        const one = this.batchFilter && this.batchFilter !== MINE ? this.batchFilter : null;
+        if (one) {
+            OpsMemory.set({ ...OpsMemory.get(), batchId: one });
         }
         const params: any = { feedDate: this.feedDate };
-        if (this.batchFilter) {
-            params.batchId = this.batchFilter;
+        if (one) {
+            params.batchId = one;
         }
-        this.sheet = await this.run(() => this.api.get<any>('Feeding', 'GetSheet', params));
+        const sheet = await this.run(() => this.api.get<any>('Feeding', 'GetSheet', params));
+        // "Your ponds" (DEC-127): the farm's sheet, cut to the ponds this person looks after.
+        const mine = new Set(this.batches.filter((b) => b.isMine).map((b) => b.id));
+        this.sheet = sheet && this.batchFilter === MINE ? { ...sheet, rows: (sheet.rows ?? []).filter((r: any) => mine.has(r.batchId)) } : sheet;
         this.entries = {};
         for (const row of this.sheet?.rows ?? []) {
             for (const s of this.slots(row)) {

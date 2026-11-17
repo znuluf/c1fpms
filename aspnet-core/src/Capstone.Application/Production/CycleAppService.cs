@@ -417,6 +417,15 @@ public class CycleAppService : CapstoneAppServiceBase
 
         var usedLetters = await _batches.GetAll().IgnoreQueryFilters().Where(x => x.CycleId == cycle.Id && x.TenantId == Farm.TenantId).Select(x => x.Letter).ToListAsync();
         var certificates = await _certificates.GetAll().AsNoTracking().Where(c => c.HatcheryId == delivery.HatcheryId).ToListAsync();
+        // A technician who stocks looks after what they stocked; only the Owner names someone else (DEC-127).
+        if (!await IsGrantedAsync(PermissionNames.Production_Manage))
+        {
+            foreach (var b in input.Batches)
+            {
+                b.TechnicianUserId = AbpSession.UserId;
+            }
+        }
+
         // The technician chosen for a pond must be an active account of the farm (DEC-127).
         var technicianIds = input.Batches.Where(x => x.TechnicianUserId.HasValue).Select(x => x.TechnicianUserId!.Value).Distinct().ToList();
         if (technicianIds.Count > 0)

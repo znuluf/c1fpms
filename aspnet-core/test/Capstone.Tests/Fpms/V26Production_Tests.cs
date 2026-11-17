@@ -105,6 +105,24 @@ public class V26Production_Tests : FpmsTestBase
         older.DaysSinceReceived.ShouldBe(6);
     }
 
+    // ---------------------------------------------------------------- DEC-127: a technician who stocks looks after the batch
+    [Fact]
+    public async Task A_technician_who_stocks_is_named_on_the_new_batch_and_cannot_name_someone_else()
+    {
+        var tenantId = GetTenantId(PilotFarm);
+        var owner = Q(c => c.Users.IgnoreQueryFilters().Single(u => u.UserName == "owner" && u.TenantId == tenantId).Id);
+        var tech = Q(c => c.Users.IgnoreQueryFilters().Single(u => u.UserName == "tech" && u.TenantId == tenantId).Id);
+
+        LoginAsPilotTechnician();
+        var stocking = Stocking("GP-03", 100000);
+        stocking.TechnicianUserId = owner; // ignored: only the Owner names someone else
+        var created = await Resolve<CycleAppService>().CreateBatches(new CreateBatchesInput { FryDeliveryId = DeliveryId(NewDelivery), Batches = new() { stocking } });
+
+        var batch = (await Resolve<BatchAppService>().GetAll(new GetBatchesInput { OpenOnly = true })).Single(b => b.Id == created.Batches.Single().Id);
+        batch.TechnicianUserId.ShouldBe(tech);
+        batch.IsMine.ShouldBeTrue();
+    }
+
     [Fact]
     public async Task Finish_stocking_accounts_for_every_pl_and_closes_the_delivery()
     {

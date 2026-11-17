@@ -1016,6 +1016,27 @@ label,
     }
 }
 
+// A chip that is a button: one of a set of toggles (My pond's ponds, DEC-127). Tablet-size target; pressed is filled
+// and also announced by aria-pressed, never by colour alone to assistive tech.
+button.fpms-chip {
+    min-height: 44px;
+    padding: 0 1rem;
+    margin: 0 0.4rem 0.4rem 0;
+    border-color: var(--fpms-line-strong);
+    background: var(--fpms-surface);
+    color: var(--fpms-text);
+    cursor: pointer;
+    &[aria-pressed='true'] {
+        background: var(--fpms-primary);
+        border-color: var(--fpms-primary);
+        color: var(--fpms-surface);
+        font-weight: 600;
+    }
+    &:disabled {
+        cursor: default;
+    }
+}
+
 // ---- Data text outside tables: label/value lists and dated record lists
 .fpms-dl {
     margin-bottom: 0;

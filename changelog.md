@@ -8,6 +8,8 @@ All notable changes to this project are documented here.
 - **Name who looks after each batch.** On the batch page (Looked after by · Change) or when stocking, the Owner names a technician and, for days off, a cover with a last day. It is a name, not a lock: anyone can still record for any pond.
 - **My pond.** A technician's own batch on one page: its figures, who covers, and today's Daily record ready to record.
 - **Your pond first.** The feeding sheet, Record operations and the side drawer start on your pond and mark it "yours". Recording for someone else's pond shows a short note, never a block.
+- **Stock it, look after it.** A technician who stocks a batch is named on it automatically; only the Owner can name someone else.
+- **More than one pond.** A technician with several ponds gets "Your ponds" on the feeding sheet and one button per pond on My ponds.
 - **Same as the last feeding.** One tap copies the previous feeding's lots and kilos, to adjust before saving.
 - **Names for the Owner.** The dashboard and Daily log status show who looks after each pond; the dashboard can filter by technician.
 

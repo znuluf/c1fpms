@@ -629,13 +629,15 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
 
     private async initNew(): Promise<void> {
         const batches = await this.api.get<any[]>('Batch', 'GetAll', { openOnly: true });
-        this.openBatches = batches.sort((x, y) => String(x.pondCode).localeCompare(String(y.pondCode), undefined, { numeric: true }));
+        this.openBatches = batches.sort((x, y) => Number(!!y.isMine) - Number(!!x.isMine) || String(x.pondCode).localeCompare(String(y.pondCode), undefined, { numeric: true }));
 
         const draft = this.query('batchId') ? null : FormDrafts.load<any>(DRAFT);
         const remembered = OpsMemory.get();
         // DEC-127: the pond the person looks after, before the last pond used.
         const mine = this.openBatches.filter((b) => b.isMine);
-        const batchId = this.query('batchId') ?? draft?.data.form.batchId ?? (mine.length === 1 ? mine[0].id : null) ?? remembered.batchId ?? null;
+        // With several ponds of their own, the last one used among them, else the first.
+        const ownPick = mine.find((b) => b.id === remembered.batchId)?.id ?? mine[0]?.id ?? null;
+        const batchId = this.query('batchId') ?? draft?.data.form.batchId ?? ownPick ?? remembered.batchId ?? null;
         const fromBatch = this.openBatches.find((b) => b.id === batchId);
         const type = Number(this.query('logType')) || null;
         const day = this.query('date');

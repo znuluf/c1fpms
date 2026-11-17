@@ -186,6 +186,11 @@ interface Allocation {
                                                     </select>
                                                     <small class="form-text text-muted">Their pond opens first for them. You can change it, or add a cover, on the batch page.</small>
                                                 </div>
+                                            } @else if (!can('Farm.Production.Manage')) {
+                                                <div class="form-group col-md-6">
+                                                    <span class="d-block font-weight-bold mb-2">Looked after by</span>
+                                                    <p class="mb-0"><i class="fas fa-user mr-1" aria-hidden="true"></i>You. The pond is added to My pond; the farm owner can name someone else.</p>
+                                                </div>
                                             }
                                         </div>
                                         <h4 class="fpms-section-h mt-3">Pond water before stocking</h4>
@@ -265,7 +270,7 @@ interface Allocation {
                                         <tbody>
                                             @for (a of selected; track a.pond.id) {
                                                 <tr>
-                                                    <td><span class="fpms-pond-tag">{{ a.pond.pondCode }}</span><div class="text-muted text-nowrap">{{ a.stockedAt.replace('T', ' ') }}</div>@if (people.length) { <div class="text-muted">{{ personName(a.technicianUserId) }}</div> }</td>
+                                                    <td><span class="fpms-pond-tag">{{ a.pond.pondCode }}</span><div class="text-muted text-nowrap">{{ a.stockedAt.replace('T', ' ') }}</div>@if (people.length) { <div class="text-muted">{{ personName(a.technicianUserId) }}</div> } @else if (!can('Farm.Production.Manage')) { <div class="text-muted">Looked after by you</div> }</td>
                                                     <td class="text-right">
                                                         {{ a.plCount | num: 0 }}
                                                         <div class="text-nowrap" [class.text-muted]="densityState(a) === 'within'" [class.text-warning-dark]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle ml-1" aria-hidden="true"></i><span class="sr-only">outside the band</span> }</div>

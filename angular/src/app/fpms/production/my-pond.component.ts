@@ -14,7 +14,7 @@ import { BatchFiguresComponent } from './batch-figures.component';
     imports: [FPMS_IMPORTS, BatchDailyRecordComponent, BatchFiguresComponent],
     template: `
         <fpms-page-header
-            title="My pond"
+            [title]="(mine()?.length ?? 0) > 1 ? 'My ponds' : 'My pond'"
             [subtitle]="b() ? b().pondCode + ' · ' + batchShort(b().batchCode) + ' · cycle ' + b().cycleCode + (b().indicators?.doc != null ? ' · day ' + b().indicators.doc + ' of culture' : '') + '.' : ''">
             @if (b(); as x) {
                 <a class="btn btn-outline-primary" [routerLink]="['/app/production/batches', x.id]"><i class="fas fa-seedling mr-1" aria-hidden="true"></i>Batch page</a>
@@ -42,11 +42,11 @@ import { BatchFiguresComponent } from './batch-figures.component';
                     </fpms-empty>
                 } @else {
                     @if (mine()!.length > 1) {
-                        <div class="btn-group-toggle mb-3" role="group" aria-label="Your ponds">
+                        <div class="fpms-toolbar"><div role="group" aria-label="Your ponds">
                             @for (m of mine(); track m.id) {
-                                <button type="button" class="fpms-chip" [attr.aria-pressed]="m.id === b()?.id" (click)="show(m.id)">{{ m.pondCode }} · {{ batchShort(m.batchCode) }}</button>
+                                <button type="button" class="fpms-chip" [attr.aria-pressed]="m.id === b()?.id" [disabled]="busy()" (click)="pick(m.id)">{{ m.pondCode }} · {{ batchShort(m.batchCode) }}</button>
                             }
-                        </div>
+                        </div></div>
                     }
                     @if (!b()) {
                         <fpms-loading></fpms-loading>
@@ -62,6 +62,8 @@ import { BatchFiguresComponent } from './batch-figures.component';
                                     <span>
                                         @if (x.coverActive) {
                                             <strong>{{ x.coverName }}</strong> covers{{ x.coverUntil ? ' until ' + (x.coverUntil | farmDate) : '' }} for {{ x.technicianName }}.
+                                        } @else if (mine()!.length > 1) {
+                                            You look after {{ mine()!.length }} ponds; this is {{ x.pondCode }}.
                                         } @else {
                                             You look after this batch.
                                         }
@@ -133,6 +135,12 @@ export class MyPondComponent extends FpmsPage implements OnInit {
         if (first) {
             await this.show(first.id);
         }
+    }
+
+    /** Switches pond and keeps it in the address, so a refresh or Back returns to it. */
+    pick(id: string): void {
+        this.router.navigate([], { relativeTo: this.route, queryParams: { batchId: id }, replaceUrl: true });
+        void this.show(id);
     }
 
     async show(id: string): Promise<void> {
