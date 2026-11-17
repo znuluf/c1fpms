@@ -342,11 +342,19 @@ public class FeedingAppService : CapstoneAppServiceBase
             return e == null ? null : FarmClock.DaysBetween(FarmClock.LocalDate(e.Last, zone), today);
         }
 
+        // Who looks after each batch today (DEC-127): the cover while covering, else the technician; the user's own first.
+        var people = await GetUserNamesAsync(batches.SelectMany(b => new[] { b.TechnicianUserId, b.CoverUserId }));
+        var me = AbpSession.UserId;
+        string LookingAfter(PondBatch b) =>
+            b.CoverUserId.HasValue && (!b.CoverUntil.HasValue || today <= b.CoverUntil.Value) ? NameOf(people, b.CoverUserId) : NameOf(people, b.TechnicianUserId);
+        batches = batches.OrderByDescending(b => b.IsLookedAfterBy(me, today)).ToList();
+
         return new DailyLogStatusDto
         {
             From = from, To = to,
             Rows = batches.Select(b => new DailyLogStatusRowDto
             {
+                TechnicianName = LookingAfter(b), IsMine = b.IsLookedAfterBy(me, today),
                 BatchId = b.Id, BatchCode = b.BatchCode, PondId = b.PondId, PondCode = b.Pond?.PondCode, CycleCode = b.Cycle?.CycleCode, StockingDate = b.StockingDate,
                 Days = grid[b.Id].Select(d => new DailyLogCellDto
                 {

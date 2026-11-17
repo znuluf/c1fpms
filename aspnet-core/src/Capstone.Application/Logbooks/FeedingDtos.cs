@@ -178,6 +178,10 @@ public class DailyLogStatusRowDto
     public string WaterAlert { get; set; }
     public DateOnly? WaterAlertDate { get; set; }
     public Guid? WaterAlertLogId { get; set; }
+
+    /// <summary>Who looks after the batch today (the cover while covering), and whether that is the signed-in user (DEC-127).</summary>
+    public string TechnicianName { get; set; }
+    public bool IsMine { get; set; }
 }
 
 public class DailyLogStatusDto

@@ -71,6 +71,18 @@ public class PondBatch : FarmEntity
     public DateTime? ClosedAtUtc { get; set; }
     public long? ClosedByUserId { get; set; }
 
+    /// <summary>The technician who looks after this batch (DEC-127). Sets defaults only; nothing is blocked by it.</summary>
+    public long? TechnicianUserId { get; set; }
+
+    /// <summary>Someone covering for the technician (days off), until and including CoverUntil, or open-ended when null (DEC-127).</summary>
+    public long? CoverUserId { get; set; }
+
+    public DateOnly? CoverUntil { get; set; }
+
+    /// <summary>True when the user is the batch's technician, or is covering for them on the given farm day (DEC-127).</summary>
+    public bool IsLookedAfterBy(long? userId, DateOnly today) =>
+        userId.HasValue && (TechnicianUserId == userId || (CoverUserId == userId && (!CoverUntil.HasValue || today <= CoverUntil.Value)));
+
     [Timestamp]
     public byte[] RowVersion { get; set; }
 

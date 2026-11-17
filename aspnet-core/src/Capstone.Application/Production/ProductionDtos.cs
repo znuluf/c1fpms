@@ -227,6 +227,34 @@ public class BatchListDto
     public decimal? CurrentAbwG { get; set; }
     public decimal? FcrToDate { get; set; }
     public decimal? EstimatedSurvivalPct { get; set; }
+
+    /// <summary>Who looks after the batch, and who covers for them until when (DEC-127).</summary>
+    public long? TechnicianUserId { get; set; }
+    public string TechnicianName { get; set; }
+    public long? CoverUserId { get; set; }
+    public string CoverName { get; set; }
+    public DateOnly? CoverUntil { get; set; }
+
+    /// <summary>The signed-in user looks after this batch today, as its technician or covering (DEC-127).</summary>
+    public bool IsMine { get; set; }
+}
+
+public class SetBatchTechnicianInput
+{
+    public Guid Id { get; set; }
+
+    /// <summary>Null leaves the batch without a technician.</summary>
+    public long? TechnicianUserId { get; set; }
+
+    public long? CoverUserId { get; set; }
+    public DateOnly? CoverUntil { get; set; }
+}
+
+public class TechnicianOptionDto
+{
+    public long Id { get; set; }
+    public string Name { get; set; }
+    public string RoleName { get; set; }
 }
 
 public class BatchDetailDto : BatchListDto
@@ -383,6 +411,9 @@ public class BatchStockingInput
     /// <summary>PL found dead at stocking (DEC-59); shown separately, not deducted.</summary>
     [Range(0, 10000000)]
     public long? DeadAtStocking { get; set; }
+
+    /// <summary>The technician who will look after the batch (DEC-127); optional.</summary>
+    public long? TechnicianUserId { get; set; }
 
     /// <summary>Pre-stocking water quality: DO, temperature, pH and salinity required; others optional.</summary>
     public List<ReadingInput> Readings { get; set; } = new();

@@ -33,6 +33,10 @@ public class PondTileDto
     public decimal? EstimatedSurvivalPct { get; set; }
     public bool HasWaterQualityAlert { get; set; }
 
+    /// <summary>Who looks after the open batch today (the cover while covering), and whether that is the signed-in user (DEC-127).</summary>
+    public string TechnicianName { get; set; }
+    public bool IsMine { get; set; }
+
     /// <summary>Estimated biomass and cumulative feed of the open batch, for the Ponds page cards.</summary>
     public decimal? EstimatedBiomassKg { get; set; }
 
@@ -320,6 +324,8 @@ public class DashboardAppService : CapstoneAppServiceBase
 
         var stockedIndicators = new List<BatchIndicators>();
         var openRounds = await _rounds.GetAll().AsNoTracking().Where(r => r.UsedAtUtc == null).Select(r => new { r.PondId, r.PreparedAtUtc }).ToListAsync();
+        var people = await GetUserNamesAsync(open.SelectMany(b => new[] { b.TechnicianUserId, b.CoverUserId }));
+        var me = AbpSession.UserId;
         foreach (var pond in ponds)
         {
             var batch = open.FirstOrDefault(b => b.PondId == pond.Id);
@@ -330,6 +336,9 @@ public class DashboardAppService : CapstoneAppServiceBase
                 Status = PondAppService.DeriveStatus(pond.ManualStatus, batch?.Status, round != null, round?.PreparedAtUtc != null),
                 BatchId = batch?.Id, BatchCode = batch?.BatchCode, BatchStatus = batch?.Status,
                 HasWaterQualityAlert = batch != null && wq.Any(w => w.BatchId == batch.Id),
+                TechnicianName = batch == null ? null
+                    : batch.CoverUserId.HasValue && (!batch.CoverUntil.HasValue || today <= batch.CoverUntil.Value) ? NameOf(people, batch.CoverUserId) : NameOf(people, batch.TechnicianUserId),
+                IsMine = batch != null && batch.IsLookedAfterBy(me, today),
             };
             if (batch != null && batch.StockingDate.HasValue)
             {

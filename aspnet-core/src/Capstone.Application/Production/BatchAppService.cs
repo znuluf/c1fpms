@@ -32,12 +32,14 @@ public class BatchAppService : CapstoneAppServiceBase
     private readonly IRepository<Sales.SaleLine, Guid> _saleLines;
     private readonly IRepository<Sales.Sale, Guid> _sales;
     private readonly IRepository<Inventory.StockMovement, Guid> _movements;
+    private readonly Authorization.Roles.RoleManager _roleManager;
 
     public BatchAppService(IRepository<PondBatch, Guid> batches, IRepository<BatchFailure, Guid> failures, IRepository<ProductionLog, Guid> logs,
         IRepository<Harvest, Guid> harvests, BatchDataLoader loader, DailyLogStatusService daily, IRepository<ReopenEvent, Guid> reopenings,
         IRepository<ProductionCycle, Guid> cycles, TreatmentWithdrawal withdrawal, IRepository<Sales.SaleLine, Guid> saleLines, IRepository<Sales.Sale, Guid> sales,
-        IRepository<Inventory.StockMovement, Guid> movements)
+        IRepository<Inventory.StockMovement, Guid> movements, Authorization.Roles.RoleManager roleManager)
     {
+        _roleManager = roleManager;
         _movements = movements;
         _saleLines = saleLines;
         _sales = sales;
@@ -60,7 +62,27 @@ public class BatchAppService : CapstoneAppServiceBase
         CurrentAbwG = b.Status == BatchStatus.Closed ? b.FinalAbwG : ind.CurrentAbwG,
         FcrToDate = b.Status == BatchStatus.Closed ? b.FinalFcr : ind.FcrToDate,
         EstimatedSurvivalPct = b.Status == BatchStatus.Closed ? b.SurvivalRatePct : ind.EstimatedSurvivalPct,
+        TechnicianUserId = b.TechnicianUserId, CoverUserId = b.CoverUserId, CoverUntil = b.CoverUntil,
     };
+
+    /// <summary>Fills the technician's and the cover's names, and whether the signed-in user looks after each batch today (DEC-127).</summary>
+    private async Task FillPeopleAsync(IReadOnlyCollection<BatchListDto> list)
+    {
+        if (list.Count == 0)
+        {
+            return;
+        }
+
+        var names = await GetUserNamesAsync(list.SelectMany(x => new[] { x.TechnicianUserId, x.CoverUserId }));
+        var me = AbpSession.UserId;
+        var today = await Farm.GetTodayAsync();
+        foreach (var x in list)
+        {
+            x.TechnicianName = NameOf(names, x.TechnicianUserId);
+            x.CoverName = NameOf(names, x.CoverUserId);
+            x.IsMine = new PondBatch { TechnicianUserId = x.TechnicianUserId, CoverUserId = x.CoverUserId, CoverUntil = x.CoverUntil }.IsLookedAfterBy(me, today);
+        }
+    }
 
     /// <summary>Batches matching a typed search on batch code, pond code or cycle code (blank matches all).</summary>
     private static IQueryable<PondBatch> Matching(IQueryable<PondBatch> query, string search)
@@ -80,7 +102,9 @@ public class BatchAppService : CapstoneAppServiceBase
             .ToListAsync();
         var facts = await _loader.LoadAsync(batches.Select(b => b.Id).ToList(), await Farm.GetTimeZoneAsync());
         var today = await Farm.GetTodayAsync();
-        return batches.Select(b => MapList(b, b.Cycle?.CycleCode, IndicatorCalculator.Compute(facts.TryGetValue(b.Id, out var f) ? f : new BatchFacts(), today))).ToList();
+        var list = batches.Select(b => MapList(b, b.Cycle?.CycleCode, IndicatorCalculator.Compute(facts.TryGetValue(b.Id, out var f) ? f : new BatchFacts(), today))).ToList();
+        await FillPeopleAsync(list);
+        return list;
     }
 
     private static readonly string[] BatchSortKeys = { "default", "batchCode", "pondCode", "cycleCode", "status", "stockingDate", "plCountStocked" };
@@ -112,6 +136,7 @@ public class BatchAppService : CapstoneAppServiceBase
         var facts = await _loader.LoadAsync(batches.Select(b => b.Id).ToList(), await Farm.GetTimeZoneAsync());
         var today = await Farm.GetTodayAsync();
         var items = batches.Select(b => MapList(b, b.Cycle?.CycleCode, IndicatorCalculator.Compute(facts.TryGetValue(b.Id, out var f) ? f : new BatchFacts(), today))).ToList();
+        await FillPeopleAsync(items);
         return new PagedResultDto<BatchListDto>(total, items);
     }
 
@@ -177,7 +202,9 @@ public class BatchAppService : CapstoneAppServiceBase
             HasRecords = counts.Count > 0 || hasHarvest,
             AllowedLogTypes = Enum.GetValues<LogType>().Where(b.AllowsNewLog).Select(t => t.ToString()).ToList(),
             IsReadOnly = b.Status == BatchStatus.Closed,
+            TechnicianUserId = b.TechnicianUserId, CoverUserId = b.CoverUserId, CoverUntil = b.CoverUntil,
         };
+        await FillPeopleAsync(new BatchListDto[] { dto });
 
         dto.CanDeclareFailure = isOwner && b.Status == BatchStatus.Stocked;
         dto.CanClose = isOwner && (b.Status == BatchStatus.Harvested || b.Status == BatchStatus.Failed);
@@ -189,6 +216,65 @@ public class BatchAppService : CapstoneAppServiceBase
         }
 
         return dto;
+    }
+
+    /// <summary>
+    /// Who looks after the batch (DEC-127): its technician, and someone covering until a day, or open-ended. Only sets
+    /// defaults and names; nothing is blocked by it. Owner only. A closed batch keeps the names it had.
+    /// </summary>
+    [AbpAuthorize(PermissionNames.Production_Manage)]
+    public virtual async Task SetTechnician(SetBatchTechnicianInput input)
+    {
+        var batch = await _batches.FirstOrDefaultAsync(b => b.Id == input.Id) ?? throw new UserFriendlyException("Batch not found.");
+        if (batch.Status == BatchStatus.Closed)
+        {
+            throw new UserFriendlyException("This batch is closed; reopen it to change who looks after it.");
+        }
+
+        if (input.CoverUserId.HasValue && !input.TechnicianUserId.HasValue)
+        {
+            throw new UserFriendlyException("Choose the technician first; a cover stands in for them.");
+        }
+
+        if (input.CoverUserId.HasValue && input.CoverUserId == input.TechnicianUserId)
+        {
+            throw new UserFriendlyException("The cover must be someone other than the technician.");
+        }
+
+        var today = await Farm.GetTodayAsync();
+        if (input.CoverUntil.HasValue && input.CoverUntil.Value < today)
+        {
+            throw new UserFriendlyException("The cover's last day cannot be in the past.");
+        }
+
+        var ids = new[] { input.TechnicianUserId, input.CoverUserId }.Where(i => i.HasValue).Select(i => i!.Value).ToList();
+        var active = await UserRepository.GetAll().AsNoTracking().Where(u => ids.Contains(u.Id) && u.IsActive).Select(u => u.Id).ToListAsync();
+        if (active.Count != ids.Distinct().Count())
+        {
+            throw new UserFriendlyException("Choose an active account of this farm.");
+        }
+
+        batch.TechnicianUserId = input.TechnicianUserId;
+        batch.CoverUserId = input.CoverUserId;
+        batch.CoverUntil = input.CoverUserId.HasValue ? input.CoverUntil : null;
+    }
+
+    /// <summary>The farm's active accounts that can look after a batch (DEC-127), Technicians first.</summary>
+    [AbpAuthorize(PermissionNames.Production_Manage)]
+    public virtual async Task<List<TechnicianOptionDto>> GetTechnicianOptions()
+    {
+        var users = await UserRepository.GetAll().AsNoTracking().Include(u => u.Roles).Where(u => u.IsActive).ToListAsync();
+        var roles = await _roleManager.Roles.AsNoTracking().ToDictionaryAsync(r => r.Id, r => r.Name);
+        return users
+            .Select(u => new TechnicianOptionDto
+            {
+                Id = u.Id,
+                Name = $"{u.Name} {u.Surname}".Trim(),
+                RoleName = u.Roles.Select(r => roles.TryGetValue(r.RoleId, out var n) ? n : null).FirstOrDefault(n => n != null),
+            })
+            .OrderBy(o => o.RoleName == Authorization.Roles.StaticRoleNames.Tenants.FarmOwner)
+            .ThenBy(o => o.Name)
+            .ToList();
     }
 
     private async Task<string> ReopenBlockedReasonAsync(PondBatch b)

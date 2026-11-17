@@ -417,6 +417,17 @@ public class CycleAppService : CapstoneAppServiceBase
 
         var usedLetters = await _batches.GetAll().IgnoreQueryFilters().Where(x => x.CycleId == cycle.Id && x.TenantId == Farm.TenantId).Select(x => x.Letter).ToListAsync();
         var certificates = await _certificates.GetAll().AsNoTracking().Where(c => c.HatcheryId == delivery.HatcheryId).ToListAsync();
+        // The technician chosen for a pond must be an active account of the farm (DEC-127).
+        var technicianIds = input.Batches.Where(x => x.TechnicianUserId.HasValue).Select(x => x.TechnicianUserId!.Value).Distinct().ToList();
+        if (technicianIds.Count > 0)
+        {
+            var active = await UserRepository.GetAll().AsNoTracking().Where(u => technicianIds.Contains(u.Id) && u.IsActive).CountAsync();
+            if (active != technicianIds.Count)
+            {
+                throw new UserFriendlyException("Choose an active account of this farm as the technician.");
+            }
+        }
+
         for (var i = 0; i < plans.Count; i++)
         {
             var (b, pond, round, stockedAtUtc, processedUtc, readings) = plans[i];
@@ -430,6 +441,7 @@ public class CycleAppService : CapstoneAppServiceBase
                 PondAreaM2AtStocking = pond.AreaM2, TransportMode = b.TransportMode, TimeProcessedUtc = processedUtc,
                 AcclimationMinutes = b.AcclimationMinutes, InitialSurvivalEstimatePct = b.InitialSurvivalEstimatePct, DeadAtStocking = b.DeadAtStocking,
                 FarmingSystemAtStocking = pond.EffectiveFarmingSystem(profile.FarmingSystem), ConstructionTypeAtStocking = pond.ConstructionType,
+                TechnicianUserId = b.TechnicianUserId,
             };
             var judgement = await _density.JudgeAsync(batch.FarmingSystemAtStocking.Value, pond.ConstructionType, batch.StockingDensityPerM2);
             batch.DensityFlag = judgement.Flag;
