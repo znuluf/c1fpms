@@ -422,7 +422,17 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
                 throw new UserFriendlyException("Enter the PL counted at the farm.");
             }
 
-            receivedAtUtc = input.ReceivedAt.HasValue ? FarmClock.ToUtc(input.ReceivedAt.Value) : DateTime.UtcNow;
+            // Without an arrival time (an entry copied from a paper sheet), the delivery date stands: now if it is today,
+            // else the start of that day.
+            var today = await Farm.GetTodayAsync();
+            if (!input.ReceivedAt.HasValue && input.DeliveryDate > today)
+            {
+                throw new UserFriendlyException("The fry have arrived, so the delivery date cannot be in the future.");
+            }
+
+            receivedAtUtc = input.ReceivedAt.HasValue ? FarmClock.ToUtc(input.ReceivedAt.Value)
+                : input.DeliveryDate == today || input.DeliveryDate == default ? DateTime.UtcNow
+                : FarmClock.StartOfDayUtc(input.DeliveryDate, zone);
             if (receivedAtUtc > DateTime.UtcNow.AddMinutes(5))
             {
                 throw new UserFriendlyException("The time the fry arrived cannot be in the future.");

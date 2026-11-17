@@ -399,7 +399,7 @@ public class V26Production_Tests : FpmsTestBase
         await Should.ThrowAsync<UserFriendlyException>(() => standards.SetThreshold(new SetThresholdInput { Code = FarmThresholds.FeedSpikeMultiplier, Value = 50 }));
         var warn = await Resolve<FryDeliveryAppService>().Create(new FryDeliveryEditDto
         {
-            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "HL-AGE", DeliveryDate = Today, PlAgeDays = 18, PlReceived = 1000,
+            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "HL-AGE", DeliveryDate = Today, PlAgeDays = 18, PlOrdered = 1000,
         });
         warn.Warnings.ShouldContain(w => w.Kind == "PlAge" && w.Message.Contains("PL10–PL15"));
 
