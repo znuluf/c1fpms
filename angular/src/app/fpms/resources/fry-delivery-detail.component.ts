@@ -22,7 +22,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <!-- Summary band (DEC-99, DEC-111): where the delivery's PL went, then where it stands. -->
                     <section class="fpms-summary" aria-label="Summary">
                         <dl class="fpms-figures">
-                            <div class="fpms-figure"><dt class="l">PL counted</dt><dd class="v">{{ d.plReceived | num: 0 }}</dd><dd class="s">{{ d.plOrdered ? extraText(d) : 'No count from the papers' }}</dd></div>
+                            <div class="fpms-figure"><dt class="l">PL counted</dt><dd class="v">{{ d.plReceived | num: 0 }}</dd><dd class="s">{{ d.plOrdered ? extraText(d) : 'No PO count recorded' }}</dd></div>
                             <div class="fpms-figure"><dt class="l">Stocked</dt><dd class="v">{{ d.plStocked | num: 0 }}</dd></div>
                             <div class="fpms-figure"><dt class="l">{{ d.isStockingFinished ? 'Not stocked' : 'Left to stock' }}</dt><dd class="v">{{ (d.isStockingFinished ? d.plNotStocked : d.plLeft) | num: 0 }}</dd></div>
                             <div class="fpms-figure"><dt class="l">PL age</dt><dd class="v">{{ d.plAgeDays != null ? 'PL' + d.plAgeDays : '—' }}</dd></div>
@@ -56,21 +56,21 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <div class="card">
                                         <div class="card-header"><h3 class="card-title">Delivery</h3></div>
                                         <div class="card-body">
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
+                                                                                        <div class="form-row">
+                                                <div class="form-group col-md-4">
                                                     <label for="bn">Hatchery batch number <span class="text-danger">*</span></label>
                                                     <input id="bn" class="form-control" name="hatcheryBatchNumber" [(ngModel)]="m.hatcheryBatchNumber" required maxlength="100" />
                                                 </div>
-                                                <div class="form-group col-md-6">
+                                                <div class="form-group col-md-4">
                                                     <label for="dd">Delivery date <span class="text-danger">*</span></label>
                                                     <input id="dd" type="date" class="form-control" name="deliveryDate" [(ngModel)]="m.deliveryDate" required />
                                                 </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="cost">Cost (₱)</label>
+                                                    <input id="cost" type="number" min="0" step="0.01" class="form-control" name="costPhp" [(ngModel)]="m.costPhp" />
+                                                </div>
                                             </div>
                                             <div class="form-row">
-                                                <div class="form-group col-md-4">
-                                                    <label for="age">PL age (days)</label>
-                                                    <input id="age" type="number" min="1" max="60" class="form-control" name="plAgeDays" [(ngModel)]="m.plAgeDays" />
-                                                </div>
                                                 <div class="form-group col-md-4">
                                                     <label for="pl">PL counted at the farm <span class="text-danger">*</span></label>
                                                     <input id="pl" type="number" min="1" max="10000000" class="form-control" name="plReceived" [(ngModel)]="m.plReceived" required />
@@ -79,15 +79,15 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     }
                                                 </div>
                                                 <div class="form-group col-md-4">
-                                                    <label for="plo">PL on the hatchery's papers <span class="text-muted font-weight-normal">(optional)</span></label>
+                                                    <label for="plo">PL ordered (PO)</label>
                                                     <input id="plo" type="number" min="1" max="10000000" class="form-control" name="plOrdered" [(ngModel)]="m.plOrdered" />
                                                     @if (m.plOrdered > 0 && m.plReceived > 0) {
                                                         <small class="form-text text-muted">{{ extraText(m) }}</small>
                                                     }
                                                 </div>
                                                 <div class="form-group col-md-4">
-                                                    <label for="cost">Cost (₱)</label>
-                                                    <input id="cost" type="number" min="0" step="0.01" class="form-control" name="costPhp" [(ngModel)]="m.costPhp" />
+                                                    <label for="age">PL age (days)</label>
+                                                    <input id="age" type="number" min="1" max="60" class="form-control" name="plAgeDays" [(ngModel)]="m.plAgeDays" />
                                                 </div>
                                             </div>
                                             <div class="form-row">
@@ -106,23 +106,26 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                             </div>
                                             <!-- DEC-128: one trip for the whole delivery, so asked here once; both optional. -->
                                             <div class="form-row">
-                                                <div class="form-group col-md-6">
+                                                <div class="form-group col-md-4">
                                                     <label for="trm">How the fry travelled</label>
                                                     <select id="trm" class="form-control" name="transportMode" [(ngModel)]="m.transportMode">
                                                         <option [ngValue]="null">Not recorded</option>
                                                         @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
                                                     </select>
                                                 </div>
-                                                <div class="form-group col-md-6">
+                                                <div class="form-group col-md-4">
                                                     <label for="tpk">Time packed at the hatchery</label>
                                                     <input id="tpk" type="datetime-local" class="form-control" name="timePacked" [(ngModel)]="m.timePacked" [max]="m.deliveryDate ? m.deliveryDate + 'T23:59' : ''" />
                                                     <small class="form-text text-muted">Optional. Stocking more than 24 hours after packing is flagged.</small>
                                                 </div>
                                             </div>
-                                            <div class="form-group mb-0">
-                                                <label for="n">Notes</label>
-                                                <input id="n" class="form-control" name="notes" [(ngModel)]="m.notes" maxlength="500" />
+                                            <div class="form-row">
+                                                <div class="form-group col-md-12">
+                                                    <label for="n">Notes</label>
+                                                    <input id="n" class="form-control" name="notes" [(ngModel)]="m.notes" maxlength="500" />
+                                                </div>
                                             </div>
+
                                         </div>
                                         @if (d.canEdit) {
                                             <div class="card-footer">
@@ -277,10 +280,10 @@ export class FryDeliveryDetailComponent extends FpmsPage implements OnInit {
     extraText(x: any): string {
         const diff = Number(x.plReceived) - Number(x.plOrdered);
         if (!diff) {
-            return 'Same as the papers.';
+            return 'Same as ordered.';
         }
         const pct = Math.round((Math.abs(diff) / Number(x.plOrdered)) * 1000) / 10;
-        return `${Math.abs(diff).toLocaleString('en-US')} ${diff > 0 ? 'more' : 'fewer'} than the papers (${diff > 0 ? '+' : '−'}${pct}%).`;
+        return `${Math.abs(diff).toLocaleString('en-US')} ${diff > 0 ? 'more' : 'fewer'} than ordered (${diff > 0 ? '+' : '−'}${pct}%).`;
     }
 
     async save(): Promise<void> {

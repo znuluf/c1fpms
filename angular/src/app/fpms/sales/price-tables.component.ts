@@ -36,8 +36,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     </select>
                                     <small class="form-text text-muted">A buyer's own table is suggested on their next sale.</small>
                                 </div>
-                                <div class="form-group col-md-2 d-flex align-items-center">
-                                    <div class="custom-control custom-checkbox mt-3">
+                                <div class="form-group col-md-2 fpms-check-cell">
+                                    <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input" id="ta" name="isActive" [(ngModel)]="editing.isActive" />
                                         <label class="custom-control-label" for="ta">Active</label>
                                     </div>

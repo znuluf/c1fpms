@@ -68,8 +68,8 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                                 <input id="he" type="date" class="form-control" name="expiryDate" [(ngModel)]="cert.expiryDate" />
                                             </div>
                                         }
-                                        <div class="form-group col-md-4 d-flex align-items-end">
-                                            <div class="custom-control custom-checkbox mb-2">
+                                        <div class="form-group col-md-4 fpms-check-cell">
+                                            <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="act" name="isActive" [(ngModel)]="form.isActive" />
                                                 <label class="custom-control-label" for="act">Active</label>
                                             </div>

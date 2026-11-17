@@ -150,7 +150,7 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                                                 <small class="form-text text-muted">Every pond uses this unless the pond sets its own.</small>
                                             </div>
                                             <div class="form-group col-lg-7">
-                                                <span class="d-block font-weight-bold mb-1" id="ftimes-l">Feeding schedule</span>
+                                                <span class="fpms-group-label" id="ftimes-l">Feeding schedule</span>
                                                 <!-- One time picker per feeding instead of typed text (DEC-123). -->
                                                 <fpms-time-list name="feedingTimes" [(ngModel)]="p.feedingTimes"></fpms-time-list>
                                                 <small class="form-text text-muted">One feeding a day per time, 1 to 8. The feeding sheet shows them in this order.</small>
@@ -210,7 +210,7 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                                                                     </select>
                                                                 </div>
                                                                 <div class="form-group col-md-4">
-                                                                    <label for="city">City / Municipality <span class="text-danger">*</span></label>
+                                                                    <label for="city">City or municipality <span class="text-danger">*</span></label>
                                                                     <select id="city" class="form-control" name="cityMunicipality" [(ngModel)]="p.cityMunicipality" (ngModelChange)="onCityChange()" [disabled]="!p.province" required>
                                                                         <option value="" disabled>{{ p.province ? 'Choose a city or municipality' : 'Choose the province first' }}</option>
                                                                         @for (name of cities(); track name) {

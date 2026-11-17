@@ -37,7 +37,7 @@ import { BatchFiguresComponent } from './batch-figures.component';
                         <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="busy()" (click)="init()">Try again</button>
                     </div>
                 } @else if (!mine()!.length) {
-                    <fpms-empty icon="fas fa-user" text="No pond is named for you yet. The farm owner names who looks after each batch, on the batch page. Until then, every stocked pond is on Daily log status.">
+                    <fpms-empty icon="fas fa-user" text="No pond is named for you yet. The Farm Owner names who looks after each batch, on the batch page. Until then, every stocked pond is on Daily log status.">
                         <a class="btn btn-outline-primary" routerLink="/app/logbook/status">Daily log status</a>
                     </fpms-empty>
                 } @else {

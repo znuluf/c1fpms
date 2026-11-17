@@ -25,7 +25,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                             <form #itf="ngForm" (ngSubmit)="saveItem()" fpmsReview="item" [fpmsReviewNew]="itemForm.id === empty" novalidate>
                                 <div class="card-body">
                                     <div class="form-row">
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="cat">Category <span class="text-danger">*</span></label>
                                             <select id="cat" class="form-control" name="category" [(ngModel)]="itemForm.category">
                                                 @for (o of Options.inventoryCategory; track o.value) {
@@ -33,20 +33,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                                 }
                                             </select>
                                         </div>
-                                        <div class="form-group col-md-2">
-                                            <label for="cd">Code</label>
-                                            <input id="cd" class="form-control text-uppercase" name="code" [(ngModel)]="itemForm.code" maxlength="20" placeholder="e.g. N314" aria-describedby="cd-h" />
-                                            <small id="cd-h" class="form-text text-muted">What the farm calls it; shown first.</small>
-                                        </div>
-                                        <div class="form-group col-md-3">
-                                            <label for="br">Brand</label>
-                                            <input id="br" class="form-control" name="brand" [(ngModel)]="itemForm.brand" maxlength="100" />
-                                        </div>
-                                        <div class="form-group col-md-2">
-                                            <label for="pn">Product name <span class="text-danger">*</span></label>
-                                            <input id="pn" class="form-control" name="productName" [(ngModel)]="itemForm.productName" required maxlength="150" />
-                                        </div>
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-4">
                                             <label for="un">Unit <span class="text-danger">*</span></label>
                                             <select id="un" class="form-control" name="unit" [(ngModel)]="itemForm.unit">
                                                 @for (u of units; track u) {
@@ -54,31 +41,48 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                                 }
                                             </select>
                                         </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="cd">Code</label>
+                                            <input id="cd" class="form-control text-uppercase" name="code" [(ngModel)]="itemForm.code" maxlength="20" placeholder="e.g. N314" aria-describedby="cd-h" />
+                                            <small id="cd-h" class="form-text text-muted">What the farm calls it; shown first.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-8">
+                                            <label for="pn">Product name <span class="text-danger">*</span></label>
+                                            <input id="pn" class="form-control" name="productName" [(ngModel)]="itemForm.productName" required maxlength="150" />
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="br">Brand</label>
+                                            <input id="br" class="form-control" name="brand" [(ngModel)]="itemForm.brand" maxlength="100" />
+                                        </div>
                                     </div>
                                     <div class="form-row">
                                         @if (itemForm.category === 1) {
-                                            <div class="form-group col-md-3">
+                                            <div class="form-group col-md-4">
                                                 <label for="ft">Feed type</label>
                                                 <input id="ft" class="form-control" name="feedType" [(ngModel)]="itemForm.feedType" maxlength="50" list="feedTypes" placeholder="starter, grower, finisher" />
                                                 <datalist id="feedTypes"><option value="Starter"></option><option value="Grower"></option><option value="Finisher"></option></datalist>
                                             </div>
                                         }
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="bai">BAI registration no.</label>
                                             <input id="bai" class="form-control" name="baiRegistrationNo" [(ngModel)]="itemForm.baiRegistrationNo" maxlength="100" />
                                         </div>
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="rl">Reorder level ({{ itemForm.unit }})</label>
                                             <input id="rl" type="number" min="0" step="0.001" class="form-control" name="reorderLevel" [(ngModel)]="itemForm.reorderLevel" />
                                             <small class="form-text text-muted">Stock at or below this shows as Low.</small>
                                         </div>
-                                        <div class="form-group col-md-3">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4">
                                             <label for="ps">Pack size ({{ itemForm.unit }} per pack)</label>
                                             <input id="ps" type="number" min="0.001" step="0.001" class="form-control" name="packSize" [(ngModel)]="itemForm.packSize" placeholder="e.g. 25 per bag" />
                                             <small class="form-text text-muted">Lets receipts be entered in packs.</small>
                                         </div>
-                                        <div class="form-group col-md-3 d-flex align-items-end">
-                                            <div class="custom-control custom-checkbox mb-2">
+                                        <div class="form-group col-md-4 fpms-check-cell">
+                                            <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="iact" name="isActive" [(ngModel)]="itemForm.isActive" />
                                                 <label class="custom-control-label" for="iact">Active</label>
                                             </div>

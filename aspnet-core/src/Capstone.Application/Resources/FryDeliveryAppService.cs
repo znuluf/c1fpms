@@ -33,7 +33,7 @@ public class FryDeliveryEditDto
     public long PlReceived { get; set; }
 
     /// <summary>PL on the hatchery's papers, optional (DEC-93).</summary>
-    [Range(1, FryDelivery.MaxPl, ErrorMessage = "PL on the hatchery's papers must be between 1 and 10,000,000.")]
+    [Range(1, FryDelivery.MaxPl, ErrorMessage = "PL ordered (PO) must be between 1 and 10,000,000.")]
     public long? PlOrdered { get; set; }
 
     [Range(0, 1000000000)]

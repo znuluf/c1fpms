@@ -32,8 +32,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     }
                                 </select>
                             </div>
-                            <div class="form-group col-auto">
-                                <div class="custom-control custom-checkbox mb-2">
+                            <div class="form-group col-auto fpms-check-cell">
+                                <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input" id="fo" [(ngModel)]="failuresOnly" />
                                     <label class="custom-control-label" for="fo">Failures only</label>
                                 </div>

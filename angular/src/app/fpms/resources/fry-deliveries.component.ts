@@ -103,7 +103,39 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                             </div>
                                         </div>
                                         <div class="form-row">
-                                            <div class="form-group col-md-3">
+                                            <div class="form-group col-md-4">
+                                                <label for="pl">
+                                                    PL counted at the farm
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    id="pl"
+                                                    type="number"
+                                                    min="1"
+                                                    max="10000000"
+                                                    step="1"
+                                                    class="form-control"
+                                                    name="plReceived"
+                                                    [(ngModel)]="form.plReceived"
+                                                    required />
+                                                <small class="form-text text-muted">Stocking, survival and density use this count.</small>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="plo">PL ordered (PO)</label>
+                                                <input
+                                                    id="plo"
+                                                    type="number"
+                                                    min="1"
+                                                    max="10000000"
+                                                    step="1"
+                                                    class="form-control"
+                                                    name="plOrdered"
+                                                    [(ngModel)]="form.plOrdered" />
+                                                @if (form.plOrdered > 0 && form.plReceived > 0) {
+                                                    <small class="form-text text-muted">{{ extraText(form) }}</small>
+                                                }
+                                            </div>
+                                            <div class="form-group col-md-4">
                                                 <label for="age">PL age (days)</label>
                                                 <input
                                                     id="age"
@@ -123,50 +155,9 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                     </small>
                                                 }
                                             </div>
-                                            <div class="form-group col-md-3">
-                                                <label for="pl">
-                                                    PL counted at the farm
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input
-                                                    id="pl"
-                                                    type="number"
-                                                    min="1"
-                                                    max="10000000"
-                                                    step="1"
-                                                    class="form-control"
-                                                    name="plReceived"
-                                                    [(ngModel)]="form.plReceived"
-                                                    required />
-                                                <small class="form-text text-muted">Stocking, survival and density use this count.</small>
-                                            </div>
-                                            <div class="form-group col-md-3">
-                                                <label for="plo">PL on the hatchery's papers <span class="text-muted font-weight-normal">(optional)</span></label>
-                                                <input
-                                                    id="plo"
-                                                    type="number"
-                                                    min="1"
-                                                    max="10000000"
-                                                    step="1"
-                                                    class="form-control"
-                                                    name="plOrdered"
-                                                    [(ngModel)]="form.plOrdered" />
-                                                @if (form.plOrdered > 0 && form.plReceived > 0) {
-                                                    <small class="form-text text-muted">{{ extraText(form) }}</small>
-                                                }
-                                            </div>
-                                            <div class="form-group col-md-3">
-                                                <label for="cost">Cost (₱)</label>
-                                                <input
-                                                    id="cost"
-                                                    type="number"
-                                                    min="0"
-                                                    step="0.01"
-                                                    class="form-control"
-                                                    name="costPhp"
-                                                    [(ngModel)]="form.costPhp" />
-                                            </div>
-                                            <div class="form-group col-md-3">
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
                                                 <label for="st">
                                                     Status now
                                                     <span class="text-danger">*</span>
@@ -180,6 +171,17 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                         <option [ngValue]="o.value">{{ o.label }}</option>
                                                     }
                                                 </select>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="cost">Cost (₱)</label>
+                                                <input
+                                                    id="cost"
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    class="form-control"
+                                                    name="costPhp"
+                                                    [(ngModel)]="form.costPhp" />
                                             </div>
                                         </div>
                                         <div class="form-row">
@@ -215,28 +217,31 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                         </div>
                                         <!-- DEC-128: one trip for the whole delivery, so asked here once; both optional. -->
                                         <div class="form-row">
-                                            <div class="form-group col-md-6">
+                                            <div class="form-group col-md-4">
                                                 <label for="trm">How the fry travelled</label>
                                                 <select id="trm" class="form-control" name="transportMode" [(ngModel)]="form.transportMode">
                                                     <option [ngValue]="null">Not recorded</option>
                                                     @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
                                                 </select>
                                             </div>
-                                            <div class="form-group col-md-6">
+                                            <div class="form-group col-md-4">
                                                 <label for="tpk">Time packed at the hatchery</label>
                                                 <input id="tpk" type="datetime-local" class="form-control" name="timePacked" [(ngModel)]="form.timePacked" [max]="form.deliveryDate ? form.deliveryDate + 'T23:59' : ''" />
                                                 <small class="form-text text-muted">Optional. Stocking more than 24 hours after packing is flagged.</small>
                                             </div>
                                         </div>
-                                        <div class="form-group mb-0">
-                                            <label for="n">Notes</label>
-                                            <input
-                                                id="n"
-                                                class="form-control"
-                                                name="notes"
-                                                [(ngModel)]="form.notes"
-                                                maxlength="500" />
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12">
+                                                <label for="n">Notes</label>
+                                                <input
+                                                    id="n"
+                                                    class="form-control"
+                                                    name="notes"
+                                                    [(ngModel)]="form.notes"
+                                                    maxlength="500" />
+                                            </div>
                                         </div>
+
                                     </div>
                                     <div class="card-footer">
                                         <button
@@ -283,7 +288,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                     <tr>
                                         <th fpmsSort="hatcheryBatchNumber" [pager]="pager" (sorted)="load()">Delivery</th>
                                         <th fpmsSort="deliveryDate" [pager]="pager" (sorted)="load()">Delivered</th>
-                                        <th class="text-right" fpmsSort="plReceived" [pager]="pager" (sorted)="load()" title="The farm's count, and how it compares with the PL on the hatchery's papers (DEC-93)">PL counted</th>
+                                        <th class="text-right" fpmsSort="plReceived" [pager]="pager" (sorted)="load()" title="The farm's count, and how it compares with the PL ordered (DEC-93)">PL counted</th>
                                         <th class="text-right">PL left</th>
                                         <th fpmsSort="status" [pager]="pager" (sorted)="load()">Status</th>
                                     </tr>
@@ -301,7 +306,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                             </td>
                                             <td class="text-right">
                                                 {{ d.plReceived | num: 0 }}
-                                                <div class="text-muted text-wrap" [title]="d.plOrdered ? (d.plOrdered | num: 0) + ' PL on the papers' : 'No count from the papers'">{{ d.plOrdered ? papersDiff(d) + ' vs. papers' : 'no papers count' }}</div>
+                                                <div class="text-muted text-wrap" [title]="d.plOrdered ? (d.plOrdered | num: 0) + ' PL ordered' : 'No PO count recorded'">{{ d.plOrdered ? papersDiff(d) + ' vs. ordered' : 'No PO count' }}</div>
                                             </td>
                                             <td class="text-right">{{ d.plLeft ? (d.plLeft | num: 0) : '—' }}</td>
                                             <td>
@@ -426,10 +431,10 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
     extraText(x: any): string {
         const diff = Number(x.plReceived) - Number(x.plOrdered);
         if (!diff) {
-            return 'Same as the papers.';
+            return 'Same as ordered.';
         }
         const pct = Math.round((Math.abs(diff) / Number(x.plOrdered)) * 1000) / 10;
-        return `${Math.abs(diff).toLocaleString('en-US')} ${diff > 0 ? 'more' : 'fewer'} than the papers (${diff > 0 ? '+' : '−'}${pct}%).`;
+        return `${Math.abs(diff).toLocaleString('en-US')} ${diff > 0 ? 'more' : 'fewer'} than ordered (${diff > 0 ? '+' : '−'}${pct}%).`;
     }
 
     async save(): Promise<void> {

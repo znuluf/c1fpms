@@ -50,8 +50,8 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                             <label for="ad">Address</label>
                                             <input id="ad" class="form-control" name="address" [(ngModel)]="form.address" maxlength="300" />
                                         </div>
-                                        <div class="form-group col-md-3 d-flex align-items-end">
-                                            <div class="custom-control custom-checkbox mb-2">
+                                        <div class="form-group col-md-3 fpms-check-cell">
+                                            <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="act" name="isActive" [(ngModel)]="form.isActive" />
                                                 <label class="custom-control-label" for="act">Active</label>
                                             </div>

@@ -170,7 +170,7 @@ interface Allocation {
                                             </div>
                                             @if (people.length) {
                                                 <fieldset class="form-group col-md-6" role="group" [attr.aria-labelledby]="'tu' + a.pond.id">
-                                                    <legend [id]="'tu' + a.pond.id" class="col-form-label pt-0 font-weight-bold">Looked after by</legend>
+                                                    <legend [id]="'tu' + a.pond.id" class="fpms-group-label">Looked after by</legend>
                                                     <div class="fpms-people">
                                                         @for (p of people; track p.id) {
                                                             <div class="custom-control custom-checkbox">
@@ -184,8 +184,8 @@ interface Allocation {
                                                 </fieldset>
                                             } @else if (!can('Farm.Production.Manage')) {
                                                 <div class="form-group col-md-6">
-                                                    <span class="d-block font-weight-bold mb-2">Looked after by</span>
-                                                    <p class="mb-0"><i class="fas fa-user mr-1" aria-hidden="true"></i>You. The pond is added to My pond; the farm owner can name someone else.</p>
+                                                    <span class="fpms-group-label">Looked after by</span>
+                                                    <p class="mb-0"><i class="fas fa-user mr-1" aria-hidden="true"></i>You. The pond is added to My pond; the Farm Owner can name someone else.</p>
                                                 </div>
                                             }
                                         </div>

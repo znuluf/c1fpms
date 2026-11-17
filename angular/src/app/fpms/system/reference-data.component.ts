@@ -55,8 +55,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                         <label for="g">Monitoring frequency (guidance)</label>
                                         <input id="g" name="guidanceFrequency" class="form-control" [(ngModel)]="edit.guidanceFrequency" maxlength="100" />
                                     </div>
-                                    <div class="form-group col-md-2 d-flex align-items-end">
-                                        <div class="custom-control custom-checkbox mb-2">
+                                    <div class="form-group col-md-2 fpms-check-cell">
+                                        <div class="custom-control custom-checkbox">
                                             <input type="checkbox" class="custom-control-input" id="act" name="isActive" [(ngModel)]="edit.isActive" />
                                             <label class="custom-control-label" for="act">Active</label>
                                         </div>

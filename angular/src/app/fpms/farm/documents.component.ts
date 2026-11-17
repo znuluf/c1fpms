@@ -355,7 +355,7 @@ const CUSTOM = 'custom';
                                 </div>
                                 <div class="form-group mb-0">
                                     <label for="f-notes">Notes or location</label>
-                                    <textarea id="f-notes" rows="2" class="form-control" name="notes" [(ngModel)]="form.notes" maxlength="500" placeholder="e.g. Hard copy stored in Binder #2 at Farm Office"></textarea>
+                                    <textarea id="f-notes" rows="2" class="form-control" name="notes" [(ngModel)]="form.notes" maxlength="500" placeholder="e.g. hard copy in binder 2 at the farm office"></textarea>
                                 </div>
                             </details>
                         </div>

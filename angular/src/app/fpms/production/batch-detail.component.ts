@@ -70,7 +70,7 @@ interface CalMonth {
                                     } @else {
                                         <!-- DEC-127: one or more people, as equals; a tick each. -->
                                         <fieldset class="form-group" role="group" aria-labelledby="at-l" data-review-list="Looked after by">
-                                            <legend id="at-l" class="col-form-label pt-0 font-weight-bold">Looked after by</legend>
+                                            <legend id="at-l" class="fpms-group-label">Looked after by</legend>
                                             <div class="fpms-people">
                                                 @for (p of people; track p.id) {
                                                     <div class="custom-control custom-checkbox">
