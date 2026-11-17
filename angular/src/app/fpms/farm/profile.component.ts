@@ -3,12 +3,13 @@ import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime } from '@shared/fpms/farm-time';
 import { LAST_FARM_CODE_KEY } from '@shared/auth/app-auth.service';
 import { FPMS_IMPORTS } from '../shared-imports';
+import { TimeListComponent } from '@shared/fpms/time-list.component';
 import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, coverageBarangays, coverageCities, coverageProvinces } from '@shared/fpms/coverage-area';
 
 /** Farm Profile Management (Ref 2.1, D-31). Owners edit; Technicians read. The Ponds tab summarizes pond specifications (D-32). */
 @Component({
     standalone: true,
-    imports: FPMS_IMPORTS,
+    imports: [...FPMS_IMPORTS, TimeListComponent],
     template: `
         <fpms-page-header [narrow]="true" title="Farm profile" subtitle="Your farm, how dates show, and the production settings."></fpms-page-header>
         <section class="content px-2 pb-3">
@@ -139,7 +140,7 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                                     <div class="card-header"><h3 class="card-title">How the farm works</h3></div>
                                     <div class="card-body">
                                         <div class="form-row">
-                                            <div class="form-group col-md-5">
+                                            <div class="form-group col-lg-5">
                                                 <label for="fsys">Farming system</label>
                                                 <select id="fsys" class="form-control" name="farmingSystem" [(ngModel)]="p.farmingSystem">
                                                     @for (o of Options.farmingSystem; track o.value) {
@@ -148,10 +149,11 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                                                 </select>
                                                 <small class="form-text text-muted">Every pond uses this unless the pond sets its own.</small>
                                             </div>
-                                            <div class="form-group col-md-7">
-                                                <label for="ftimes">Feeding schedule</label>
-                                                <input id="ftimes" class="form-control" name="feedingTimes" [(ngModel)]="p.feedingTimes" maxlength="100" placeholder="06:00, 10:00, 14:00, 18:00" />
-                                                <small class="form-text text-muted">The usual feeding times, 24-hour, separated by commas (1 to 8): one feeding a day per time. Blank is 06:00, 10:00, 14:00, 18:00.</small>
+                                            <div class="form-group col-lg-7">
+                                                <span class="d-block font-weight-bold mb-1" id="ftimes-l">Feeding schedule</span>
+                                                <!-- One time picker per feeding instead of typed text (DEC-123). -->
+                                                <fpms-time-list name="feedingTimes" [(ngModel)]="p.feedingTimes"></fpms-time-list>
+                                                <small class="form-text text-muted">One feeding a day per time, 1 to 8. The feeding sheet shows them in this order.</small>
                                             </div>
                                         </div>
                                         <div class="fpms-setting">

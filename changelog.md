@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (feeding schedule, DEC-123; branch `feature/page-structure`)
+- **Farm profile: set feeding times with a time picker.** Each feeding has its own row and picker; Add feeding and × change how many there are (1 to 8). The list keeps itself in time order, and a time used twice is flagged before saving.
+
 ### Changed (system administration, DEC-122; branch `feature/page-structure`)
 - **System health, Reference data, Security logs, Farms and Account recovery fit a 1,000 px screen.** System health opens with its figures and alerts in one band; the backup history and the logs have fewer, merged columns, and filters above the lists.
 - **Account and registration actions ask first.** Unlocking an account or issuing a temporary password shows the account, farm, verification and note before it goes ahead; opening farm registration and deactivating a farm do too. Editing a water-quality parameter is reviewed before saving.

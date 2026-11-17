@@ -3212,3 +3212,38 @@ i.wq-key.out {
     word-break: break-word;
     min-width: 8rem;
 }
+
+// ---- A list of times, one picker per row (DEC-123): the feeding schedule on Farm profile.
+.fpms-times {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+    gap: 0.5rem 1rem;
+}
+.fpms-time {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+    .form-control {
+        min-width: 0;
+    }
+}
+.fpms-time-label {
+    margin: 0;
+    font-weight: 400;
+    color: var(--fpms-muted);
+    white-space: nowrap;
+}
+.fpms-time-remove {
+    width: 44px;
+    min-height: 44px;
+    padding: 0;
+    color: var(--fpms-muted);
+}
+.fpms-times-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.6rem;
+}

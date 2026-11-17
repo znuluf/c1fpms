@@ -907,6 +907,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-120 | Collapsed sidebar opens on hover (proposed): no menu button; narrow windows always show the icon bar. Amends DEC-119. |
 | DEC-121 | Trace report not-recorded list (proposed): light panel grouped by section, repeats merged, visible buttons. |
 | DEC-122 | System administration pages (proposed): fit 1,000 px; health summary band; account, farm and registration actions reviewed first. |
+| DEC-123 | Feeding schedule picker (proposed): one time picker per feeding, add and remove, kept in order, duplicates blocked; stored value unchanged. |
 
 # **Appendix B. Manuscript alignment notes**
 

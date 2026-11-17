@@ -3100,6 +3100,27 @@ Negative:
 - The security logs can no longer show the service and method in separate columns.
 ---
 
+## Decision DEC-123: The feeding schedule is set with one time picker per feeding
+
+Status: Proposed 2026-11-17; built on `feature/page-structure`; checked in a browser at 1,000 px
+Date: 2026-11-17
+Related: DEC-61, DEC-109
+
+### Context
+Farm profile asked for the feeding schedule as typed text ("06:00, 10:00, 14:00, 18:00"): 24-hour times with colons, separated by commas. It was easy to mistype and gave no picker on a tablet. The Owner asked for a better way to set the times.
+
+### Decision
+- A list with one row per feeding ("Feeding 1", "Feeding 2", …), each with the browser's own time picker (a clock wheel on a tablet, in the device's 12- or 24-hour style).
+- "Add feeding" adds a row two hours after the last (at most 8); × removes one (at least 1). Rows go back into time order when the person leaves a field, so Feeding 1 is always the earliest.
+- A time used twice, or a row left without a time, is shown under the list and keeps the form from saving.
+- The saved value is unchanged (the same comma-separated text), so the server, the feeding sheet and existing farms are unaffected. The review before saving lists each feeding's time.
+- Built as a shared control (`fpms-time-list`) so another list of times can use it.
+
+### Consequences
+Positive:
+- No typing of separators; mistakes are caught before saving.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.
