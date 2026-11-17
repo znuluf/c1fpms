@@ -101,7 +101,9 @@ interface StatusRow {
                                                 <span class="fpms-pond-tag">{{ r.pondCode }}</span>
                                                 <span class="batch">{{ batchShort(r.batchCode) }}</span>
                                             </a>
-                                            @if (r.cycleCode) { <span class="cycle">Cycle {{ r.cycleCode }}</span> }
+                                            @if (r.cycleCode || r.technicianName) {
+                                                <span class="cycle">{{ r.cycleCode ? 'Cycle ' + r.cycleCode : '' }}@if (r.technicianName) { <span class="fpms-pcal-person">{{ r.cycleCode ? ' · ' : '' }}{{ r.isMine ? 'You' : r.technicianName }}</span> }</span>
+                                            }
                                         </div>
                                         @for (c of r.cells; track c.date) {
                                             <div role="cell" class="day">

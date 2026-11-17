@@ -80,6 +80,8 @@ public class BatchAppService : CapstoneAppServiceBase
         {
             x.TechnicianName = NameOf(names, x.TechnicianUserId);
             x.CoverName = NameOf(names, x.CoverUserId);
+            x.CoverActive = x.CoverUserId.HasValue && (!x.CoverUntil.HasValue || today <= x.CoverUntil.Value);
+            x.LookingAfterName = x.CoverActive ? x.CoverName : x.TechnicianName;
             x.IsMine = new PondBatch { TechnicianUserId = x.TechnicianUserId, CoverUserId = x.CoverUserId, CoverUntil = x.CoverUntil }.IsLookedAfterBy(me, today);
         }
     }
@@ -264,16 +266,18 @@ public class BatchAppService : CapstoneAppServiceBase
     public virtual async Task<List<TechnicianOptionDto>> GetTechnicianOptions()
     {
         var users = await UserRepository.GetAll().AsNoTracking().Include(u => u.Roles).Where(u => u.IsActive).ToListAsync();
-        var roles = await _roleManager.Roles.AsNoTracking().ToDictionaryAsync(r => r.Id, r => r.Name);
+        var roles = await _roleManager.Roles.AsNoTracking().ToDictionaryAsync(r => r.Id, r => new { r.Name, r.DisplayName });
         return users
-            .Select(u => new TechnicianOptionDto
+            .Select(u => (u, role: u.Roles.Select(r => roles.GetValueOrDefault(r.RoleId)).FirstOrDefault(r => r != null)))
+            .OrderBy(x => x.role?.Name != Authorization.Roles.StaticRoleNames.Tenants.FarmTechnician)
+            .ThenBy(x => x.u.Name)
+            .Select(x => new TechnicianOptionDto
             {
-                Id = u.Id,
-                Name = $"{u.Name} {u.Surname}".Trim(),
-                RoleName = u.Roles.Select(r => roles.TryGetValue(r.RoleId, out var n) ? n : null).FirstOrDefault(n => n != null),
+                Id = x.u.Id,
+                Name = $"{x.u.Name} {x.u.Surname}".Trim(),
+                RoleName = x.role?.DisplayName ?? x.role?.Name,
+                IsTechnician = x.role?.Name == Authorization.Roles.StaticRoleNames.Tenants.FarmTechnician,
             })
-            .OrderBy(o => o.RoleName == Authorization.Roles.StaticRoleNames.Tenants.FarmOwner)
-            .ThenBy(o => o.Name)
             .ToList();
     }
 

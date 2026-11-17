@@ -78,7 +78,7 @@ interface CheckRow {
                                 <label for="lw-pond">Which pond? <span class="text-danger">*</span></label>
                                 <select id="lw-pond" class="form-control" [ngModel]="batchId()" (ngModelChange)="batchId.set($event)">
                                     @for (b of batches(); track b.id) {
-                                        <option [ngValue]="b.id">{{ b.pondCode }} · {{ b.batchCode }}</option>
+                                        <option [ngValue]="b.id">{{ b.pondCode }} · {{ b.batchCode }}{{ b.isMine ? ' (yours)' : b.lookingAfterName ? ' · ' + b.lookingAfterName : '' }}</option>
                                     }
                                 </select>
                                 @if (!batches().length) {
@@ -371,7 +371,8 @@ export class LogDrawerComponent {
         }
         this.stage.set('pond');
         const batches = await this.api.get<any[]>('Batch', 'GetAll', { openOnly: true });
-        this.batches.set(batches.sort((x, y) => String(x.pondCode).localeCompare(String(y.pondCode), undefined, { numeric: true })));
+        // DEC-127: the pond the person looks after comes first and is chosen; another is one pick away.
+        this.batches.set(batches.sort((x, y) => Number(!!y.isMine) - Number(!!x.isMine) || String(x.pondCode).localeCompare(String(y.pondCode), undefined, { numeric: true })));
         this.batchId.set(this.batches()[0]?.id ?? null);
     }
 

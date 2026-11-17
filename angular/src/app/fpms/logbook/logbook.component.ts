@@ -51,7 +51,7 @@ import { batchShort } from '@shared/fpms/labels';
                                     (ngModelChange)="apply()">
                                     <option [ngValue]="null">All ponds</option>
                                     @for (x of batches(); track x.id) {
-                                        <option [ngValue]="x.id">{{ x.pondCode }} · {{ x.batchCode }}</option>
+                                        <option [ngValue]="x.id">{{ x.pondCode }} · {{ x.batchCode }}{{ x.isMine ? ' (yours)' : '' }}</option>
                                     }
                                 </select>
                             </label>
@@ -363,6 +363,7 @@ export class LogbookComponent extends FpmsPage implements OnInit {
                         .slice()
                         .sort(
                             (x, y) =>
+                                Number(!!y.isMine) - Number(!!x.isMine) ||
                                 String(x.pondCode).localeCompare(String(y.pondCode)) ||
                                 String(x.batchCode).localeCompare(String(y.batchCode))
                         )

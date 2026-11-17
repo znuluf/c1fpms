@@ -59,6 +59,48 @@ interface CalMonth {
                 @if (!b) {
                     <fpms-loading></fpms-loading>
                 } @else {
+                    @if (assigning) {
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-primary mb-0 border-0">
+                            <div class="card-header"><h3 class="card-title"><i class="fas fa-user" aria-hidden="true"></i>Who looks after {{ b.pondCode }}</h3></div>
+                            <form #af="ngForm" (ngSubmit)="saveAssign()" fpmsReview="technician" novalidate>
+                                <div class="card-body">
+                                    @if (!people) {
+                                        <fpms-loading></fpms-loading>
+                                    } @else {
+                                        <div class="form-group">
+                                            <label for="at">Technician</label>
+                                            <select id="at" name="technician" class="form-control" [(ngModel)]="assigning.technicianUserId" (ngModelChange)="techChanged($event)">
+                                                <option [ngValue]="null">No one named</option>
+                                                @for (p of people; track p.id) { <option [ngValue]="p.id">{{ p.name }} · {{ p.roleName }}</option> }
+                                            </select>
+                                            <small class="form-text text-muted">Their pond opens first for them, and their name shows on the dashboard and Daily log status. Anyone with access can still record for it.</small>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-sm-7">
+                                                <label for="ac">Cover for days off</label>
+                                                <select id="ac" name="cover" class="form-control" [(ngModel)]="assigning.coverUserId" [disabled]="!assigning.technicianUserId">
+                                                    <option [ngValue]="null">No cover</option>
+                                                    @for (p of people; track p.id) {
+                                                        @if (p.id !== assigning.technicianUserId) { <option [ngValue]="p.id">{{ p.name }} · {{ p.roleName }}</option> }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-sm-5">
+                                                <label for="au">Cover until</label>
+                                                <input id="au" type="date" name="coverUntil" class="form-control" [(ngModel)]="assigning.coverUntil" [min]="today" [disabled]="!assigning.coverUserId" />
+                                            </div>
+                                        </div>
+                                        <p class="small text-muted mb-0">The cover's last day is included. Leave the date empty to keep the cover until you change it.</p>
+                                    }
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-primary mr-2" type="submit" [disabled]="busy() || !people">Save</button>
+                                    <button class="btn btn-default" type="button" (click)="assigning = null">Cancel</button>
+                                </div>
+                            </form>
+                        </div></div></div></div>
+                    }
+
                     @if (reopening) {
                         <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
                             <div class="card-header"><h3 class="card-title"><i class="fas fa-undo" aria-hidden="true"></i>Reopen batch {{ b.batchCode }}</h3></div>
@@ -185,8 +227,29 @@ interface CalMonth {
                                 @if (i.cultureDays != null) { <div><dt>Days of culture</dt><dd>{{ i.cultureDays }}</dd></div> }
                             </dl>
                         }
-                        @if (b.failureReason || b.isReadOnly || (b.earliestSafeHarvestDate && !b.isReadOnly) || (b.status === 2 && docHint)) {
+                        @if (b.failureReason || b.isReadOnly || (b.earliestSafeHarvestDate && !b.isReadOnly) || (b.status === 2 && docHint) || b.technicianName || (canManage && !b.isReadOnly)) {
                             <ul class="fpms-notices">
+                                <!-- DEC-127: who looks after this batch day to day, and a cover for days off. A name, not a lock. -->
+                                @if (b.technicianName || (canManage && !b.isReadOnly)) {
+                                    <li>
+                                        <i class="fas fa-user" aria-hidden="true"></i>
+                                        <span>
+                                            @if (b.technicianName) {
+                                                Looked after by <strong>{{ b.technicianName }}</strong>
+                                                @if (b.isMine && !coverActive()) { <span class="badge badge-info ml-1">You</span> }
+                                                @if (coverActive()) {
+                                                    · <strong>{{ b.coverName }}</strong> covers{{ b.coverUntil ? ' until ' + (b.coverUntil | farmDate) : '' }}
+                                                    @if (b.isMine) { <span class="badge badge-info ml-1">You</span> }
+                                                }
+                                            } @else {
+                                                No technician named for this batch yet.
+                                            }
+                                            @if (canManage && !b.isReadOnly) {
+                                                · <button type="button" class="btn btn-link p-0 align-baseline" (click)="startAssign()">{{ b.technicianName ? 'Change' : 'Name a technician' }}</button>
+                                            }
+                                        </span>
+                                    </li>
+                                }
                                 @if (b.failureReason) {
                                     <li class="error">
                                         <i class="fas fa-ban" aria-hidden="true"></i>
@@ -659,6 +722,42 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
         return next == null
             ? null
             : `PCR health check suggested at DOC 30, 45, 60 and 75. Next: DOC ${next}${next - doc > 0 ? `, in ${next - doc} day${next - doc === 1 ? '' : 's'}` : ', now'}.`;
+    }
+
+    assigning: { technicianUserId: number | null; coverUserId: number | null; coverUntil: string | null } | null = null;
+    people: any[] | null = null;
+
+    /** The cover is named and today is on or before their last day. */
+    coverActive(): boolean {
+        return !!this.b?.coverActive;
+    }
+
+    /** A cover cannot be the technician, and needs one. */
+    techChanged(id: number | null): void {
+        if (this.assigning && (!id || this.assigning.coverUserId === id)) {
+            this.assigning.coverUserId = null;
+            this.assigning.coverUntil = null;
+        }
+    }
+
+    async startAssign(): Promise<void> {
+        this.assigning = {
+            technicianUserId: this.b.technicianUserId ?? null,
+            coverUserId: this.coverActive() ? (this.b.coverUserId ?? null) : null,
+            coverUntil: this.coverActive() && this.b.coverUntil ? String(this.b.coverUntil).substring(0, 10) : null,
+        };
+        this.people ??= (await this.run(() => this.api.get<any[]>('Batch', 'GetTechnicianOptions'))) ?? [];
+    }
+
+    async saveAssign(): Promise<void> {
+        const a = this.assigning!;
+        const input = { id: this.b.id, technicianUserId: a.technicianUserId, coverUserId: a.technicianUserId ? a.coverUserId : null, coverUntil: a.coverUserId ? a.coverUntil || null : null };
+        if (await this.act(() => this.api.post('Batch', 'SetTechnician', input))) {
+            const name = this.people?.find((p) => p.id === a.technicianUserId)?.name;
+            this.notifySaved(name ? `${name} looks after ${this.b.pondCode}.` : `No technician named for ${this.b.pondCode}.`);
+            this.assigning = null;
+            this.load();
+        }
     }
 
     async reopen(): Promise<void> {

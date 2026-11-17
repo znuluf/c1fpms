@@ -123,16 +123,20 @@ const DRAFT = 'log-entry';
                                     <div class="card-body">
                                         @if (isNew) {
                                             @if (inWizard) {
-                                                <p class="mb-3"><strong>Pond (batch):</strong> {{ batch?.pondCode }} · {{ batch?.batchCode }}</p>
+                                                <p class="mb-3"><strong>Pond (batch):</strong> {{ batch?.pondCode }} · {{ batch?.batchCode }}@if (othersPond(); as o) { <span class="d-block small text-warning-dark"><i class="fas fa-user mr-1" aria-hidden="true"></i>{{ o }}</span> }</p>
                                             } @else {
                                             <div class="form-row">
                                                     <div class="form-group col-md-6">
                                                         <label for="batch">Pond (batch) <span class="text-danger">*</span></label>
                                                         <select id="batch" class="form-control" name="batchId" [(ngModel)]="form.batchId" (ngModelChange)="onBatch()" required>
                                                             @for (x of openBatches; track x.id) {
-                                                                <option [value]="x.id">{{ x.pondCode }} · {{ x.letter ? 'Batch ' + x.letter : x.batchCode }} ({{ x.status | label: L.BatchStatuses }})</option>
+                                                                <option [value]="x.id">{{ x.pondCode }} · {{ x.letter ? 'Batch ' + x.letter : x.batchCode }} ({{ x.status | label: L.BatchStatuses }}){{ x.isMine ? ' · yours' : '' }}</option>
                                                             }
                                                         </select>
+                                                        @if (othersPond(); as o) {
+                                                            <!-- DEC-127: said, never blocked; the review carries it as a note. -->
+                                                            <small class="form-text text-warning-dark"><i class="fas fa-user mr-1" aria-hidden="true"></i>{{ o }}</small>
+                                                        }
                                                         @if (!openBatches.length) {
                                                             <small class="form-text text-muted">No pond is stocked. Stock a batch first (Production → Stock a batch).</small>
                                                         }
@@ -613,13 +617,25 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
         }
     }
 
+    /** "This is Jun's pond. You can still record for it." when a technician with a pond of their own picks another (DEC-127). */
+    othersPond(): string {
+        if (!this.isNew || this.can('Farm.Production.Manage') || !this.openBatches.some((b) => b.isMine)) {
+            return '';
+        }
+        const b = this.openBatches.find((x) => x.id === this.form?.batchId);
+        const who = b?.lookingAfterName;
+        return b && !b.isMine && who ? `This is ${who}'s pond. You can still record for it.` : '';
+    }
+
     private async initNew(): Promise<void> {
         const batches = await this.api.get<any[]>('Batch', 'GetAll', { openOnly: true });
         this.openBatches = batches.sort((x, y) => String(x.pondCode).localeCompare(String(y.pondCode), undefined, { numeric: true }));
 
         const draft = this.query('batchId') ? null : FormDrafts.load<any>(DRAFT);
         const remembered = OpsMemory.get();
-        const batchId = this.query('batchId') ?? draft?.data.form.batchId ?? remembered.batchId ?? null;
+        // DEC-127: the pond the person looks after, before the last pond used.
+        const mine = this.openBatches.filter((b) => b.isMine);
+        const batchId = this.query('batchId') ?? draft?.data.form.batchId ?? (mine.length === 1 ? mine[0].id : null) ?? remembered.batchId ?? null;
         const fromBatch = this.openBatches.find((b) => b.id === batchId);
         const type = Number(this.query('logType')) || null;
         const day = this.query('date');

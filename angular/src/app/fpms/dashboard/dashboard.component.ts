@@ -22,6 +22,8 @@ interface CalendarRow {
     survival: number | null;
     sampleDays: number | null;
     hasAlert: boolean;
+    person: string;
+    isMine: boolean;
 }
 
 interface AttentionRow {
@@ -170,6 +172,18 @@ interface AttentionGroup {
                                     </select>
                                 </label>
                             }
+                            @if (showPeople()) {
+                                <label class="fpms-sort">
+                                    <span>Technician</span>
+                                    <select class="form-control form-control-sm" aria-label="Technician" [ngModel]="person()" (ngModelChange)="person.set($event)">
+                                        <option value="">Everyone</option>
+                                        @for (p of people(); track p) {
+                                            <option [value]="p">{{ p }}</option>
+                                        }
+                                        <option value="-">No one named</option>
+                                    </select>
+                                </label>
+                            }
                             <div class="btn-group-toggle ml-auto" role="group" aria-label="Show">
                                 <button type="button" class="fpms-chip" [attr.aria-pressed]="group() === 'all'" (click)="group.set('all')">All batches · {{ rows().length }}</button>
                                 <button type="button" class="fpms-chip" [attr.aria-pressed]="group() === 'alert'" (click)="group.set('alert')">Alerts · {{ alertRows() }}</button>
@@ -209,9 +223,10 @@ interface AttentionGroup {
                                                         <span class="fpms-pond-tag">{{ r.pondCode }}</span>
                                                         <span class="batch">{{ batchShort(r.batchCode) }}</span>
                                                     </a>
-                                                    @if (r.cycleCode || r.hasAlert) {
+                                                    @if (r.cycleCode || r.hasAlert || r.person) {
                                                         <span class="cycle">
                                                             {{ r.cycleCode ? 'Cycle ' + r.cycleCode : '' }}
+                                                            @if (r.person) { <span class="fpms-pcal-person">· {{ r.isMine ? 'You' : r.person }}</span> }
                                                             <!-- The water alert in words beside the gold edge; the status and last sample are on Daily log status. -->
                                                             @if (r.hasAlert) { <span class="fpms-pcal-tag"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i>Water alert</span> }
                                                         </span>
@@ -463,6 +478,8 @@ export class DashboardComponent extends FpmsPage implements OnInit {
                 survival: t?.estimatedSurvivalPct ?? null,
                 sampleDays: r.daysSinceGrowthSampling ?? null,
                 hasAlert: !!t?.hasWaterQualityAlert,
+                person: r.technicianName ?? '',
+                isMine: !!r.isMine,
             };
         });
     });
@@ -472,6 +489,10 @@ export class DashboardComponent extends FpmsPage implements OnInit {
     cycle = signal<string>('');
     alertRows = computed(() => this.rows().filter((r) => r.hasAlert).length);
     cycles = computed(() => [...new Set(this.rows().map((r) => r.cycleCode).filter(Boolean))].sort());
+    /** DEC-127: the Owner sees one technician's ponds at a time; '-' is the ponds with no one named. */
+    person = signal<string>('');
+    people = computed(() => [...new Set(this.rows().map((r) => r.person).filter(Boolean))].sort());
+    showPeople = computed(() => this.people().length > 1 || (this.people().length > 0 && this.rows().some((r) => !r.person)));
 
     visible = computed<CalendarRow[]>(() => {
         const q = this.q().trim().toLowerCase();
@@ -481,12 +502,13 @@ export class DashboardComponent extends FpmsPage implements OnInit {
                 (r) =>
                     (this.group() === 'all' || r.hasAlert) &&
                     (!this.cycle() || r.cycleCode === this.cycle()) &&
-                    (!q || `${r.pondCode} ${r.batchCode} ${r.cycleCode}`.toLowerCase().includes(q))
+                    (!this.person() || r.person === this.person() || (this.person() === '-' && !r.person)) &&
+                    (!q || `${r.pondCode} ${r.batchCode} ${r.cycleCode} ${r.person}`.toLowerCase().includes(q))
             )
             .sort((a, b) => {
                 switch (this.sort()) {
                     case 'attention':
-                        return Number(b.hasAlert) - Number(a.hasAlert) || a.pondCode.localeCompare(b.pondCode);
+                        return Number(b.hasAlert) - Number(a.hasAlert) || Number(b.isMine) - Number(a.isMine) || a.pondCode.localeCompare(b.pondCode);
                     case 'doc':
                         return num(b.doc) - num(a.doc);
                     case 'fcr':

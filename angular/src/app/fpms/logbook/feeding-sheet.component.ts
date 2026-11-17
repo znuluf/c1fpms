@@ -45,7 +45,7 @@ interface Entry {
                             <select class="form-control form-control-sm" [(ngModel)]="batchFilter" (ngModelChange)="load()">
                                 <option [ngValue]="null">All stocked ponds</option>
                                 @for (b of batches; track b.id) {
-                                    <option [ngValue]="b.id">{{ b.pondCode }} · {{ b.letter ? 'Batch ' + b.letter : b.batchCode }}</option>
+                                    <option [ngValue]="b.id">{{ b.pondCode }} · {{ b.letter ? 'Batch ' + b.letter : b.batchCode }}{{ b.isMine ? ' (yours)' : '' }}</option>
                                 }
                             </select>
                         </label>
@@ -180,6 +180,12 @@ interface Entry {
                                                         <button type="button" class="btn" [class.btn-primary]="e.status === 1" [class.btn-outline-primary]="e.status !== 1" [attr.aria-pressed]="e.status === 1" (click)="setFed(e)">Fed</button>
                                                         <button type="button" class="btn" [class.btn-secondary]="e.status === 2" [class.btn-outline-secondary]="e.status !== 2" [attr.aria-pressed]="e.status === 2" (click)="e.status = 2; keepDraft()">Not fed</button>
                                                     </div>
+                                                    @if (e.status === 1 && previousFed(row, s); as prev) {
+                                                        <!-- DEC-127: the day's routine repeats; one tap copies the last feeding's lot and kilos, to adjust. -->
+                                                        <button type="button" class="btn btn-sm btn-outline-primary fpms-same-as mb-2" (click)="sameAs(e, prev)">
+                                                            <i class="fas fa-redo mr-1" aria-hidden="true"></i>Same as {{ prev.session | label: L.FeedingSessions }} ({{ describeSaved(prev) }})
+                                                        </button>
+                                                    }
                                                     @if (e.status === 2) {
                                                         <small class="d-block text-muted mb-1">Saved as a deliberate skip (for example a molt, a treatment or bad weather). No stock is drawn.</small>
                                                     }
@@ -266,6 +272,29 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
     readonly notFedReasons = ['Molting', 'Rain / weather', 'Low DO', 'Treatment', 'Tray not cleared', 'Power outage'];
 
     /** Back to Fed: a quick reason picked while Not fed was chosen is not a note on a feeding that happened. */
+    /** The day's latest fed feeding before this one, for "Same as" (DEC-127); null when there is none. */
+    previousFed(row: any, s: number): any {
+        for (let k = s - 2; k >= 0; k--) {
+            const x = row.sessions?.[k];
+            if (x && x.status !== 2 && x.lines?.length) {
+                return x;
+            }
+        }
+        return null;
+    }
+
+    /** Copies a feeding's lots and kilos into this one; the time fed and notes stay as typed. */
+    sameAs(e: Entry, prev: any): void {
+        e.status = 1;
+        e.lines = prev.lines.map((l: any) => this.newLine(l.lotId, l.kg));
+        for (const l of prev.lines) {
+            if (!this.feedLots.some((o) => o.lotId === l.lotId)) {
+                this.feedLots = [...this.feedLots, { lotId: l.lotId, label: l.label, unit: 'kg', quantityOnHand: 0 }];
+            }
+        }
+        this.keepDraft();
+    }
+
     setFed(e: Entry): void {
         e.status = 1;
         if (this.notFedReasons.includes(e.notes)) {
@@ -308,6 +337,12 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
         if (this.inWizard && this.focusBatchId) {
             // The wizard is for one pond: only that pond's sessions are listed.
             this.batchFilter = this.focusBatchId;
+        } else if (!this.focusBatchId) {
+            // A technician starts on the pond they look after (DEC-127); "All stocked ponds" is one choice away.
+            const mine = this.batches.filter((b) => b.isMine);
+            if (mine.length === 1) {
+                this.batchFilter = mine[0].id;
+            }
         }
         const date = this.query('date');
         if (date && /^\d{4}-\d{2}-\d{2}$/.test(date) && date <= this.today) {
@@ -514,6 +549,19 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
         return lines + (x.fedAtTime ? ' · fed ' + x.fedAtTime : '') + (x.notes ? ' · ' + x.notes : '');
     }
 
+    /**
+     * "This is Jun's pond." when a technician who has a pond of their own records for a pond someone else looks after
+     * (DEC-127): said in the review, never blocked, so covering stays easy.
+     */
+    private othersPond(batchId: string): string {
+        if (this.can('Farm.Production.Manage') || !this.batches.some((b) => b.isMine)) {
+            return '';
+        }
+        const b = this.batches.find((x) => x.id === batchId);
+        const who = b?.lookingAfterName;
+        return b && !b.isMine && who ? `This is ${who}'s pond.` : '';
+    }
+
     private existingOf(batchId: string, session: number): any {
         return this.sheet?.rows?.find((r: any) => r.batchId === batchId)?.sessions?.[session - 1] ?? null;
     }
@@ -522,18 +570,20 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
         // Review (DEC-116, DEC-118): one row per feeding; a correction shows what it was; a lot short of stock is flagged.
         const items = this.pending();
         const corrections = items.filter((i) => this.existingOf(i.batchId, i.session));
-        if (this.feedback.reviewMode === 'all' || corrections.length) {
+        if (this.feedback.reviewMode === 'all' || corrections.length || items.some((i) => this.othersPond(i.batchId))) {
             const fed = items.filter((i) => i.e.status === 1);
             const kg = fed.reduce((sum, i) => sum + this.total(i.e), 0);
             const notFed = items.length - fed.length;
             const rows = items.map((i) => {
                 const was = this.existingOf(i.batchId, i.session);
                 const short = i.e.status === 1 && i.e.lines.some((l) => this.short(l));
+                const other = this.othersPond(i.batchId);
+                const notes = [short ? "More than the lot's stock on hand; the lot will be flagged." : '', other].filter(Boolean);
                 return {
                     label: this.feedingName(i.batchId, i.session),
                     before: was ? this.describeSaved(was) : undefined,
                     after: this.describeEntry(i.e),
-                    note: short ? "More than the lot's stock on hand; the lot will be flagged." : undefined,
+                    note: notes.length ? notes.join(' ') : undefined,
                 };
             });
             const ok = await this.feedback.review({

@@ -237,6 +237,10 @@ public class BatchListDto
 
     /// <summary>The signed-in user looks after this batch today, as its technician or covering (DEC-127).</summary>
     public bool IsMine { get; set; }
+    /// <summary>The cover while covering, else the technician: the name to show as who looks after the batch today.</summary>
+    public string LookingAfterName { get; set; }
+    /// <summary>A cover is named and today is on or before their last day.</summary>
+    public bool CoverActive { get; set; }
 }
 
 public class SetBatchTechnicianInput
@@ -255,6 +259,8 @@ public class TechnicianOptionDto
     public long Id { get; set; }
     public string Name { get; set; }
     public string RoleName { get; set; }
+    /// <summary>Holds the Farm technician role; preselected when they are the only one.</summary>
+    public bool IsTechnician { get; set; }
 }
 
 public class BatchDetailDto : BatchListDto

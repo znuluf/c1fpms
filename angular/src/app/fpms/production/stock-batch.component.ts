@@ -13,6 +13,7 @@ interface Allocation {
     transportMode: number;
     timeProcessed: string;
     acclimationMinutes: number | null;
+    technicianUserId: number | null;
     initialSurvivalEstimatePct: number | null;
     deadAtStocking: number | null;
     readings: Record<string, number | null>;
@@ -176,6 +177,16 @@ interface Allocation {
                                                     }
                                                 </select>
                                             </div>
+                                            @if (people.length) {
+                                                <div class="form-group col-md-6">
+                                                    <label [for]="'tu' + a.pond.id">Looked after by</label>
+                                                    <select [id]="'tu' + a.pond.id" class="form-control" [(ngModel)]="a.technicianUserId">
+                                                        <option [ngValue]="null">No one named</option>
+                                                        @for (p of people; track p.id) { <option [ngValue]="p.id">{{ p.name }} · {{ p.roleName }}</option> }
+                                                    </select>
+                                                    <small class="form-text text-muted">Their pond opens first for them. You can change it, or add a cover, on the batch page.</small>
+                                                </div>
+                                            }
                                         </div>
                                         <h4 class="fpms-section-h mt-3">Pond water before stocking</h4>
                                         <div class="form-row">
@@ -254,7 +265,7 @@ interface Allocation {
                                         <tbody>
                                             @for (a of selected; track a.pond.id) {
                                                 <tr>
-                                                    <td><span class="fpms-pond-tag">{{ a.pond.pondCode }}</span><div class="text-muted text-nowrap">{{ a.stockedAt.replace('T', ' ') }}</div></td>
+                                                    <td><span class="fpms-pond-tag">{{ a.pond.pondCode }}</span><div class="text-muted text-nowrap">{{ a.stockedAt.replace('T', ' ') }}</div>@if (people.length) { <div class="text-muted">{{ personName(a.technicianUserId) }}</div> }</td>
                                                     <td class="text-right">
                                                         {{ a.plCount | num: 0 }}
                                                         <div class="text-nowrap" [class.text-muted]="densityState(a) === 'within'" [class.text-warning-dark]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle ml-1" aria-hidden="true"></i><span class="sr-only">outside the band</span> }</div>
@@ -442,11 +453,24 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
             transportMode: 1,
             timeProcessed: '',
             acclimationMinutes: null,
+            technicianUserId: null,
             initialSurvivalEstimatePct: null,
             deadAtStocking: null,
             readings: Object.fromEntries(this.stockingParams.map((p) => [p.code, null])),
         }));
         this.options = options;
+        // DEC-127: the Owner names who looks after each new batch; anyone stocking without that right skips the choice.
+        this.people = this.can('Farm.Production.Manage') ? ((await this.run(() => this.api.get<any[]>('Batch', 'GetTechnicianOptions'))) ?? []) : [];
+        const techs = this.people.filter((x) => x.isTechnician);
+        if (techs.length === 1) {
+            this.allocations.forEach((a) => (a.technicianUserId = techs[0].id));
+        }
+    }
+
+    people: any[] = [];
+
+    personName(id: number | null): string {
+        return this.people.find((x) => x.id === id)?.name ?? 'No one named';
     }
 
     go(step: number): void {
@@ -489,6 +513,7 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
         a.acclimationMinutes = f.acclimationMinutes;
         a.initialSurvivalEstimatePct = f.initialSurvivalEstimatePct;
         a.deadAtStocking = f.deadAtStocking;
+        a.technicianUserId = f.technicianUserId;
         a.readings = { ...f.readings };
     }
 
@@ -510,6 +535,7 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
                 acclimationMinutes: a.acclimationMinutes,
                 initialSurvivalEstimatePct: a.initialSurvivalEstimatePct,
                 deadAtStocking: a.deadAtStocking,
+                technicianUserId: a.technicianUserId,
                 readings: this.stockingParams.map((p) => ({ parameterCode: p.code, value: a.readings[p.code] })),
             })),
         };
