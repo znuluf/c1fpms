@@ -51,6 +51,12 @@ public class FryDeliveryEditDto
     [StringLength(FryDelivery.MaxPermitLength)]
     public string SfscNo { get; set; }
 
+    /// <summary>How the fry travelled, optional (DEC-128).</summary>
+    public Production.TransportMode? TransportMode { get; set; }
+
+    /// <summary>When the hatchery packed the fry (ISO with offset), optional; not after the delivery day (DEC-128).</summary>
+    public DateTime? TimePacked { get; set; }
+
     /// <summary>Create only: the first status (Ordered by default).</summary>
     public FryDeliveryStatus InitialStatus { get; set; } = FryDeliveryStatus.Ordered;
 
@@ -73,6 +79,8 @@ public class FryDeliveryDto
     public string PlHealthCertificateNo { get; set; }
     public string TransportPermitNo { get; set; }
     public string SfscNo { get; set; }
+    public Production.TransportMode? TransportMode { get; set; }
+    public DateTime? TimePackedUtc { get; set; }
     public FryDeliveryStatus Status { get; set; }
 
     /// <summary>Finish stocking was recorded (DEC-63).</summary>
@@ -462,6 +470,22 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         {
             throw new UserFriendlyException("The delivery date is too far in the future.");
         }
+
+        if (input.TransportMode.HasValue && !Enum.IsDefined(input.TransportMode.Value))
+        {
+            throw new UserFriendlyException("Choose how the fry travelled, or leave it blank.");
+        }
+
+        // DEC-128: packed at the hatchery, so not after the day the fry arrived and not in the future.
+        if (input.TimePacked.HasValue)
+        {
+            var packed = FarmClock.ToUtc(input.TimePacked.Value);
+            var endOfDelivery = FarmClock.StartOfDayUtc(input.DeliveryDate.AddDays(1), await Farm.GetTimeZoneAsync());
+            if (packed > DateTime.UtcNow.AddMinutes(5) || packed >= endOfDelivery)
+            {
+                throw new UserFriendlyException("The time packed cannot be after the delivery day or in the future. Check the date, or leave it blank.");
+            }
+        }
     }
 
     private async Task<List<WarningDto>> WarningsAsync(FryDeliveryEditDto input)
@@ -489,6 +513,8 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         d.PlHealthCertificateNo = string.IsNullOrWhiteSpace(input.PlHealthCertificateNo) ? null : input.PlHealthCertificateNo.Trim();
         d.TransportPermitNo = string.IsNullOrWhiteSpace(input.TransportPermitNo) ? null : input.TransportPermitNo.Trim();
         d.SfscNo = string.IsNullOrWhiteSpace(input.SfscNo) ? null : input.SfscNo.Trim();
+        d.TransportMode = input.TransportMode;
+        d.TimePackedUtc = input.TimePacked.HasValue ? FarmClock.ToUtc(input.TimePacked.Value) : null;
     }
 
     private async Task<List<FryDeliveryDto>> MapAsync(List<FryDelivery> deliveries)
@@ -514,6 +540,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
                 HatcheryBatchNumber = d.HatcheryBatchNumber, DeliveryDate = d.DeliveryDate, PlAgeDays = d.PlAgeDays, PlReceived = d.PlReceived, PlOrdered = d.PlOrdered,
                 CostPhp = d.CostPhp, Notes = d.Notes, Status = latest?.Status ?? FryDeliveryStatus.Ordered, StatusChangedAtUtc = latest?.ChangedAtUtc ?? d.CreationTime,
                 PlHealthCertificateNo = d.PlHealthCertificateNo, TransportPermitNo = d.TransportPermitNo, SfscNo = d.SfscNo,
+                TransportMode = d.TransportMode, TimePackedUtc = d.TimePackedUtc,
                 IsStockingFinished = d.IsStockingFinished, StockingFinishedAtUtc = d.StockingFinishedAtUtc,
                 PlNotStocked = shortfalls.FirstOrDefault(s => s.DeliveryId == d.Id)?.Pl ?? 0,
                 IsStocked = cycle != null, CycleId = cycle?.Id, CycleCode = cycle?.CycleCode, PlStocked = pl,

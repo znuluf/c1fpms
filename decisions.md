@@ -18,7 +18,7 @@ All decisions below were accepted on 2026-10-22 by the capstone development team
 | DEC-08 | One fry delivery → one Production Cycle → batches (one per pond) → logs and harvests | Accepted (full write-up) |
 | DEC-09 | Pond-level preparation; only Prepared ponds can be stocked; Create Batch (Stocking) stepper | Accepted (full write-up) |
 | DEC-10 | Batch Stocked → Harvested / Failed → Closed; cycle Active → Closed | Accepted (full write-up); amended by DEC-64 (reopening, cycle outcome) |
-| DEC-11 | Transport mode and time processed per batch; hatchery, batch number, PL age, PL received per delivery | Accepted |
+| DEC-11 | Transport mode and time processed per batch; hatchery, batch number, PL age, PL received per delivery | Accepted; transport amended by DEC-128 |
 | DEC-12 | GAqP ranges as reference data: flag with recommendations, never block | Accepted (full write-up); notifications part superseded by DEC-49; host-only ranges superseded by DEC-58 |
 | DEC-13 | Daily logs: cycle → pond selection; AM/PM feeding; chemical and supplement application; three mortality causes | Accepted |
 | DEC-14 | Asia/Manila for display, day boundaries and DOC (stocking day = 0); UTC storage | Accepted |
@@ -3217,6 +3217,27 @@ Positive:
 Negative:
 - New columns: the Codespace database must be recreated (delete the Migrations folder, drop the database volume, run `start-fpms.sh`).
 - Pond-specific alerts for a technician (only their pond's water alerts and notices) are not in this change.
+
+## Decision DEC-128: Transport mode and time packed move to the fry delivery, optional
+
+Status: Proposed 2026-11-17; built on `feature/batch-technician`
+Date: 2026-11-17
+Amends: DEC-11
+
+### Context
+Stock a batch asked for a transport mode (required, preset to Truck) and a time processed for every pond. Every pond stocked from one delivery came on the same trip, so the answer repeated per pond, and the preset meant most entries said Truck whatever happened. No regulation in `docs/references.md` asks for the vehicle at stocking: transport details are required on sales shipments (DEC-55) and a transport permit on the delivery (DEC-59). Nothing but the batch page showed the field.
+
+### Decision
+- `FryDelivery.TransportMode` (Truck, Van, Motorcycle, Boat, Other) and `FryDelivery.TimePackedUtc`, both optional, asked on Record a fry delivery and the delivery page as "How the fry travelled" and "Time packed at the hatchery". Time packed cannot be after the delivery day or in the future.
+- `PondBatch.TransportMode` and `TimeProcessedUtc` are removed; Stock a batch no longer asks for them. The batch page and the trace report show the delivery's values ("Not recorded" when blank).
+- The stocking warning "stocked more than 24 hours after the fry were packed" now uses the delivery's time packed.
+
+### Consequences
+Positive:
+- One question per delivery instead of two per pond; stocking has one required field fewer.
+Negative:
+- Columns move: the Codespace database must be recreated (with DEC-127's reset).
+- The planning document's batch definition changes (transport is now a delivery fact); check with the adviser if DEC-11 was a set requirement.
 
 ---
 

@@ -341,7 +341,7 @@ public class CycleAppService : CapstoneAppServiceBase
         var result = new CreateBatchesResultDto();
 
         // Validate every pond and its details before writing anything.
-        var plans = new List<(BatchStockingInput Input, Pond Pond, PondPreparationRound Round, DateTime StockedAtUtc, DateTime? ProcessedUtc, List<EvaluatedReading> Readings)>();
+        var plans = new List<(BatchStockingInput Input, Pond Pond, PondPreparationRound Round, DateTime StockedAtUtc, List<EvaluatedReading> Readings)>();
         foreach (var b in input.Batches)
         {
             var pond = await _ponds.GetAll().Include(p => p.Prefix).FirstOrDefaultAsync(p => p.Id == b.PondId) ?? throw new UserFriendlyException("Pond not found.");
@@ -371,11 +371,6 @@ public class CycleAppService : CapstoneAppServiceBase
                 throw new UserFriendlyException($"Pond {pond.PondCode} is not marked Prepared.");
             }
 
-            if (!Enum.IsDefined(b.TransportMode))
-            {
-                throw new UserFriendlyException("Choose the transport mode.");
-            }
-
             var stockedAtUtc = FarmClock.ToUtc(b.StockedAt);
             if (stockedAtUtc > DateTime.UtcNow.AddMinutes(5))
             {
@@ -394,14 +389,8 @@ public class CycleAppService : CapstoneAppServiceBase
                 throw new UserFriendlyException($"{pond.PondCode}: dead at stocking cannot be negative.");
             }
 
-            DateTime? processedUtc = b.TimeProcessed.HasValue ? FarmClock.ToUtc(b.TimeProcessed.Value) : null;
-            if (processedUtc > stockedAtUtc)
-            {
-                throw new UserFriendlyException($"{pond.PondCode}: the time processed cannot be after the stocking time.");
-            }
-
             var readings = await _waterQuality.EvaluateAsync(b.Readings.Select(r => (r.ParameterCode, r.Value)), requireStockingSet: true);
-            plans.Add((b, pond, round, stockedAtUtc, processedUtc, readings));
+            plans.Add((b, pond, round, stockedAtUtc, readings));
         }
 
         // Start the cycle on the first creation from this delivery.
@@ -444,7 +433,7 @@ public class CycleAppService : CapstoneAppServiceBase
 
         for (var i = 0; i < plans.Count; i++)
         {
-            var (b, pond, round, stockedAtUtc, processedUtc, readings) = plans[i];
+            var (b, pond, round, stockedAtUtc, readings) = plans[i];
             var letter = NextLetter(usedLetters);
             usedLetters.Add(letter);
             var stockingDate = FarmClock.LocalDate(stockedAtUtc, zone);
@@ -452,7 +441,7 @@ public class CycleAppService : CapstoneAppServiceBase
             {
                 CycleId = cycle.Id, PondId = pond.Id, PreparationRoundId = round.Id, Letter = letter, BatchCode = $"{cycle.CycleCode}-{letter}",
                 Status = BatchStatus.Stocked, StockedAtUtc = stockedAtUtc, StockingDate = stockingDate, PlCountStocked = b.PlCount,
-                PondAreaM2AtStocking = pond.AreaM2, TransportMode = b.TransportMode, TimeProcessedUtc = processedUtc,
+                PondAreaM2AtStocking = pond.AreaM2,
                 AcclimationMinutes = b.AcclimationMinutes, InitialSurvivalEstimatePct = b.InitialSurvivalEstimatePct, DeadAtStocking = b.DeadAtStocking,
                 FarmingSystemAtStocking = pond.EffectiveFarmingSystem(profile.FarmingSystem), ConstructionTypeAtStocking = pond.ConstructionType,
                 Technicians = (b.TechnicianUserIds ?? new()).Distinct().Select(id => new BatchTechnician { UserId = id }).ToList(),
@@ -500,9 +489,9 @@ public class CycleAppService : CapstoneAppServiceBase
                 result.Warnings.Add(new WarningDto { Kind = "Hatchery", Message = $"{pond.PondCode}: the hatchery's health certificate had expired on the stocking date." });
             }
 
-            if (processedUtc.HasValue && stockedAtUtc - processedUtc.Value > TimeSpan.FromHours(24))
+            if (delivery.TimePackedUtc.HasValue && stockedAtUtc - delivery.TimePackedUtc.Value > TimeSpan.FromHours(24))
             {
-                result.Warnings.Add(new WarningDto { Kind = "Transport", Message = $"{pond.PondCode}: stocked more than 24 hours after the fry were processed." });
+                result.Warnings.Add(new WarningDto { Kind = "Transport", Message = $"{pond.PondCode}: stocked more than 24 hours after the fry were packed at the hatchery." });
             }
 
             if (b.DeadAtStocking > b.PlCount)

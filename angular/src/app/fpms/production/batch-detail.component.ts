@@ -311,6 +311,9 @@ interface CalMonth {
                                         <h3 class="fpms-section-h">Fry</h3>
                                         <dl class="fpms-facts">
                                             <div><dt>Fry delivery</dt><dd><a [routerLink]="['/app/resources/fry-deliveries', b.fryDeliveryId]">{{ b.hatcheryBatchNumber }}</a> · {{ b.hatcheryName }}</dd></div>
+                                            <!-- DEC-128: from the fry delivery, one trip for every pond stocked from it. -->
+                                            <div><dt>Travelled by</dt><dd>{{ b.transportMode ? (b.transportMode | label: L.TransportModes) : 'Not recorded' }}</dd></div>
+                                            <div><dt>Packed at the hatchery</dt><dd>{{ b.timePackedUtc ? (b.timePackedUtc | farmDateTime) : 'Not recorded' }}</dd></div>
                                             <div><dt>PL age</dt><dd>{{ b.plAgeDays != null ? 'PL' + b.plAgeDays : '—' }}</dd></div>
                                             <div><dt>Hatchery certification</dt><dd>{{ b.hatcheryCertificationStatusAtStocking || '—' }}</dd></div>
                                             <div><dt>PL health certificate</dt><dd>{{ b.plHealthCertificateNo ?? '—' }}</dd></div>
@@ -332,8 +335,6 @@ interface CalMonth {
                                             <div><dt>Dead at stocking</dt><dd>{{ b.deadAtStocking != null ? (b.deadAtStocking | num: 0) + ' PL' : '—' }}</dd></div>
                                             <div><dt>Initial survival est.</dt><dd>{{ b.initialSurvivalEstimatePct != null ? b.initialSurvivalEstimatePct + '%' : '—' }}</dd></div>
                                             <div><dt>Acclimation</dt><dd>{{ b.acclimationMinutes != null ? b.acclimationMinutes + ' min' : '—' }}</dd></div>
-                                            <div><dt>Time processed</dt><dd>{{ b.timeProcessedUtc ? (b.timeProcessedUtc | farmDateTime) : '—' }}</dd></div>
-                                            <div><dt>Transport</dt><dd>{{ b.transportMode | label: L.TransportModes }}</dd></div>
                                         </dl>
                                         <h3 class="fpms-section-h">Pond at stocking</h3>
                                         <dl class="fpms-facts">

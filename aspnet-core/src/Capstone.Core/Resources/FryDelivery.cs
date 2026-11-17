@@ -44,6 +44,12 @@ public class FryDelivery : FarmEntity
     /// <summary>Optional transport permit number (DEC-59).</summary>
     public string TransportPermitNo { get; set; }
 
+    /// <summary>How the fry travelled from the hatchery, optional (DEC-128). One trip for the whole delivery.</summary>
+    public Production.TransportMode? TransportMode { get; set; }
+
+    /// <summary>When the hatchery packed the fry, optional (DEC-128; was "time processed" per batch).</summary>
+    public DateTime? TimePackedUtc { get; set; }
+
     /// <summary>Optional Shrimp Fry Source Certification (SFSC) number for this delivery (DEC-70).</summary>
     public string SfscNo { get; set; }
 

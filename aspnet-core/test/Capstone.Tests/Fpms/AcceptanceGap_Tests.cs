@@ -176,7 +176,7 @@ public class AcceptanceGap_Tests : FpmsTestBase
             FryDeliveryId = delivery.Id,
             Batches = new()
             {
-                new() { PondId = pondId, PlCount = 80000, StockedAt = DateTime.UtcNow.AddDays(-20), TransportMode = TransportMode.Van, Readings = Baseline() },
+                new() { PondId = pondId, PlCount = 80000, StockedAt = DateTime.UtcNow.AddDays(-20), Readings = Baseline() },
             },
         });
         var batchId = created.Batches.Single().Id;

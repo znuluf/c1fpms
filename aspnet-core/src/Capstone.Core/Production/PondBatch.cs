@@ -44,8 +44,6 @@ public class PondBatch : FarmEntity
     /// <summary>Pond area when stocked; later pond edits do not change it.</summary>
     public decimal PondAreaM2AtStocking { get; set; }
 
-    public TransportMode TransportMode { get; set; } = TransportMode.Other;
-    public DateTime? TimeProcessedUtc { get; set; }
     public int? AcclimationMinutes { get; set; }
     public decimal? InitialSurvivalEstimatePct { get; set; }
     public string HatcheryCertificationStatusAtStocking { get; set; }

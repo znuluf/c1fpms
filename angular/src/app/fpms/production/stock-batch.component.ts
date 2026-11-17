@@ -11,8 +11,6 @@ interface Allocation {
     selected: boolean;
     plCount: number | null;
     stockedAt: string;
-    transportMode: number;
-    timeProcessed: string;
     acclimationMinutes: number | null;
     technicianUserIds: number[];
     initialSurvivalEstimatePct: number | null;
@@ -170,14 +168,6 @@ interface Allocation {
                                                     From {{ delivery.deliveryDate | farmDate }} (received) to now.
                                                 </small>
                                             </div>
-                                            <div class="form-group col-md-6">
-                                                <label [for]="'tm' + a.pond.id">Transport mode <span class="text-danger">*</span></label>
-                                                <select [id]="'tm' + a.pond.id" class="form-control" [(ngModel)]="a.transportMode">
-                                                    @for (o of Options.transportMode; track o.value) {
-                                                        <option [ngValue]="o.value">{{ o.label }}</option>
-                                                    }
-                                                </select>
-                                            </div>
                                             @if (people.length) {
                                                 <fieldset class="form-group col-md-6" role="group" [attr.aria-labelledby]="'tu' + a.pond.id">
                                                     <legend [id]="'tu' + a.pond.id" class="col-form-label pt-0 font-weight-bold">Looked after by</legend>
@@ -218,13 +208,9 @@ interface Allocation {
                                                 </div>
                                             }
                                         </div>
-                                        <details class="fpms-fold" [open]="!!a.timeProcessed || a.acclimationMinutes != null || a.initialSurvivalEstimatePct != null || a.deadAtStocking != null">
-                                            <summary>More details <span class="fpms-fold-hint">time packed, acclimation, survival estimate, dead at stocking</span></summary>
+                                        <details class="fpms-fold" [open]="a.acclimationMinutes != null || a.initialSurvivalEstimatePct != null || a.deadAtStocking != null">
+                                            <summary>More details <span class="fpms-fold-hint">acclimation, survival estimate, dead at stocking</span></summary>
                                             <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label [for]="'tp' + a.pond.id">Time processed (packed at the hatchery)</label>
-                                                    <input [id]="'tp' + a.pond.id" type="datetime-local" class="form-control" [(ngModel)]="a.timeProcessed" [max]="a.stockedAt" />
-                                                </div>
                                                 <div class="form-group col-md-6">
                                                     <label [for]="'ac' + a.pond.id">Acclimation (minutes)</label>
                                                     <input [id]="'ac' + a.pond.id" type="number" min="0" max="600" class="form-control" [(ngModel)]="a.acclimationMinutes" />
@@ -272,7 +258,7 @@ interface Allocation {
                                     </p>
                                     <div class="table-responsive">
                                     <table class="table table-sm">
-                                        <thead><tr><th>Pond · stocked</th><th class="text-right">PL · PL/m²</th><th class="text-right">Dead</th><th>Transport</th><th>DO / Temp / pH / Sal</th></tr></thead>
+                                        <thead><tr><th>Pond · stocked</th><th class="text-right">PL · PL/m²</th><th class="text-right">Dead</th><th>DO / Temp / pH / Sal</th></tr></thead>
                                         <tbody>
                                             @for (a of selected; track a.pond.id) {
                                                 <tr>
@@ -282,7 +268,6 @@ interface Allocation {
                                                         <div class="text-nowrap" [class.text-muted]="densityState(a) === 'within'" [class.text-warning-dark]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle ml-1" aria-hidden="true"></i><span class="sr-only">outside the band</span> }</div>
                                                     </td>
                                                     <td class="text-right">{{ a.deadAtStocking != null ? (a.deadAtStocking | num: 0) : '—' }}</td>
-                                                    <td>{{ a.transportMode | label: L.TransportModes }}</td>
                                                     <td>{{ readingsLine(a) }}</td>
                                                 </tr>
                                             }
@@ -461,8 +446,6 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
             selected: false,
             plCount: null,
             stockedAt: FarmTime.nowInput(),
-            transportMode: 1,
-            timeProcessed: '',
             acclimationMinutes: null,
             technicianUserIds: [],
             initialSurvivalEstimatePct: null,
@@ -515,7 +498,6 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
                 !!a.stockedAt &&
                 this.inWindow(a) &&
                 this.stockingParams.every((p) => ['ok', 'out'].includes(this.state(p, a))) &&
-                (!a.timeProcessed || a.timeProcessed <= a.stockedAt) &&
                 (a.deadAtStocking == null || a.deadAtStocking >= 0)
         );
     }
@@ -523,8 +505,6 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
     copyFromFirst(a: Allocation): void {
         const f = this.selected[0];
         a.stockedAt = f.stockedAt;
-        a.transportMode = f.transportMode;
-        a.timeProcessed = f.timeProcessed;
         a.acclimationMinutes = f.acclimationMinutes;
         a.initialSurvivalEstimatePct = f.initialSurvivalEstimatePct;
         a.deadAtStocking = f.deadAtStocking;
@@ -545,8 +525,6 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
                 pondId: a.pond.id,
                 plCount: a.plCount,
                 stockedAt: FarmTime.fromLocalInput(a.stockedAt),
-                transportMode: a.transportMode,
-                timeProcessed: a.timeProcessed ? FarmTime.fromLocalInput(a.timeProcessed) : null,
                 acclimationMinutes: a.acclimationMinutes,
                 initialSurvivalEstimatePct: a.initialSurvivalEstimatePct,
                 deadAtStocking: a.deadAtStocking,

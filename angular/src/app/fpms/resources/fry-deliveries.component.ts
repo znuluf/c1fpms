@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { PagerState } from '@shared/fpms/pager';
-import { EMPTY_GUID } from '@shared/fpms/farm-time';
+import { EMPTY_GUID, FarmTime } from '@shared/fpms/farm-time';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { unbroken } from '@shared/fpms/labels';
 import { ToolbarChip } from '@shared/fpms/ui';
@@ -213,6 +213,21 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                     placeholder="optional" />
                                             </div>
                                         </div>
+                                        <!-- DEC-128: one trip for the whole delivery, so asked here once; both optional. -->
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="trm">How the fry travelled</label>
+                                                <select id="trm" class="form-control" name="transportMode" [(ngModel)]="form.transportMode">
+                                                    <option [ngValue]="null">Not recorded</option>
+                                                    @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="tpk">Time packed at the hatchery</label>
+                                                <input id="tpk" type="datetime-local" class="form-control" name="timePacked" [(ngModel)]="form.timePacked" [max]="form.deliveryDate ? form.deliveryDate + 'T23:59' : ''" />
+                                                <small class="form-text text-muted">Optional. Stocking more than 24 hours after packing is flagged.</small>
+                                            </div>
+                                        </div>
                                         <div class="form-group mb-0">
                                             <label for="n">Notes</label>
                                             <input
@@ -388,6 +403,8 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
             plHealthCertificateNo: '',
             transportPermitNo: '',
             sfscNo: '',
+            transportMode: null,
+            timePacked: '',
             initialStatus: 1,
         };
     }
@@ -417,7 +434,7 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
 
     async save(): Promise<void> {
         let result: any;
-        if (await this.act(async () => (result = await this.api.post<any>('FryDelivery', 'Create', this.form)))) {
+        if (await this.act(async () => (result = await this.api.post<any>('FryDelivery', 'Create', { ...this.form, timePacked: this.form.timePacked ? FarmTime.fromLocalInput(this.form.timePacked) : null })))) {
             this.notifySaved('Fry delivery recorded.');
             if (result?.warnings?.length) {
                 this.showWarnings(result.warnings);

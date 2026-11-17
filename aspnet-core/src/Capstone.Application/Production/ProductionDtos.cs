@@ -269,8 +269,9 @@ public class BatchDetailDto : BatchListDto
 {
     public decimal PondAreaM2AtStocking { get; set; }
     public DateTime? StockedAtUtc { get; set; }
-    public TransportMode TransportMode { get; set; }
-    public DateTime? TimeProcessedUtc { get; set; }
+    /// <summary>From the fry delivery (DEC-128): one trip for every pond stocked from it.</summary>
+    public TransportMode? TransportMode { get; set; }
+    public DateTime? TimePackedUtc { get; set; }
     public int? AcclimationMinutes { get; set; }
     public decimal? InitialSurvivalEstimatePct { get; set; }
     public Guid FryDeliveryId { get; set; }
@@ -404,11 +405,6 @@ public class BatchStockingInput
 
     /// <summary>Stocking date and time (ISO with offset). Not before the delivery date; not in the future.</summary>
     public DateTime StockedAt { get; set; }
-
-    public TransportMode TransportMode { get; set; } = TransportMode.Truck;
-
-    /// <summary>When the fry were processed (packed) at the hatchery; not after stocking.</summary>
-    public DateTime? TimeProcessed { get; set; }
 
     [Range(0, 600)]
     public int? AcclimationMinutes { get; set; }

@@ -151,6 +151,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <div><dt>Fry Source Certificate</dt><dd>@if (f.sfscNo) { {{ f.sfscNo }} } @else { <span class="ts-missing">Not recorded</span><span class="ts-d">Required by BFAR FAO 225-1</span> }</dd></div>
                                     <div><dt>PL health certificate</dt><dd>@if (f.plHealthCertificateNo) { {{ f.plHealthCertificateNo }} } @else { <span class="ts-missing">Not recorded</span> }</dd></div>
                                     <div><dt>Transport permit</dt><dd>@if (f.transportPermitNo) { {{ f.transportPermitNo }} } @else { <span class="ts-missing">Not recorded</span> }</dd></div>
+                                    <div><dt>Travelled by</dt><dd>{{ f.transportMode ? (f.transportMode | label: L.TransportModes) : 'Not recorded' }}{{ f.timePackedUtc ? ' · packed ' + (f.timePackedUtc | farmDateTime) : '' }}</dd></div>
                                 </dl>
                             } @else {
                                 <p class="ts-missing">Not recorded: no fry delivery is linked to this batch.</p>

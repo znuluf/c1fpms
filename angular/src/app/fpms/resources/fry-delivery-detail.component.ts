@@ -104,6 +104,21 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     <input id="sfsc" class="form-control" name="sfscNo" [(ngModel)]="m.sfscNo" maxlength="100" placeholder="optional" />
                                                 </div>
                                             </div>
+                                            <!-- DEC-128: one trip for the whole delivery, so asked here once; both optional. -->
+                                            <div class="form-row">
+                                                <div class="form-group col-md-6">
+                                                    <label for="trm">How the fry travelled</label>
+                                                    <select id="trm" class="form-control" name="transportMode" [(ngModel)]="m.transportMode">
+                                                        <option [ngValue]="null">Not recorded</option>
+                                                        @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label for="tpk">Time packed at the hatchery</label>
+                                                    <input id="tpk" type="datetime-local" class="form-control" name="timePacked" [(ngModel)]="m.timePacked" [max]="m.deliveryDate ? m.deliveryDate + 'T23:59' : ''" />
+                                                    <small class="form-text text-muted">Optional. Stocking more than 24 hours after packing is flagged.</small>
+                                                </div>
+                                            </div>
                                             <div class="form-group mb-0">
                                                 <label for="n">Notes</label>
                                                 <input id="n" class="form-control" name="notes" [(ngModel)]="m.notes" maxlength="500" />
@@ -250,7 +265,7 @@ export class FryDeliveryDetailComponent extends FpmsPage implements OnInit {
 
     async load(): Promise<void> {
         const d = await this.api.get<any>('FryDelivery', 'Get', { id: this.param('id') });
-        this.m = { ...d };
+        this.m = { ...d, timePacked: d.timePackedUtc ? FarmTime.toLocalInput(d.timePackedUtc) : '' };
         this.change = { status: null, changedAt: FarmTime.nowInput(), note: '' };
         const gap = d.plReceived - d.plStocked;
         this.shortfalls = gap > 0 ? [{ reason: 1, count: gap, note: '' }] : [];
@@ -270,7 +285,7 @@ export class FryDeliveryDetailComponent extends FpmsPage implements OnInit {
 
     async save(): Promise<void> {
         let result: any;
-        if (await this.act(async () => (result = await this.api.put<any>('FryDelivery', 'Update', this.m)))) {
+        if (await this.act(async () => (result = await this.api.put<any>('FryDelivery', 'Update', { ...this.m, timePacked: this.m.timePacked ? FarmTime.fromLocalInput(this.m.timePacked) : null })))) {
             this.notifySaved('Delivery saved.');
             if (result?.warnings?.length) {
                 this.showWarnings(result.warnings);

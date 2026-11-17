@@ -188,7 +188,7 @@ public class BatchAppService : CapstoneAppServiceBase
             Id = list.Id, BatchCode = list.BatchCode, Letter = list.Letter, CycleId = list.CycleId, CycleCode = list.CycleCode, PondId = list.PondId, PondCode = list.PondCode,
             Status = list.Status, StockingDate = list.StockingDate, PlCountStocked = list.PlCountStocked, Doc = list.Doc, CurrentAbwG = list.CurrentAbwG,
             FcrToDate = list.FcrToDate, EstimatedSurvivalPct = list.EstimatedSurvivalPct,
-            PondAreaM2AtStocking = b.PondAreaM2AtStocking, StockedAtUtc = b.StockedAtUtc, TransportMode = b.TransportMode, TimeProcessedUtc = b.TimeProcessedUtc,
+            PondAreaM2AtStocking = b.PondAreaM2AtStocking, StockedAtUtc = b.StockedAtUtc, TransportMode = delivery?.TransportMode, TimePackedUtc = delivery?.TimePackedUtc,
             AcclimationMinutes = b.AcclimationMinutes, InitialSurvivalEstimatePct = b.InitialSurvivalEstimatePct,
             FryDeliveryId = b.Cycle?.FryDeliveryId ?? Guid.Empty, HatcheryName = delivery?.Hatchery?.Name, HatcheryBatchNumber = delivery?.HatcheryBatchNumber,
             PlAgeDays = delivery?.PlAgeDays,

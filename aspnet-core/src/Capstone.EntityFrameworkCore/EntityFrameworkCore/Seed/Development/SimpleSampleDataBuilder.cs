@@ -235,7 +235,7 @@ public class SimpleSampleDataBuilder
         {
             TenantId = _t, CreatorUserId = _ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = "GSH-B0202", DeliveryDate = Stocking, PlAgeDays = 12,
             PlReceived = pls.Sum() + deadOnArrival + countDifference, CostPhp = Math.Round((pls.Sum() + deadOnArrival + countDifference) * 0.36m, 0),
-            PlHealthCertificateNo = "PLHC-20260202", TransportPermitNo = "DTP-20260202-GSH", SfscNo = "SFSC-2026-GSH-0202",
+            PlHealthCertificateNo = "PLHC-20260202", TransportPermitNo = "DTP-20260202-GSH", SfscNo = "SFSC-2026-GSH-0202", TransportMode = TransportMode.Truck, TimePackedUtc = Local(Stocking, 4, 30),
             StockingFinishedAtUtc = Local(Stocking, 11), StockingFinishedByUserId = _ownerId,
             Notes = "Picked up at the hatchery in Brgy. Tinoto, Maasim; oxygenated bags, by truck to the farm.",
         };
@@ -282,8 +282,8 @@ public class SimpleSampleDataBuilder
             var batch = new PondBatch
             {
                 TenantId = _t, CreatorUserId = _ownerId, CycleId = cycle.Id, PondId = pond.Id, PreparationRoundId = round.Id, Letter = letter, BatchCode = $"{cycle.CycleCode}-{letter}",
-                Status = BatchStatus.Stocked, StockedAtUtc = Local(Stocking, 7, 30 + i * 10), StockingDate = Stocking, PondAreaM2AtStocking = pond.AreaM2, TransportMode = TransportMode.Truck,
-                TimeProcessedUtc = Local(Stocking, 6, 30), PlCountStocked = pl, DeadAtStocking = 150, AcclimationMinutes = 60, InitialSurvivalEstimatePct = 95,
+                Status = BatchStatus.Stocked, StockedAtUtc = Local(Stocking, 7, 30 + i * 10), StockingDate = Stocking, PondAreaM2AtStocking = pond.AreaM2,
+                PlCountStocked = pl, DeadAtStocking = 150, AcclimationMinutes = 60, InitialSurvivalEstimatePct = 95,
                 FarmingSystemAtStocking = FarmingSystem.Intensive, ConstructionTypeAtStocking = plan.Type, DensityFlag = band?.Judge(plan.Density),
                 HatcheryCertificationStatusAtStocking = hatchery.DescribeCertification(certificate, Stocking),
             };
@@ -497,7 +497,7 @@ public class SimpleSampleDataBuilder
         {
             TenantId = _t, CreatorUserId = _ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = "SNA-B0914", DeliveryDate = stocking, PlAgeDays = 12,
             PlReceived = pls.Sum() + 4000, PlOrdered = pls.Sum() + 6500, CostPhp = Math.Round((pls.Sum() + 4000) * 0.33m, 0), // DEC-93: 2,500 fewer than the papers
-            PlHealthCertificateNo = "PLHC-20260914", TransportPermitNo = "DTP-20260914-SNA", SfscNo = null, // the SFSC paper has not arrived yet: shows the DEC-79 warnings until it is typed in
+            PlHealthCertificateNo = "PLHC-20260914", TransportPermitNo = "DTP-20260914-SNA", SfscNo = null, TransportMode = TransportMode.Truck, TimePackedUtc = Local(stocking, 4, 0), // the SFSC paper has not arrived yet: shows the DEC-79 warnings until it is typed in
             StockingFinishedAtUtc = Local(stocking, 11), StockingFinishedByUserId = _ownerId,
             Notes = "Delivered by the hatchery truck from Brgy. Tuyan, Malapatan; oxygenated bags. SFSC to follow from the hatchery.",
         };
@@ -540,8 +540,8 @@ public class SimpleSampleDataBuilder
             var batch = new PondBatch
             {
                 TenantId = _t, CreatorUserId = _ownerId, CycleId = cycle.Id, PondId = pond.Id, PreparationRoundId = round.Id, Letter = letter, BatchCode = $"{cycle.CycleCode}-{letter}",
-                Status = BatchStatus.Stocked, StockedAtUtc = Local(stocking, 7, 30 + i * 10), StockingDate = stocking, PondAreaM2AtStocking = pond.AreaM2, TransportMode = TransportMode.Truck,
-                TimeProcessedUtc = Local(stocking, 6, 30), PlCountStocked = pl, DeadAtStocking = 120, AcclimationMinutes = 60, InitialSurvivalEstimatePct = 95,
+                Status = BatchStatus.Stocked, StockedAtUtc = Local(stocking, 7, 30 + i * 10), StockingDate = stocking, PondAreaM2AtStocking = pond.AreaM2,
+                PlCountStocked = pl, DeadAtStocking = 120, AcclimationMinutes = 60, InitialSurvivalEstimatePct = 95,
                 FarmingSystemAtStocking = FarmingSystem.Intensive, ConstructionTypeAtStocking = plan.Type, DensityFlag = band?.Judge(plan.Density),
                 HatcheryCertificationStatusAtStocking = hatchery.DescribeCertification(certificate, stocking),
             };

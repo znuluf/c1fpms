@@ -40,7 +40,7 @@ public class V26Production_Tests : FpmsTestBase
 
     private BatchStockingInput Stocking(string pondCode, long pl, DateTime? at = null, long? dead = null) => new()
     {
-        PondId = PondId(pondCode), PlCount = pl, StockedAt = at ?? DateTime.UtcNow.AddMinutes(-1), TransportMode = TransportMode.Truck,
+        PondId = PondId(pondCode), PlCount = pl, StockedAt = at ?? DateTime.UtcNow.AddMinutes(-1),
         AcclimationMinutes = 45, InitialSurvivalEstimatePct = 95, DeadAtStocking = dead, Readings = Baseline(),
     };
 
@@ -103,6 +103,35 @@ public class V26Production_Tests : FpmsTestBase
         fresh.PlHealthCertificateNo.ShouldBe("PLHC-2026-1020");
         var older = options.Deliveries.Single(d => d.HatcheryBatchNumber == "HL-OLDER");
         older.DaysSinceReceived.ShouldBe(6);
+    }
+
+    // ---------------------------------------------------------------- DEC-128: transport is asked once, on the delivery, and optional
+    [Fact]
+    public async Task Transport_mode_and_time_packed_belong_to_the_delivery_and_show_on_its_batches()
+    {
+        var deliveries = Resolve<FryDeliveryAppService>();
+        var received = Today.AddDays(-1);
+        var input = new FryDeliveryEditDto
+        {
+            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "TR-1", DeliveryDate = received, PlAgeDays = 12, PlReceived = 100000,
+            InitialStatus = FryDeliveryStatus.Received, TransportMode = TransportMode.Boat,
+            TimePacked = FarmClock.StartOfDayUtc(received, Zone).AddHours(4),
+        };
+        var id = (await deliveries.Create(input)).Id;
+        var saved = await deliveries.Get(id);
+        saved.TransportMode.ShouldBe(TransportMode.Boat);
+        saved.TimePackedUtc.ShouldNotBeNull();
+
+        // Packed after the fry arrived is refused; leaving both blank is fine.
+        input.HatcheryBatchNumber = "TR-2";
+        input.TimePacked = FarmClock.StartOfDayUtc(received.AddDays(1), Zone).AddHours(1);
+        await Should.ThrowAsync<UserFriendlyException>(() => deliveries.Create(input));
+        input.TimePacked = null;
+        input.TransportMode = null;
+        (await deliveries.Create(input)).Id.ShouldNotBe(Guid.Empty);
+
+        var created = await Resolve<CycleAppService>().CreateBatches(new CreateBatchesInput { FryDeliveryId = id, Batches = new() { Stocking("GP-03", 50000) } });
+        (await Resolve<BatchAppService>().Get(created.Batches.Single().Id)).TransportMode.ShouldBe(TransportMode.Boat);
     }
 
     // ---------------------------------------------------------------- DEC-127: a technician who stocks looks after the batch

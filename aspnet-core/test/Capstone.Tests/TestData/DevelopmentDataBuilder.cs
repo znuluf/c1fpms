@@ -154,14 +154,14 @@ public class DevelopmentDataBuilder
         var reference = new PondBatch
         {
             TenantId = t, CreatorUserId = ownerId, CycleId = cycle.Id, PondId = p1.Id, Letter = "A", BatchCode = "B-2026-01-P01", Status = BatchStatus.Harvested,
-            StockedAtUtc = Utc(2026, 6, 1, 0, 0), StockingDate = new DateOnly(2026, 6, 1), PondAreaM2AtStocking = 2000, TransportMode = TransportMode.Truck,
+            StockedAtUtc = Utc(2026, 6, 1, 0, 0), StockingDate = new DateOnly(2026, 6, 1), PondAreaM2AtStocking = 2000,
             PlCountStocked = 200000, AcclimationMinutes = 45, InitialSurvivalEstimatePct = 95,
             HatcheryCertificationStatusAtStocking = hatchery.DescribeCertification(healthCertificate, new DateOnly(2026, 6, 1)),
         };
         var current = new PondBatch
         {
             TenantId = t, CreatorUserId = ownerId, CycleId = cycle.Id, PondId = p2.Id, Letter = "B", BatchCode = "B-2026-02-P02", Status = BatchStatus.Stocked,
-            StockedAtUtc = Utc(2026, 9, 14, 23, 0), StockingDate = new DateOnly(2026, 9, 15), PondAreaM2AtStocking = 2500, TransportMode = TransportMode.Truck,
+            StockedAtUtc = Utc(2026, 9, 14, 23, 0), StockingDate = new DateOnly(2026, 9, 15), PondAreaM2AtStocking = 2500,
             PlCountStocked = 250000, AcclimationMinutes = 40, InitialSurvivalEstimatePct = 95,
             HatcheryCertificationStatusAtStocking = hatchery.DescribeCertification(healthCertificate, new DateOnly(2026, 9, 15)),
         };

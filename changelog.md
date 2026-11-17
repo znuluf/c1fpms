@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (transport on the fry delivery, DEC-128; branch `feature/batch-technician`)
+- **Stock a batch no longer asks how the fry travelled.** "How the fry travelled" and "Time packed at the hatchery" are now optional fields on the fry delivery, asked once for the whole trip. The batch page and trace report show them from the delivery.
+
 ### Added (technician per batch, DEC-127; branch `feature/batch-technician`)
 - **Name who looks after each batch.** On the batch page (Looked after by · Change) or when stocking, the Owner names a technician and, for days off, a cover with a last day. It is a name, not a lock: anyone can still record for any pond.
 - **My pond.** A technician's own batch on one page: its figures, who covers, and today's Daily record ready to record.

@@ -30,8 +30,8 @@ public class Lifecycle_Tests : FpmsTestBase
 
     private BatchStockingInput Stocking(string pondCode, long pl, DateTime? at = null) => new()
     {
-        PondId = PondId(pondCode), PlCount = pl, StockedAt = at ?? DateTime.UtcNow.AddMinutes(-1), TransportMode = TransportMode.Truck,
-        TimeProcessed = (at ?? DateTime.UtcNow.AddMinutes(-1)).AddHours(-5), AcclimationMinutes = 45, InitialSurvivalEstimatePct = 95, Readings = Baseline(),
+        PondId = PondId(pondCode), PlCount = pl, StockedAt = at ?? DateTime.UtcNow.AddMinutes(-1),
+        AcclimationMinutes = 45, InitialSurvivalEstimatePct = 95, Readings = Baseline(),
     };
 
     private async Task<Guid> NewPreparedPondAsync(int number)
@@ -156,7 +156,7 @@ public class Lifecycle_Tests : FpmsTestBase
         (await Resolve<PondAppService>().Get(other)).OpenRound.ShouldBeNull();
         var batch = await Resolve<BatchAppService>().Get(result.Batches[0].Id);
         batch.Status.ShouldBe(BatchStatus.Stocked);
-        batch.TransportMode.ShouldBe(TransportMode.Truck);
+        batch.TransportMode.ShouldBeNull(); // asked on the delivery now, optional (DEC-128)
         batch.FarmingSystemAtStocking.ShouldBe(FarmingSystem.Intensive); // snapshot of the pond's override (DEC-52)
         batch.ConstructionTypeAtStocking.ShouldNotBeNull();
         batch.DensityFlag.ShouldBe(DensityFlag.Below);
@@ -188,9 +188,6 @@ public class Lifecycle_Tests : FpmsTestBase
         await Should.ThrowAsync<UserFriendlyException>(() => cycles.CreateBatches(new CreateBatchesInput { FryDeliveryId = DeliveryId(NewDelivery), Batches = new() { Stocking("GP-01", 1000) } }));
         await Should.ThrowAsync<UserFriendlyException>(() => cycles.CreateBatches(new CreateBatchesInput { FryDeliveryId = DeliveryId(NewDelivery), Batches = new() { Stocking("GP-03", 1000, DateTime.UtcNow.AddDays(1)) } }));
         await Should.ThrowAsync<UserFriendlyException>(() => cycles.CreateBatches(new CreateBatchesInput { FryDeliveryId = DeliveryId(NewDelivery), Batches = new() { Stocking("GP-03", 1000, new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc)) } }));
-        var late = Stocking("GP-03", 1000);
-        late.TimeProcessed = DateTime.UtcNow;
-        await Should.ThrowAsync<UserFriendlyException>(() => cycles.CreateBatches(new CreateBatchesInput { FryDeliveryId = DeliveryId(NewDelivery), Batches = new() { late } }));
         await Should.ThrowAsync<UserFriendlyException>(() => cycles.CreateBatches(new CreateBatchesInput { FryDeliveryId = DeliveryId("HL-0530"), Batches = new() { Stocking("GP-03", 1000) } }));
     }
 
