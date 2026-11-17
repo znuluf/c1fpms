@@ -3145,6 +3145,33 @@ Negative:
 - Until the Farm Owner sets the band, super-intensive densities are not checked at all.
 ---
 
+## Decision DEC-125: Record, correct and void from the Daily record; the drawer shows the day as a checklist
+
+Status: Proposed 2026-11-17; built on `feature/daily-record-actions` (from `feature/page-structure`)
+Date: 2026-11-17
+Related: DEC-96, DEC-104, DEC-116, DEC-117, DEC-118
+
+### Context
+The Daily record showed one pond's day read-only, with one "Record for this day" button. To correct or void an entry, or to fill a gap, the person left it for Record operations and chose the pond, day and kind again. The log drawer's "Today so far" was a row of chips, which did not show what was still missing.
+
+### Options considered
+1. Edit inside the Daily record's rows: water quality has up to seven readings, chemicals have product lots and withdrawal, mortality a cause; none fit a row at 1,000 px, and a second set of forms would need its own checks, flags, review and drafts.
+2. Row actions that open the existing forms in the log drawer, already set to the pond, day and kind, or to the entry (chosen).
+
+### Decision
+- **Daily record:** each entry has Correct (or View when the person cannot change it) and, when allowed, Void; Void opens the entry at its Void section, where the reason is asked. A feeding not recorded has Record; a recorded feeding has Correct and Void, which open the feeding sheet for that pond and day. Water quality has Record (or Add reading). Other entries ends with a Record row: Growth sampling, Mortality, Chemical and supplement application, Pond activity, General note. Nothing shows on a closed batch, to a person who cannot record, or on a day not yet reached. After a save the record reloads in place.
+- **Log drawer:** "Today so far" is a checklist: Feeding, then each kind of entry, marked with a filled check and its entries, or an empty circle and "None recorded". Each row has Record (or Add, or Open for feeding); each entry has Correct or View.
+- **Log entry:** opens an existing entry when the drawer gives its id; after voiding in the drawer it stays and shows the entry as voided.
+- The forms are the same everywhere, so the review before saving, drafts and permissions do not change. "Discard this entry?" in the drawer uses the review panel.
+
+### Consequences
+Positive:
+- Gaps and mistakes are fixed from the day they are seen on, without choosing the pond, day and kind again.
+
+Negative:
+- Feeding rows open the whole feeding sheet for the day rather than a single feeding.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

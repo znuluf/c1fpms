@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added (Daily record actions, DEC-125; branch `feature/daily-record-actions`)
+- **Record, correct and void from the Daily record.** Each entry has Correct (or View) and Void; a missing feeding or water reading has Record; other kinds have a Record row. Each opens its form in the side drawer, already set to the pond and day.
+- **The drawer shows the day as a checklist.** Each kind of record is marked recorded or not yet, with Record and Correct beside it.
+
 ### Added (super-intensive, DEC-124; branch `feature/page-structure`)
 - **Super-intensive is a farming system again.** The national standard gives it no stocking density band, so Farm standards asks for the farm's own; until it is set, super-intensive stockings are not checked for density.
 
