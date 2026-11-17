@@ -3247,3 +3247,61 @@ i.wq-key.out {
     gap: 0.5rem 1rem;
     margin-top: 0.6rem;
 }
+
+// ---- Daily record row actions (DEC-125): Correct, Void or View beside each entry; Record for what is missing.
+.fpms-dr-entry-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem 0.75rem;
+}
+.fpms-dr-actions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+.fpms-dr-record {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.5rem;
+}
+
+// ---- Log drawer: the day as a checklist (DEC-125). A row per kind of record, a filled check when it is in, an empty
+// circle when not yet; the words "recorded" or "None recorded" carry the state as well as the mark.
+.fpms-lw-check {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    > li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        padding: 0.55rem 0;
+        & + li {
+            border-top: 1px solid var(--fpms-line);
+        }
+        > .fas {
+            margin-top: 0.25rem;
+            color: var(--fpms-line-strong);
+        }
+        &.is-done > .fas {
+            color: var(--fpms-success);
+        }
+        > .btn {
+            flex: none;
+        }
+    }
+}
+.fpms-lw-check-what {
+    flex: 1;
+    min-width: 0;
+}
+.fpms-lw-check-entry {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 0.5rem;
+}

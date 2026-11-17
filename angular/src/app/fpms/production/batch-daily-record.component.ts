@@ -6,6 +6,7 @@ import { LogTypes, MortalityCauses } from '@shared/fpms/labels';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { dayFeedings, shortDate } from '../log-calendar';
 import { BatchFiguresComponent } from './batch-figures.component';
+import { LogDrawerService } from '@shared/fpms/log-drawer.service';
 
 /** Log types (labels.ts LogTypes). */
 const WATER = 4;
@@ -139,7 +140,7 @@ function daysBetween(a: string, b: string): number {
                             </div>
                             <div class="card-body p-0 table-responsive">
                                 <table class="table table-sm mb-0">
-                                    <thead><tr><th class="text-nowrap">Feeding</th><th class="text-right">Kg</th><th>Feed lot</th><th title="Who entered it, and when">Entered</th></tr></thead>
+                                    <thead><tr><th class="text-nowrap">Feeding</th><th class="text-right">Kg</th><th>Feed lot</th><th title="Who entered it, and when">Entered</th>@if (actionsOn()) {<th><span class="sr-only">Actions</span></th>}</tr></thead>
                                     <tbody>
                                         @for (n of slots(); track n) {
                                             @let s = sessionOf(day(), n);
@@ -164,6 +165,19 @@ function daysBetween(a: string, b: string): number {
                                                         <div class="text-muted text-nowrap">{{ entered(s.creationTime, day()) }}</div>
                                                     }
                                                 </td>
+                                                @if (actionsOn()) {
+                                                    <!-- Row actions (DEC-125): each opens the feeding sheet for this pond and day in the log drawer. -->
+                                                    <td class="text-right">
+                                                        <div class="fpms-actions-stack">
+                                                            @if (!s) {
+                                                                @if (canRecordDay()) { <button type="button" class="btn btn-sm btn-outline-primary" (click)="openFeeding()" [attr.aria-label]="'Record feeding ' + n">Record</button> }
+                                                            } @else {
+                                                                @if (s.canEdit) { <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openFeeding()" [attr.aria-label]="'Correct feeding ' + n">Correct</button> }
+                                                                @if (s.canVoid) { <button type="button" class="btn btn-sm btn-outline-danger" (click)="openFeeding()" [attr.aria-label]="'Void feeding ' + n">Void</button> }
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                }
                                             </tr>
                                         }
                                     </tbody>
@@ -175,13 +189,19 @@ function daysBetween(a: string, b: string): number {
                             <div class="card-header d-flex align-items-center">
                                 <h4 class="card-title mr-auto">Water quality</h4>
                                 @if (outOfRange(ls).length) {
-                                    <span class="text-warning-dark"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ outOfRange(ls).length }} out of range</span>
+                                    <span class="text-warning-dark mr-2"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ outOfRange(ls).length }} out of range</span>
+                                }
+                                @if (canRecordDay()) {
+                                    <button type="button" class="btn btn-sm" [class.btn-outline-primary]="!byType(ls, WATER).length" [class.btn-outline-secondary]="byType(ls, WATER).length" (click)="openNew(WATER)">{{ byType(ls, WATER).length ? 'Add reading' : 'Record' }}</button>
                                 }
                             </div>
                             <div class="card-body p-0">
                                 @for (l of byType(ls, WATER); track l.id) {
                                     <div class="fpms-dr-entry">
-                                        <div class="text-muted">{{ time(l.observedAtUtc) }} · {{ l.recordedBy }}</div>
+                                        <div class="fpms-dr-entry-head">
+                                            <span class="text-muted">{{ time(l.observedAtUtc) }} · {{ l.recordedBy }}</span>
+                                            <ng-container *ngTemplateOutlet="entryActions; context: { $implicit: l }"></ng-container>
+                                        </div>
                                         <!-- Each reading on its own ruled row (DEC-116). -->
                                         <dl class="fpms-facts mt-1">
                                             @for (m of l.measurements; track m.parameterCode) {
@@ -211,7 +231,10 @@ function daysBetween(a: string, b: string): number {
                             <div class="card-body p-0">
                                 @for (l of otherLogs(ls); track l.id) {
                                     <div class="fpms-dr-entry">
-                                        <div class="text-muted">{{ l.logType | label: LogTypes }} · {{ time(l.observedAtUtc) }}</div>
+                                        <div class="fpms-dr-entry-head">
+                                            <span class="text-muted">{{ l.logType | label: LogTypes }} · {{ time(l.observedAtUtc) }}</span>
+                                            <ng-container *ngTemplateOutlet="entryActions; context: { $implicit: l }"></ng-container>
+                                        </div>
                                         <div>{{ summary(l) || '—' }}</div>
                                         <div class="text-muted">{{ l.recordedBy }}</div>
                                     </div>
@@ -219,6 +242,15 @@ function daysBetween(a: string, b: string): number {
                                     <p class="text-muted px-3 py-2 mb-0">No growth sample, mortality, chemical, pond activity or note this day.</p>
                                 }
                             </div>
+                            @if (canRecordDay()) {
+                                <!-- Record any other kind for this day (DEC-125): each opens its form in the log drawer. -->
+                                <div class="card-footer fpms-dr-record">
+                                    <span class="text-muted">Record</span>
+                                    @for (t of otherTypes; track t.value) {
+                                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="openNew(t.value)">{{ t.label }}</button>
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -279,6 +311,20 @@ function daysBetween(a: string, b: string): number {
                 <p class="text-muted">Week 1 starts on the stocking day (day of culture 0). Select a day to see its full record.</p>
             }
         }
+        <ng-template #entryActions let-l>
+            @if (actionsOn()) {
+                <span class="fpms-dr-actions">
+                    @if (l.canEdit) {
+                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openEntry(l)" [attr.aria-label]="'Correct ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">Correct</button>
+                    } @else {
+                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openEntry(l)" [attr.aria-label]="'View ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">View</button>
+                    }
+                    @if (l.canVoid) {
+                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="openEntry(l, 'void')" [attr.aria-label]="'Void ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">Void</button>
+                    }
+                </span>
+            }
+        </ng-template>
     `,
 })
 export class BatchDailyRecordComponent {
@@ -295,6 +341,34 @@ export class BatchDailyRecordComponent {
     readonly record = output<string>();
 
     readonly WATER = WATER;
+    private readonly drawer = inject(LogDrawerService);
+    /** The kinds recorded from the Other entries card (DEC-125). */
+    readonly otherTypes = [GROWTH, MORTALITY, CHEMICAL, ACTIVITY, NOTE].map((value) => ({ value, label: (LogTypes as Record<number, string>)[value] }));
+
+    /** Row actions show on an open batch for a person who may record (DEC-125). */
+    actionsOn(): boolean {
+        return this.canRecord() && !this.batch()?.isReadOnly;
+    }
+
+    /** New records only on a day of culture that has come. */
+    canRecordDay(): boolean {
+        return this.actionsOn() && this.inRange(this.day()) && this.day() <= this.today;
+    }
+
+    /** Opens a new entry of this kind for the pond and the day shown, in the log drawer. */
+    openNew(logType: number): void {
+        this.drawer.open({ kind: 'log', batchId: this.batch().id, logType, date: this.day() });
+    }
+
+    /** Opens a recorded entry in the log drawer: to correct it, at its Void section, or to read it. */
+    openEntry(l: any, focus: 'void' | null = null): void {
+        this.drawer.open({ kind: 'log', batchId: this.batch().id, logType: l.logType, date: this.day(), logId: l.id, focus });
+    }
+
+    /** Feeding is recorded, corrected and voided on the feeding sheet for the pond and day. */
+    openFeeding(): void {
+        this.drawer.open({ kind: 'feeding', batchId: this.batch().id, date: this.day() });
+    }
     readonly LogTypes = LogTypes as Record<number, string>;
     readonly today = FarmTime.today();
 

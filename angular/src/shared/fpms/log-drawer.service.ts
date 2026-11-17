@@ -14,6 +14,10 @@ export interface LogDrawerRequest {
     date?: string | null;
     /** Preselected log type; log only. */
     logType?: number | null;
+    /** An entry to open for correction instead of a new one; log only (DEC-125). */
+    logId?: string | null;
+    /** "void": open the entry at its Void section (DEC-125). */
+    focus?: 'void' | null;
 }
 
 /** Opens the Feeding and Record operations pages in the logging wizard dialog, so a batch, pond or cycle page need not be left to log. */

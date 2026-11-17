@@ -2,13 +2,14 @@ import { Component, ChangeDetectionStrategy, Injector, Type, effect, inject, sig
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgComponentOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { FpmsApiService } from '@shared/fpms/api.service';
 import { FarmTime } from '@shared/fpms/farm-time';
 import { FeedingSessions, LogTypes, NewLogTypes } from '@shared/fpms/labels';
 import { logSummary } from '@shared/fpms/log-summary';
 import { EMBEDDED_QUERY, LogDrawerRequest, LogDrawerService } from '@shared/fpms/log-drawer.service';
+import { FeedbackService } from '@shared/fpms/feedback';
 
 type Kind = 'feeding' | 'log';
 
@@ -30,7 +31,18 @@ const NEW_LOG_TYPES = NewLogTypes.map((value) => ({
 
 interface DayView {
     feeding: { session: string; text: string }[];
-    logs: { id: string; type: string; time: string; summary: string }[];
+    logs: { id: string; logType: number; type: string; time: string; summary: string; canEdit: boolean; canVoid: boolean }[];
+}
+
+/** One line of the day's checklist (DEC-125): a kind of record, whether it is in, and what is in. */
+interface CheckRow {
+    key: string;
+    label: string;
+    kind: Kind;
+    logType: number | null;
+    done: boolean;
+    detail: string;
+    entries: DayView['logs'];
 }
 
 /**
@@ -44,7 +56,7 @@ interface DayView {
     selector: 'fpms-log-drawer',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [NgComponentOutlet, FormsModule, RouterLink],
+    imports: [NgComponentOutlet, FormsModule],
     template: `
         @if (request(); as r) {
             <div class="fpms-dialog-backdrop no-print">
@@ -77,7 +89,7 @@ interface DayView {
                             <!-- What is already logged on this day, as small chips (DEC-96). -->
                             <div class="fpms-lw-so-far">
                                 <div class="fpms-lw-so-far-head">
-                                    <h3 class="fpms-lw-h">{{ isToday() ? 'Today so far' : 'Logged this day' }}</h3>
+                                    <h3 class="fpms-lw-h">{{ isToday() ? 'Today so far' : 'This day' }}</h3>
                                     <label for="lw-date" class="mb-0 ml-auto mr-2">Day</label>
                                     <input
                                         id="lw-date"
@@ -90,23 +102,28 @@ interface DayView {
                                 @if (day() === null) {
                                     <span class="text-muted">Loading…</span>
                                 } @else {
-                                    <ul class="fpms-lw-chips">
-                                        @for (f of day()!.feeding; track f.session) {
-                                            <li class="fpms-lw-chip" [class.is-empty]="f.session === 'Feeding'">
-                                                <i class="fas" [class.fa-check]="f.session !== 'Feeding'" [class.fa-minus]="f.session === 'Feeding'" aria-hidden="true"></i>
-                                                {{ f.session }}: {{ f.text }}
-                                            </li>
-                                        }
-                                        @for (l of day()!.logs; track l.id) {
-                                            <li class="fpms-lw-chip">
-                                                <i class="fas fa-check" aria-hidden="true"></i>
-                                                <a [routerLink]="['/app/logbook', l.id]" [title]="'Open this ' + l.type.toLowerCase() + ' entry'">{{ l.type }}<span class="text-muted"> {{ l.time }}</span>: {{ l.summary }}</a>
+                                    <!-- The day as a checklist (DEC-125): each kind of record, in or not yet, with Record or Correct beside it. -->
+                                    <ul class="fpms-lw-check">
+                                        @for (r of checklist(); track r.key) {
+                                            <li [class.is-done]="r.done">
+                                                <i class="fas" [class.fa-check-circle]="r.done" [class.fa-circle]="!r.done" aria-hidden="true"></i>
+                                                <div class="fpms-lw-check-what">
+                                                    <strong>{{ r.label }}</strong>
+                                                    <span class="sr-only">{{ r.done ? ': recorded' : ': not recorded' }}</span>
+                                                    @if (r.detail) { <div class="text-muted">{{ r.detail }}</div> }
+                                                    @for (l of r.entries; track l.id) {
+                                                        <div class="fpms-lw-check-entry">
+                                                            <span><span class="text-muted">{{ l.time }}</span> {{ l.summary }}</span>
+                                                            <button type="button" class="btn btn-sm btn-link px-1" (click)="openEntry(l)">{{ l.canEdit ? 'Correct' : 'View' }}</button>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                <button type="button" class="btn btn-sm" [class.btn-outline-primary]="!r.done" [class.btn-outline-secondary]="r.done" (click)="pick(r.kind, r.logType)" [attr.aria-label]="(r.done && r.kind !== 'feeding' ? 'Record another ' : r.kind === 'feeding' && r.done ? 'Open feeding for ' : 'Record ') + r.label.toLowerCase()">
+                                                    {{ r.kind === 'feeding' ? (r.done ? 'Open' : 'Record') : r.done ? 'Add' : 'Record' }}
+                                                </button>
                                             </li>
                                         }
                                     </ul>
-                                    @if (!day()!.logs.length) {
-                                        <div class="text-muted">No other entries.</div>
-                                    }
                                 }
                             </div>
                             <h3 class="fpms-lw-h">What do you want to record?</h3>
@@ -159,6 +176,7 @@ export class LogDrawerComponent {
     private injector = inject(Injector);
     private api = inject(FpmsApiService);
     private drawer = inject(LogDrawerService);
+    private feedback = inject(FeedbackService);
 
     readonly request = this.drawer.request;
     readonly stage = signal<'pond' | 'work'>('pond');
@@ -260,9 +278,13 @@ export class LogDrawerComponent {
         if (!this.drawer.embeddedPage?.hasUnsavedInput()) {
             return Promise.resolve(true);
         }
-        return new Promise<boolean>((resolve) =>
-            abp.message.confirm('The entry you started is not saved and will be discarded.', 'Discard this entry?', (ok: boolean) => resolve(!!ok))
-        );
+        return this.feedback.review({
+            title: 'Discard this entry?',
+            message: 'The entry you started is not saved and will be discarded.',
+            confirmText: 'Discard entry',
+            cancelText: 'Keep editing',
+            danger: true,
+        });
     }
 
     start(): void {
@@ -278,6 +300,36 @@ export class LogDrawerComponent {
         this.selected.set(null);
         this.day.set(null);
         this.stage.set('pond');
+    }
+
+    /**
+     * The day as a checklist (DEC-125): feeding, then each kind of entry, each marked in or not yet. Water quality and
+     * feeding are expected every day; the others are listed so the person sees at a glance what is and is not in.
+     */
+    checklist(): CheckRow[] {
+        const d = this.day();
+        if (!d) {
+            return [];
+        }
+        const fed = d.feeding.filter((f) => f.session !== 'Feeding');
+        const rows: CheckRow[] = [
+            { key: 'feeding', label: 'Feeding', kind: 'feeding', logType: null, done: fed.length > 0, detail: fed.length ? fed.map((f) => `${f.session}: ${f.text}`).join(' · ') : 'None recorded', entries: [] },
+        ];
+        for (const t of this.logTypes) {
+            const entries = d.logs.filter((l) => l.logType === t.value);
+            rows.push({ key: 'log' + t.value, label: t.label, kind: 'log', logType: t.value, done: entries.length > 0, detail: entries.length ? '' : 'None recorded', entries });
+        }
+        return rows;
+    }
+
+    /** Opens a recorded entry below, to correct it (or to read it when the person cannot change it). */
+    async openEntry(l: DayView['logs'][number]): Promise<void> {
+        if (!(await this.confirmDiscard())) {
+            return;
+        }
+        this.selected.set(l.logType);
+        await this.show({ kind: 'log', batchId: this.batchId(), logType: l.logType, date: this.dateValue(), logId: l.id });
+        setTimeout(() => document.getElementById('lw-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     }
 
     /** Opens the chosen form for the pond and day, below the buttons. */
@@ -309,7 +361,10 @@ export class LogDrawerComponent {
             this.stage.set('work');
             void this.loadPond(request.batchId);
             void this.loadDay();
-            if (request.kind) {
+            if (request.kind === 'log' && request.logId) {
+                this.selected.set(request.logType ?? null);
+                await this.show(request);
+            } else if (request.kind) {
                 await this.pick(request.kind, request.logType ?? null);
             }
             return;
@@ -347,9 +402,12 @@ export class LogDrawerComponent {
                 .filter((l) => !l.isVoided)
                 .map((l) => ({
                     id: l.id,
+                    logType: l.logType,
                     type: (LogTypes as Record<number, string>)[l.logType] ?? '',
                     time: FarmTime.time(l.observedAtUtc),
                     summary: logSummary(l) || (l.notes ?? ''),
+                    canEdit: !!l.canEdit,
+                    canVoid: !!l.canVoid,
                 })),
         });
     }
@@ -359,6 +417,8 @@ export class LogDrawerComponent {
             batchId: request.batchId ?? null,
             date: request.date ?? null,
             logType: request.logType != null ? String(request.logType) : null,
+            logId: request.logId ?? null,
+            focus: request.focus ?? null,
         };
         const injector = Injector.create({ providers: [{ provide: EMBEDDED_QUERY, useValue: query }], parent: this.injector });
         const type =

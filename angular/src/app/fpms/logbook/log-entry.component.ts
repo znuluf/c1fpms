@@ -513,7 +513,7 @@ const DRAFT = 'log-entry';
                         </div>
 
                         @if (!isNew && log?.canVoid && !log?.isVoided) {
-                            <div class="card card-outline card-danger mt-4">
+                            <div class="card card-outline card-danger mt-4" id="void-card">
                                 <div class="card-header"><h3 class="card-title">Void this entry</h3></div>
                                 <div class="card-body">
                                     <p class="small text-muted">Voiding hides the entry from records and indicators{{ log.usages?.length ? ' and returns its products to stock with reversing movements' : '' }}. It is kept in the audit history with your reason. You can then record it again correctly.</p>
@@ -586,7 +586,8 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
 
     async init(): Promise<void> {
         this.loading = true;
-        const id = this.param('id');
+        // A routed page has the entry in its address; in the log drawer it comes with the request (DEC-125).
+        const id = this.param('id') ?? this.query('logId');
         this.isNew = !id;
         this.result = null;
         this.restoredAt = null;
@@ -604,9 +605,12 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
         if (this.isNew) {
             await this.initNew();
         } else {
-            await this.loadExisting(id);
+            await this.loadExisting(id!);
         }
         this.loading = false;
+        if (!this.isNew && this.query('focus') === 'void') {
+            setTimeout(() => document.getElementById('void-card')?.scrollIntoView({ block: 'center' }));
+        }
     }
 
     private async initNew(): Promise<void> {
@@ -1058,7 +1062,13 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
         }
         if (await this.act(() => this.api.post('Log', 'Void', { id: this.log.id, reason: this.voidReason.trim() }))) {
             this.notifySaved('Entry voided.');
-            this.router.navigate(['/app/production/batches', this.log.batchId], { replaceUrl: true });
+            if (this.embedded) {
+                // In the log drawer: stay, and show the entry as voided; the day list and the page behind reload.
+                this.voidReason = '';
+                await this.init();
+            } else {
+                this.router.navigate(['/app/production/batches', this.log.batchId], { replaceUrl: true });
+            }
         }
     }
 
