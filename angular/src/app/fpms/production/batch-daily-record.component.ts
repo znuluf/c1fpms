@@ -19,6 +19,15 @@ const ACTIVITY = 10;
 const NOT_FED = 2;
 /** The list endpoints return at most 100 rows; a week of one batch stays well under that. */
 const PAGE = 100;
+const EDIT_KEY = 'fpms.dailyRecord.mode';
+
+function readEditing(): boolean {
+    try {
+        return localStorage.getItem(EDIT_KEY) === 'edit';
+    } catch {
+        return false;
+    }
+}
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 type CellKind = 'value' | 'warn' | 'notfed' | 'missing' | 'open' | 'none';
@@ -76,6 +85,13 @@ function daysBetween(a: string, b: string): number {
                     <button type="button" class="btn" [class.btn-primary]="mode() === 'day'" [class.btn-outline-primary]="mode() !== 'day'" [attr.aria-pressed]="mode() === 'day'" (click)="mode.set('day')">Day</button>
                     <button type="button" class="btn" [class.btn-primary]="mode() === 'week'" [class.btn-outline-primary]="mode() !== 'week'" [attr.aria-pressed]="mode() === 'week'" (click)="mode.set('week')">Week</button>
                 </div>
+                @if (actionsOn() && mode() === 'day') {
+                    <!-- View or Edit (DEC-126): the record read-only, or with Correct, Void and Record on its rows. -->
+                    <div class="btn-group" role="group" aria-label="Mode">
+                        <button type="button" class="btn" [class.btn-primary]="!editing()" [class.btn-outline-primary]="editing()" [attr.aria-pressed]="!editing()" (click)="setEditing(false)">View</button>
+                        <button type="button" class="btn" [class.btn-primary]="editing()" [class.btn-outline-primary]="!editing()" [attr.aria-pressed]="editing()" (click)="setEditing(true)"><i class="fas fa-pen mr-1" aria-hidden="true"></i>Edit</button>
+                    </div>
+                }
                 <div class="fpms-dr-steps">
                     <button type="button" class="btn btn-outline-secondary" [attr.aria-label]="mode() === 'day' ? 'Previous day' : 'Previous week'" [disabled]="!canStep(-1)" (click)="step(-1)"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
                     <button type="button" class="btn btn-outline-secondary" [attr.aria-label]="mode() === 'day' ? 'Next day' : 'Next week'" [disabled]="!canStep(1)" (click)="step(1)"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
@@ -140,7 +156,7 @@ function daysBetween(a: string, b: string): number {
                             </div>
                             <div class="card-body p-0 table-responsive">
                                 <table class="table table-sm mb-0">
-                                    <thead><tr><th class="text-nowrap">Feeding</th><th class="text-right">Kg</th><th>Feed lot</th><th title="Who entered it, and when">Entered</th>@if (actionsOn()) {<th><span class="sr-only">Actions</span></th>}</tr></thead>
+                                    <thead><tr><th class="text-nowrap">Feeding</th><th class="text-right">Kg</th><th>Feed lot</th><th title="Who entered it, and when">Entered</th>@if (showActions()) {<th><span class="sr-only">Actions</span></th>}</tr></thead>
                                     <tbody>
                                         @for (n of slots(); track n) {
                                             @let s = sessionOf(day(), n);
@@ -165,7 +181,7 @@ function daysBetween(a: string, b: string): number {
                                                         <div class="text-muted text-nowrap">{{ entered(s.creationTime, day()) }}</div>
                                                     }
                                                 </td>
-                                                @if (actionsOn()) {
+                                                @if (showActions()) {
                                                     <!-- Row actions (DEC-125): each opens the feeding sheet for this pond and day in the log drawer. -->
                                                     <td class="text-right">
                                                         <div class="fpms-actions-stack">
@@ -312,7 +328,7 @@ function daysBetween(a: string, b: string): number {
             }
         }
         <ng-template #entryActions let-l>
-            @if (actionsOn()) {
+            @if (showActions()) {
                 <span class="fpms-dr-actions">
                     @if (l.canEdit) {
                         <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openEntry(l)" [attr.aria-label]="'Correct ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">Correct</button>
@@ -350,9 +366,25 @@ export class BatchDailyRecordComponent {
         return this.canRecord() && !this.batch()?.isReadOnly;
     }
 
+    /** View or Edit (DEC-126): Edit shows the row actions. Starts in View; the choice is kept on this device. */
+    readonly editing = signal(readEditing());
+
+    setEditing(on: boolean): void {
+        this.editing.set(on);
+        try {
+            localStorage.setItem(EDIT_KEY, on ? 'edit' : 'view');
+        } catch {
+            // Storage can be blocked; the choice then lasts until the page is reloaded.
+        }
+    }
+
+    showActions(): boolean {
+        return this.actionsOn() && this.editing();
+    }
+
     /** New records only on a day of culture that has come. */
     canRecordDay(): boolean {
-        return this.actionsOn() && this.inRange(this.day()) && this.day() <= this.today;
+        return this.showActions() && this.inRange(this.day()) && this.day() <= this.today;
     }
 
     /** Opens a new entry of this kind for the pond and the day shown, in the log drawer. */

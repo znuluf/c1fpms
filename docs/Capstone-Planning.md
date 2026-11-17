@@ -910,6 +910,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-123 | Feeding schedule picker (proposed): one time picker per feeding, add and remove, kept in order, duplicates blocked; stored value unchanged. |
 | DEC-124 | Super-intensive restored (proposed): open band per construction type until the farm sets its own in Farm Standards. Amends DEC-65. |
 | DEC-125 | Daily record actions (proposed): row actions open the existing forms in the drawer; drawer day checklist. |
+| DEC-126 | Daily record View and Edit (proposed): starts in View; Edit shows the row actions. Amends DEC-125. |
 
 # **Appendix B. Manuscript alignment notes**
 

@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (Daily record View and Edit, DEC-126; branch `feature/daily-record-actions`)
+- **The Daily record has View and Edit.** View shows the day without buttons; Edit shows Correct, Void and Record on its rows. It starts in View and remembers your choice on this device.
+
 ### Added (Daily record actions, DEC-125; branch `feature/daily-record-actions`)
 - **Record, correct and void from the Daily record.** Each entry has Correct (or View) and Void; a missing feeding or water reading has Record; other kinds have a Record row. Each opens its form in the side drawer, already set to the pond and day.
 - **The drawer shows the day as a checklist.** Each kind of record is marked recorded or not yet, with Record and Correct beside it.

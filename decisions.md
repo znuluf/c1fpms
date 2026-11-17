@@ -3172,6 +3172,25 @@ Negative:
 - Feeding rows open the whole feeding sheet for the day rather than a single feeding.
 ---
 
+## Decision DEC-126: The Daily record opens in View; Edit shows the row actions
+
+Status: Proposed 2026-11-17; built on `feature/daily-record-actions`
+Date: 2026-11-17
+Amends: DEC-125
+
+### Context
+DEC-125 put Correct, Void and Record on every row of the Daily record. The Owner asked for a view-only version the person can switch to, so the record can be read without the buttons.
+
+### Decision
+- A View | Edit switch in the Daily record's toolbar, beside Day | Week, in the Day view only. View shows the record without row actions; Edit shows Correct, Void, Record and the Record row of DEC-125.
+- It starts in View and remembers the choice on this device. It shows only to a person who can record, on an open batch.
+- "Record for this day" at the top stays in both modes.
+
+### Consequences
+Positive:
+- Reading a day is calm by default; corrections are one switch away.
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.
