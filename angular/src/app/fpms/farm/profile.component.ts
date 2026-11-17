@@ -75,7 +75,7 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                                     <dt class="col-sm-4">Time zone</dt><dd class="col-sm-8">{{ p.timeZone }}</dd>
                                     <dt class="col-sm-4">Farming system</dt><dd class="col-sm-8">{{ p.farmingSystem | label: L.FarmingSystems }}</dd>
                                     <dt class="col-sm-4">Permit alert</dt><dd class="col-sm-8">{{ p.documentExpiryAlertDays }} days</dd>
-                                    <dt class="col-sm-4">Date display</dt><dd class="col-sm-8">{{ p.dateOrder === 2 ? 'Day first (22 Oct 2026)' : 'Month first (Oct 22, 2026)' }}</dd>
+                                    <dt class="col-sm-4">Date display</dt><dd class="col-sm-8">{{ p.dateOrder === 2 ? 'Day first' : 'Month first' }}</dd>
                                     <dt class="col-sm-4">Time display</dt><dd class="col-sm-8">{{ p.use24HourTime ? '24-hour (14:30)' : '12-hour (2:30 PM)' }}</dd>
                                     <dt class="col-sm-4">Feeding schedule</dt><dd class="col-sm-8">{{ feedingCount() }} a day: {{ p.feedingTimes }}</dd>
                                     <dt class="col-sm-4">Water quality</dt><dd class="col-sm-8">{{ p.waterQualityDaily === false ? 'Tested on some days; a day without a reading is not a gap' : 'Tested every day' }}</dd>
@@ -286,8 +286,8 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                                             <div class="form-group col-md-6 mb-md-0">
                                                 <label for="dord">Date display</label>
                                                 <select id="dord" class="form-control" name="dateOrder" [(ngModel)]="p.dateOrder">
-                                                    <option [ngValue]="1">Month first (Oct 22, 2026)</option>
-                                                    <option [ngValue]="2">Day first (22 Oct 2026)</option>
+                                                    <option [ngValue]="1">Month first</option>
+                                                    <option [ngValue]="2">Day first</option>
                                                 </select>
                                             </div>
                                             <div class="form-group col-md-6 mb-0">
