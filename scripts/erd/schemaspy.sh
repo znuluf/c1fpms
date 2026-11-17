@@ -31,7 +31,7 @@ while [ $# -gt 0 ]; do
     --all) TABLES='.*'; shift ;;
     --out) OUT="${2:?--out needs a directory}"; shift 2 ;;
     -h|--help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    *) echo "Unknown option: $1 (see --help)" >&2; exit 2 ;;
+    *) echo "Unknown option: $1 (options: --db, --all, --out; run with --help for details)" >&2; exit 2 ;;
   esac
 done
 case "$DB" in *[!A-Za-z0-9_]*|'') echo "Database name may only use letters, digits and _: $DB" >&2; exit 2 ;; esac
@@ -112,4 +112,4 @@ docker run --rm \
 [ -f "$OUT/index.html" ] || fail "SchemaSpy finished without writing $OUT/index.html; see its output above."
 echo
 echo "Done: ${OUT#"$ROOT"/}/index.html"
-echo "To browse it in the Codespace: python3 -m http.server 8090 -d ${OUT#"$ROOT"/}  (then open the forwarded port 8090)"
+echo "To browse it in the Codespace: npx --yes http-server ${OUT#"$ROOT"/} -p 8090 -c-1  (then open the forwarded port 8090)"
