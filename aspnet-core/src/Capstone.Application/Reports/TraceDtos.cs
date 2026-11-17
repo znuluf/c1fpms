@@ -63,6 +63,7 @@ public class TraceFrySourceDto
     public string PlHealthCertificateNo { get; set; }
     public string TransportPermitNo { get; set; }
     public string SfscNo { get; set; }
+    public string PurchaseOrderNo { get; set; }
     /// <summary>How the fry travelled and when they were packed (DEC-128); null when not recorded.</summary>
     public Production.TransportMode? TransportMode { get; set; }
     public DateTime? TimePackedUtc { get; set; }

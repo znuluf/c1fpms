@@ -275,6 +275,7 @@ public static class FpmsModelConfiguration
             e.Property(x => x.Notes).HasMaxLength(FryDelivery.MaxNotesLength);
             e.Property(x => x.PlHealthCertificateNo).HasMaxLength(FryDelivery.MaxPermitLength);
             e.Property(x => x.TransportPermitNo).HasMaxLength(FryDelivery.MaxPermitLength);
+            e.Property(x => x.PurchaseOrderNo).HasMaxLength(FryDelivery.MaxPermitLength);
             e.Property(x => x.SfscNo).HasMaxLength(FryDelivery.MaxPermitLength);
             e.Ignore(x => x.IsStockingFinished);
             e.HasOne(x => x.Hatchery).WithMany().HasForeignKey(x => x.HatcheryId).OnDelete(DeleteBehavior.Restrict);

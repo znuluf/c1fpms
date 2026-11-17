@@ -181,6 +181,11 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                     }
                                                 </select>
                                             </div>
+                                            <!-- DEC-129: the PO number from the farm's logbook. -->
+                                            <div class="form-group col-md-4">
+                                                <label for="po">Purchase order (PO) no.</label>
+                                                <input id="po" class="form-control" name="purchaseOrderNo" [(ngModel)]="form.purchaseOrderNo" maxlength="100" placeholder="optional" />
+                                            </div>
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group col-md-4">
@@ -256,7 +261,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                 <!-- Filters on the page ground, the list in one panel (DEC-107, DEC-111). -->
                 <div class="fpms-list-filters">
                         <fpms-list-toolbar
-                            placeholder="Search by hatchery lot, hatchery or certificate"
+                            placeholder="Search by hatchery lot, hatchery, PO or certificate"
                             [search]="search"
                             [resultText]="resultText()"
                             [chips]="chips()"
@@ -293,7 +298,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                         <tr>
                                             <td>
                                                 <a class="text-nowrap" [routerLink]="['/app/resources/fry-deliveries', d.id]">{{ d.hatcheryBatchNumber }}</a>
-                                                <div class="text-muted">{{ d.hatcheryName }}</div>
+                                                <div class="text-muted">{{ d.hatcheryName }}{{ d.purchaseOrderNo ? ' · PO ' + d.purchaseOrderNo : '' }}</div>
                                             </td>
                                             <td class="text-nowrap">
                                                 {{ d.deliveryDate | farmDate }}
@@ -403,6 +408,7 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
             plHealthCertificateNo: '',
             transportPermitNo: '',
             sfscNo: '',
+            purchaseOrderNo: '',
             transportMode: null,
             timePacked: '',
             initialStatus: 1,

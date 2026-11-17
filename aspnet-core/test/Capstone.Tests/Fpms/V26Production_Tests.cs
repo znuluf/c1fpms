@@ -114,13 +114,15 @@ public class V26Production_Tests : FpmsTestBase
         var input = new FryDeliveryEditDto
         {
             HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "TR-1", DeliveryDate = received, PlAgeDays = 12, PlReceived = 100000,
-            InitialStatus = FryDeliveryStatus.Received, TransportMode = TransportMode.Boat,
+            InitialStatus = FryDeliveryStatus.Received, TransportMode = TransportMode.Boat, PurchaseOrderNo = " PO-77 ",
             TimePacked = FarmClock.StartOfDayUtc(received, Zone).AddHours(4),
         };
         var id = (await deliveries.Create(input)).Id;
         var saved = await deliveries.Get(id);
         saved.TransportMode.ShouldBe(TransportMode.Boat);
         saved.TimePackedUtc.ShouldNotBeNull();
+        saved.PurchaseOrderNo.ShouldBe("PO-77"); // DEC-129, trimmed
+        (await deliveries.GetAll(new GetFryDeliveriesInput { Search = "PO-77", MaxResultCount = 10 })).Items.ShouldContain(x => x.Id == id);
 
         // Packed after the fry arrived is refused; leaving both blank is fine.
         input.HatcheryBatchNumber = "TR-2";
