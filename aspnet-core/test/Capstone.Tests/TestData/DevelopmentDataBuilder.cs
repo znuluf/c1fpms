@@ -139,7 +139,7 @@ public class DevelopmentDataBuilder
         var delivery = new FryDelivery
         {
             TenantId = t, CreatorUserId = ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = "HL-0530", DeliveryDate = new DateOnly(2026, 5, 31),
-            PlAgeDays = 12, PlReceived = 450000, CostPhp = 135000m,
+            PlAgeDays = 12, PlReceived = 450000, CostPhp = 135000m, ReceivedAtUtc = Utc(2026, 5, 31, 22),
         };
         _context.FryDeliveries.Add(delivery);
         _context.SaveChanges();
@@ -224,7 +224,7 @@ public class DevelopmentDataBuilder
         var delivery2 = new FryDelivery
         {
             // Received today, so its ponds can be stocked within the default 1-day stocking window (DEC-63).
-            TenantId = t, CreatorUserId = ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = "HL-1020",
+            TenantId = t, CreatorUserId = ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = "HL-1020", ReceivedAtUtc = Utc(2026, 10, 20, 1),
             DeliveryDate = FarmClock.Today(FarmClock.Resolve(FarmClock.DefaultTimeZone)), PlHealthCertificateNo = "PLHC-2026-1020",
             PlAgeDays = 12, PlReceived = 150000,
         };

@@ -50,6 +50,8 @@ public class SimpleSampleDataBuilder
     private int _t;
     private long _ownerId;
     private long _techId;
+    /// <summary>The second technician (DEC-127): shares HP-01 with Kim and looks after CP-01.</summary>
+    private long _tech2Id;
     private ContainerType _banyera;
     private ContainerType _tub;
     private Buyer _processor;
@@ -79,6 +81,7 @@ public class SimpleSampleDataBuilder
         var abi = farms.EnsureUser(farm.Id, "arkabubba", "Abi", "Rkabubba", StaticRoleNames.Tenants.FarmOwner, pw);
         farms.EnsureUser(farm.Id, "samsedel", "Sam", "Amsedel", StaticRoleNames.Tenants.FarmOwner, pw);
         var kim = farms.EnsureUser(farm.Id, "konacsus", "Kim", "Onacsus", StaticRoleNames.Tenants.FarmTechnician, pw);
+        var jun = farms.EnsureUser(farm.Id, "jdelarosa", "Jun", "Dela Rosa", StaticRoleNames.Tenants.FarmTechnician, pw);
 
         if (_context.Ponds.IgnoreQueryFilters().Any(p => p.TenantId == farm.Id))
         {
@@ -88,6 +91,7 @@ public class SimpleSampleDataBuilder
         _t = farm.Id;
         _ownerId = abi.Id;
         _techId = kim.Id;
+        _tech2Id = jun.Id;
         _parameters = _context.ParameterDefinitions.AsNoTracking().ToDictionary(p => p.Id);
 
         var profile = _context.FarmProfiles.IgnoreQueryFilters().First(p => p.Id == _t);
@@ -236,7 +240,7 @@ public class SimpleSampleDataBuilder
             TenantId = _t, CreatorUserId = _ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = "GSH-B0202", DeliveryDate = Stocking, PlAgeDays = 12,
             PlReceived = pls.Sum() + deadOnArrival + countDifference, CostPhp = Math.Round((pls.Sum() + deadOnArrival + countDifference) * 0.36m, 0),
             PlHealthCertificateNo = "PLHC-20260202", TransportPermitNo = "DTP-20260202-GSH", SfscNo = "SFSC-2026-GSH-0202", TransportMode = TransportMode.Truck, TimePackedUtc = Local(Stocking, 4, 30),
-            StockingFinishedAtUtc = Local(Stocking, 11), StockingFinishedByUserId = _ownerId,
+            StockingFinishedAtUtc = Local(Stocking, 11), StockingFinishedByUserId = _ownerId, ReceivedAtUtc = Local(Stocking, 5),
             Notes = "Picked up at the hatchery in Brgy. Tinoto, Maasim; oxygenated bags, by truck to the farm.",
         };
         _context.FryDeliveries.Add(delivery);
@@ -454,6 +458,7 @@ public class SimpleSampleDataBuilder
 
         _context.SaveChanges();
         var running = SeedRunningCycle(ponds, pls, stoNino, stoNinoHealth, feeds, probiotic);
+        SeedTechnicians(running);
         SeedRunningHarvests(running, ponds, grades);
         SeedReadyToStock(rdex);
 
@@ -465,6 +470,37 @@ public class SimpleSampleDataBuilder
         {
             _context.NumberSequences.Add(new NumberSequence { Id = Guid.NewGuid(), TenantId = _t, SequenceType = NumberSequenceType.HarvestLot, Scope = $"P{n}-2026", NextValue = _lotHarvests.GetValueOrDefault(n) + 1 });
         }
+        _context.SaveChanges();
+    }
+
+    /// <summary>
+    /// Who looks after each running batch (DEC-127): Kim has EP-01; Jun has CP-01, with Kim covering his days off until three
+    /// days from now; HP-01 is shared by Kim and Jun as equals. The closed cycle's batches were all Kim's.
+    /// </summary>
+    private void SeedTechnicians(List<PondBatch> running)
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(8));
+        foreach (var b in _context.PondBatches.Local.Where(x => x.TenantId == _t))
+        {
+            var code = _context.Ponds.Local.First(p => p.Id == b.PondId).PondCode;
+            var people = !running.Contains(b) ? new[] { _techId } : code switch
+            {
+                "CP-01" => new[] { _tech2Id },
+                "HP-01" => new[] { _techId, _tech2Id },
+                _ => new[] { _techId },
+            };
+            foreach (var userId in people)
+            {
+                _context.BatchTechnicians.Add(new BatchTechnician { TenantId = _t, BatchId = b.Id, UserId = userId });
+            }
+
+            if (running.Contains(b) && code == "CP-01")
+            {
+                b.CoverUserId = _techId;
+                b.CoverUntil = today.AddDays(3);
+            }
+        }
+
         _context.SaveChanges();
     }
 
@@ -498,7 +534,7 @@ public class SimpleSampleDataBuilder
             TenantId = _t, CreatorUserId = _ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = "SNA-B0914", DeliveryDate = stocking, PlAgeDays = 12,
             PlReceived = pls.Sum() + 4000, PlOrdered = pls.Sum() + 6500, CostPhp = Math.Round((pls.Sum() + 4000) * 0.33m, 0), // DEC-93: 2,500 fewer than the papers
             PlHealthCertificateNo = "PLHC-20260914", TransportPermitNo = "DTP-20260914-SNA", SfscNo = null, TransportMode = TransportMode.Truck, TimePackedUtc = Local(stocking, 4, 0), // the SFSC paper has not arrived yet: shows the DEC-79 warnings until it is typed in
-            StockingFinishedAtUtc = Local(stocking, 11), StockingFinishedByUserId = _ownerId,
+            StockingFinishedAtUtc = Local(stocking, 11), StockingFinishedByUserId = _ownerId, ReceivedAtUtc = Local(stocking, 5),
             Notes = "Delivered by the hatchery truck from Brgy. Tuyan, Malapatan; oxygenated bags. SFSC to follow from the hatchery.",
         };
         _context.FryDeliveries.Add(delivery);
@@ -506,6 +542,7 @@ public class SimpleSampleDataBuilder
         _context.FryDeliveryShortfalls.Add(new FryDeliveryShortfall { TenantId = _t, CreatorUserId = _ownerId, DeliveryId = delivery.Id, Reason = ShortfallReason.DeadOnArrival, Count = 1500, Note = "Dead in the bags on arrival" });
         _context.FryDeliveryShortfalls.Add(new FryDeliveryShortfall { TenantId = _t, CreatorUserId = _ownerId, DeliveryId = delivery.Id, Reason = ShortfallReason.CountDifference, Count = 2500, Note = "Hatchery count was higher than the farm's count" });
         _context.FryDeliveryStatusChanges.Add(new FryDeliveryStatusChange { TenantId = _t, CreatorUserId = _ownerId, DeliveryId = delivery.Id, Status = FryDeliveryStatus.Ordered, ChangedAtUtc = Local(new DateOnly(2026, 9, 1), 10), Note = "Ordered by phone" });
+        _context.FryDeliveryStatusChanges.Add(new FryDeliveryStatusChange { TenantId = _t, CreatorUserId = _ownerId, DeliveryId = delivery.Id, Status = FryDeliveryStatus.InTransit, ChangedAtUtc = Local(stocking.AddDays(-1), 23), Note = "Hatchery truck left Malapatan" });
         _context.FryDeliveryStatusChanges.Add(new FryDeliveryStatusChange { TenantId = _t, CreatorUserId = _techId, DeliveryId = delivery.Id, Status = FryDeliveryStatus.Received, ChangedAtUtc = Local(stocking, 5) });
 
         var cycle = new ProductionCycle { TenantId = _t, CreatorUserId = _ownerId, CycleCode = "2026-09-SNA-01", Status = CycleStatus.Active, FryDeliveryId = delivery.Id };
@@ -687,13 +724,58 @@ public class SimpleSampleDataBuilder
         {
             TenantId = _t, CreatorUserId = _ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = $"RDX-B{today:MMdd}", DeliveryDate = today, PlAgeDays = 12,
             PlReceived = 303000, PlOrdered = 300000, CostPhp = Math.Round(303000 * 0.34m, 0), PlHealthCertificateNo = $"PLHC-{today:yyyyMMdd}", TransportPermitNo = $"DTP-{today:yyyyMMdd}-RDX",
+            ReceivedAtUtc = Local(today, 0, 30), TransportMode = TransportMode.Truck, TimePackedUtc = Local(today.AddDays(-1), 21),
             Notes = "Delivered by the hatchery truck from Bawing; oxygenated bags. Planned for EP-02 (170,000 PL) and HP-02 (130,000 PL). Shrimp Fry Source Certificate to follow.",
         };
         _context.FryDeliveries.Add(delivery);
         _context.SaveChanges();
-        _context.FryDeliveryStatusChanges.Add(new FryDeliveryStatusChange { TenantId = _t, CreatorUserId = _ownerId, DeliveryId = delivery.Id, Status = FryDeliveryStatus.Ordered, ChangedAtUtc = Local(today.AddDays(-10), 10), Note = "Ordered by phone" });
-        _context.FryDeliveryStatusChanges.Add(new FryDeliveryStatusChange { TenantId = _t, CreatorUserId = _ownerId, DeliveryId = delivery.Id, Status = FryDeliveryStatus.InTransit, ChangedAtUtc = Local(today.AddDays(-1), 23), Note = "Left the hatchery" });
-        _context.FryDeliveryStatusChanges.Add(new FryDeliveryStatusChange { TenantId = _t, CreatorUserId = _techId, DeliveryId = delivery.Id, Status = FryDeliveryStatus.Received, ChangedAtUtc = Local(today, 0, 30) });
+        // Logged at the gate (DEC-131): one step, Received, with the farm's count.
+        _context.FryDeliveryStatusChanges.Add(new FryDeliveryStatusChange { TenantId = _t, CreatorUserId = _techId, DeliveryId = delivery.Id, Status = FryDeliveryStatus.Received, ChangedAtUtc = Local(today, 0, 30), Note = "Recorded at arrival" });
+        _context.SaveChanges();
+        SeedDeliverySteps(hatchery, today);
+    }
+
+    /// <summary>
+    /// One delivery at each other step (DEC-131), from a second hatchery: an order not here yet, one on the road, an order
+    /// the hatchery cancelled, and fry refused at the gate. None has a farm count, so none can be stocked.
+    /// </summary>
+    private void SeedDeliverySteps(HatcherySource hatchery, DateOnly today)
+    {
+        var steps = new (string Number, DateOnly Expected, long Ordered, (FryDeliveryStatus Status, DateTime At, string Note, bool ByTech)[] History)[]
+        {
+            ($"RDX-O{today.AddDays(6):MMdd}", today.AddDays(6), 250000, new[] { (FryDeliveryStatus.Ordered, Local(today.AddDays(-2), 10), "Order recorded", false) }),
+            ($"RDX-T{today:MMdd}", today, 180000, new[]
+            {
+                (FryDeliveryStatus.Ordered, Local(today.AddDays(-7), 9), "Order recorded", false),
+                (FryDeliveryStatus.InTransit, Local(today, 3), "Left the hatchery 3 AM", true),
+            }),
+            ($"RDX-C{today.AddDays(-20):MMdd}", today.AddDays(-20), 200000, new[]
+            {
+                (FryDeliveryStatus.Ordered, Local(today.AddDays(-30), 10), "Order recorded", false),
+                (FryDeliveryStatus.Cancelled, Local(today.AddDays(-22), 14), "Hatchery had no PL12 of this size; reordered", false),
+            }),
+            ($"RDX-R{today.AddDays(-15):MMdd}", today.AddDays(-15), 220000, new[]
+            {
+                (FryDeliveryStatus.Ordered, Local(today.AddDays(-25), 10), "Order recorded", false),
+                (FryDeliveryStatus.InTransit, Local(today.AddDays(-16), 22), "Left the hatchery", false),
+                (FryDeliveryStatus.Rejected, Local(today.AddDays(-15), 5), "Weak and uneven fry; failed the stress test at the gate", true),
+            }),
+        };
+        foreach (var (number, expected, ordered, history) in steps)
+        {
+            var d = new FryDelivery
+            {
+                TenantId = _t, CreatorUserId = _ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = number, DeliveryDate = expected, PlAgeDays = 12,
+                PlOrdered = ordered, CostPhp = Math.Round(ordered * 0.34m, 0),
+            };
+            _context.FryDeliveries.Add(d);
+            _context.SaveChanges();
+            foreach (var (status, at, note, byTech) in history)
+            {
+                _context.FryDeliveryStatusChanges.Add(new FryDeliveryStatusChange { TenantId = _t, CreatorUserId = byTech ? _techId : _ownerId, DeliveryId = d.Id, Status = status, ChangedAtUtc = at, Note = note });
+            }
+        }
+
         _context.SaveChanges();
     }
 
