@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds a browsable HTML description of the live FPMS database with SchemaSpy:
 # a diagram of all tables and foreign keys, one diagram per table with its neighbours,
-# every column, index, check constraint and row count, and a list of anomalies.
+# every column, index and check constraint, and a list of anomalies. Row counts are left out (-norows).
 #
 # Needs: Docker, and the SQL Server that .devcontainer/start-fpms.sh starts (with the database migrated).
 # The first run downloads the SchemaSpy image and the Microsoft JDBC driver; later runs reuse them.
@@ -107,7 +107,8 @@ docker run --rm \
   -configFile /config/schemaspy.properties \
   -t mssql17 -host sqlserver -port 1433 -db "$DB" -s dbo -u sa \
   -connprops 'encrypt\=true;trustServerCertificate\=true' \
-  -i "$TABLES"
+  -i "$TABLES" \
+  -norows
 
 [ -f "$OUT/index.html" ] || fail "SchemaSpy finished without writing $OUT/index.html; see its output above."
 echo
