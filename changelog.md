@@ -4,9 +4,6 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-### Added (purchase order on the fry delivery, DEC-129; branch `feature/batch-technician`)
-- **Fry deliveries have a purchase order (PO) number.** Optional, as in the farm's logbook. It shows in the delivery list, can be searched, is in the CSV export and appears on the trace report.
-
 ### Changed (transport on the fry delivery, DEC-128; branch `feature/batch-technician`)
 - **Stock a batch no longer asks how the fry travelled.** "How the fry travelled" and "Time packed at the hatchery" are now optional fields on the fry delivery, asked once for the whole trip. The batch page and trace report show them from the delivery.
 

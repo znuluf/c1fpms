@@ -89,11 +89,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     <label for="cost">Cost (₱)</label>
                                                     <input id="cost" type="number" min="0" step="0.01" class="form-control" name="costPhp" [(ngModel)]="m.costPhp" />
                                                 </div>
-                                                <!-- DEC-129: the PO number from the farm's logbook. -->
-                                                <div class="form-group col-md-4">
-                                                    <label for="po">Purchase order (PO) no.</label>
-                                                    <input id="po" class="form-control" name="purchaseOrderNo" [(ngModel)]="m.purchaseOrderNo" maxlength="100" placeholder="optional" />
-                                                </div>
                                             </div>
                                             <div class="form-row">
                                                 <div class="form-group col-md-4">

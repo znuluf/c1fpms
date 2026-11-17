@@ -48,10 +48,6 @@ public class FryDeliveryEditDto
     [StringLength(FryDelivery.MaxPermitLength)]
     public string TransportPermitNo { get; set; }
 
-    /// <summary>The farm's purchase order number, optional (DEC-129).</summary>
-    [StringLength(FryDelivery.MaxPermitLength)]
-    public string PurchaseOrderNo { get; set; }
-
     [StringLength(FryDelivery.MaxPermitLength)]
     public string SfscNo { get; set; }
 
@@ -82,7 +78,6 @@ public class FryDeliveryDto
     public string Notes { get; set; }
     public string PlHealthCertificateNo { get; set; }
     public string TransportPermitNo { get; set; }
-    public string PurchaseOrderNo { get; set; }
     public string SfscNo { get; set; }
     public Production.TransportMode? TransportMode { get; set; }
     public DateTime? TimePackedUtc { get; set; }
@@ -252,7 +247,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
             .OrderByDescending(d => d.DeliveryDate).ThenBy(d => d.HatcheryBatchNumber).ToListAsync();
         var list = await MapAsync(deliveries);
         return list
-            .Where(d => SearchText.Matches(input.Search, d.HatcheryBatchNumber, d.HatcheryName, d.HatcheryShortCode, d.PlHealthCertificateNo, d.SfscNo, d.PurchaseOrderNo))
+            .Where(d => SearchText.Matches(input.Search, d.HatcheryBatchNumber, d.HatcheryName, d.HatcheryShortCode, d.PlHealthCertificateNo, d.SfscNo))
             .Where(d => !input.Status.HasValue || d.Status == input.Status)
             .Where(d => !input.AvailableForStocking || (d.Status == FryDeliveryStatus.Received && !d.IsStocked && !d.IsStockingFinished))
             .ToList();
@@ -517,7 +512,6 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         d.Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim();
         d.PlHealthCertificateNo = string.IsNullOrWhiteSpace(input.PlHealthCertificateNo) ? null : input.PlHealthCertificateNo.Trim();
         d.TransportPermitNo = string.IsNullOrWhiteSpace(input.TransportPermitNo) ? null : input.TransportPermitNo.Trim();
-        d.PurchaseOrderNo = string.IsNullOrWhiteSpace(input.PurchaseOrderNo) ? null : input.PurchaseOrderNo.Trim();
         d.SfscNo = string.IsNullOrWhiteSpace(input.SfscNo) ? null : input.SfscNo.Trim();
         d.TransportMode = input.TransportMode;
         d.TimePackedUtc = input.TimePacked.HasValue ? FarmClock.ToUtc(input.TimePacked.Value) : null;
@@ -545,7 +539,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
                 Id = d.Id, HatcheryId = d.HatcheryId, HatcheryName = d.Hatchery?.Name, HatcheryShortCode = d.Hatchery?.ShortCode,
                 HatcheryBatchNumber = d.HatcheryBatchNumber, DeliveryDate = d.DeliveryDate, PlAgeDays = d.PlAgeDays, PlReceived = d.PlReceived, PlOrdered = d.PlOrdered,
                 CostPhp = d.CostPhp, Notes = d.Notes, Status = latest?.Status ?? FryDeliveryStatus.Ordered, StatusChangedAtUtc = latest?.ChangedAtUtc ?? d.CreationTime,
-                PlHealthCertificateNo = d.PlHealthCertificateNo, TransportPermitNo = d.TransportPermitNo, SfscNo = d.SfscNo, PurchaseOrderNo = d.PurchaseOrderNo,
+                PlHealthCertificateNo = d.PlHealthCertificateNo, TransportPermitNo = d.TransportPermitNo, SfscNo = d.SfscNo,
                 TransportMode = d.TransportMode, TimePackedUtc = d.TimePackedUtc,
                 IsStockingFinished = d.IsStockingFinished, StockingFinishedAtUtc = d.StockingFinishedAtUtc,
                 PlNotStocked = shortfalls.FirstOrDefault(s => s.DeliveryId == d.Id)?.Pl ?? 0,

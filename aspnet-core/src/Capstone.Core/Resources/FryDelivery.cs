@@ -41,9 +41,6 @@ public class FryDelivery : FarmEntity
     /// <summary>The PL health certificate number that came with this delivery (DEC-59).</summary>
     public string PlHealthCertificateNo { get; set; }
 
-    /// <summary>The farm's purchase order number for these fry, optional (DEC-129), as written in the farm's logbook.</summary>
-    public string PurchaseOrderNo { get; set; }
-
     /// <summary>Optional transport permit number (DEC-59).</summary>
     public string TransportPermitNo { get; set; }
 

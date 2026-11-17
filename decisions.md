@@ -3239,26 +3239,6 @@ Negative:
 - Columns move: the Codespace database must be recreated (with DEC-127's reset).
 - The planning document's batch definition changes (transport is now a delivery fact); check with the adviser if DEC-11 was a set requirement.
 
-## Decision DEC-129: The fry delivery records the farm's purchase order number
-
-Status: Proposed 2026-11-17; built on `feature/batch-technician`
-Date: 2026-11-17
-
-### Context
-The farm's paper logbook records a purchase order (PO) number for each fry purchase. The system had no place for it, so a delivery could not be matched to its PO when checking costs or a hatchery's invoice.
-
-### Decision
-- `FryDelivery.PurchaseOrderNo`, optional text up to 100 characters, trimmed. Asked on Record a fry delivery (beside Status now) and the delivery page (beside Cost).
-- Shown in the delivery list under the hatchery ("· PO PO-2026-0118"), found by the list's search, added to the delivery CSV export ("PO no.") and shown on the trace report's fry source when recorded.
-- Not unique and never required: one PO can cover several deliveries, and older deliveries have none.
-
-### Consequences
-Positive:
-- A delivery can be matched to the PO in the logbook and the hatchery's invoice.
-Negative:
-- A new column: the Codespace database must be recreated (with DEC-127 and DEC-128's reset).
-- Feed and chemical purchases (inventory lots) have no PO field yet; add one there if the logbook records it for those too.
-
 ---
 
 ## Note: glossary of interface terms
