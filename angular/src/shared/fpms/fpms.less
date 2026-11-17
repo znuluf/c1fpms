@@ -2907,6 +2907,62 @@ i.wq-key.out {
     text-transform: none;
 }
 
+// ---- Delivery steps (DEC-131): Ordered → In transit → Received → Stocked, each with its time; the current step is
+// marked by its icon and weight as well as colour, and an ended delivery (Cancelled, Rejected) by its icon and word.
+.fpms-dsteps {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    > li {
+        display: grid;
+        grid-template-columns: 1.5rem auto;
+        column-gap: 0.5rem;
+        align-items: baseline;
+        padding: 0.25rem 0;
+        color: var(--fpms-muted);
+        > i {
+            grid-row: span 2;
+            align-self: center;
+            color: var(--fpms-line-strong);
+        }
+        > small {
+            grid-column: 2;
+        }
+    }
+    > li.done {
+        color: var(--fpms-text);
+        > i {
+            color: var(--fpms-success);
+        }
+    }
+    > li.now {
+        color: var(--fpms-text);
+        font-weight: 600;
+        > i {
+            color: var(--fpms-info);
+        }
+    }
+    > li.ended {
+        color: var(--fpms-text);
+        font-weight: 600;
+        > i {
+            color: var(--fpms-error);
+        }
+    }
+}
+.fpms-step-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.fpms-step-form {
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--fpms-line);
+}
+
 // ---- Form rows (DEC-130): the heading of a group of controls (a list of times, a checklist) looks and spaces like a
 // label, so the fields beside it line up.
 .fpms-group-label {

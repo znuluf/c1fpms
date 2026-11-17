@@ -329,7 +329,7 @@ public class CycleAppService : CapstoneAppServiceBase
         }
 
         var plStocked = cycle == null ? 0 : await PlStockedAsync(cycle.Id);
-        var plLeft = delivery.PlReceived - plStocked;
+        var plLeft = (delivery.PlReceived ?? 0) - plStocked;
         var requested = input.Batches.Sum(b => b.PlCount);
         if (requested > plLeft)
         {
@@ -603,7 +603,7 @@ public class CycleAppService : CapstoneAppServiceBase
         {
             CycleId = cycle.Id, CycleCode = cycle.CycleCode, WasDuplicate = true,
             Batches = batches.Select(b => new CreatedBatchDto { Id = b.Id, BatchCode = b.BatchCode, PondCode = b.Pond?.PondCode, StockingDensityPerM2 = b.StockingDensityPerM2, DensityFlag = b.DensityFlag }).ToList(),
-            PlLeft = cycle.FryDelivery.PlReceived - await PlStockedAsync(cycle.Id),
+            PlLeft = (cycle.FryDelivery.PlReceived ?? 0) - await PlStockedAsync(cycle.Id),
         };
     }
 
@@ -618,7 +618,7 @@ public class CycleAppService : CapstoneAppServiceBase
     private static StockingDeliveryDto MapDelivery(FryDelivery d, long plStocked, DateOnly today) => new()
     {
         Id = d.Id, HatcheryName = d.Hatchery?.Name, HatcheryShortCode = d.Hatchery?.ShortCode, HatcheryBatchNumber = d.HatcheryBatchNumber,
-        DeliveryDate = d.DeliveryDate, PlAgeDays = d.PlAgeDays, PlReceived = d.PlReceived, PlLeft = d.PlReceived - plStocked,
+        DeliveryDate = d.DeliveryDate, PlAgeDays = d.PlAgeDays, PlReceived = d.PlReceived ?? 0, PlLeft = (d.PlReceived ?? 0) - plStocked,
         PlHealthCertificateNo = d.PlHealthCertificateNo, DaysSinceReceived = Math.Max(0, FarmClock.DaysBetween(d.DeliveryDate, today)),
     };
 

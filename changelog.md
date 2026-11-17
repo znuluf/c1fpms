@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (fry delivery steps, DEC-131; branch `feature/batch-technician`)
+- **Record fry received, or record an order.** Fry logged at the gate are recorded with the farm's count; an order is recorded with the PL ordered (PO) and counted later.
+- **Steps instead of a free status list.** A delivery goes Ordered → In transit → Received → Stocked. Receive fry takes the count, papers and trip; Cancel order and Reject fry need a reason; only the next steps are offered.
+- **Take back a step.** The Farm Owner can take back the last step with a reason; it stays in the history.
+
 ### Changed (form layout, DEC-129 and DEC-130; branch `feature/batch-technician`)
 - **Fields line up.** In every form, fields on one row start at the same height even when a label wraps, and tick boxes such as Active sit level with them. Several forms are regrouped into even rows: fry delivery, inventory item, hatchery source, account, pond, harvest and the farm address.
 - **One button order.** Every form and dialog ends with its main action first, then Cancel.

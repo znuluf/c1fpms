@@ -915,6 +915,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-128 | Transport mode and time packed move to the fry delivery, optional (proposed). Amends DEC-11. |
 | DEC-129 | "PL ordered (PO)" names the count on the purchase order (proposed); no PO number field. Amends DEC-93 wording. |
 | DEC-130 | Form rows line up (shared directive), forms use a grid of thirds, one footer order (proposed). |
+| DEC-131 | Fry delivery steps (proposed): Record fry received or an order; Ordered → In transit → Received → Stocked; Receive fry takes the count; Cancelled and Rejected need a reason; Owner takes back a step. |
 
 # **Appendix B. Manuscript alignment notes**
 

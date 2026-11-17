@@ -1,3 +1,4 @@
+using Capstone.Domain;
 using Abp.Authorization;
 using Abp.UI;
 using Capstone.Logbooks;
@@ -50,21 +51,98 @@ public class Lifecycle_Tests : FpmsTestBase
         var service = Resolve<FryDeliveryAppService>();
         var saved = await service.Create(new FryDeliveryEditDto
         {
-            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "HL-NEW", DeliveryDate = new DateOnly(2026, 10, 21), PlAgeDays = 25, PlReceived = 100000,
+            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "HL-NEW", DeliveryDate = new DateOnly(2026, 10, 21), PlAgeDays = 25, PlOrdered = 100000,
         });
         saved.Warnings.ShouldContain(w => w.Kind == "PlAge");
+        (await service.Get(saved.Id)).PlReceived.ShouldBeNull(); // DEC-131: an order has no count
 
         LoginAsPilotTechnician();
         await service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = saved.Id, Status = FryDeliveryStatus.InTransit, Note = "Left the hatchery 4 AM" });
-        await service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = saved.Id, Status = FryDeliveryStatus.Received });
+        // Arrival goes through Receive, which takes the count.
         await Should.ThrowAsync<UserFriendlyException>(() => service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = saved.Id, Status = FryDeliveryStatus.Received }));
+        await service.Receive(new ReceiveFryInput { DeliveryId = saved.Id, PlReceived = 103000, SfscNo = "SFSC-1" });
+        await Should.ThrowAsync<UserFriendlyException>(() => service.Receive(new ReceiveFryInput { DeliveryId = saved.Id, PlReceived = 1 }));
         await Should.ThrowAsync<AbpAuthorizationException>(() => service.Update(new FryDeliveryEditDto { Id = saved.Id, HatcheryBatchNumber = "X", PlReceived = 1 }));
 
         var detail = await service.Get(saved.Id);
         detail.Status.ShouldBe(FryDeliveryStatus.Received);
+        detail.PlReceived.ShouldBe(103000);
+        detail.SfscNo.ShouldBe("SFSC-1");
+        detail.ReceivedAtUtc.ShouldNotBeNull();
         detail.History.Count.ShouldBe(3);
         detail.History.Select(h => h.ChangedBy).ShouldContain("Tomas Technician");
         detail.History.ShouldContain(h => h.Note == "Left the hatchery 4 AM");
+    }
+
+    // ---------------------------------------------------------------- DEC-131 delivery steps
+    [Fact]
+    public async Task Fry_logged_at_the_gate_need_their_count_and_take_the_arrival_day_as_delivery_date()
+    {
+        var service = Resolve<FryDeliveryAppService>();
+        var input = new FryDeliveryEditDto
+        {
+            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "HL-GATE", DeliveryDate = new DateOnly(2030, 1, 1), PlAgeDays = 12,
+            InitialStatus = FryDeliveryStatus.Received, ReceivedAt = DateTime.UtcNow.AddHours(-2),
+        };
+        await Should.ThrowAsync<UserFriendlyException>(() => service.Create(input)); // no count
+        input.PlReceived = 120000;
+        var id = (await service.Create(input)).Id;
+        var d = await service.Get(id);
+        d.Status.ShouldBe(FryDeliveryStatus.Received);
+        d.DeliveryDate.ShouldBe(FarmClock.LocalDate(DateTime.UtcNow.AddHours(-2), FarmClock.Resolve(FarmClock.DefaultTimeZone)));
+        d.History.Single().Note.ShouldBe("Recorded at arrival");
+
+        // An order needs the PL ordered (PO) and keeps no count even if one is sent.
+        var order = new FryDeliveryEditDto { HatcheryId = input.HatcheryId, HatcheryBatchNumber = "HL-ORDER", DeliveryDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(5), PlReceived = 5 };
+        await Should.ThrowAsync<UserFriendlyException>(() => service.Create(order));
+        order.PlOrdered = 200000;
+        (await service.Get((await service.Create(order)).Id)).PlReceived.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task Delivery_steps_follow_the_flow_and_endings_need_a_reason()
+    {
+        var service = Resolve<FryDeliveryAppService>();
+        FryDeliveryEditDto Order(string number) => new()
+        {
+            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = number, DeliveryDate = DateOnly.FromDateTime(DateTime.UtcNow), PlOrdered = 100000,
+        };
+        var a = (await service.Create(Order("HL-A"))).Id;
+        // An order is cancelled, not rejected, and the cancel needs a reason; then it takes no further steps.
+        await Should.ThrowAsync<UserFriendlyException>(() => service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = a, Status = FryDeliveryStatus.Rejected, Note = "weak" }));
+        await Should.ThrowAsync<UserFriendlyException>(() => service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = a, Status = FryDeliveryStatus.Cancelled }));
+        await service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = a, Status = FryDeliveryStatus.Cancelled, Note = "Hatchery had no stock" });
+        await Should.ThrowAsync<UserFriendlyException>(() => service.Receive(new ReceiveFryInput { DeliveryId = a, PlReceived = 1000 }));
+
+        // Fry refused at the gate after arriving.
+        var b = (await service.Create(Order("HL-B"))).Id;
+        await service.Receive(new ReceiveFryInput { DeliveryId = b, PlReceived = 99000 });
+        await service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = b, Status = FryDeliveryStatus.Rejected, Note = "Failed the stress test" });
+        (await service.Get(b)).Status.ShouldBe(FryDeliveryStatus.Rejected);
+    }
+
+    [Fact]
+    public async Task Only_the_owner_takes_back_a_step_and_taking_back_received_clears_the_count()
+    {
+        var service = Resolve<FryDeliveryAppService>();
+        var id = (await service.Create(new FryDeliveryEditDto
+        {
+            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "HL-UNDO", DeliveryDate = DateOnly.FromDateTime(DateTime.UtcNow), PlOrdered = 100000,
+        })).Id;
+        await service.Receive(new ReceiveFryInput { DeliveryId = id, PlReceived = 101000 });
+
+        LoginAsPilotTechnician();
+        await Should.ThrowAsync<AbpAuthorizationException>(() => Resolve<FryDeliveryAppService>().UndoLastStep(new UndoDeliveryStepInput { DeliveryId = id, Reason = "mistake" }));
+
+        LoginAsPilotOwner();
+        await Should.ThrowAsync<UserFriendlyException>(() => service.UndoLastStep(new UndoDeliveryStepInput { DeliveryId = id }));
+        await service.UndoLastStep(new UndoDeliveryStepInput { DeliveryId = id, Reason = "Marked received by mistake" });
+        var d = await service.Get(id);
+        d.Status.ShouldBe(FryDeliveryStatus.Ordered);
+        d.PlReceived.ShouldBeNull();
+        d.History.Count.ShouldBe(1);
+        // The first step cannot be taken back.
+        await Should.ThrowAsync<UserFriendlyException>(() => service.UndoLastStep(new UndoDeliveryStepInput { DeliveryId = id, Reason = "again" }));
     }
 
     [Fact]
@@ -73,7 +151,7 @@ public class Lifecycle_Tests : FpmsTestBase
         var service = Resolve<FryDeliveryAppService>();
         await Should.ThrowAsync<UserFriendlyException>(() => service.Create(new FryDeliveryEditDto
         {
-            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "HL-0530", DeliveryDate = new DateOnly(2026, 10, 21), PlAgeDays = 12, PlReceived = 1000,
+            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "HL-0530", DeliveryDate = new DateOnly(2026, 10, 21), PlAgeDays = 12, PlOrdered = 1000,
         }));
         var stocked = (await service.GetAll(new GetFryDeliveriesInput())).Items.Single(d => d.HatcheryBatchNumber == "HL-0530");
         stocked.IsStocked.ShouldBeTrue();

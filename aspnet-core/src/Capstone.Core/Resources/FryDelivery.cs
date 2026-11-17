@@ -1,11 +1,30 @@
 using Capstone.Domain;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Capstone.Resources;
 
-/// <summary>Current or past status of a fry delivery. "Stocked" is not stored: it is shown when a cycle uses the delivery.</summary>
-public enum FryDeliveryStatus { Ordered = 1, InTransit = 2, Received = 3, Rejected = 4 }
+/// <summary>
+/// Current or past status of a fry delivery. "Stocked" is not stored: it is shown when a cycle uses the delivery.
+/// Rejected: fry refused at arrival. Cancelled: an order that never shipped (DEC-131).
+/// </summary>
+public enum FryDeliveryStatus { Ordered = 1, InTransit = 2, Received = 3, Rejected = 4, Cancelled = 5 }
+
+/// <summary>The steps a delivery may take next (DEC-131). Received is reached only through Receive, which takes the count.</summary>
+public static class FryDeliveryFlow
+{
+    public static IReadOnlyList<FryDeliveryStatus> Next(FryDeliveryStatus current) => current switch
+    {
+        FryDeliveryStatus.Ordered => new[] { FryDeliveryStatus.InTransit, FryDeliveryStatus.Received, FryDeliveryStatus.Cancelled },
+        FryDeliveryStatus.InTransit => new[] { FryDeliveryStatus.Received, FryDeliveryStatus.Rejected },
+        // Turned away after arriving (failed the gate check), as long as nothing was stocked from it.
+        FryDeliveryStatus.Received => new[] { FryDeliveryStatus.Rejected },
+        _ => Array.Empty<FryDeliveryStatus>(),
+    };
+
+    public static bool IsEnded(FryDeliveryStatus status) => status is FryDeliveryStatus.Rejected or FryDeliveryStatus.Cancelled;
+}
 
 /// <summary>One delivery of post-larvae from a hatchery (Log Fries, Ref 3.1a). Exactly one delivery starts one production cycle.</summary>
 public class FryDelivery : FarmEntity
@@ -26,8 +45,14 @@ public class FryDelivery : FarmEntity
     /// <summary>PL age in days (PL12 = 12). Null only for deliveries converted from before step C.</summary>
     public int? PlAgeDays { get; set; }
 
-    /// <summary>PL counted at the farm (DEC-93). Stocking counts, survival and density are worked out from this.</summary>
-    public long PlReceived { get; set; }
+    /// <summary>
+    /// PL counted at the farm (DEC-93). Stocking counts, survival and density are worked out from this. Null until the fry
+    /// arrive (DEC-131): an order has no count.
+    /// </summary>
+    public long? PlReceived { get; set; }
+
+    /// <summary>When the fry arrived at the farm (DEC-131); null until received. DeliveryDate is then its farm date.</summary>
+    public DateTime? ReceivedAtUtc { get; set; }
 
     /// <summary>
     /// PL on the hatchery's papers (purchase order or invoice), when known (DEC-93). Hatcheries usually add extra, so the

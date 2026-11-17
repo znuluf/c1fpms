@@ -24,7 +24,7 @@ export const MovementTypes = { 1: 'Receipt', 2: 'Usage', 3: 'Adjustment' };
 export const CycleStatuses = { 2: 'Active', 4: 'Closed' };
 export const BatchStatuses = { 2: 'Stocked', 3: 'Harvested', 4: 'Failed', 5: 'Closed' };
 export const TransportModes = { 1: 'Truck', 2: 'Van', 3: 'Motorcycle', 4: 'Boat', 5: 'Other' };
-export const FryDeliveryStatuses = { 1: 'Ordered', 2: 'In transit', 3: 'Received', 4: 'Rejected' };
+export const FryDeliveryStatuses = { 1: 'Ordered', 2: 'In transit', 3: 'Received', 4: 'Rejected', 5: 'Cancelled' };
 /** 1, 3 and 8 remain only on historical rows (pond preparation moved to the pond, feeding to numbered feeding sessions, post-production removed). */
 export const LogTypes = {
     1: 'Pond preparation (historical)',

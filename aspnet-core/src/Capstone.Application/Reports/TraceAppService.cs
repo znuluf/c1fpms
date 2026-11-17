@@ -126,7 +126,7 @@ public class TraceAppService : CapstoneAppServiceBase
             {
                 DeliveryId = delivery.Id, HatcheryName = delivery.Hatchery?.Name, HatcheryShortCode = delivery.Hatchery?.ShortCode,
                 BfarAccreditationNo = delivery.Hatchery?.BfarAccreditationNo, AccreditationStatus = (int)(delivery.Hatchery?.AccreditationStatus ?? Resources.AccreditationStatus.Unknown),
-                HatcheryBatchNumber = delivery.HatcheryBatchNumber, DeliveryDate = delivery.DeliveryDate, PlAgeDays = delivery.PlAgeDays, PlReceived = delivery.PlReceived,
+                HatcheryBatchNumber = delivery.HatcheryBatchNumber, DeliveryDate = delivery.DeliveryDate, PlAgeDays = delivery.PlAgeDays, PlReceived = delivery.PlReceived ?? 0,
                 PlHealthCertificateNo = delivery.PlHealthCertificateNo, TransportPermitNo = delivery.TransportPermitNo, SfscNo = delivery.SfscNo,
                 TransportMode = delivery.TransportMode, TimePackedUtc = delivery.TimePackedUtc,
             };

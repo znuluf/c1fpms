@@ -3274,6 +3274,31 @@ Positive:
 Negative:
 - Label heights are set by script after layout, so a label can settle a frame after the form appears.
 
+## Decision DEC-131: A fry delivery moves through steps: ordered, in transit, received, then stocked
+
+Status: Proposed 2026-11-17; built on `feature/batch-technician`
+Date: 2026-11-17
+Amends: AC-06 status updates, DEC-33 (who may update), DEC-93 (count)
+
+### Context
+A delivery was recorded with any "Status now" and then moved to any other status, in any order. "PL counted at the farm" was required even for an order, so the ordered number was typed as the count and then used for stocking and survival. "Rejected" meant both an order that never shipped and fry refused at the gate. Arrival (the count, the papers, the trip) was not a step of its own. The farm usually logs fry at the gate.
+
+### Decision
+- Two ways in. **Record fry received** (the main button): the arrival time, the farm's count (required), PL ordered (PO), PL age, papers, trip and cost; the delivery date is the arrival's farm date. **Record an order**: hatchery, batch number, expected date, PL ordered (PO, required), PL age and cost; no count.
+- Steps (`FryDeliveryFlow`): Ordered → In transit, Received or Cancelled; In transit → Received or Rejected; Received → Rejected (turned away after the gate check, before stocking); Cancelled and Rejected end the delivery. Stocking still needs Received.
+- **Receive fry** is the only way to Received: when, the count (required), PL age, health certificate, SFSC, transport permit, how the fry travelled and time packed. Blank papers keep what the order had.
+- Cancel and Reject need a reason. A step cannot be dated in the future or before the step it follows.
+- The Farm Owner can take back the last step with a reason; it stays in the audit trail with "Taken back: …". Taking back Received clears the count and arrival time. The first step cannot be taken back, and nothing changes once a cycle uses the delivery.
+- New status Cancelled (5). `FryDelivery.PlReceived` is null until the fry arrive; `FryDelivery.ReceivedAtUtc` records the arrival.
+- The delivery page shows the steps as a line with times and only the next actions; an order's page shows the PL ordered, "Expected" date and no papers until it is received. The list shows "Not counted" and "Expected" for orders.
+- No "overdue" or reminder for an order past its expected date (DEC-31).
+
+### Consequences
+Positive:
+- The count used for stocking is always the farm's own count, taken when the fry are in hand.
+Negative:
+- Columns and a status value change: the Codespace database must be recreated (with DEC-127 and DEC-128's reset).
+
 ---
 
 ## Note: glossary of interface terms

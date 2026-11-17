@@ -29,8 +29,12 @@ public class FryDeliveryEditDto
     [Range(1, 60, ErrorMessage = "PL age must be between 1 and 60 days.")]
     public int? PlAgeDays { get; set; }
 
-    [Range(1, FryDelivery.MaxPl, ErrorMessage = "PL received must be between 1 and 10,000,000.")]
-    public long PlReceived { get; set; }
+    /// <summary>PL counted at the farm; required once the fry have arrived, empty for an order (DEC-131).</summary>
+    [Range(1, FryDelivery.MaxPl, ErrorMessage = "PL counted at the farm must be between 1 and 10,000,000.")]
+    public long? PlReceived { get; set; }
+
+    /// <summary>Create as Received only: when the fry arrived (defaults to now). Its farm date becomes the delivery date.</summary>
+    public DateTime? ReceivedAt { get; set; }
 
     /// <summary>PL on the hatchery's papers, optional (DEC-93).</summary>
     [Range(1, FryDelivery.MaxPl, ErrorMessage = "PL ordered (PO) must be between 1 and 10,000,000.")]
@@ -57,7 +61,7 @@ public class FryDeliveryEditDto
     /// <summary>When the hatchery packed the fry (ISO with offset), optional; not after the delivery day (DEC-128).</summary>
     public DateTime? TimePacked { get; set; }
 
-    /// <summary>Create only: the first status (Ordered by default).</summary>
+    /// <summary>Create only: Received (logged at the gate), or Ordered / In transit for an order not yet here (DEC-131).</summary>
     public FryDeliveryStatus InitialStatus { get; set; } = FryDeliveryStatus.Ordered;
 
     public string RowVersion { get; set; }
@@ -72,7 +76,8 @@ public class FryDeliveryDto
     public string HatcheryBatchNumber { get; set; }
     public DateOnly DeliveryDate { get; set; }
     public int? PlAgeDays { get; set; }
-    public long PlReceived { get; set; }
+    public long? PlReceived { get; set; }
+    public DateTime? ReceivedAtUtc { get; set; }
     public long? PlOrdered { get; set; }
     public decimal? CostPhp { get; set; }
     public string Notes { get; set; }
@@ -161,6 +166,43 @@ public class FryDeliveryStatusChangeDto
     public DateTime ChangedAtUtc { get; set; }
     public string ChangedBy { get; set; }
     public string Note { get; set; }
+}
+
+public class ReceiveFryInput
+{
+    public Guid DeliveryId { get; set; }
+
+    /// <summary>When the fry arrived (defaults to now); not in the future, not before the previous step.</summary>
+    public DateTime? ReceivedAt { get; set; }
+
+    [Range(1, FryDelivery.MaxPl, ErrorMessage = "PL counted at the farm must be between 1 and 10,000,000.")]
+    public long PlReceived { get; set; }
+
+    [Range(1, 60, ErrorMessage = "PL age must be between 1 and 60 days.")]
+    public int? PlAgeDays { get; set; }
+
+    [StringLength(FryDelivery.MaxPermitLength)]
+    public string PlHealthCertificateNo { get; set; }
+
+    [StringLength(FryDelivery.MaxPermitLength)]
+    public string TransportPermitNo { get; set; }
+
+    [StringLength(FryDelivery.MaxPermitLength)]
+    public string SfscNo { get; set; }
+
+    public Production.TransportMode? TransportMode { get; set; }
+    public DateTime? TimePacked { get; set; }
+
+    [StringLength(FryDeliveryStatusChange.MaxNoteLength)]
+    public string Note { get; set; }
+}
+
+public class UndoDeliveryStepInput
+{
+    public Guid DeliveryId { get; set; }
+
+    [StringLength(FryDeliveryStatusChange.MaxNoteLength)]
+    public string Reason { get; set; }
 }
 
 public class UpdateFryDeliveryStatusInput
@@ -351,7 +393,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         return mapped.Where(d => (d.IsStocked || d.Status == FryDeliveryStatus.Received) && d.PlStocked < d.PlReceived).Select(d => new OpenDeliveryDto
         {
             Id = d.Id, HatcheryBatchNumber = d.HatcheryBatchNumber, HatcheryName = d.HatcheryName, DeliveryDate = d.DeliveryDate,
-            PlReceived = d.PlReceived, PlStocked = d.PlStocked, CycleId = d.CycleId, CycleCode = d.CycleCode,
+            PlReceived = d.PlReceived ?? 0, PlStocked = d.PlStocked, CycleId = d.CycleId, CycleCode = d.CycleCode,
         }).ToList();
     }
 
@@ -364,16 +406,48 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
             throw new UserFriendlyException($"The hatchery '{hatchery.Name}' is inactive.");
         }
 
-        if (!Enum.IsDefined(input.InitialStatus))
+        // DEC-131: logged at the gate (Received, with the count) or as an order (Ordered / In transit, with the PL ordered).
+        if (input.InitialStatus is not (FryDeliveryStatus.Received or FryDeliveryStatus.Ordered or FryDeliveryStatus.InTransit))
         {
-            throw new UserFriendlyException("Choose the delivery status.");
+            throw new UserFriendlyException("Record fry that have arrived, or an order that is not here yet.");
+        }
+
+        var arrived = input.InitialStatus == FryDeliveryStatus.Received;
+        var zone = await Farm.GetTimeZoneAsync();
+        DateTime? receivedAtUtc = null;
+        if (arrived)
+        {
+            if (!input.PlReceived.HasValue)
+            {
+                throw new UserFriendlyException("Enter the PL counted at the farm.");
+            }
+
+            receivedAtUtc = input.ReceivedAt.HasValue ? FarmClock.ToUtc(input.ReceivedAt.Value) : DateTime.UtcNow;
+            if (receivedAtUtc > DateTime.UtcNow.AddMinutes(5))
+            {
+                throw new UserFriendlyException("The time the fry arrived cannot be in the future.");
+            }
+
+            input.DeliveryDate = FarmClock.LocalDate(receivedAtUtc.Value, zone);
+        }
+        else
+        {
+            if (!input.PlOrdered.HasValue)
+            {
+                throw new UserFriendlyException("Enter the PL ordered (PO). The farm's count is entered when the fry arrive.");
+            }
+
+            input.PlReceived = null;
         }
 
         await ValidateAsync(input, null);
-        var delivery = new FryDelivery { HatcheryId = hatchery.Id };
+        var delivery = new FryDelivery { HatcheryId = hatchery.Id, ReceivedAtUtc = receivedAtUtc };
         Apply(delivery, input);
         var id = await _deliveries.InsertAndGetIdAsync(delivery);
-        await _changes.InsertAsync(new FryDeliveryStatusChange { DeliveryId = id, Status = input.InitialStatus, ChangedAtUtc = DateTime.UtcNow, Note = "Recorded" });
+        await _changes.InsertAsync(new FryDeliveryStatusChange
+        {
+            DeliveryId = id, Status = input.InitialStatus, ChangedAtUtc = receivedAtUtc ?? DateTime.UtcNow, Note = arrived ? "Recorded at arrival" : "Order recorded",
+        });
         return new SaveFryDeliveryResult { Id = id, Warnings = await WarningsAsync(input) };
     }
 
@@ -395,6 +469,25 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
             delivery.HatcheryId = hatchery.Id;
         }
 
+        // DEC-131: the count belongs to fry that have arrived. An order keeps none; a received delivery must keep one.
+        var arrived = await CurrentStatusAsync(delivery.Id) == FryDeliveryStatus.Received || cycle != null;
+        if (!arrived)
+        {
+            input.PlReceived = null;
+        }
+        else
+        {
+            if (!input.PlReceived.HasValue)
+            {
+                throw new UserFriendlyException("Enter the PL counted at the farm.");
+            }
+
+            if (input.DeliveryDate > await Farm.GetTodayAsync())
+            {
+                throw new UserFriendlyException("The fry have arrived, so the delivery date cannot be in the future.");
+            }
+        }
+
         if (cycle != null)
         {
             var stocked = await _batches.GetAll().Where(b => b.CycleId == cycle.Id).SumAsync(b => b.PlCountStocked ?? 0);
@@ -414,37 +507,154 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         return new SaveFryDeliveryResult { Id = delivery.Id, Warnings = await WarningsAsync(input) };
     }
 
-    /// <summary>Records a status change with an optional note (AC-06). Not allowed once a cycle uses the delivery.</summary>
+    /// <summary>
+    /// Moves a delivery one step (DEC-131): In transit, Cancelled (an order that never shipped) or Rejected (fry refused at
+    /// arrival). Only the next steps of FryDeliveryFlow are allowed; Cancelled and Rejected need a reason. Arrival goes
+    /// through Receive, which takes the count. Not allowed once a cycle uses the delivery.
+    /// </summary>
     [AbpAuthorize(PermissionNames.FryDeliveries_UpdateStatus)]
     public virtual async Task UpdateStatus(UpdateFryDeliveryStatusInput input)
     {
         var delivery = await _deliveries.GetAsync(input.DeliveryId);
-        if (!Enum.IsDefined(input.Status))
+        var (current, lastAt) = await NextStepCheckAsync(delivery.Id, input.Status);
+        if (input.Status == FryDeliveryStatus.Received)
         {
-            throw new UserFriendlyException("Choose the new status.");
+            throw new UserFriendlyException("Use Receive fry: the count is entered when the fry arrive.");
         }
 
+        var note = string.IsNullOrWhiteSpace(input.Note) ? null : input.Note.Trim();
+        if (FryDeliveryFlow.IsEnded(input.Status) && (note == null || note.Length < 3))
+        {
+            throw new UserFriendlyException(input.Status == FryDeliveryStatus.Cancelled ? "Say why the order was cancelled." : "Say why the fry were rejected.");
+        }
+
+        var changedAt = await StepTimeAsync(input.ChangedAt, lastAt);
+        await _changes.InsertAsync(new FryDeliveryStatusChange { DeliveryId = delivery.Id, Status = input.Status, ChangedAtUtc = changedAt, Note = note });
+    }
+
+    /// <summary>
+    /// The fry arrived (DEC-131): records when, the farm's count, and the papers and trip details that came with them. The
+    /// delivery date becomes the arrival's farm date. Only an Ordered or In transit delivery can be received.
+    /// </summary>
+    [AbpAuthorize(PermissionNames.FryDeliveries_UpdateStatus)]
+    public virtual async Task Receive(ReceiveFryInput input)
+    {
+        var delivery = await _deliveries.GetAsync(input.DeliveryId);
+        var (_, lastAt) = await NextStepCheckAsync(delivery.Id, FryDeliveryStatus.Received);
+        var receivedAtUtc = await StepTimeAsync(input.ReceivedAt, lastAt);
+        DateTime? packedUtc = input.TimePacked.HasValue ? FarmClock.ToUtc(input.TimePacked.Value) : delivery.TimePackedUtc;
+        if (packedUtc > receivedAtUtc)
+        {
+            throw new UserFriendlyException("The time packed cannot be after the fry arrived.");
+        }
+
+        if (input.TransportMode.HasValue && !Enum.IsDefined(input.TransportMode.Value))
+        {
+            throw new UserFriendlyException("Choose how the fry travelled, or leave it blank.");
+        }
+
+        var zone = await Farm.GetTimeZoneAsync();
+        delivery.PlReceived = input.PlReceived;
+        delivery.ReceivedAtUtc = receivedAtUtc;
+        delivery.DeliveryDate = FarmClock.LocalDate(receivedAtUtc, zone);
+        delivery.PlAgeDays = input.PlAgeDays ?? delivery.PlAgeDays;
+        delivery.TimePackedUtc = packedUtc;
+        delivery.TransportMode = input.TransportMode ?? delivery.TransportMode;
+        delivery.PlHealthCertificateNo = Keep(input.PlHealthCertificateNo, delivery.PlHealthCertificateNo);
+        delivery.TransportPermitNo = Keep(input.TransportPermitNo, delivery.TransportPermitNo);
+        delivery.SfscNo = Keep(input.SfscNo, delivery.SfscNo);
+        await _changes.InsertAsync(new FryDeliveryStatusChange
+        {
+            DeliveryId = delivery.Id, Status = FryDeliveryStatus.Received, ChangedAtUtc = receivedAtUtc,
+            Note = string.IsNullOrWhiteSpace(input.Note) ? null : input.Note.Trim(),
+        });
+
+        static string Keep(string typed, string current) => string.IsNullOrWhiteSpace(typed) ? current : typed.Trim();
+    }
+
+    /// <summary>
+    /// The Owner takes back the latest step, with a reason (DEC-131), e.g. a delivery marked Received by mistake. The step
+    /// stays in the audit trail with the reason; undoing Received clears the count and arrival time. Not once stocked.
+    /// </summary>
+    [AbpAuthorize(PermissionNames.FryDeliveries_Manage)]
+    public virtual async Task UndoLastStep(UndoDeliveryStepInput input)
+    {
+        var delivery = await _deliveries.GetAsync(input.DeliveryId);
         if (await _cycles.GetAll().AnyAsync(c => c.FryDeliveryId == delivery.Id))
+        {
+            throw new UserFriendlyException("This delivery is already stocked into a production cycle; its steps can no longer change.");
+        }
+
+        var reason = input.Reason?.Trim();
+        if (string.IsNullOrEmpty(reason) || reason.Length < 3)
+        {
+            throw new UserFriendlyException("Say why the step is taken back.");
+        }
+
+        var steps = await _changes.GetAll().Where(c => c.DeliveryId == delivery.Id).OrderByDescending(c => c.ChangedAtUtc).ThenByDescending(c => c.CreationTime).ToListAsync();
+        if (steps.Count < 2)
+        {
+            throw new UserFriendlyException("This is the delivery's first step; edit or delete the delivery instead.");
+        }
+
+        var last = steps[0];
+        var note = $"Taken back: {reason}";
+        last.Note = string.IsNullOrEmpty(last.Note) ? note : $"{last.Note} · {note}";
+        if (last.Note.Length > FryDeliveryStatusChange.MaxNoteLength)
+        {
+            last.Note = last.Note[..FryDeliveryStatusChange.MaxNoteLength];
+        }
+
+        await CurrentUnitOfWork.SaveChangesAsync();
+        await _changes.DeleteAsync(last);
+        if (last.Status == FryDeliveryStatus.Received)
+        {
+            delivery.PlReceived = null;
+            delivery.ReceivedAtUtc = null;
+        }
+    }
+
+    /// <summary>The delivery's current step and its time, after checking that <paramref name="next"/> may follow it.</summary>
+    private async Task<(FryDeliveryStatus Current, DateTime LastAt)> NextStepCheckAsync(Guid deliveryId, FryDeliveryStatus next)
+    {
+        if (!Enum.IsDefined(next))
+        {
+            throw new UserFriendlyException("Choose the next step.");
+        }
+
+        if (await _cycles.GetAll().AnyAsync(c => c.FryDeliveryId == deliveryId))
         {
             throw new UserFriendlyException("This delivery is already stocked into a production cycle; its status can no longer change.");
         }
 
-        var current = await CurrentStatusAsync(delivery.Id);
-        if (current == input.Status)
+        var last = await _changes.GetAll().Where(c => c.DeliveryId == deliveryId).OrderByDescending(c => c.ChangedAtUtc).ThenByDescending(c => c.CreationTime)
+            .Select(c => new { c.Status, c.ChangedAtUtc }).FirstOrDefaultAsync();
+        var current = last?.Status ?? FryDeliveryStatus.Ordered;
+        if (!FryDeliveryFlow.Next(current).Contains(next))
         {
-            throw new UserFriendlyException($"The delivery is already {Label(input.Status)}.");
+            throw new UserFriendlyException(FryDeliveryFlow.IsEnded(current)
+                ? $"The delivery is {Label(current)}; it takes no further steps."
+                : $"A delivery that is {Label(current)} cannot become {Label(next)}.");
         }
 
-        var changedAt = input.ChangedAt.HasValue ? FarmClock.ToUtc(input.ChangedAt.Value) : DateTime.UtcNow;
-        if (changedAt > DateTime.UtcNow.AddMinutes(5))
+        return (current, last?.ChangedAtUtc ?? DateTime.MinValue);
+    }
+
+    /// <summary>When a step happened: now by default, never in the future and never before the step it follows.</summary>
+    private static Task<DateTime> StepTimeAsync(DateTime? typed, DateTime previousUtc)
+    {
+        var at = typed.HasValue ? FarmClock.ToUtc(typed.Value) : DateTime.UtcNow;
+        if (at > DateTime.UtcNow.AddMinutes(5))
         {
-            throw new UserFriendlyException("The status change cannot be in the future.");
+            throw new UserFriendlyException("The time cannot be in the future.");
         }
 
-        await _changes.InsertAsync(new FryDeliveryStatusChange
+        if (at < previousUtc)
         {
-            DeliveryId = delivery.Id, Status = input.Status, ChangedAtUtc = changedAt, Note = string.IsNullOrWhiteSpace(input.Note) ? null : input.Note.Trim(),
-        });
+            throw new UserFriendlyException("The time cannot be before the delivery's previous step.");
+        }
+
+        return Task.FromResult(at);
     }
 
     public static string Label(FryDeliveryStatus status) => status switch
@@ -538,13 +748,14 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
             {
                 Id = d.Id, HatcheryId = d.HatcheryId, HatcheryName = d.Hatchery?.Name, HatcheryShortCode = d.Hatchery?.ShortCode,
                 HatcheryBatchNumber = d.HatcheryBatchNumber, DeliveryDate = d.DeliveryDate, PlAgeDays = d.PlAgeDays, PlReceived = d.PlReceived, PlOrdered = d.PlOrdered,
+                ReceivedAtUtc = d.ReceivedAtUtc,
                 CostPhp = d.CostPhp, Notes = d.Notes, Status = latest?.Status ?? FryDeliveryStatus.Ordered, StatusChangedAtUtc = latest?.ChangedAtUtc ?? d.CreationTime,
                 PlHealthCertificateNo = d.PlHealthCertificateNo, TransportPermitNo = d.TransportPermitNo, SfscNo = d.SfscNo,
                 TransportMode = d.TransportMode, TimePackedUtc = d.TimePackedUtc,
                 IsStockingFinished = d.IsStockingFinished, StockingFinishedAtUtc = d.StockingFinishedAtUtc,
                 PlNotStocked = shortfalls.FirstOrDefault(s => s.DeliveryId == d.Id)?.Pl ?? 0,
                 IsStocked = cycle != null, CycleId = cycle?.Id, CycleCode = cycle?.CycleCode, PlStocked = pl,
-                PlLeft = d.PlReceived - pl - (shortfalls.FirstOrDefault(s => s.DeliveryId == d.Id)?.Pl ?? 0),
+                PlLeft = (d.PlReceived ?? 0) - pl - (shortfalls.FirstOrDefault(s => s.DeliveryId == d.Id)?.Pl ?? 0),
                 RowVersion = Production.Concurrency.Encode(d.RowVersion),
             };
         }).ToList();
