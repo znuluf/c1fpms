@@ -76,8 +76,11 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
         const production = 'Production level';
         const farm = 'Farm level';
         const canSell = this.permission.isGranted('Farm.Sales');
+        // DEC-127: a technician's own pond, one tap from anywhere. The Owner sees every pond, so has no such item.
+        const myPond = this.permission.isGranted('Farm.Production.Manage') ? [] : [new MenuItem('My pond', '/app/my-pond', 'fas fa-user-check', 'Farm.Logs')];
         return [
             new MenuItem('Dashboard', '/app/dashboard', 'fas fa-tachometer-alt', 'Farm.Dashboard'),
+            ...myPond,
             this.inSection(production, this.sectionItem('operations', 'Operations', 'fas fa-clipboard-check')),
             this.inSection(production, this.sectionItem('production', 'Production', 'fas fa-seedling', '/app/production/batches')),
             this.inSection(production, this.sectionItem('harvest', canSell ? 'Harvest and sales' : 'Harvest', 'fas fa-shrimp')),

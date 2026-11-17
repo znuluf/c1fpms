@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added (technician per batch, DEC-127; branch `feature/batch-technician`)
+- **Name who looks after each batch.** On the batch page (Looked after by · Change) or when stocking, the Owner names a technician and, for days off, a cover with a last day. It is a name, not a lock: anyone can still record for any pond.
+- **My pond.** A technician's own batch on one page: its figures, who covers, and today's Daily record ready to record.
+- **Your pond first.** The feeding sheet, Record operations and the side drawer start on your pond and mark it "yours". Recording for someone else's pond shows a short note, never a block.
+- **Same as the last feeding.** One tap copies the previous feeding's lots and kilos, to adjust before saving.
+- **Names for the Owner.** The dashboard and Daily log status show who looks after each pond; the dashboard can filter by technician.
+
 ### Changed (Daily record View and Edit, DEC-126; branch `feature/daily-record-actions`)
 - **The Daily record has View and Edit.** View shows the day without buttons; Edit shows Correct, Void and Record on its rows. It starts in View and remembers your choice on this device.
 

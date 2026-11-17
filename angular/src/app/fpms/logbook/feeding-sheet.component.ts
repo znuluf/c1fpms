@@ -183,7 +183,7 @@ interface Entry {
                                                     @if (e.status === 1 && previousFed(row, s); as prev) {
                                                         <!-- DEC-127: the day's routine repeats; one tap copies the last feeding's lot and kilos, to adjust. -->
                                                         <button type="button" class="btn btn-sm btn-outline-primary fpms-same-as mb-2" (click)="sameAs(e, prev)">
-                                                            <i class="fas fa-redo mr-1" aria-hidden="true"></i>Same as {{ prev.session | label: L.FeedingSessions }} ({{ describeSaved(prev) }})
+                                                            <i class="fas fa-redo mr-1" aria-hidden="true"></i>Same as {{ prev.session | label: L.FeedingSessions }} · {{ kgOf(prev) | num: 1 }} kg
                                                         </button>
                                                     }
                                                     @if (e.status === 2) {
@@ -281,6 +281,10 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
             }
         }
         return null;
+    }
+
+    kgOf(x: any): number {
+        return (x.lines ?? []).reduce((sum: number, l: any) => sum + (Number(l.kg) || 0), 0);
     }
 
     /** Copies a feeding's lots and kilos into this one; the time fed and notes stay as typed. */

@@ -36,6 +36,7 @@ const routes: Routes = [
             { path: 'production/cycles', title: 'Cycles', loadComponent: () => import('./fpms/production/cycles.component').then((m) => m.CyclesComponent), ...page('Farm.Production') },
             { path: 'production/cycles/:id', title: 'Cycle', loadComponent: () => import('./fpms/production/cycle-detail.component').then((m) => m.CycleDetailComponent), ...page('Farm.Production') },
             { path: 'production/batches', title: 'Batches', loadComponent: () => import('./fpms/production/batches.component').then((m) => m.BatchesComponent), ...page('Farm.Production') },
+            { path: 'my-pond', title: 'My pond', loadComponent: () => import('./fpms/production/my-pond.component').then((m) => m.MyPondComponent), ...page('Farm.Logs') },
             { path: 'production/batches/:id', title: 'Batch', loadComponent: () => import('./fpms/production/batch-detail.component').then((m) => m.BatchDetailComponent), ...page('Farm.Production') },
             { path: 'production/create-batch', title: 'Stock a batch', loadComponent: () => import('./fpms/production/stock-batch.component').then((m) => m.CreateBatchComponent), ...page('Farm.Production.Stock') },
 

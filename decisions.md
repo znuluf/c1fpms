@@ -3189,6 +3189,32 @@ DEC-125 put Correct, Void and Record on every row of the Daily record. The Owner
 ### Consequences
 Positive:
 - Reading a day is calm by default; corrections are one switch away.
+## Decision DEC-127: Each batch names the technician who looks after it, with a cover for days off
+
+Status: Proposed 2026-11-17; built on `feature/batch-technician`
+Date: 2026-11-17
+Builds on: DEC-31 (no tasks or schedules), DEC-118, DEC-125
+
+### Context
+The farm runs one pond per technician. The Owner asked how the interface could help a technician look after the batch assigned to them. Nothing recorded who that is, so every page treated every person the same: the same pond list, the same first pond, and no way for the Owner to see whose pond is behind.
+
+### Decision
+- A batch has an optional technician and an optional cover with a last day (`PondBatch.TechnicianUserId`, `CoverUserId`, `CoverUntil`). It is set per batch, not per pond, so a new round can go to someone else. The Owner (`Farm.Production.Manage`) sets it on the batch page ("Looked after by … · Change") or when stocking; anyone else only sees it.
+- It is a name, never a lock. Anyone who could record for a pond still can. A technician who has a pond of their own and records for another sees "This is Jun's pond. You can still record for it." under the pond; on the feeding sheet the same note appears in the review before saving.
+- "Mine" means the technician, or the cover from today to their last day included. The API returns `IsMine`, `LookingAfterName` and `CoverActive` on batch lists and the Daily log status.
+- Defaults follow "mine": the feeding sheet's pond filter, Record operations and the drawer's pond step start on the person's pond (when they have exactly one), and lists put it first and mark it "yours". The Logbook only sorts and marks; its filter keeps what the person last chose.
+- **My pond**, a sidebar item for people without `Farm.Production.Manage`: the batch's headline figures, who covers, and its Daily record opened in Edit, with Feeding sheet, Record operations and Batch page one tap away. With no batch named, it says so and points to Daily log status.
+- "Same as Feeding 2 · 27 kg" on a feeding being recorded copies the day's previous feeding's lots and kilos, to adjust before saving.
+- The Owner sees names: on dashboard pond rows and Daily log status ("You" for one's own), and a Technician filter on the dashboard when more than one person (or no one) is named.
+- Still no tasks, due times or "overdue" (DEC-31).
+
+### Consequences
+Positive:
+- A technician opens one page for their pond and records with fewer choices; the Owner sees whose pond each row is.
+Negative:
+- New columns: the Codespace database must be recreated (delete the Migrations folder, drop the database volume, run `start-fpms.sh`).
+- Pond-specific alerts for a technician (only their pond's water alerts and notices) are not in this change.
+
 ---
 
 ## Note: glossary of interface terms

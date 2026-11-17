@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { FpmsApiService } from '@shared/fpms/api.service';
 import { FarmTime } from '@shared/fpms/farm-time';
 import { logSummary } from '@shared/fpms/log-summary';
@@ -343,7 +343,7 @@ function daysBetween(a: string, b: string): number {
         </ng-template>
     `,
 })
-export class BatchDailyRecordComponent {
+export class BatchDailyRecordComponent implements OnInit {
     private readonly api = inject(FpmsApiService);
 
     /** The batch from Batch/Get. A new object (after a save) reloads the records shown. */
@@ -355,6 +355,8 @@ export class BatchDailyRecordComponent {
     readonly date = input('');
     /** Asks the page to open the log drawer for a day (yyyy-MM-dd). */
     readonly record = output<string>();
+    /** Opens in Edit whatever was last chosen on this device: My pond is for recording (DEC-127). */
+    readonly startInEdit = input(false);
 
     readonly WATER = WATER;
     private readonly drawer = inject(LogDrawerService);
@@ -446,6 +448,12 @@ export class BatchDailyRecordComponent {
         }
         return Array.from({ length: Math.max(count, 1) }, (_, i) => i + 1);
     });
+
+    ngOnInit(): void {
+        if (this.startInEdit() && this.actionsOn()) {
+            this.editing.set(true);
+        }
+    }
 
     constructor() {
         effect(() => {
