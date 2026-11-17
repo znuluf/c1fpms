@@ -179,12 +179,12 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                                             <i class="fas fa-barcode mr-1" aria-hidden="true"></i>Harvest lot codes use this address{{ p.lotCodeParts ? ' (' + p.lotCodeParts + ')' : '' }}: {{ p.lotCodeNote }}
                                         </p>
                                         <div class="form-row">
-                                            <div class="form-group col-md-6">
+                                            <div class="form-group col-md-8">
                                                 <label for="line1">Address line 1 <span class="text-danger">*</span></label>
                                                 <input id="line1" class="form-control" name="addressLine1" [(ngModel)]="p.addressLine1" required maxlength="200" />
                                                 <small class="form-text text-muted">House number, street, purok or sitio, apartment/unit, building or floor.</small>
                                             </div>
-                                            <div class="form-group col-md-6">
+                                            <div class="form-group col-md-4">
                                                 <label for="barangay">Barangay</label>
                                                 @if (barangays().length) {
                                                     <select id="barangay" class="form-control" name="addressLine2" [(ngModel)]="p.addressLine2" [disabled]="!p.cityMunicipality">
@@ -201,42 +201,42 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group col-md-4">
-                                                                    <label for="province">Province <span class="text-danger">*</span></label>
-                                                                    <select id="province" class="form-control" name="province" [(ngModel)]="p.province" (ngModelChange)="onProvinceChange()" required>
-                                                                        <option value="" disabled>Choose a province</option>
-                                                                        @for (name of provinces(); track name) {
-                                                                            <option [value]="name">{{ name }}</option>
-                                                                        }
-                                                                    </select>
-                                                                </div>
-                                                                <div class="form-group col-md-4">
-                                                                    <label for="city">City or municipality <span class="text-danger">*</span></label>
-                                                                    <select id="city" class="form-control" name="cityMunicipality" [(ngModel)]="p.cityMunicipality" (ngModelChange)="onCityChange()" [disabled]="!p.province" required>
-                                                                        <option value="" disabled>{{ p.province ? 'Choose a city or municipality' : 'Choose the province first' }}</option>
-                                                                        @for (name of cities(); track name) {
-                                                                            <option [value]="name">{{ name }}</option>
-                                                                        }
-                                                                    </select>
-                                                                    <small class="form-text text-muted">Covered: General Santos City and Sarangani.</small>
-                                                                </div>
-                                            <div class="form-group col-md-2">
+                                                <label for="province">Province <span class="text-danger">*</span></label>
+                                                <select id="province" class="form-control" name="province" [(ngModel)]="p.province" (ngModelChange)="onProvinceChange()" required>
+                                                    <option value="" disabled>Choose a province</option>
+                                                    @for (name of provinces(); track name) {
+                                                        <option [value]="name">{{ name }}</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="city">City or municipality <span class="text-danger">*</span></label>
+                                                <select id="city" class="form-control" name="cityMunicipality" [(ngModel)]="p.cityMunicipality" (ngModelChange)="onCityChange()" [disabled]="!p.province" required>
+                                                    <option value="" disabled>{{ p.province ? 'Choose a city or municipality' : 'Choose the province first' }}</option>
+                                                    @for (name of cities(); track name) {
+                                                        <option [value]="name">{{ name }}</option>
+                                                    }
+                                                </select>
+                                                <small class="form-text text-muted">Covered: General Santos City and Sarangani.</small>
+                                            </div>
+                                            <div class="form-group col-md-4">
                                                 <label for="postal">Postal code</label>
                                                 <input id="postal" class="form-control" name="postalCode" [(ngModel)]="p.postalCode" maxlength="10" inputmode="numeric" />
                                                 @if (!postalOk) {
                                                     <small class="text-danger">4 digits, e.g. 9502.</small>
                                                 }
                                             </div>
-                                            <div class="form-group col-md-2">
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
                                                 <label for="country">Country <span class="text-danger">*</span></label>
                                                 <input id="country" class="form-control" name="country" [(ngModel)]="p.country" required maxlength="100" />
                                             </div>
-                                        </div>
-                                        <div class="form-row">
-                                            <div class="form-group col-md-3">
+                                            <div class="form-group col-md-4">
                                                 <label for="lat">Latitude</label>
                                                 <input id="lat" type="number" step="0.000001" min="-90" max="90" class="form-control" name="latitude" [(ngModel)]="p.latitude" />
                                             </div>
-                                            <div class="form-group col-md-3">
+                                            <div class="form-group col-md-4">
                                                 <label for="lng">Longitude</label>
                                                 <input id="lng" type="number" step="0.000001" min="-180" max="180" class="form-control" name="longitude" [(ngModel)]="p.longitude" />
                                             </div>

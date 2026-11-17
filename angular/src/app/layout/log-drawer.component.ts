@@ -161,8 +161,8 @@ interface CheckRow {
                             @if (stage() === 'work') {
                                 <button type="button" class="btn btn-default mr-auto" (click)="changePond()">Change pond</button>
                             } @else {
-                                <button type="button" class="btn btn-default" (click)="close()">Cancel</button>
                                 <button type="button" class="btn btn-primary" [disabled]="!batchId()" (click)="start()">Next</button>
+                                <button type="button" class="btn btn-default" (click)="close()">Cancel</button>
                             }
                         </div>
                     }

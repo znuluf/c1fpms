@@ -152,8 +152,8 @@ export class FeedbackService {
                         }
                     </div>
                     <div class="fpms-dialog-foot">
-                        <button type="button" class="btn btn-default" (click)="fb.close(false)">{{ r.cancelText || 'Back' }}</button>
                         <button #go type="button" class="btn" [class.btn-primary]="!r.danger" [class.btn-danger]="r.danger" (click)="fb.close(true)">{{ r.confirmText }}</button>
+                        <button type="button" class="btn btn-default" (click)="fb.close(false)">{{ r.cancelText || 'Back' }}</button>
                     </div>
                 </div>
             </div>

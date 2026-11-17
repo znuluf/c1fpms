@@ -360,14 +360,14 @@ const CUSTOM = 'custom';
                             </details>
                         </div>
                         <div class="fpms-dialog-foot">
-                            <fpms-form-hint [form]="df" class="mr-auto"></fpms-form-hint>
-                            <button type="button" class="btn btn-default" (click)="closeForm()">Cancel</button>
                             <button type="submit" class="btn btn-primary" [disabled]="busy() || !df.form.valid || !!dateError">
                                 @if (busy()) {
                                     <i class="fas fa-spinner fa-spin mr-1"></i>
                                 }
                                 {{ form.mode === 'renew' ? 'Save renewal' : 'Save' }}
                             </button>
+                            <button type="button" class="btn btn-default" (click)="closeForm()">Cancel</button>
+                            <fpms-form-hint [form]="df"></fpms-form-hint>
                         </div>
                     </form>
                 </div>

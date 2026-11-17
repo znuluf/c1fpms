@@ -913,6 +913,8 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-126 | Daily record View and Edit (proposed): starts in View; Edit shows the row actions. Amends DEC-125. |
 | DEC-127 | Technician per batch (proposed): one or more people (as equals) and a cover per batch, My pond, defaults to one's own pond, Same as last feeding, names for the Owner. A name, never a lock; no tasks (DEC-31). |
 | DEC-128 | Transport mode and time packed move to the fry delivery, optional (proposed). Amends DEC-11. |
+| DEC-129 | "PL ordered (PO)" names the count on the purchase order (proposed); no PO number field. Amends DEC-93 wording. |
+| DEC-130 | Form rows line up (shared directive), forms use a grid of thirds, one footer order (proposed). |
 
 # **Appendix B. Manuscript alignment notes**
 

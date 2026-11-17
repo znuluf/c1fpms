@@ -306,35 +306,24 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                         </select>
                                         <small class="form-text text-warning-dark"><i class="fas fa-exclamation-circle mr-1"></i>Check the type before saving. It names the pond and cannot be changed afterwards.</small>
                                     </div>
-                                    <div class="form-group col-md-2">
+                                    <div class="form-group col-md-4">
                                         <label for="num">Number</label>
                                         <input id="num" type="number" min="1" max="999" step="1" class="form-control" name="number" [(ngModel)]="pond.number" [placeholder]="nextNumber" />
                                     </div>
-                                    <div class="form-group col-md-3">
+                                    <div class="form-group col-md-4">
                                         <label>Pond ID and name</label>
                                         <p class="form-control-plaintext font-weight-bold" aria-live="polite">{{ previewCode }} <span class="font-weight-normal text-muted">{{ previewName }}</span></p>
                                     </div>
                                 } @else {
-                                    <div class="form-group col-md-3">
+                                    <div class="form-group col-md-4">
                                         <label>Pond ID</label>
                                         <p class="form-control-plaintext font-weight-bold">{{ pond.pondCode }}</p>
                                     </div>
-                                    <div class="form-group col-md-5">
+                                    <div class="form-group col-md-8">
                                         <label>Name</label>
                                         <p class="form-control-plaintext">{{ pond.name }}</p>
                                     </div>
                                 }
-                                <div class="form-group col-md-4">
-                                    <label for="purpose">Purpose</label>
-                                    <select id="purpose" class="form-control" name="purpose" [(ngModel)]="pond.purpose" [disabled]="isLocked('purpose')">
-                                        @for (o of Options.pondPurpose; track o.value) {
-                                            <option [ngValue]="o.value">{{ o.label }}</option>
-                                        }
-                                    </select>
-                                    @if (isLocked('purpose')) {
-                                        <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('purpose') }}</small>
-                                    }
-                                </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-4">
@@ -383,6 +372,17 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     </div>
                                 }
                                 <div class="form-group col-md-4">
+                                    <label for="purpose">Purpose</label>
+                                    <select id="purpose" class="form-control" name="purpose" [(ngModel)]="pond.purpose" [disabled]="isLocked('purpose')">
+                                        @for (o of Options.pondPurpose; track o.value) {
+                                            <option [ngValue]="o.value">{{ o.label }}</option>
+                                        }
+                                    </select>
+                                    @if (isLocked('purpose')) {
+                                        <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('purpose') }}</small>
+                                    }
+                                </div>
+                                <div class="form-group col-md-4">
                                     <label for="fs">Farming system</label>
                                     <select id="fs" class="form-control" name="farmingSystemOverride" [(ngModel)]="pond.farmingSystemOverride" [disabled]="isLocked('farmingSystemOverride')">
                                         <option [ngValue]="null">Farm setting ({{ farmSystem | label: L.FarmingSystems }})</option>
@@ -415,11 +415,11 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 </div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     <label for="lat">Latitude</label>
                                     <input id="lat" type="number" step="0.000001" min="-90" max="90" class="form-control" name="latitude" [(ngModel)]="pond.latitude" />
                                 </div>
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     <label for="lng">Longitude</label>
                                     <input id="lng" type="number" step="0.000001" min="-180" max="180" class="form-control" name="longitude" [(ngModel)]="pond.longitude" />
                                 </div>

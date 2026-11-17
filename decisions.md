@@ -3239,6 +3239,41 @@ Negative:
 - Columns move: the Codespace database must be recreated (with DEC-127's reset).
 - The planning document's batch definition changes (transport is now a delivery fact); check with the adviser if DEC-11 was a set requirement.
 
+## Decision DEC-129: "PL ordered (PO)" names the count on the purchase order
+
+Status: Proposed 2026-11-17; built on `feature/batch-technician`
+Date: 2026-11-17
+Amends: DEC-93 (wording only)
+
+### Context
+The farm's logbook records the number of fry ordered under "PO". The delivery form called the same number "PL on the hatchery's papers", so the farm did not recognise it, and a separate purchase order number field was added and then removed: the logbook's PO is the count, not a document number.
+
+### Decision
+- The field `FryDelivery.PlOrdered` is labelled "PL ordered (PO)" on both delivery forms; the comparison reads "17,810 more than ordered (+17.8%)", the list "+3,000 (+1.0%) vs. ordered", and a delivery without it "No PO count".
+- No purchase order number field. Nothing else changes: the count stays optional and is still compared with the farm's own count.
+
+## Decision DEC-130: Form rows line up, use one grid, and end with one footer order
+
+Status: Proposed 2026-11-17; built on `feature/batch-technician`
+Date: 2026-11-17
+
+### Context
+Fields in a form row did not line up when a label wrapped to two lines; tick boxes such as "Active" sat 10–25 px off their row, each placed with its own spacing; some forms mixed quarters, thirds and halves so columns did not line up from row to row; dialog footers had two orders (Save then Cancel at the left in most forms, Cancel then Save at the right in five dialogs).
+
+### Decision
+- `FormRowAlignDirective` (in FPMS_IMPORTS, on every `.form-row`) gives the labels on one visual line the height of the tallest, so the fields below them line up. It only sets heights, follows width and content changes, and leaves stacked (one-column) rows alone.
+- A cell holding only a tick box uses `fpms-check-cell`: it starts where the fields start and is as tall as a field, so the box is centred on the row. The heading of a group of controls uses `fpms-group-label`, spaced like a label.
+- Forms use a grid of thirds (a wide field spans two thirds); short rows stay on the same columns. Regrouped this way: Record a fry delivery and the delivery page, New inventory item, New hatchery source, New account, New pond and the pond page, Record harvest, and the farm address.
+- Every footer: the main action first, at the left, then Cancel, then the hint about missing fields. The large buttons stay on the five main recording forms.
+- A placeholder in a capitals-only field keeps its case ("e.g. N314").
+- An automated check (fields' top edges in each row) was run on 27 forms at 1,000 px; none is misaligned.
+
+### Consequences
+Positive:
+- Forms read as one system; adding a field no longer needs hand-tuned spacing.
+Negative:
+- Label heights are set by script after layout, so a label can settle a frame after the form appears.
+
 ---
 
 ## Note: glossary of interface terms

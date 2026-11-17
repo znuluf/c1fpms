@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (form layout, DEC-129 and DEC-130; branch `feature/batch-technician`)
+- **Fields line up.** In every form, fields on one row start at the same height even when a label wraps, and tick boxes such as Active sit level with them. Several forms are regrouped into even rows: fry delivery, inventory item, hatchery source, account, pond, harvest and the farm address.
+- **One button order.** Every form and dialog ends with its main action first, then Cancel.
+- **"PL ordered (PO)".** The delivery's ordered count now uses the logbook's wording.
+
 ### Changed (transport on the fry delivery, DEC-128; branch `feature/batch-technician`)
 - **Stock a batch no longer asks how the fry travelled.** "How the fry travelled" and "Time packed at the hatchery" are now optional fields on the fry delivery, asked once for the whole trip. The batch page and trace report show them from the delivery.
 

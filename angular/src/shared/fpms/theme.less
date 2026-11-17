@@ -554,11 +554,13 @@ html body.sidebar-mini .wrapper .main-footer {
 .fpms-dialog-body > .card + .card .card-footer {
     position: static;
 }
+// One footer order on every form and dialog (DEC-130): the main action first, at the left, then Cancel, then any hint.
 .fpms-dialog-foot {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 0.5rem;
-    justify-content: flex-end;
+    justify-content: flex-start;
     padding: 1rem 1.75rem;
     border-top: 1px solid var(--fpms-line);
     background: var(--fpms-bg);

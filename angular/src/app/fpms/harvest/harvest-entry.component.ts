@@ -98,7 +98,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                             <div class="card">
                                 <div class="card-body">
                                     <div class="form-row">
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-8">
                                             <label for="b">Batch <span class="text-danger">*</span></label>
                                             <select id="b" class="form-control" name="batchId" [(ngModel)]="m.batchId" (ngModelChange)="onBatch()" required [disabled]="!isNew">
                                                 @for (x of batches; track x.id) {
@@ -106,7 +106,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                 }
                                             </select>
                                         </div>
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-4">
                                             <label class="d-block">Harvest type <span class="text-danger">*</span></label>
                                             @for (o of Options.harvestType; track o.value) {
                                                 <div class="custom-control custom-radio custom-control-inline">
@@ -120,7 +120,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                         </div>
                                     </div>
                                     <div class="form-row">
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-8">
                                             <label for="buyer">Buyer</label>
                                             <select id="buyer" class="form-control" name="buyerId" [(ngModel)]="m.buyerId" (ngModelChange)="onBuyer()">
                                                 <option value="">Not one buyer / not decided</option>
@@ -130,7 +130,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             </select>
                                             <small class="form-text text-muted">When one buyer harvests or orders it. Their usual crate and price terms are filled in.</small>
                                         </div>
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-4">
                                             <label for="wb">Weighed on</label>
                                             <select id="wb" class="form-control" name="weighedBy" [(ngModel)]="m.weighedBy" (ngModelChange)="keepDraft()">
                                                 <option [ngValue]="null">Not recorded</option>
@@ -141,16 +141,16 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                         </div>
                                     </div>
                                     <div class="form-row">
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-4">
                                             <label for="at">Harvest date and time <span class="text-danger">*</span></label>
                                             <input id="at" type="datetime-local" class="form-control" name="harvestedAt" [(ngModel)]="m.harvestedAt" (ngModelChange)="keepDraft()" required [max]="nowInput" />
                                         </div>
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="kg">Total kg <span class="text-danger">*</span></label>
                                             <input id="kg" type="number" min="0.001" step="0.001" class="form-control" name="totalKg" [(ngModel)]="m.totalKg" (ngModelChange)="keepDraft()" required [readonly]="hasCrates()" />
                                             <small class="form-text text-muted">{{ hasCrates() ? 'Sum of the crate tally.' : 'Farm weight.' }}</small>
                                         </div>
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="bx">Boxes / crates</label>
                                             <input id="bx" type="number" min="0" step="1" class="form-control" name="boxes" [(ngModel)]="m.boxes" (ngModelChange)="keepDraft()" [readonly]="hasCrates()" />
                                         </div>

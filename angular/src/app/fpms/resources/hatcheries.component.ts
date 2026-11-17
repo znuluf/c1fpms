@@ -23,16 +23,18 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                             <form #f="ngForm" (ngSubmit)="save()" fpmsReview="hatchery" [fpmsReviewNew]="form.id === empty" novalidate>
                                 <div class="card-body">
                                     <div class="form-row">
-                                        <div class="form-group col-md-5">
+                                        <div class="form-group col-md-8">
                                             <label for="n">Name <span class="text-danger">*</span></label>
                                             <input id="n" class="form-control" name="name" [(ngModel)]="form.name" (blur)="suggestCode()" required maxlength="150" />
                                         </div>
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-4">
                                             <label for="sc">Short code <span class="text-danger">*</span></label>
                                             <input id="sc" class="form-control text-uppercase" name="shortCode" [(ngModel)]="form.shortCode" required maxlength="6" pattern="[A-Za-z]{2,6}" [placeholder]="suggestedCode" [disabled]="form.cycleCount > 0" />
                                             <small class="form-text text-muted">{{ form.cycleCount > 0 ? 'Fixed: used in cycle codes.' : '2–6 letters, used in cycle codes.' }}</small>
                                         </div>
-                                        <div class="form-group col-md-5">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-12">
                                             <label for="a">Address <span class="text-danger">*</span></label>
                                             <input id="a" class="form-control" name="address" [(ngModel)]="form.address" required maxlength="300" />
                                         </div>
@@ -46,28 +48,28 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                             <label for="ph">Phone <span class="text-danger">*</span></label>
                                             <input id="ph" class="form-control" name="phone" [(ngModel)]="form.phone" required maxlength="50" />
                                         </div>
-                                    </div>
-                                    <div class="form-row">
                                         <div class="form-group col-md-4">
                                             <label for="acc">BFAR accreditation no.</label>
                                             <input id="acc" class="form-control" name="bfarAccreditationNo" [(ngModel)]="form.bfarAccreditationNo" maxlength="100" />
                                         </div>
                                     </div>
+                                    @if (form.id === empty) {
                                     <div class="form-row">
-                                        @if (form.id === empty) {
-                                            <div class="form-group col-md-4">
-                                                <label for="hc">Health certificate no.</label>
-                                                <input id="hc" class="form-control" name="certificateNo" [(ngModel)]="cert.certificateNo" maxlength="100" />
-                                            </div>
-                                            <div class="form-group col-md-2">
-                                                <label for="hi">Issued</label>
-                                                <input id="hi" type="date" class="form-control" name="issueDate" [(ngModel)]="cert.issueDate" [max]="today" />
-                                            </div>
-                                            <div class="form-group col-md-2">
-                                                <label for="he">Expires</label>
-                                                <input id="he" type="date" class="form-control" name="expiryDate" [(ngModel)]="cert.expiryDate" />
-                                            </div>
-                                        }
+                                        <div class="form-group col-md-4">
+                                            <label for="hc">Health certificate no.</label>
+                                            <input id="hc" class="form-control" name="certificateNo" [(ngModel)]="cert.certificateNo" maxlength="100" />
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="hi">Issued</label>
+                                            <input id="hi" type="date" class="form-control" name="issueDate" [(ngModel)]="cert.issueDate" [max]="today" />
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="he">Expires</label>
+                                            <input id="he" type="date" class="form-control" name="expiryDate" [(ngModel)]="cert.expiryDate" />
+                                        </div>
+                                    </div>
+                                    }
+                                    <div class="form-row">
                                         <div class="form-group col-md-4 fpms-check-cell">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="act" name="isActive" [(ngModel)]="form.isActive" />

@@ -25,15 +25,15 @@ const ROLES = [
                             <form #f="ngForm" (ngSubmit)="save()" fpmsReview="account" [fpmsReviewNew]="!form.id" novalidate autocomplete="off">
                                 <div class="card-body">
                                     <div class="form-row">
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="name">First name <span class="text-danger">*</span></label>
                                             <input id="name" class="form-control" name="name" [(ngModel)]="form.name" (blur)="suggestUserName()" required maxlength="64" />
                                         </div>
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="surname">Surname <span class="text-danger">*</span></label>
                                             <input id="surname" class="form-control" name="surname" [(ngModel)]="form.surname" (blur)="suggestUserName()" required maxlength="64" />
                                         </div>
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="role">Role <span class="text-danger">*</span></label>
                                             <select id="role" class="form-control" name="roleName" [(ngModel)]="form.roleName" required>
                                                 @for (r of roles; track r.value) {
@@ -43,19 +43,19 @@ const ROLES = [
                                         </div>
                                     </div>
                                     <div class="form-row">
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="userName">Username <span class="text-danger">*</span></label>
                                             <input id="userName" class="form-control" name="userName" [(ngModel)]="form.userName" (ngModelChange)="userNameEdited = !!$event" required maxlength="256" autocapitalize="off" [disabled]="!!form.id" />
                                             @if (!form.id) {
                                                 <small class="form-text text-muted">Filled in from the name; you can change it. Fixed once saved.</small>
                                             }
                                         </div>
-                                        <div class="form-group col-md-3">
+                                        <div class="form-group col-md-4">
                                             <label for="email">Email <span class="text-danger">*</span></label>
                                             <input id="email" type="email" email class="form-control" name="emailAddress" [(ngModel)]="form.emailAddress" required maxlength="256" />
                                         </div>
                                         @if (!form.id) {
-                                            <div class="form-group col-md-3">
+                                            <div class="form-group col-md-4">
                                                 <label for="pw">Temporary password <span class="text-danger">*</span></label>
                                                 <div class="input-group">
                                                     <input id="pw" class="form-control" name="temporaryPassword" [(ngModel)]="form.temporaryPassword" required minlength="8" autocomplete="new-password" />
