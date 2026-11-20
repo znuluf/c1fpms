@@ -17,13 +17,8 @@ import { BatchFiguresComponent } from './batch-figures.component';
             [title]="(mine()?.length ?? 0) > 1 ? 'My ponds' : 'My pond'"
             [subtitle]="b() ? b().pondCode + ' · ' + batchShort(b().batchCode) + ' · cycle ' + b().cycleCode + (b().indicators?.doc != null ? ' · day ' + b().indicators.doc + ' of culture' : '') + '.' : ''">
             @if (b(); as x) {
+                <!-- Recording happens in the Daily record below ("Record for this day" and its rows), so the header keeps only the batch page. -->
                 <a class="btn btn-outline-primary" [routerLink]="['/app/production/batches', x.id]"><i class="fas fa-seedling mr-1" aria-hidden="true"></i>Batch page</a>
-                @if (can('Farm.Logs')) {
-                    <a class="btn btn-outline-primary" routerLink="/app/logbook/feeding" [queryParams]="{ batchId: x.id }"><i class="fas fa-fish mr-1" aria-hidden="true"></i>Feeding sheet</a>
-                }
-                @if (x.allowedLogTypes?.length && can('Farm.Logs.Create')) {
-                    <button type="button" class="btn btn-primary" (click)="drawer.open({ batchId: x.id })"><i class="fas fa-plus mr-1" aria-hidden="true"></i>Record operations</button>
-                }
             }
         </fpms-page-header>
         <section class="content px-2 pb-3">
