@@ -25,7 +25,7 @@ public class FarmProfileDto
 
     public string FarmCode { get; set; }
     /// <summary>Farm ID, A-LL-FF (area, place, farm number), the same three parts as the harvest lot code; "??" for the farm number until it is given (docs/farm-id-proposal.md).</summary>
-    public string FarmId => LotCodeParts;
+    public string FarmId => LotCodeParts != null && !LotCodeParts.EndsWith("??") ? LotCodeParts : null;
 
     /// <summary>Output only: the signed-in person is the Farm Owner, who alone may change the farm code (DEC-78).</summary>
     public bool CanChangeFarmCode { get; set; }
@@ -72,7 +72,7 @@ public class FarmProfileDto
     [StringLength(100)]
     public string ContactName { get; set; }
 
-    [Required(ErrorMessage = "Enter the farm's contact phone; it is printed on tally sheets and dispatch receipts."), StringLength(50)]
+    [Required(ErrorMessage = "Enter the farm's contact phone; it is printed on tally sheets and dispatch receipts."), StringLength(50), Capstone.Validation.PhilippinePhone]
     public string ContactPhone { get; set; }
 
     [OptionalEmailAddress, StringLength(256)]
@@ -157,18 +157,6 @@ public class FarmProfileAppService : CapstoneAppServiceBase
     {
         var p = await Farm.GetProfileAsync();
         var tenant = await GetCurrentTenantAsync();
-        // The Owner opening the profile is what gives the farm its number (docs/farm-id-proposal.md section 4), as long as the
-        // address names a known place. Otherwise the number is given with the first harvest lot code, as before.
-        if (p?.LotFarmNumber == null && await IsFarmOwnerAsync())
-        {
-            var (given, _) = await LotCoder.EnsureFarmIdentityAsync(tenant.Id);
-            if (given?.LotFarmNumber != null)
-            {
-                await CurrentUnitOfWork.SaveChangesAsync();
-                p = given;
-            }
-        }
-
         return new FarmProfileDto
         {
             RowVersion = Production.Concurrency.Encode(p?.RowVersion),
@@ -199,6 +187,38 @@ public class FarmProfileAppService : CapstoneAppServiceBase
             PondAreaHectares = await GetPondAreaHectaresAsync(),
             FullAddress = p.FormatAddress(),
         }.WithLotCode(p);
+    }
+
+    /// <summary>
+    /// Gives the farm its Farm ID when the Farm Owner opens the profile (docs/farm-id-proposal.md section 4), as long as the
+    /// address names a known place; otherwise the number is given with the first harvest lot code, as before. It is its own
+    /// call (a POST) so that opening a page with Get never changes data. Calling it again does nothing once the ID is given.
+    /// </summary>
+    public virtual async Task<string> GiveFarmId()
+    {
+        if (!await IsFarmOwnerAsync())
+        {
+            return null;
+        }
+
+        var tenant = await GetCurrentTenantAsync();
+        var (profile, _) = await LotCoder.EnsureFarmIdentityAsync(tenant.Id);
+        if (profile?.LotFarmNumber == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            await CurrentUnitOfWork.SaveChangesAsync();
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+        {
+            // The number is unique across farms; another farm in the same place took it at the same moment. Nothing was saved.
+            throw new Abp.UI.UserFriendlyException("Another farm was given the next Farm ID at the same moment. Open Farm profile again.");
+        }
+
+        return $"{profile.LotAreaCode}-{profile.LotPlaceCode:00}-{profile.LotFarmNumber:00}";
     }
 
     private async Task<bool> IsFarmOwnerAsync()
@@ -272,7 +292,7 @@ public class FarmProfileAppService : CapstoneAppServiceBase
         profile.Latitude = input.Latitude;
         profile.Longitude = input.Longitude;
         profile.ContactName = input.ContactName;
-        profile.ContactPhone = input.ContactPhone;
+        profile.ContactPhone = FarmAddress.Clean(input.ContactPhone);
         profile.ContactEmail = input.ContactEmail;
         profile.TimeZone = input.TimeZone;
         profile.DocumentExpiryAlertDays = input.DocumentExpiryAlertDays;

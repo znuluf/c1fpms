@@ -129,22 +129,14 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                     <input id="sfsc" class="form-control" name="sfscNo" [(ngModel)]="form.sfscNo" maxlength="100" placeholder="optional" />
                                                 </div>
                                             </div>
-                                            <!-- DEC-128: one trip for the whole delivery, so asked here once; both optional. -->
                                             <div class="form-row">
-                                                <div class="form-group col-md-4">
-                                                    <label for="trm">How the fry travelled</label>
-                                                    <select id="trm" class="form-control" name="transportMode" [(ngModel)]="form.transportMode">
-                                                        <option [ngValue]="null">Not recorded</option>
-                                                        @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
-                                                    </select>
-                                                </div>
                                                 <div class="form-group col-md-4">
                                                     <label for="cost">Cost (₱)</label>
                                                     <input id="cost" type="number" min="0" step="0.01" class="form-control" name="costPhp" [(ngModel)]="form.costPhp" />
                                                 </div>
                                             </div>
                                         } @else {
-                                            <p class="text-muted">The farm's count, the papers and the trip are entered with <strong>Receive fry</strong> when the fry arrive.</p>
+                                            <p class="text-muted">The farm's count and the papers are entered with <strong>Receive fry</strong> when the fry arrive.</p>
                                         }
                                         <div class="form-row">
                                             <div class="form-group col-md-12 mb-0">
@@ -311,7 +303,7 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
     readonly nowInput = FarmTime.nowInput();
 
     async startCreate(arrived = true): Promise<void> {
-        const list = (await this.api.get<any[]>('Hatchery', 'GetLookup')).filter((h) => h.isActive);
+        const list = (await this.api.get<any[]>('Hatchery', 'GetLookup'));
         this.hatcheries.set(list);
         this.form = {
             id: EMPTY_GUID,

@@ -490,11 +490,6 @@ public class CycleAppService : CapstoneAppServiceBase
                 result.Warnings.Add(new WarningDto { Kind = "Hatchery", Message = $"{pond.PondCode}: the hatchery's health certificate had expired on the stocking date." });
             }
 
-            if (delivery.TimePackedUtc.HasValue && stockedAtUtc - delivery.TimePackedUtc.Value > TimeSpan.FromHours(24))
-            {
-                result.Warnings.Add(new WarningDto { Kind = "Transport", Message = $"{pond.PondCode}: stocked more than 24 hours after the fry were packed at the hatchery." });
-            }
-
             if (b.DeadAtStocking > b.PlCount)
             {
                 result.Warnings.Add(new WarningDto { Kind = "DeadAtStocking", Message = $"{pond.PondCode}: dead at stocking ({b.DeadAtStocking:N0}) is more than the stocking count ({b.PlCount:N0}). Check both numbers." });

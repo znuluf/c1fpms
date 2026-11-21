@@ -1,3 +1,4 @@
+import { PHONE_MESSAGE, tidyPhone } from '@shared/fpms/phone';
 import { Component, OnInit, signal } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { EMPTY_GUID } from '@shared/fpms/farm-time';
@@ -42,7 +43,8 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                         }
                                         <div class="form-group col-md-3">
                                             <label for="ph">Phone</label>
-                                            <input id="ph" class="form-control" name="phone" [(ngModel)]="form.phone" maxlength="50" />
+                                            <input id="ph" fpmsPhone class="form-control" [class.is-invalid]="ph.invalid && ph.touched" name="phone" [(ngModel)]="form.phone" #ph="ngModel" aria-describedby="phHelp" />
+                                            <small id="phHelp" class="form-text" [class.text-danger]="ph.invalid && ph.touched" [class.text-muted]="!(ph.invalid && ph.touched)">{{ ph.invalid && ph.touched ? PHONE_MESSAGE : 'Optional. Mobile 0917 123 4567 or landline (083) 552 1234.' }}</small>
                                         </div>
                                     </div>
                                     <div class="form-row">
@@ -162,6 +164,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
     `,
 })
 export class BuyersComponent extends FpmsPage implements OnInit {
+    readonly PHONE_MESSAGE = PHONE_MESSAGE;
     readonly empty = EMPTY_GUID;
     list = signal<any[] | null>(null);
     f = new ClientListFilter<any>(
@@ -188,7 +191,7 @@ export class BuyersComponent extends FpmsPage implements OnInit {
     }
 
     startEdit(b?: any): void {
-        this.form = b ? { ...b } : { id: EMPTY_GUID, buyerType: 2, name: '', contactPerson: '', phone: '', address: '', isActive: true, privacyNoticeAcknowledged: false };
+        this.form = b ? { ...b, phone: tidyPhone(b.phone) } : { id: EMPTY_GUID, buyerType: 2, name: '', contactPerson: '', phone: '', address: '', isActive: true, privacyNoticeAcknowledged: false };
     }
 
     async save(): Promise<void> {

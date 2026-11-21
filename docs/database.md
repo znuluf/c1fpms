@@ -88,7 +88,7 @@ erDiagram
 | | `UsesSizeGrading` | | Whether harvests are graded by size (DEC-100). |
 | | `LotAreaCode`, `LotPlaceCode`, `LotFarmNumber` | | Parts of the harvest lot code (DEC-83). |
 | | `RowVersion` | | Version check on farm profile changes (DEC-133). |
-| `FpmsPonds` | `IsArchived` | | Ponds are archived, never deleted (DEC-77). |
+| `FpmsPonds` | `IsArchived`, `LengthM`, `WidthM` | | Ponds are archived, never deleted (DEC-77). Length and width are optional (ponds made before they were asked for have only an area); when both are set the area is their product. |
 | | `LotNumber` | | The pond's number in the lot code, never reused (DEC-83). |
 | `FpmsInventoryItems` | `Code` | | The farm's product code, shown first (DEC-98). |
 

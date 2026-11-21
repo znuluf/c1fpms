@@ -137,6 +137,8 @@ public static class FpmsModelConfiguration
             e.HasIndex(x => new { x.TenantId, x.PrefixId, x.Number }).IsUnique().HasFilter(NotDeleted);
             e.HasIndex(x => new { x.TenantId, x.LotNumber }).IsUnique().HasFilter("[LotNumber] IS NOT NULL"); // DEC-83, never reused
             e.Property(x => x.AreaM2).HasPrecision(10, 2);
+            e.Property(x => x.LengthM).HasPrecision(8, 2);
+            e.Property(x => x.WidthM).HasPrecision(8, 2);
             e.Property(x => x.AverageDepthM).HasPrecision(5, 2);
             e.Property(x => x.MaxDepthM).HasPrecision(5, 2);
             e.Property(x => x.InletType).HasMaxLength(Pond.MaxTypeLength);

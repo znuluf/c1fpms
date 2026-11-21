@@ -1,3 +1,4 @@
+import { PHONE_MESSAGE, tidyPhone } from '@shared/fpms/phone';
 import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime } from '@shared/fpms/farm-time';
@@ -280,7 +281,8 @@ const PROFILE_DRAFT = 'farm-profile';
                                             </div>
                                             <div class="form-group col-md-4">
                                                 <label for="cphone">Phone <span class="text-danger">*</span></label>
-                                                <input id="cphone" class="form-control" name="contactPhone" [(ngModel)]="p.contactPhone" required maxlength="50" />
+                                                <input id="cphone" fpmsPhone class="form-control" [class.is-invalid]="cph.invalid && cph.touched" name="contactPhone" [(ngModel)]="p.contactPhone" required #cph="ngModel" aria-describedby="cphoneHelp" />
+                                                <small id="cphoneHelp" class="form-text" [class.text-danger]="cph.invalid && cph.touched" [class.text-muted]="!(cph.invalid && cph.touched)">{{ cph.invalid && cph.touched ? PHONE_MESSAGE : 'Mobile 0917 123 4567 or landline (083) 552 1234.' }}</small>
                                             </div>
                                             <div class="form-group col-md-4">
                                                 <label for="cemail">Email</label>
@@ -510,6 +512,7 @@ const PROFILE_DRAFT = 'farm-profile';
     `,
 })
 export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy {
+    readonly PHONE_MESSAGE = PHONE_MESSAGE;
     p: any = null;
     /** When restored unsaved changes were last kept on this device (DEC-134), else null. */
     restoredAt: string | null = null;
@@ -585,6 +588,7 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
     }
 
     async ngOnInit(): Promise<void> {
+        await this.giveFarmId();
         await this.load();
         this.restoreDraft();
     }
@@ -710,6 +714,24 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
 
     async load(): Promise<void> {
         this.p = await this.api.get<any>('FarmProfile', 'Get');
+        this.p.contactPhone = tidyPhone(this.p.contactPhone);
+        // Keep the Farm ID in the top bar and on print headers in step without signing in again.
+        if (this.session.tenant && this.p?.farmId) {
+            this.session.tenant.farmId = this.p.farmId;
+        }
+    }
+
+    /** Opening this page as the Farm Owner gives the farm its Farm ID when it has none and the address names a known place. Reading the profile never changes data. */
+    private async giveFarmId(): Promise<void> {
+        if (!this.can('Farm.Profile.Edit') || this.session.tenant?.farmId) {
+            return;
+        }
+
+        try {
+            await this.api.post<string | null>('FarmProfile', 'GiveFarmId');
+        } catch {
+            // Not given this time (for example two farms at once); the profile still opens and says so.
+        }
     }
 
     async openPonds(): Promise<void> {

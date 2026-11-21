@@ -62,6 +62,9 @@ public class Pond : FarmEntity
     /// </summary>
     public int? LotNumber { get; set; }
 
+    /// <summary>Length and width in metres. Optional: ponds made before they were asked for have only an area. When both are set, the area is their product.</summary>
+    public decimal? LengthM { get; set; }
+    public decimal? WidthM { get; set; }
     public decimal AreaM2 { get; set; }
     public decimal AverageDepthM { get; set; }
     public decimal MaxDepthM { get; set; }

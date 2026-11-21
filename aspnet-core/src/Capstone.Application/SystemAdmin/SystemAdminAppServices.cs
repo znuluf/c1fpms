@@ -63,11 +63,13 @@ public class SystemFarmAppService : CapstoneAppServiceBase
 {
     private readonly IRepository<Tenant, int> _tenants;
     private readonly IRepository<Capstone.Farms.FarmProfile, int> _profiles;
+    private readonly IRepository<Capstone.Harvests.Harvest, Guid> _harvests;
 
-    public SystemFarmAppService(IRepository<Tenant, int> tenants, IRepository<Capstone.Farms.FarmProfile, int> profiles)
+    public SystemFarmAppService(IRepository<Tenant, int> tenants, IRepository<Capstone.Farms.FarmProfile, int> profiles, IRepository<Capstone.Harvests.Harvest, Guid> harvests)
     {
         _tenants = tenants;
         _profiles = profiles;
+        _harvests = harvests;
     }
 
     public virtual async Task<List<SystemFarmDto>> GetFarms()
@@ -94,7 +96,9 @@ public class SystemFarmAppService : CapstoneAppServiceBase
 
     /// <summary>
     /// Corrects a Farm ID given in error (docs/farm-id-proposal.md section 4). Only the System Administrator may, with a reason;
-    /// the new ID must be free, because an ID is never shared or reused. The reason and both IDs go to the log.
+    /// the new ID must be free, because an ID is never shared or reused, and it cannot be changed once a harvest lot code
+    /// carries it, because that code is already on paper. The call, with its reason, is in the audit log (ABP records the
+    /// input of every application service call), and the warning below names both IDs.
     /// </summary>
     public virtual async Task SetFarmId(SetFarmIdInput input)
     {
@@ -110,8 +114,14 @@ public class SystemFarmAppService : CapstoneAppServiceBase
             throw new Abp.UI.UserFriendlyException("That place is not on the list. General Santos is area 0 (places 01–26); Sarangani is area 1 (places 01–07).");
         }
 
-        using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+        using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant, AbpDataFilters.SoftDelete))
         {
+            // Only whether any harvest has a lot code is asked, nothing of the harvest itself; a deleted harvest still counts, its code was printed.
+            if (await _harvests.GetAll().AnyAsync(h => h.TenantId == input.TenantId && h.LotCode != null))
+            {
+                throw new Abp.UI.UserFriendlyException("This farm's Farm ID is already in harvest lot codes, so it cannot be changed. Those codes are on paper and in buyers' records.");
+            }
+
             if (await _profiles.GetAll().AnyAsync(f => f.Id != input.TenantId && f.LotAreaCode == input.Area && f.LotPlaceCode == input.Place && f.LotFarmNumber == input.FarmNumber))
             {
                 throw new Abp.UI.UserFriendlyException($"{input.Area}-{input.Place:00}-{input.FarmNumber:00} already belongs to another farm.");

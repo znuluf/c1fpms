@@ -25,6 +25,13 @@ public class PondEditDto : IValidatableObject
     [Range(1, Pond.MaxNumber)]
     public int? Number { get; set; }
 
+    /// <summary>Length and width in metres. When both are given the area is length times width, worked out here, whatever AreaM2 says.</summary>
+    [Range(0.01, 100000)]
+    public decimal? LengthM { get; set; }
+
+    [Range(0.01, 100000)]
+    public decimal? WidthM { get; set; }
+
     [Range(0.01, 100000000)]
     public decimal AreaM2 { get; set; }
 
@@ -81,6 +88,8 @@ public class PondListDto
 
     public Guid PrefixId { get; set; }
     public int Number { get; set; }
+    public decimal? LengthM { get; set; }
+    public decimal? WidthM { get; set; }
     public decimal AreaM2 { get; set; }
     public decimal AverageDepthM { get; set; }
     public decimal MaxDepthM { get; set; }
@@ -324,7 +333,7 @@ public class PondAppService : CapstoneAppServiceBase
             return new PondListDto
             {
                 Id = p.Id, PondCode = p.PondCode, Name = PondNaming.DisplayName(p.Prefix?.Name, p.Number), PrefixId = p.PrefixId, Number = p.Number,
-                AreaM2 = p.AreaM2, AverageDepthM = p.AverageDepthM, MaxDepthM = p.MaxDepthM,
+                LengthM = p.LengthM, WidthM = p.WidthM, AreaM2 = p.AreaM2, AverageDepthM = p.AverageDepthM, MaxDepthM = p.MaxDepthM,
                 Purpose = p.Purpose, ConstructionType = p.ConstructionType, FarmingSystem = system, FarmingSystemOverride = p.FarmingSystemOverride,
                 ManualStatus = p.ManualStatus,
                 Status = p.IsArchived ? PondDisplayStatus.Archived : DeriveStatus(p.ManualStatus, batch?.Status, round != null, round?.PreparedAtUtc != null),
@@ -361,7 +370,7 @@ public class PondAppService : CapstoneAppServiceBase
         return new PondDetailDto
         {
             Id = p.Id, PondCode = p.PondCode, Name = PondNaming.DisplayName(p.Prefix?.Name, p.Number), PrefixId = p.PrefixId, PrefixName = p.Prefix?.Name,
-            Number = p.Number, AreaM2 = p.AreaM2, AverageDepthM = p.AverageDepthM, MaxDepthM = p.MaxDepthM,
+            Number = p.Number, LengthM = p.LengthM, WidthM = p.WidthM, AreaM2 = p.AreaM2, AverageDepthM = p.AverageDepthM, MaxDepthM = p.MaxDepthM,
             Purpose = p.Purpose, ConstructionType = p.ConstructionType, InletType = p.InletType, OutletType = p.OutletType,
             AerationSystem = p.AerationSystem, FarmingSystemOverride = p.FarmingSystemOverride, FarmingSystem = system, FarmFarmingSystem = farmSystem,
             Latitude = p.Latitude, Longitude = p.Longitude, Notes = p.Notes,
@@ -450,7 +459,7 @@ public class PondAppService : CapstoneAppServiceBase
             PondId = id,
             ChangeDateUtc = DateTime.UtcNow,
             ChangeType = PondChangeType.Created,
-            Description = $"Pond {code} ({PondNaming.DisplayName(prefix.Name, number)}) created ({input.AreaM2:0.##} m², {input.Purpose}). Status Available.",
+            Description = $"Pond {code} ({PondNaming.DisplayName(prefix.Name, number)}) created ({AreaOf(input):0.##} m², {input.Purpose}). Status Available.",
         });
         return id;
     }
@@ -476,7 +485,7 @@ public class PondAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("The construction type is set when the pond is created and cannot change, because the pond's name and code depend on it. A different construction is a different pond; add a new pond instead.");
         }
 
-        var sizeChanged = input.AreaM2 != pond.AreaM2 || input.AverageDepthM != pond.AverageDepthM || input.MaxDepthM != pond.MaxDepthM;
+        var sizeChanged = AreaOf(input) != pond.AreaM2 || input.LengthM != pond.LengthM || input.WidthM != pond.WidthM || input.AverageDepthM != pond.AverageDepthM || input.MaxDepthM != pond.MaxDepthM;
         if (hasOpenBatch && sizeChanged)
         {
             throw new UserFriendlyException("The area and depths cannot change while this pond has an open batch. Close the batch first.");
@@ -876,9 +885,15 @@ public class PondAppService : CapstoneAppServiceBase
     private async Task<int> NextNumberAsync(Guid prefixId) =>
         (await _ponds.GetAll().Where(p => p.PrefixId == prefixId).MaxAsync(p => (int?)p.Number) ?? 0) + 1;
 
+    /// <summary>The area is length times width to two decimals when both are given; otherwise the area as entered (ponds made before length and width were asked for).</summary>
+    private static decimal AreaOf(PondEditDto input) =>
+        input.LengthM > 0 && input.WidthM > 0 ? Math.Round(input.LengthM.Value * input.WidthM.Value, 2) : input.AreaM2;
+
     private static void Apply(Pond pond, PondEditDto input)
     {
-        pond.AreaM2 = input.AreaM2;
+        pond.LengthM = input.LengthM;
+        pond.WidthM = input.WidthM;
+        pond.AreaM2 = AreaOf(input);
         pond.AverageDepthM = input.AverageDepthM;
         pond.MaxDepthM = input.MaxDepthM;
         pond.Purpose = input.Purpose;
@@ -903,7 +918,9 @@ public class PondAppService : CapstoneAppServiceBase
             }
         }
 
-        Check("Area (m²)", p.AreaM2, i.AreaM2);
+        Check("Length (m)", p.LengthM, i.LengthM);
+        Check("Width (m)", p.WidthM, i.WidthM);
+        Check("Area (m²)", p.AreaM2, AreaOf(i));
         Check("Average depth (m)", p.AverageDepthM, i.AverageDepthM);
         Check("Max depth (m)", p.MaxDepthM, i.MaxDepthM);
         Check("Purpose", p.Purpose, i.Purpose);

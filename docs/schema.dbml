@@ -985,6 +985,8 @@ Table "dbo"."FpmsPonds" {
   "PrefixId" uniqueidentifier(16) [unique, not null]
   "Number" int(10) [unique, not null, check: `[Number]>=(1) AND [Number]<=(999)`]
   "PondCode" nvarchar(30) [unique, not null]
+  "LengthM" decimal(8,2)
+  "WidthM" decimal(8,2)
   "AreaM2" decimal(10,2) [not null, check: `[AreaM2]>(0)`]
   "AverageDepthM" decimal(5,2) [not null]
   "MaxDepthM" decimal(5,2) [not null]

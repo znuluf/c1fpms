@@ -404,11 +404,6 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
     public virtual async Task<SaveFryDeliveryResult> Create(FryDeliveryEditDto input)
     {
         var hatchery = await _hatcheries.FirstOrDefaultAsync(h => h.Id == input.HatcheryId) ?? throw new UserFriendlyException("Choose a hatchery.");
-        if (!hatchery.IsActive)
-        {
-            throw new UserFriendlyException($"The hatchery '{hatchery.Name}' is inactive.");
-        }
-
         // DEC-131: logged at the gate (Received, with the count) or as an order (Ordered / In transit, with the PL ordered).
         if (input.InitialStatus is not (FryDeliveryStatus.Received or FryDeliveryStatus.Ordered or FryDeliveryStatus.InTransit))
         {
@@ -737,10 +732,19 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         d.CostPhp = input.CostPhp;
         d.Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim();
         d.PlHealthCertificateNo = string.IsNullOrWhiteSpace(input.PlHealthCertificateNo) ? null : input.PlHealthCertificateNo.Trim();
-        d.TransportPermitNo = string.IsNullOrWhiteSpace(input.TransportPermitNo) ? null : input.TransportPermitNo.Trim();
+        // The transport permit and the time packed are no longer asked for on the screens (capstone consultation, 21 Nov 2026).
+        // A value is set only when one is sent, so an edit from the screens does not clear what was recorded earlier.
+        if (!string.IsNullOrWhiteSpace(input.TransportPermitNo))
+        {
+            d.TransportPermitNo = input.TransportPermitNo.Trim();
+        }
+
         d.SfscNo = string.IsNullOrWhiteSpace(input.SfscNo) ? null : input.SfscNo.Trim();
         d.TransportMode = input.TransportMode;
-        d.TimePackedUtc = input.TimePacked.HasValue ? FarmClock.ToUtc(input.TimePacked.Value) : null;
+        if (input.TimePacked.HasValue)
+        {
+            d.TimePackedUtc = FarmClock.ToUtc(input.TimePacked.Value);
+        }
     }
 
     private async Task<List<FryDeliveryDto>> MapAsync(List<FryDelivery> deliveries)

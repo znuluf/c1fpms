@@ -31,7 +31,7 @@ public class HatcheryDto
     [StringLength(HatcherySource.MaxShortLength)]
     public string ContactPerson { get; set; }
 
-    [Required, StringLength(50)]
+    [Required, StringLength(50), Capstone.Validation.PhilippinePhone]
     public string Phone { get; set; }
 
     /// <summary>Optional. Shown in the hatchery list and the trace report.</summary>
@@ -39,7 +39,6 @@ public class HatcheryDto
     public string BfarAccreditationNo { get; set; }
 
     public AccreditationStatus AccreditationStatus { get; set; } = AccreditationStatus.Unknown;
-    public bool IsActive { get; set; } = true;
 
     /// <summary>Read only: the current health certificate (latest unexpired, else the latest).</summary>
     public string HealthCertificateNo { get; set; }
@@ -124,7 +123,7 @@ public class HatcheryAppService : CapstoneAppServiceBase
     public virtual async Task<List<LookupDto>> GetLookup()
     {
         return await _hatcheries.GetAll().AsNoTracking().OrderBy(h => h.Name)
-            .Select(h => new LookupDto { Id = h.Id, Name = h.Name + " (" + h.ShortCode + ")", IsActive = h.IsActive }).ToListAsync();
+            .Select(h => new LookupDto { Id = h.Id, Name = h.Name + " (" + h.ShortCode + ")" }).ToListAsync();
     }
 
     [AbpAuthorize(PermissionNames.Hatcheries_Manage)]
@@ -174,15 +173,7 @@ public class HatcheryAppService : CapstoneAppServiceBase
         h.Phone = input.Phone.Trim();
         h.BfarAccreditationNo = input.BfarAccreditationNo;
         h.AccreditationStatus = input.AccreditationStatus;
-        h.IsActive = input.IsActive;
         return isNew ? await _hatcheries.InsertAndGetIdAsync(h) : h.Id;
-    }
-
-    [AbpAuthorize(PermissionNames.Hatcheries_Manage)]
-    public virtual async Task SetActive(SetActiveInput input)
-    {
-        var h = await _hatcheries.GetAsync(input.Id);
-        h.IsActive = input.IsActive;
     }
 
     /// <summary>Adds a certificate (a renewal adds a new one; earlier ones stay in the history).</summary>
@@ -230,7 +221,6 @@ public class HatcheryAppService : CapstoneAppServiceBase
         dto.Phone = h.Phone;
         dto.BfarAccreditationNo = h.BfarAccreditationNo;
         dto.AccreditationStatus = h.AccreditationStatus;
-        dto.IsActive = h.IsActive;
         dto.HealthCertificateNo = current?.CertificateNo;
         dto.HealthCertificateExpiry = current?.ExpiryDate;
         dto.IsCertificateExpired = current != null && current.IsExpiredOn(today);

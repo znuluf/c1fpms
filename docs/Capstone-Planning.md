@@ -612,7 +612,7 @@ Thresholds marked † are defaults the Owner can change in Farm Standards (DEC-5
 | Reopen batch | Owner; batch is Closed; its cycle is not Closed; reason given |
 | Reopen cycle | Owner; cycle is Closed; reason given |
 | Edit stocking count | Batch is not Closed; new cycle total ≤ PL received (after Finish stocking, the change is balanced by the delivery's count-difference line); Owner only, reason recorded in the audit log |
-| Deactivate a hatchery, item, buyer, prefix, size grade, or category | Allowed at any time. It disappears from pickers, while history and existing links stay. A hatchery with a delivery that has no cycle yet shows a warning first. |
+| Deactivate an item, buyer, prefix, size grade, or category | Allowed at any time. It disappears from pickers, while history and existing links stay. A hatchery with a delivery that has no cycle yet shows a warning first. |
 
 ### **Edits, removals, and stock integrity**
 
@@ -921,6 +921,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-135 | New log entries, feedings and preparation entries are kept on the tablet without a connection and sent later; drafts on the farm profile and account form (accepted 2026-11-21). |
 | DEC-136 | The farm profile needs a sign-in; a kept entry refused by a rule is shown at once; system, API and query guides (accepted 2026-11-21). |
 | DEC-137 | The farm profile requires the contact phone; the setup step says what is missing (accepted 2026-11-21). |
+| DEC-138 | Plainer forms after the capstone consultation: pond length and width stored, one phone format, Farm ID given by its own call, safer permit renewal (accepted 2026-11-21). |
 
 # **Appendix B. Manuscript alignment notes**
 

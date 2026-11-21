@@ -784,7 +784,13 @@ public class SaleAppService : CapstoneAppServiceBase
         sale.PlateNo = Clean(input.PlateNo);
         sale.LoadedAtUtc = input.LoadedAt.HasValue ? FarmClock.ToUtc(input.LoadedAt.Value) : null;
         sale.Destination = Clean(input.Destination);
-        sale.LocalTransportPermitNo = Clean(input.LocalTransportPermitNo);
+        // The local transport permit is no longer asked for on the screen (capstone consultation, 21 Nov 2026); a value is set only
+        // when one is sent, so an edit from the screen keeps what was recorded earlier.
+        if (!string.IsNullOrWhiteSpace(input.LocalTransportPermitNo))
+        {
+            sale.LocalTransportPermitNo = Clean(input.LocalTransportPermitNo);
+        }
+
         sale.TemperatureNote = Clean(input.TemperatureNote);
 
         foreach (var existing in sale.Lines.ToList())

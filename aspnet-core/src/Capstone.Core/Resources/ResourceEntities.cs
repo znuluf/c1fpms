@@ -30,7 +30,6 @@ public class HatcherySource : FarmEntity
     public string Phone { get; set; }
     public string BfarAccreditationNo { get; set; }
     public AccreditationStatus AccreditationStatus { get; set; } = AccreditationStatus.Unknown;
-    public bool IsActive { get; set; } = true;
 
     /// <summary>Snapshot text stored on a batch at stocking (AC-08).</summary>
     public string DescribeCertification(HatcheryCertificate healthCertificate, DateOnly onDate)

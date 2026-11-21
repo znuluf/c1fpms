@@ -1,3 +1,4 @@
+import { PHONE_MESSAGE, tidyPhone } from '@shared/fpms/phone';
 import { Component, OnInit, signal } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { EMPTY_GUID } from '@shared/fpms/farm-time';
@@ -46,7 +47,8 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                         </div>
                                         <div class="form-group col-md-4">
                                             <label for="ph">Phone <span class="text-danger">*</span></label>
-                                            <input id="ph" class="form-control" name="phone" [(ngModel)]="form.phone" required maxlength="50" />
+                                            <input id="ph" fpmsPhone class="form-control" [class.is-invalid]="ph.invalid && ph.touched" name="phone" [(ngModel)]="form.phone" required #ph="ngModel" aria-describedby="phHelp" />
+                                            <small id="phHelp" class="form-text" [class.text-danger]="ph.invalid && ph.touched" [class.text-muted]="!(ph.invalid && ph.touched)">{{ ph.invalid && ph.touched ? PHONE_MESSAGE : 'Mobile 0917 123 4567 or landline (083) 552 1234.' }}</small>
                                         </div>
                                         <div class="form-group col-md-4">
                                             <label for="acc">BFAR accreditation no.</label>
@@ -212,6 +214,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
     `,
 })
 export class HatcheriesComponent extends FpmsPage implements OnInit {
+    readonly PHONE_MESSAGE = PHONE_MESSAGE;
     readonly empty = EMPTY_GUID;
     list = signal<any[] | null>(null);
     f = new ClientListFilter<any>(
@@ -255,7 +258,7 @@ export class HatcheriesComponent extends FpmsPage implements OnInit {
     async startEdit(h?: any): Promise<void> {
         this.cert = this.blankCertificate();
         this.detail.set(null);
-        this.form = h ? { ...h } : { id: EMPTY_GUID, name: '', shortCode: '', accreditationStatus: 4, isActive: true, cycleCount: 0 };
+        this.form = h ? { ...h, phone: tidyPhone(h.phone) } : { id: EMPTY_GUID, name: '', shortCode: '', accreditationStatus: 4, cycleCount: 0 };
         if (h) {
             this.detail.set(await this.api.get<any>('Hatchery', 'Get', { id: h.id }));
         }

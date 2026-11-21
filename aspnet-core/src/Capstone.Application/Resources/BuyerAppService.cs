@@ -26,7 +26,7 @@ public class BuyerDto
     [StringLength(Buyer.MaxShortLength)]
     public string ContactPerson { get; set; }
 
-    [StringLength(50)]
+    [StringLength(50), Capstone.Validation.PhilippinePhone]
     public string Phone { get; set; }
 
     [StringLength(Buyer.MaxAddressLength)]
@@ -142,7 +142,7 @@ public class BuyerAppService : CapstoneAppServiceBase
             b.PrivacyNoticeAcknowledgedAtUtc = null;
         }
 
-        b.Phone = input.Phone;
+        b.Phone = string.IsNullOrWhiteSpace(input.Phone) ? null : input.Phone.Trim();
         b.Address = input.Address;
         b.IsActive = input.IsActive;
         return input.Id == Guid.Empty ? await _buyers.InsertAndGetIdAsync(b) : b.Id;

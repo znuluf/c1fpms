@@ -28,7 +28,10 @@ export class HeaderLeftNavbarComponent implements OnInit {
     private router = inject(Router);
     readonly isHost = !this.session.tenant;
     readonly farmName = this.session.tenant?.farmName || this.session.tenant?.name;
-    readonly farmId = this.session.tenant?.farmId;
+    /** Read each time, not once: the Farm ID is given while the Owner is signed in (Farm profile), after this bar was made. */
+    get farmId(): string | null | undefined {
+        return this.session.tenant?.farmId;
+    }
 
     private url = signal(effectiveUrl(this.router.url));
     private title = signal(pageTitleOf(this.router.routerState.snapshot.root));

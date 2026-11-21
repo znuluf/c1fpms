@@ -57,7 +57,7 @@ export const FeedingMethods = { 1: 'Broadcast', 2: 'Tray', 3: 'Auto-feeder', 4: 
 /** Feedings are numbered in the day's order (DEC-61); 1 and 2 were AM and PM before. */
 export const FeedingSessions = { 1: 'Feeding 1', 2: 'Feeding 2', 3: 'Feeding 3', 4: 'Feeding 4', 5: 'Feeding 5', 6: 'Feeding 6', 7: 'Feeding 7', 8: 'Feeding 8' };
 export const FeedingStatuses = { 1: 'Fed', 2: 'Not fed' };
-export const DensityFlags = { 1: 'Within band', 2: 'Below band', 3: 'Above band' };
+export const DensityFlags = { 1: 'Within range', 2: 'Below range', 3: 'Above range' };
 export const ShortfallReasons = { 1: 'Dead on arrival', 2: 'Discarded', 3: 'Returned', 4: 'Count difference' };
 export const CycleOutcomes = { 1: 'Completed', 2: 'Failed' };
 export const MortalityCauses = { 1: 'Disease', 4: 'Water quality', 7: 'Other' };

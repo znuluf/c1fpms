@@ -56,13 +56,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
-                                            <label for="r-trm">How the fry travelled</label>
-                                            <select id="r-trm" class="form-control" name="transportMode" [(ngModel)]="receiving.transportMode">
-                                                <option [ngValue]="null">Not recorded</option>
-                                                @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-md-4">
                                             <label for="r-n">Note</label>
                                             <input id="r-n" class="form-control" name="note" [(ngModel)]="receiving.note" maxlength="500" placeholder="e.g. 2 bags damaged" />
                                         </div>
@@ -220,18 +213,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     <input id="sfsc" class="form-control" name="sfscNo" [(ngModel)]="m.sfscNo" maxlength="100" placeholder="optional" />
                                                 </div>
                                             </div>
-                                            <!-- DEC-128: one trip for the whole delivery, so asked here once; both optional. -->
-                                            <div class="form-row">
-                                                <div class="form-group col-md-4">
-                                                    <label for="trm">How the fry travelled</label>
-                                                    <select id="trm" class="form-control" name="transportMode" [(ngModel)]="m.transportMode">
-                                                        <option [ngValue]="null">Not recorded</option>
-                                                        @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
-                                                    </select>
-                                                </div>
-                                            </div>
                                             } @else {
-                                                <p class="text-muted">The papers and the trip are entered with <strong>Receive fry</strong> when the fry arrive.</p>
+                                                <p class="text-muted">The papers are entered with <strong>Receive fry</strong> when the fry arrive.</p>
                                             }
                                             <div class="form-row">
                                                 <div class="form-group col-md-12">

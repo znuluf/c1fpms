@@ -319,9 +319,13 @@ const CUSTOM = 'custom';
                                 <div class="form-group col-md-6">
                                     <label for="f-num">Reference number <span class="text-danger">*</span></label>
                                     <input id="f-num" class="form-control" name="documentNumber" [(ngModel)]="form.documentNumber" required maxlength="100" autocomplete="off" placeholder="e.g. ECC-R12-2026-8891" />
-                                    <small class="form-text text-muted">Copy it as written on the paper. The year is part of the number; it changes each year the permit is renewed.</small>
+                                    <small class="form-text text-muted">Copy it as written on the paper.</small>
                                     @if (form.mode === 'renew') {
-                                        <small class="form-text text-muted">The year in the number is updated for you. Check it against the new paper and fix it if the agency gave a different number.</small>
+                                        @if (form.numberYearUpdated) {
+                                            <small class="form-text text-muted">The year in the number is updated for you. Check it against the new paper and fix it if the agency gave a different number.</small>
+                                        } @else {
+                                            <small class="form-text text-muted">Carried over from the current record. Change it if the agency issued a new number.</small>
+                                        }
                                     }
                                 </div>
                                 <div class="form-group col-md-6">
@@ -549,13 +553,30 @@ export class DocumentsComponent extends FpmsPage implements OnInit {
         this.opened();
     }
 
-    /** Permit numbers usually carry the year and change on every renewal, so a renewal starts with this year in place of the old one. */
-    private numberForThisYear(no: string): string {
+    /**
+     * Permit numbers often carry the year they were issued, so a renewal starts with this year in place of the old one.
+     * Only a year that matches the old permit's own issue year (else its expiry year) is replaced, and only when exactly one
+     * part of the number matches; any other number is left as it was, because a block like 2001 is a serial, not a year.
+     */
+    private numberForThisYear(d: any): { no: string; changed: boolean } {
+        const no: string = d.documentNumber ?? '';
         const year = this.today.slice(0, 4);
-        return (no ?? '').replace(/\b(19|20)\d{2}\b/, year);
+        for (const old of [d.issueDate, d.expiryDate].map((x: string) => (x ?? '').slice(0, 4))) {
+            if (!/^(19|20)\d{2}$/.test(old) || old === year) {
+                continue;
+            }
+
+            const parts = no.match(new RegExp(`(?<![0-9])${old}(?![0-9])`, 'g')) ?? [];
+            if (parts.length === 1) {
+                return { no: no.replace(new RegExp(`(?<![0-9])${old}(?![0-9])`), year), changed: true };
+            }
+        }
+
+        return { no, changed: false };
     }
 
     startRenew(d: any): void {
+        const renewed = this.numberForThisYear(d);
         this.form = {
             mode: 'renew',
             renewedFromId: d.id,
@@ -564,7 +585,8 @@ export class DocumentsComponent extends FpmsPage implements OnInit {
             categoryId: d.categoryId,
             presetChoice: d.presetId ?? CUSTOM,
             title: d.title,
-            documentNumber: this.numberForThisYear(d.documentNumber),
+            documentNumber: renewed.no,
+            numberYearUpdated: renewed.changed,
             issuingAgency: d.issuingAgency ?? '',
             isPerpetual: false,
             issueDate: this.today,

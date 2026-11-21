@@ -3436,6 +3436,32 @@ Positive:
 Negative:
 - A farm without a phone must enter one to save its profile.
 
+## Decision DEC-138: Plainer forms after the capstone consultation; one phone format; Farm ID
+
+Status: Accepted 2026-11-21
+Date: 2026-11-21
+
+### Context
+The consultation on 21 Nov 2026 asked for fewer fields and plainer words for farm owners and technicians. Reviewing that branch showed three places where a screen change had no matching server rule: pond length and width were asked for but never stored; a permit renewal could change the wrong number in a permit; and phone numbers were free text, so the same kind of number was written many ways.
+
+### Decision
+- **Pond size.** A pond stores optional length and width (`LengthM`, `WidthM`). When both are given the server works out the area as length times width, to two decimals, whatever area is sent. A pond made before they were asked for has only an area, and its area stays editable until length and width are entered.
+- **Phone numbers have one format**, in the farm profile, buyers and hatcheries: mobile `0917 123 4567`; landline `(083) 552 1234` (3-digit area code) or `(02) 8123 4567` (Metro Manila). The screens write what is typed or pasted in that format (including +63 forms); the server accepts nothing else (`PhilippinePhone`). Postal code (4 digits), email and coordinates were already checked and are unchanged.
+- **Farm ID** (`A-LL-FF`, docs/farm-id-proposal.md): given when the Farm Owner opens the farm profile, by its own call (`FarmProfile.GiveFarmId`), not by reading the profile. The System Administrator may correct it with a reason, but not once any harvest of the farm has a lot code, because that code is on paper. The call and its reason are in the audit log.
+- **Permit year on renewal.** Only a year in the permit number that equals the old permit's own issue (else expiry) year is replaced, and only when it is the one such part of the number. Any other number is carried over as it was.
+- **Removed fields keep their data.** The transport permits, "time packed" and "Travelled by" are no longer asked for or shown; values already recorded are left in place, not cleared by an edit, and the 24-hour "packed too long ago" warning is removed. There is no Active or Inactive for a hatchery: the switch, the Inactive label and the Deactivate action are gone, and every hatchery on record is listed and can be chosen on a delivery.
+
+### Consequences
+Positive:
+- Area, phone numbers and permit numbers can no longer disagree between screen and records.
+- Opening a page never writes.
+Negative:
+- A phone number that is not in the format cannot be saved; an old record in another style is shown in the format when it can be, and must be fixed when it cannot.
+- Ponds get two new columns; a database made before this needs recreating (the migration is made fresh in each Codespace).
+- The BFAR trace no longer shows a transport permit for new deliveries; confirm this with the partner farm.
+
+---
+
 ---
 
 ## Decision DEC-138: Remove the PCR health-test hint from batch pages

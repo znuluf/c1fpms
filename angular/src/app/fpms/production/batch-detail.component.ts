@@ -308,8 +308,6 @@ interface CalMonth {
                                         <h3 class="fpms-section-h">Fry</h3>
                                         <dl class="fpms-facts">
                                             <div><dt>Fry delivery</dt><dd><a [routerLink]="['/app/resources/fry-deliveries', b.fryDeliveryId]">{{ b.hatcheryBatchNumber }}</a> · {{ b.hatcheryName }}</dd></div>
-                                            <!-- DEC-128: from the fry delivery, one trip for every pond stocked from it. -->
-                                            <div><dt>Travelled by</dt><dd>{{ b.transportMode ? (b.transportMode | label: L.TransportModes) : 'Not recorded' }}</dd></div>
                                             <div><dt>PL age</dt><dd>{{ b.plAgeDays != null ? 'PL' + b.plAgeDays : '—' }}</dd></div>
                                             <div><dt>Hatchery certification</dt><dd>{{ b.hatcheryCertificationStatusAtStocking || '—' }}</dd></div>
                                             <div><dt>PL health certificate</dt><dd>{{ b.plHealthCertificateNo ?? '—' }}</dd></div>

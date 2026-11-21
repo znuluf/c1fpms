@@ -41,8 +41,8 @@ public class Resources_Tests : FpmsTestBase
         var service = Resolve<HatcheryAppService>();
         var id = await service.Save(new HatcheryDto { Name = "Sarangani Hatchery Inc", ShortCode = "shi", Address = "Glan, Sarangani", Phone = "0917 000 0001" });
         (await service.Get(id)).ShortCode.ShouldBe("SHI");
-        await Should.ThrowAsync<UserFriendlyException>(() => service.Save(new HatcheryDto { Name = "Another", ShortCode = "SHI", Address = "x", Phone = "1" }));
-        await Should.ThrowAsync<UserFriendlyException>(() => service.Save(new HatcheryDto { Name = "Bad code", ShortCode = "S1", Address = "x", Phone = "1" }));
+        await Should.ThrowAsync<UserFriendlyException>(() => service.Save(new HatcheryDto { Name = "Another", ShortCode = "SHI", Address = "x", Phone = "0917 000 0002" }));
+        await Should.ThrowAsync<UserFriendlyException>(() => service.Save(new HatcheryDto { Name = "Bad code", ShortCode = "S1", Address = "x", Phone = "0917 000 0002" }));
     }
 
     [Fact]
@@ -50,11 +50,11 @@ public class Resources_Tests : FpmsTestBase
     {
         var service = Resolve<HatcheryAppService>();
         // The DTO marks these [Required], so ABP rejects a missing one before Save runs (a validation error naming the field).
-        await Should.ThrowAsync<AbpValidationException>(() => service.Save(new HatcheryDto { Name = "No code", Address = "x", Phone = "1" }));
-        await Should.ThrowAsync<AbpValidationException>(() => service.Save(new HatcheryDto { Name = "No address", ShortCode = "NAD", Phone = "1" }));
+        await Should.ThrowAsync<AbpValidationException>(() => service.Save(new HatcheryDto { Name = "No code", Address = "x", Phone = "0917 000 0002" }));
+        await Should.ThrowAsync<AbpValidationException>(() => service.Save(new HatcheryDto { Name = "No address", ShortCode = "NAD", Phone = "0917 000 0002" }));
         await Should.ThrowAsync<AbpValidationException>(() => service.Save(new HatcheryDto { Name = "No phone", ShortCode = "NPH", Address = "x" }));
         // The BFAR accreditation number is optional, whatever the status.
-        var id = await service.Save(new HatcheryDto { Name = "No BFAR number", ShortCode = "NBN", Address = "x", Phone = "1", AccreditationStatus = AccreditationStatus.Accredited });
+        var id = await service.Save(new HatcheryDto { Name = "No BFAR number", ShortCode = "NBN", Address = "x", Phone = "0917 000 0002", AccreditationStatus = AccreditationStatus.Accredited });
         (await service.Get(id)).ShortCode.ShouldBe("NBN");
     }
 

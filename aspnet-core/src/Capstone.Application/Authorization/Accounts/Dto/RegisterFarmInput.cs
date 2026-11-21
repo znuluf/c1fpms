@@ -45,7 +45,7 @@ public class RegisterFarmInput
     [StringLength(100)]
     public string ContactName { get; set; }
 
-    [StringLength(50)]
+    [StringLength(50), Capstone.Validation.PhilippinePhone]
     public string ContactPhone { get; set; }
 
     [OptionalEmailAddress]

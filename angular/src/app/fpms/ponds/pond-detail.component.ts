@@ -336,9 +336,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="area">Area (m²)</label>
-                                    <input id="area" type="number" class="form-control" name="areaM2" [ngModel]="pond.areaM2" readonly required aria-describedby="areaHelp" />
+                                    <input id="area" type="number" min="0.01" step="0.01" class="form-control" name="areaM2" [(ngModel)]="pond.areaM2" [readonly]="areaFromSides()" [disabled]="isLocked('areaM2')" required aria-describedby="areaHelp" />
                                     <small id="areaHelp" class="form-text text-muted">
-                                        @if (isLocked('areaM2')) { <i class="fas fa-lock mr-1"></i>{{ lockReason('areaM2') }} } @else { Worked out from length × width. }
+                                        @if (isLocked('areaM2')) { <i class="fas fa-lock mr-1"></i>{{ lockReason('areaM2') }} } @else if (areaFromSides()) { Worked out from length × width. } @else { Enter length and width to work it out, or type the area. }
                                     </small>
                                 </div>
                             </div>
@@ -542,8 +542,12 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
         return this.historyType == null ? all : all.filter((h) => h.changeType === this.historyType);
     }
 
-    /** The API reports which fields are locked and why (same rules as saving). */
-    /** Area is never typed: it is length times width, to two decimals. */
+    /** True when both length and width are filled in: the area then follows them and the server uses their product. */
+    areaFromSides(): boolean {
+        return Number(this.pond?.lengthM) > 0 && Number(this.pond?.widthM) > 0;
+    }
+
+    /** With length and width filled in, the area is their product, to two decimals. Ponds made before length and width were asked for keep a typed area. */
     recalcArea(): void {
         const l = Number(this.pond.lengthM);
         const w = Number(this.pond.widthM);
@@ -552,6 +556,7 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
         }
     }
 
+    /** The API reports which fields are locked and why (same rules as saving). */
     isLocked(field: string): boolean {
         return !this.isNew && !!this.pond?.lockedFields?.[field];
     }
