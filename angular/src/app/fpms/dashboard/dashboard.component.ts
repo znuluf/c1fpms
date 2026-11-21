@@ -64,6 +64,9 @@ interface AttentionGroup {
  * averages: an average of ponds stocked weeks apart, or of FCRs, describes no pond.
  * Everything is derived from what has been entered; a blank day is a gap to fill in, never "overdue" (DEC-31, DEC-50).
  */
+/** Getting started is two steps: the farm profile, then the ponds. The rest is reachable from the menu when the farm needs it. */
+const SETUP_STEPS = ['profile', 'ponds'];
+
 @Component({
     standalone: true,
     imports: FPMS_IMPORTS,
@@ -82,7 +85,7 @@ interface AttentionGroup {
                                     <i class="fas fa-tasks" aria-hidden="true"></i>
                                     Set up your farm
                                 </h3>
-                                <span class="float-right text-muted">{{ doneSetup().length }} of {{ x.setupTasks.length }} done</span>
+                                <span class="float-right text-muted">{{ doneSetup().length }} of {{ doneSetup().length + pendingSetup().length }} done</span>
                             </div>
                             <div class="card-body py-2">
                                 <ul class="list-unstyled mb-0 fpms-setup">
@@ -428,8 +431,9 @@ export class DashboardComponent extends FpmsPage implements OnInit {
                   )
                 : Promise.resolve(null),
         ]);
-        this.pendingSetup.set((data?.setupTasks ?? []).filter((t: any) => !t.done));
-        this.doneSetup.set((data?.setupTasks ?? []).filter((t: any) => t.done));
+        const steps = (data?.setupTasks ?? []).filter((t: any) => SETUP_STEPS.includes(t.key));
+        this.pendingSetup.set(steps.filter((t: any) => !t.done));
+        this.doneSetup.set(steps.filter((t: any) => t.done));
         this.d.set(data);
         this.s.set(status ?? { rows: [] });
     }

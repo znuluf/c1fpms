@@ -459,7 +459,7 @@ public class DashboardAppService : CapstoneAppServiceBase
                     Key = "profile", Done = profileMissing.Count == 0, Route = "/app/farm/profile",
                     Label = profileMissing.Count == 0 ? "Complete the farm profile" : $"Complete the farm profile: add {string.Join(" and ", profileMissing)}",
                 },
-                new() { Key = "standards", Label = "Review Farm standards (water ranges, density bands, warning thresholds)", Done = profile.StandardsReviewedAtUtc.HasValue, Route = "/app/farm/standards" },
+                new() { Key = "standards", Label = "Review Farm standards (water ranges, density ranges, warning thresholds)", Done = profile.StandardsReviewedAtUtc.HasValue, Route = "/app/farm/standards" },
                 new() { Key = "documents", Label = "Record permits and licenses", Done = await _documents.GetAll().AnyAsync(), Route = "/app/farm/documents" },
                 new() { Key = "ponds", Label = "Add ponds", Done = ponds.Count > 0, Route = "/app/ponds" },
                 new() { Key = "hatcheries", Label = "Add hatchery sources", Done = await _hatcheries.GetAll().AnyAsync(), Route = "/app/resources/hatcheries" },

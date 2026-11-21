@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (capstone consultation, 21 Nov 2026)
+- **Plainer for farm owners and technicians.** The app is named Shrimp.io (Farm Production Information System). "Farm code" is now "Farm ID". The sidebar lists Farm management above Production management. Registration steps read "1. Farm", "2. Owner account", "3. Review".
+- **Fewer fields.** Removed time zone, coordinates, country and postal code (farm profile and registration), "Time packed at the hatchery", the transport permits (fry delivery, sales, trace report) and the hatchery Active/Inactive switch.
+- **Pond area is worked out** from length and width; units sit beside the field label.
+- **Permit numbers** keep their format; a renewal updates the year in the number for you.
+- **Getting started** shows two steps: farm profile, then ponds.
+- "Density band" is now "Density range".
+
 ### Fixed (DEC-137)
 - **"Set up your farm" now ticks "Complete the farm profile" when the profile is saved.** The step needed a contact phone the form did not ask for; the phone is now required on the farm profile, and the step says what is missing.
 

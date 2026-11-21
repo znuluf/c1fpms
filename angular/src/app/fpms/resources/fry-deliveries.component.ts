@@ -125,10 +125,6 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                     <input id="phc" class="form-control" name="plHealthCertificateNo" [(ngModel)]="form.plHealthCertificateNo" maxlength="100" />
                                                 </div>
                                                 <div class="form-group col-md-4">
-                                                    <label for="tpn">Transport permit (DTP/LTP)</label>
-                                                    <input id="tpn" class="form-control" name="transportPermitNo" [(ngModel)]="form.transportPermitNo" maxlength="100" placeholder="optional" />
-                                                </div>
-                                                <div class="form-group col-md-4">
                                                     <label for="sfsc">Shrimp Fry Source Certificate no.</label>
                                                     <input id="sfsc" class="form-control" name="sfscNo" [(ngModel)]="form.sfscNo" maxlength="100" placeholder="optional" />
                                                 </div>
@@ -141,11 +137,6 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                         <option [ngValue]="null">Not recorded</option>
                                                         @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
                                                     </select>
-                                                </div>
-                                                <div class="form-group col-md-4">
-                                                    <label for="tpk">Time packed at the hatchery</label>
-                                                    <input id="tpk" type="datetime-local" class="form-control" name="timePacked" [(ngModel)]="form.timePacked" [max]="form.receivedAt || nowInput" />
-                                                    <small class="form-text text-muted">Optional. Stocking more than 24 hours after packing is flagged.</small>
                                                 </div>
                                                 <div class="form-group col-md-4">
                                                     <label for="cost">Cost (₱)</label>

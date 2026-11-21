@@ -150,8 +150,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <div><dt>Delivered</dt><dd>{{ f.deliveryDate | farmDate }} · {{ f.plReceived | num: 0 }} PL{{ f.plAgeDays != null ? ' · PL' + f.plAgeDays : '' }}</dd></div>
                                     <div><dt>Fry Source Certificate</dt><dd>@if (f.sfscNo) { {{ f.sfscNo }} } @else { <span class="ts-missing">Not recorded</span><span class="ts-d">Required by BFAR FAO 225-1</span> }</dd></div>
                                     <div><dt>PL health certificate</dt><dd>@if (f.plHealthCertificateNo) { {{ f.plHealthCertificateNo }} } @else { <span class="ts-missing">Not recorded</span> }</dd></div>
-                                    <div><dt>Transport permit</dt><dd>@if (f.transportPermitNo) { {{ f.transportPermitNo }} } @else { <span class="ts-missing">Not recorded</span> }</dd></div>
-                                    <div><dt>Travelled by</dt><dd>{{ f.transportMode ? (f.transportMode | label: L.TransportModes) : 'Not recorded' }}{{ f.timePackedUtc ? ' · packed ' + (f.timePackedUtc | farmDateTime) : '' }}</dd></div>
+                                    <div><dt>Travelled by</dt><dd>{{ f.transportMode ? (f.transportMode | label: L.TransportModes) : 'Not recorded' }}</dd></div>
                                 </dl>
                             } @else {
                                 <p class="ts-missing">Not recorded: no fry delivery is linked to this batch.</p>
@@ -902,7 +901,6 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
         if (f) {
             if (!f.plHealthCertificateNo) out.push({ what: 'PL health certificate number', where: 'Origin · ' + f.hatcheryBatchNumber, action: 'Open fry delivery', link: delivery });
             if (!f.sfscNo) out.push({ what: 'Shrimp Fry Source Certificate number', where: 'Origin · ' + f.hatcheryBatchNumber, action: 'Open fry delivery', link: delivery });
-            if (!f.transportPermitNo) out.push({ what: 'Transport permit (DTP/LTP)', where: 'Origin · ' + f.hatcheryBatchNumber, action: 'Open fry delivery', link: delivery });
             if (!f.bfarAccreditationNo) out.push({ what: 'Hatchery BFAR accreditation number', where: 'Origin · ' + f.hatcheryName, action: 'Open hatcheries', link: ['/app/resources/hatcheries'] });
         }
         if (!t.bfarRegistrationNo) out.push({ what: 'Farm BFAR registration number', where: 'Farm profile', action: 'Open farm profile', link: ['/app/farm/profile'] });

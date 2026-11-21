@@ -319,8 +319,9 @@ const CUSTOM = 'custom';
                                 <div class="form-group col-md-6">
                                     <label for="f-num">Reference number <span class="text-danger">*</span></label>
                                     <input id="f-num" class="form-control" name="documentNumber" [(ngModel)]="form.documentNumber" required maxlength="100" autocomplete="off" placeholder="e.g. ECC-R12-2026-8891" />
+                                    <small class="form-text text-muted">Copy it as written on the paper. The year is part of the number; it changes each year the permit is renewed.</small>
                                     @if (form.mode === 'renew') {
-                                        <small class="form-text text-muted">Carried over from the current record. Change it if the agency issued a new number.</small>
+                                        <small class="form-text text-muted">The year in the number is updated for you. Check it against the new paper and fix it if the agency gave a different number.</small>
                                     }
                                 </div>
                                 <div class="form-group col-md-6">
@@ -548,6 +549,12 @@ export class DocumentsComponent extends FpmsPage implements OnInit {
         this.opened();
     }
 
+    /** Permit numbers usually carry the year and change on every renewal, so a renewal starts with this year in place of the old one. */
+    private numberForThisYear(no: string): string {
+        const year = this.today.slice(0, 4);
+        return (no ?? '').replace(/\b(19|20)\d{2}\b/, year);
+    }
+
     startRenew(d: any): void {
         this.form = {
             mode: 'renew',
@@ -557,7 +564,7 @@ export class DocumentsComponent extends FpmsPage implements OnInit {
             categoryId: d.categoryId,
             presetChoice: d.presetId ?? CUSTOM,
             title: d.title,
-            documentNumber: d.documentNumber,
+            documentNumber: this.numberForThisYear(d.documentNumber),
             issuingAgency: d.issuingAgency ?? '',
             isPerpetual: false,
             issueDate: this.today,

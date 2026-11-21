@@ -180,7 +180,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 <div><span>Plate no.</span>{{ s.plateNo || '—' }}</div>
                                 <div><span>Loaded</span>{{ s.loadedAtUtc ? (s.loadedAtUtc | farmDateTime) : '—' }}</div>
                                 <div><span>Destination</span>{{ s.destination || '—' }}</div>
-                                <div><span>Transport permit no.</span>{{ s.localTransportPermitNo || '—' }}</div>
                                 <div><span>Temperature / icing</span>{{ s.temperatureNote || '—' }}</div>
                             </div>
                         }

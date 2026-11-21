@@ -71,23 +71,23 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             ].map((i) => this.inSection('System', i));
         }
 
-        // Daily work first (production level), what the farm is made of last (farm level).
+        // What the farm is made of first (farm management), daily work after it (production management).
         // Sections with several pages show one item here; their pages are tabs across the top of the content.
-        const production = 'Production level';
-        const farm = 'Farm level';
+        const production = 'Production management';
+        const farm = 'Farm management';
         const canSell = this.permission.isGranted('Farm.Sales');
         // DEC-127: a technician's own pond, one tap from anywhere. The Owner sees every pond, so has no such item.
         const myPond = this.permission.isGranted('Farm.Production.Manage') ? [] : [new MenuItem('My pond', '/app/my-pond', 'fas fa-user-check', 'Farm.Logs')];
         return [
             new MenuItem('Dashboard', '/app/dashboard', 'fas fa-tachometer-alt', 'Farm.Dashboard'),
             ...myPond,
+            this.inSection(farm, new MenuItem('Ponds', '/app/ponds', 'fas fa-water', 'Farm.Ponds')),
+            this.inSection(farm, this.sectionItem('resources', 'Resources', 'fas fa-boxes')),
+            this.inSection(farm, this.sectionItem('farm', 'Farm', 'fas fa-home')),
             this.inSection(production, this.sectionItem('operations', 'Operations', 'fas fa-clipboard-check')),
             this.inSection(production, this.sectionItem('production', 'Production', 'fas fa-seedling', '/app/production/batches')),
             this.inSection(production, this.sectionItem('harvest', canSell ? 'Harvest and sales' : 'Harvest', 'fas fa-shrimp')),
             this.inSection(production, new MenuItem('Reports', '/app/reports', 'fas fa-chart-line', 'Farm.Reports')),
-            this.inSection(farm, new MenuItem('Ponds', '/app/ponds', 'fas fa-water', 'Farm.Ponds')),
-            this.inSection(farm, this.sectionItem('resources', 'Resources', 'fas fa-boxes')),
-            this.inSection(farm, this.sectionItem('farm', 'Farm', 'fas fa-home')),
         ];
     }
 

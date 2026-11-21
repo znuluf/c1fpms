@@ -327,31 +327,32 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-4">
-                                    <label for="area">Area <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input id="area" type="number" min="0.01" step="0.01" class="form-control" name="areaM2" [(ngModel)]="pond.areaM2" [disabled]="isLocked('areaM2')" required />
-                                        <div class="input-group-append"><span class="input-group-text">m²</span></div>
-                                    </div>
-                                    @if (isLocked('areaM2')) {
-                                        <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('areaM2') }}</small>
-                                    }
+                                    <label for="len">Length (m)</label>
+                                    <input id="len" type="number" min="0.01" step="0.01" class="form-control" name="lengthM" [(ngModel)]="pond.lengthM" (ngModelChange)="recalcArea()" [disabled]="isLocked('areaM2')" />
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label for="avg">Average depth <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input id="avg" type="number" min="0.01" max="100" step="0.01" class="form-control" name="averageDepthM" [(ngModel)]="pond.averageDepthM" [disabled]="isLocked('averageDepthM')" required />
-                                        <div class="input-group-append"><span class="input-group-text">m</span></div>
-                                    </div>
+                                    <label for="wid">Width (m)</label>
+                                    <input id="wid" type="number" min="0.01" step="0.01" class="form-control" name="widthM" [(ngModel)]="pond.widthM" (ngModelChange)="recalcArea()" [disabled]="isLocked('areaM2')" />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="area">Area (m²)</label>
+                                    <input id="area" type="number" class="form-control" name="areaM2" [ngModel]="pond.areaM2" readonly required aria-describedby="areaHelp" />
+                                    <small id="areaHelp" class="form-text text-muted">
+                                        @if (isLocked('areaM2')) { <i class="fas fa-lock mr-1"></i>{{ lockReason('areaM2') }} } @else { Worked out from length × width. }
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="avg">Average depth (m) <span class="text-danger">*</span></label>
+                                    <input id="avg" type="number" min="0.01" max="100" step="0.01" class="form-control" name="averageDepthM" [(ngModel)]="pond.averageDepthM" [disabled]="isLocked('averageDepthM')" required />
                                     @if (isLocked('averageDepthM')) {
                                         <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('averageDepthM') }}</small>
                                     }
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label for="max">Maximum depth <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input id="max" type="number" min="0.01" max="100" step="0.01" class="form-control" name="maxDepthM" [(ngModel)]="pond.maxDepthM" [disabled]="isLocked('maxDepthM')" required />
-                                        <div class="input-group-append"><span class="input-group-text">m</span></div>
-                                    </div>
+                                <div class="form-group col-md-6">
+                                    <label for="max">Maximum depth (m) <span class="text-danger">*</span></label>
+                                    <input id="max" type="number" min="0.01" max="100" step="0.01" class="form-control" name="maxDepthM" [(ngModel)]="pond.maxDepthM" [disabled]="isLocked('maxDepthM')" required />
                                     @if (depthError) {
                                         <small class="text-danger">Maximum depth cannot be less than average depth.</small>
                                     }
@@ -542,6 +543,15 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
     }
 
     /** The API reports which fields are locked and why (same rules as saving). */
+    /** Area is never typed: it is length times width, to two decimals. */
+    recalcArea(): void {
+        const l = Number(this.pond.lengthM);
+        const w = Number(this.pond.widthM);
+        if (l > 0 && w > 0) {
+            this.pond.areaM2 = Math.round(l * w * 100) / 100;
+        }
+    }
+
     isLocked(field: string): boolean {
         return !this.isNew && !!this.pond?.lockedFields?.[field];
     }
@@ -662,6 +672,8 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
                 id: '00000000-0000-0000-0000-000000000000',
                 number: null,
                 areaM2: null,
+                lengthM: null,
+                widthM: null,
                 averageDepthM: null,
                 maxDepthM: null,
                 purpose: 1,

@@ -44,7 +44,7 @@ export class RegisterComponent {
     private auth = inject(AppAuthService);
     private cdr = inject(ChangeDetectorRef);
 
-    /** Set once the person types their own farm code or username; suggestions then stop replacing it (DEC-75). */
+    /** Set once the person types their own farm ID or username; suggestions then stop replacing it (DEC-75). */
     farmCodeEdited = false;
     ownerUserNameEdited = false;
 
@@ -129,7 +129,7 @@ export class RegisterComponent {
             .catch(() => this.enabled.set(false));
     }
 
-    /** Fills the farm code from the farm name (numbered when taken), unless the person typed their own. */
+    /** Fills the farm ID from the farm name (numbered when taken), unless the person typed their own. */
     async suggestFarmCode(): Promise<void> {
         if (this.farmCodeEdited || !this.model.farmName?.trim()) {
             return;

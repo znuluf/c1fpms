@@ -265,7 +265,7 @@ interface Allocation {
                                                     <td><span class="fpms-pond-tag">{{ a.pond.pondCode }}</span><div class="text-muted text-nowrap">{{ a.stockedAt.replace('T', ' ') }}</div>@if (people.length) { <div class="text-muted">{{ peopleNames(a.technicianUserIds) }}</div> } @else if (!can('Farm.Production.Manage')) { <div class="text-muted">Looked after by you</div> }</td>
                                                     <td class="text-right">
                                                         {{ a.plCount | num: 0 }}
-                                                        <div class="text-nowrap" [class.text-muted]="densityState(a) === 'within'" [class.text-warning-dark]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle ml-1" aria-hidden="true"></i><span class="sr-only">outside the band</span> }</div>
+                                                        <div class="text-nowrap" [class.text-muted]="densityState(a) === 'within'" [class.text-warning-dark]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle ml-1" aria-hidden="true"></i><span class="sr-only">outside the range</span> }</div>
                                                     </td>
                                                     <td class="text-right">{{ a.deadAtStocking != null ? (a.deadAtStocking | num: 0) : '—' }}</td>
                                                     <td>{{ readingsLine(a) }}</td>
@@ -366,9 +366,9 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
 
     bandText(p: any): string {
         if (p.bandMinPlM2 == null && p.bandMaxPlM2 == null) {
-            return 'no band set (Farm standards)';
+            return 'no range set (Farm standards)';
         }
-        return `band ${p.bandMinPlM2 ?? 0}–${p.bandMaxPlM2 ?? '∞'} PL/m² (${p.bandSource ?? 'standard'})`;
+        return `range ${p.bandMinPlM2 ?? 0}–${p.bandMaxPlM2 ?? '∞'} PL/m² (${p.bandSource ?? 'standard'})`;
     }
 
     get delivery(): any {

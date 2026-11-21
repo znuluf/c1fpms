@@ -77,8 +77,8 @@ export class AppAuthService {
             const old = code;
             this.farmCode = result.replacedByFarmCode;
             abp.message.info(
-                `The farm code ${old} was changed. Use ${result.replacedByFarmCode} to sign in; it is filled in below.`,
-                'Farm code changed'
+                `The farm ID ${old} was changed. Use ${result.replacedByFarmCode} to sign in; it is filled in below.`,
+                'Farm ID changed'
             );
             return false;
         }
@@ -86,7 +86,7 @@ export class AppAuthService {
         abp.message.error(
             result.state === TenantAvailabilityState._2
                 ? 'This farm account is inactive. Contact the System Administrator.'
-                : 'No farm account uses this farm code.',
+                : 'No farm account uses this farm ID.',
             'Sign-in failed'
         );
         return false;

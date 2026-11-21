@@ -167,8 +167,7 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-4"><label for="la">Loaded at</label><input id="la" type="datetime-local" class="form-control" name="loadedAt" [(ngModel)]="m.loadedAt" /></div>
-                                        <div class="form-group col-md-4"><label for="de">Destination</label><input id="de" class="form-control" name="destination" [(ngModel)]="m.destination" maxlength="200" /></div>
-                                        <div class="form-group col-md-4"><label for="ltp">Local transport permit no.</label><input id="ltp" class="form-control" name="localTransportPermitNo" [(ngModel)]="m.localTransportPermitNo" maxlength="100" /></div>
+                                        <div class="form-group col-md-8"><label for="de">Destination</label><input id="de" class="form-control" name="destination" [(ngModel)]="m.destination" maxlength="200" /></div>
                                     </div>
                                     <div class="form-group mb-0"><label for="tn">Temperature / icing note</label><input id="tn" class="form-control" name="temperatureNote" [(ngModel)]="m.temperatureNote" maxlength="200" placeholder="e.g. iced 1:1, 4 °C" /></div>
                                 </div>

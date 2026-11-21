@@ -50,10 +50,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                             <input id="r-phc" class="form-control" name="plHealthCertificateNo" [(ngModel)]="receiving.plHealthCertificateNo" maxlength="100" />
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <label for="r-tpn">Transport permit (DTP/LTP)</label>
-                                            <input id="r-tpn" class="form-control" name="transportPermitNo" [(ngModel)]="receiving.transportPermitNo" maxlength="100" placeholder="optional" />
-                                        </div>
-                                        <div class="form-group col-md-4">
                                             <label for="r-sfsc">Shrimp Fry Source Certificate no.</label>
                                             <input id="r-sfsc" class="form-control" name="sfscNo" [(ngModel)]="receiving.sfscNo" maxlength="100" placeholder="optional" />
                                         </div>
@@ -65,10 +61,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                 <option [ngValue]="null">Not recorded</option>
                                                 @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
                                             </select>
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="r-tpk">Time packed at the hatchery</label>
-                                            <input id="r-tpk" type="datetime-local" class="form-control" name="timePacked" [(ngModel)]="receiving.timePacked" [max]="receiving.receivedAt || nowInput" />
                                         </div>
                                         <div class="form-group col-md-4">
                                             <label for="r-n">Note</label>
@@ -224,10 +216,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     <input id="phc" class="form-control" name="plHealthCertificateNo" [(ngModel)]="m.plHealthCertificateNo" maxlength="100" />
                                                 </div>
                                                 <div class="form-group col-md-4">
-                                                    <label for="tpn">Transport permit (DTP/LTP)</label>
-                                                    <input id="tpn" class="form-control" name="transportPermitNo" [(ngModel)]="m.transportPermitNo" maxlength="100" placeholder="optional" />
-                                                </div>
-                                                <div class="form-group col-md-4">
                                                     <label for="sfsc">Shrimp Fry Source Certificate no.</label>
                                                     <input id="sfsc" class="form-control" name="sfscNo" [(ngModel)]="m.sfscNo" maxlength="100" placeholder="optional" />
                                                 </div>
@@ -240,11 +228,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                         <option [ngValue]="null">Not recorded</option>
                                                         @for (o of Options.transportMode; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
                                                     </select>
-                                                </div>
-                                                <div class="form-group col-md-4">
-                                                    <label for="tpk">Time packed at the hatchery</label>
-                                                    <input id="tpk" type="datetime-local" class="form-control" name="timePacked" [(ngModel)]="m.timePacked" [max]="m.deliveryDate ? m.deliveryDate + 'T23:59' : ''" />
-                                                    <small class="form-text text-muted">Optional. Stocking more than 24 hours after packing is flagged.</small>
                                                 </div>
                                             </div>
                                             } @else {

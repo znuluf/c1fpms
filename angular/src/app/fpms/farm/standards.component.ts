@@ -11,7 +11,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
     standalone: true,
     imports: FPMS_IMPORTS,
     template: `
-        <fpms-page-header [narrow]="true" title="Farm standards" subtitle="Water-quality ranges, density bands and warning thresholds this farm uses."></fpms-page-header>
+        <fpms-page-header [narrow]="true" title="Farm standards" subtitle="Water-quality ranges, density ranges and warning thresholds this farm uses."></fpms-page-header>
         <section class="content px-2 pb-3">
             <div class="container-fluid fpms-narrow">
                 @if (!s()) {
@@ -70,7 +70,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     </div>
 
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title">Stocking density bands (PL/m²)</h3></div>
+                        <div class="card-header"><h3 class="card-title">Stocking density ranges (PL/m²)</h3></div>
                         <div class="card-body p-0 table-responsive">
                             <table class="table table-sm mb-0 fpms-standards">
                                 <thead><tr><th title="Farming system and pond construction">System</th><th>Standard</th><th title="The farm's own minimum">Farm min.</th><th title="The farm's own maximum">Farm max.</th><th><span class="sr-only">Actions</span></th></tr></thead>
@@ -264,7 +264,7 @@ export class FarmStandardsComponent extends FpmsPage implements OnInit {
     }
 
     resetBand(b: any): Promise<void> {
-        return this.save('ResetDensityBand', { farmingSystem: b.farmingSystem, constructionType: b.constructionType }, 'Density band reset to the standard.');
+        return this.save('ResetDensityBand', { farmingSystem: b.farmingSystem, constructionType: b.constructionType }, 'Density range reset to the standard.');
     }
 
     saveThreshold(t: any): Promise<void> {

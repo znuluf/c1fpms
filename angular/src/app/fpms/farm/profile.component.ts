@@ -41,7 +41,7 @@ const PROFILE_DRAFT = 'farm-profile';
                             <div class="card-header"><h3 class="card-title">Farm details</h3></div>
                             <div class="card-body">
                                 <dl class="row mb-0 fpms-dl">
-                                    <dt class="col-sm-4">Farm code</dt><dd class="col-sm-8"><code>{{ p.farmCode }}</code><span class="fpms-none ml-2">used with your username to sign in</span></dd>
+                                    <dt class="col-sm-4">Farm ID</dt><dd class="col-sm-8"><code>{{ p.farmCode }}</code><span class="fpms-none ml-2">used with your username to sign in</span></dd>
                                     <dt class="col-sm-4">Farm name</dt><dd class="col-sm-8">{{ p.farmName }}</dd>
                                     <dt class="col-sm-4">Total farm area</dt>
                                     <dd class="col-sm-8">
@@ -53,10 +53,6 @@ const PROFILE_DRAFT = 'farm-profile';
                                     <dd class="col-sm-8">
                                         @if (p.lotCodeParts) { <code>YY-{{ p.lotCodeParts }}-PP-HH</code> }
                                         <div class="small" [class.text-warning-dark]="!p.lotCodeParts" [class.fpms-none]="p.lotCodeParts">{{ p.lotCodeNote }}</div>
-                                    </dd>
-                                    <dt class="col-sm-4">Coordinates</dt>
-                                    <dd class="col-sm-8">
-                                        @if (p.latitude != null && p.longitude != null) { {{ p.latitude | num: 6 }}, {{ p.longitude | num: 6 }} } @else { <span class="fpms-none">—</span> }
                                     </dd>
                                 </dl>
                             </div>
@@ -75,7 +71,6 @@ const PROFILE_DRAFT = 'farm-profile';
                             <div class="card-header"><h3 class="card-title">Settings</h3></div>
                             <div class="card-body">
                                 <dl class="row mb-0 fpms-dl">
-                                    <dt class="col-sm-4">Time zone</dt><dd class="col-sm-8">{{ p.timeZone }}</dd>
                                     <dt class="col-sm-4">Farming system</dt><dd class="col-sm-8">{{ p.farmingSystem | label: L.FarmingSystems }}</dd>
                                     <dt class="col-sm-4">Permit alert</dt><dd class="col-sm-8">{{ p.documentExpiryAlertDays }} days</dd>
                                     <dt class="col-sm-4">Date display</dt><dd class="col-sm-8">{{ p.dateOrder === 2 ? 'Day first' : 'Month first' }}</dd>
@@ -110,7 +105,7 @@ const PROFILE_DRAFT = 'farm-profile';
                                     <div class="card-header"><h3 class="card-title">Farm details</h3></div>
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <label for="farmCode">Farm code</label>
+                                            <label for="farmCode">Farm ID</label>
                                             <div class="input-group fpms-code-field-group">
                                                 <input id="farmCode" class="form-control fpms-code-field" name="farmCode" [ngModel]="p.farmCode" readonly aria-describedby="farmCodeHelp" />
                                                 @if (p.canChangeFarmCode) {
@@ -196,9 +191,9 @@ const PROFILE_DRAFT = 'farm-profile';
                                         </p>
                                         <div class="form-row">
                                             <div class="form-group col-md-8">
-                                                <label for="line1">Address line 1 <span class="text-danger">*</span></label>
+                                                <label for="line1">Street, purok or sitio <span class="text-danger">*</span></label>
                                                 <input id="line1" class="form-control" name="addressLine1" [(ngModel)]="p.addressLine1" required maxlength="200" />
-                                                <small class="form-text text-muted">House number, street, purok or sitio, apartment/unit, building or floor.</small>
+                                                <small class="form-text text-muted">House number, street, purok or sitio.</small>
                                             </div>
                                             <div class="form-group col-md-4">
                                                 <label for="barangay">Barangay</label>
@@ -235,27 +230,6 @@ const PROFILE_DRAFT = 'farm-profile';
                                                 </select>
                                                 <small class="form-text text-muted">Covered: General Santos City and Sarangani.</small>
                                             </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="postal">Postal code</label>
-                                                <input id="postal" class="form-control" name="postalCode" [(ngModel)]="p.postalCode" maxlength="10" inputmode="numeric" />
-                                                @if (!postalOk) {
-                                                    <small class="text-danger">4 digits, e.g. 9502.</small>
-                                                }
-                                            </div>
-                                        </div>
-                                        <div class="form-row">
-                                            <div class="form-group col-md-4">
-                                                <label for="country">Country <span class="text-danger">*</span></label>
-                                                <input id="country" class="form-control" name="country" [(ngModel)]="p.country" required maxlength="100" />
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="lat">Latitude</label>
-                                                <input id="lat" type="number" step="0.000001" min="-90" max="90" class="form-control" name="latitude" [(ngModel)]="p.latitude" />
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="lng">Longitude</label>
-                                                <input id="lng" type="number" step="0.000001" min="-180" max="180" class="form-control" name="longitude" [(ngModel)]="p.longitude" />
-                                            </div>
                                         </div>
                                         @if (p.fullAddress) {
                                             <p class="small text-muted mb-0">Printed on reports and sales records as: <span class="text-body">{{ p.fullAddress }}</span></p>
@@ -283,16 +257,11 @@ const PROFILE_DRAFT = 'farm-profile';
                                 </div>
                                 <!-- How dates and times show, and when permits warn (DEC-109). -->
                                 <div class="card">
-                                    <div class="card-header"><h3 class="card-title">Dates, times and alerts</h3></div>
+                                    <div class="card-header"><h3 class="card-title">Dates, times and reminders</h3></div>
                                     <div class="card-body">
                                         <div class="form-row">
                                             <div class="form-group col-md-6">
-                                                <label for="tz">Time zone</label>
-                                                <input id="tz" class="form-control" name="timeZone" [(ngModel)]="p.timeZone" required maxlength="64" />
-                                                <small class="form-text text-muted">IANA name. Default Asia/Manila (UTC+08:00).</small>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label for="alert">Permit alert</label>
+                                                <label for="alert">Permit reminder</label>
                                                 <div class="input-group">
                                                     <input id="alert" type="number" min="1" max="365" class="form-control" name="documentExpiryAlertDays" [(ngModel)]="p.documentExpiryAlertDays" required />
                                                     <div class="input-group-append"><span class="input-group-text">days</span></div>
@@ -436,12 +405,12 @@ const PROFILE_DRAFT = 'farm-profile';
             <div class="fpms-dialog-backdrop">
                 <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="codeDlgTitle">
                     <div class="fpms-dialog-head">
-                        <h2 id="codeDlgTitle" class="mr-auto">{{ d.done ? 'Farm code changed' : 'Change farm code' }}</h2>
+                        <h2 id="codeDlgTitle" class="mr-auto">{{ d.done ? 'Farm ID changed' : 'Change farm ID' }}</h2>
                         <button type="button" class="fpms-dialog-close" aria-label="Close" (click)="closeCodeDlg()"><span aria-hidden="true">&times;</span></button>
                     </div>
                     @if (d.done) {
                         <div class="fpms-dialog-body">
-                            <p class="mb-2">The new farm code is</p>
+                            <p class="mb-2">The new farm ID is</p>
                             <p class="h3 mb-3"><code>{{ d.done.farmCode }}</code></p>
                             <div class="alert alert-info small mb-0">
                                 <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
@@ -454,11 +423,11 @@ const PROFILE_DRAFT = 'farm-profile';
                             <button type="button" class="btn btn-primary" (click)="closeCodeDlg()">Done</button>
                         </div>
                     } @else {
-                        <form (ngSubmit)="saveCode()" fpmsReview="farm code" novalidate autocomplete="off">
+                        <form (ngSubmit)="saveCode()" fpmsReview="farm ID" novalidate autocomplete="off">
                             <div class="fpms-dialog-body">
                                 <div class="alert alert-warning small">
                                     <i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>
-                                    The farm code is what staff type, with their username, to sign in. After the change:
+                                    The farm ID is what staff type, with their username, to sign in. After the change:
                                     <ul class="mb-0 pl-3 mt-1">
                                         <li>everyone must sign in with the new code, and saved links or bookmarks that use the old one stop working;</li>
                                         <li>exports and reports made earlier keep the old code;</li>
@@ -620,7 +589,7 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
         await this.load();
     }
 
-    // ------------------------------------------------------------ farm code (DEC-78)
+    // ------------------------------------------------------------ farm ID (DEC-78)
 
     get canSaveCode(): boolean {
         const d = this.codeDlg;
@@ -695,9 +664,9 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
         const code = this.codeDlg?.done?.farmCode ?? '';
         try {
             await navigator.clipboard.writeText(code);
-            this.notifySaved('Farm code copied.');
+            this.notifySaved('Farm ID copied.');
         } catch {
-            abp.message.info(code, 'Farm code');
+            abp.message.info(code, 'Farm ID');
         }
     }
 

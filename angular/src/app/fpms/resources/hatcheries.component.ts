@@ -69,14 +69,6 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                         </div>
                                     </div>
                                     }
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4 fpms-check-cell">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="act" name="isActive" [(ngModel)]="form.isActive" />
-                                                <label class="custom-control-label" for="act">Active</label>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !f.form.valid">Save</button>
@@ -171,11 +163,11 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                         } @else {
                             <table class="table table-hover mb-0">
                                 <thead>
-                                    <tr><th>Hatchery · contact</th><th title="BFAR accreditation and the current health certificate">Papers</th><th>Status</th>@if (canManage) {<th><span class="sr-only">Actions</span></th>}</tr>
+                                    <tr><th>Hatchery · contact</th><th title="BFAR accreditation and the current health certificate">Papers</th><th>Used in</th>@if (canManage) {<th><span class="sr-only">Actions</span></th>}</tr>
                                 </thead>
                                 <tbody>
                                     @for (h of f.visible(); track h.id) {
-                                        <tr [class.text-muted]="!h.isActive">
+                                        <tr>
                                             <td>
                                                 <span class="fpms-pond-tag mr-1" title="Short code, used in cycle codes">{{ h.shortCode }}</span><strong>{{ h.name }}</strong>
                                                 <div class="text-muted">{{ h.address }}</div>
@@ -199,14 +191,12 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                                 }
                                             </td>
                                             <td>
-                                                <fpms-badge [text]="h.isActive ? 'Active' : 'Inactive'" [tone]="h.isActive ? 'success' : 'secondary'"></fpms-badge>
                                                 <div class="text-muted text-nowrap">{{ h.cycleCount === 1 ? '1 cycle' : h.cycleCount + ' cycles' }}</div>
                                             </td>
                                             @if (canManage) {
                                                 <td class="text-right">
                                                     <div class="fpms-actions-stack">
                                                         <button class="btn btn-sm btn-outline-primary" (click)="startEdit(h)" [attr.aria-label]="'Edit ' + h.name">Edit</button>
-                                                        <button class="btn btn-sm btn-outline-secondary" [disabled]="busy()" (click)="toggle(h)">{{ h.isActive ? 'Deactivate' : 'Reactivate' }}</button>
                                                     </div>
                                                 </td>
                                             }
@@ -227,8 +217,8 @@ export class HatcheriesComponent extends FpmsPage implements OnInit {
     f = new ClientListFilter<any>(
         () => this.list(),
         (h) => [h.name, h.shortCode, h.contactPerson, h.phone, h.address, h.bfarAccreditationNo],
-        (h) => (h.isActive ? 'active' : 'inactive'),
-        [{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }],
+        () => null,
+        [],
         'All sources',
         ['hatchery source', 'hatchery sources']
     );
@@ -312,16 +302,6 @@ export class HatcheriesComponent extends FpmsPage implements OnInit {
         }
         if (await this.act(() => this.api.delete('Hatchery', 'DeleteCertificate', { id: c.id }))) {
             this.detail.set(await this.api.get<any>('Hatchery', 'Get', { id: this.form.id }));
-            this.load();
-        }
-    }
-
-    /** Deactivate or reactivate; easy to reverse, so it acts at once and offers Undo (DEC-116). */
-    async toggle(h: any, undoing = false): Promise<void> {
-        if (await this.act(() => this.api.post('Hatchery', 'SetActive', { id: h.id, isActive: !h.isActive }))) {
-            if (!undoing) {
-                this.notifySaved(`${h.name} ${h.isActive ? 'deactivated' : 'reactivated'}.`, () => this.toggle({ ...h, isActive: !h.isActive }, true));
-            }
             this.load();
         }
     }
