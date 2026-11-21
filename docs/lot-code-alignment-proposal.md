@@ -60,6 +60,8 @@ place"):
 
 ### 3.1 New farm lot code format: `YYYYABFFPP-HH`
 
+The `ABFF` digits are the farm's **Farm ID** (`A-B-FF`), proposed in [farm-id-proposal.md](farm-id-proposal.md).
+
 The first ten digits are laid out **exactly like the Shrimp.io lot no.**; FPMS adds the harvest number after a hyphen,
 where Shrimp.io puts its production code.
 
