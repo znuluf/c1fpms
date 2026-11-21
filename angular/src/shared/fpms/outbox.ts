@@ -55,6 +55,16 @@ function reasonOf(e: HttpErrorResponse): string {
     return parts.length ? parts.join(' ') : `The farm server refused it (error ${e.status}).`;
 }
 
+/**
+ * ABP answers a refusal by a business rule (the batch was closed, someone recorded the feeding first) with status 500 and a
+ * message written for the person; an unexpected error has its generic message. The first is final, the second worth retrying.
+ */
+function isRuleRefusal(e: HttpErrorResponse): boolean {
+    const body = e.error as any;
+    const message: string = body?.error?.message ?? '';
+    return !!body?.__abp && !!message && !/internal error occurred/i.test(message);
+}
+
 class SendFailure extends Error {
     constructor(
         readonly kind: 'offline' | 'signedOut' | 'refused' | 'serverError',
@@ -291,7 +301,7 @@ export class FpmsOutbox {
                     // A proxy answered but the farm server did not: the same as no connection.
                     throw new SendFailure('offline', 'The farm server did not answer.', e);
                 }
-                if (e.status >= 500) {
+                if (e.status >= 500 && !isRuleRefusal(e)) {
                     throw new SendFailure('serverError', reasonOf(e), e);
                 }
                 throw new SendFailure('refused', reasonOf(e), e);

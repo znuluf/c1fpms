@@ -2,7 +2,7 @@
 
 How the FPMS database is defined, how a change reaches a farm's SQL Server, and what was added most recently.
 Written for developers and for review; the reliability side (retries, version checks, locks) is in
-[reliability.md](reliability.md).
+[reliability.md](reliability.md). What the queries themselves look like is in [database-queries.md](database-queries.md); the whole system in [system-overview.md](system-overview.md).
 
 ## 1. Where the database comes from
 

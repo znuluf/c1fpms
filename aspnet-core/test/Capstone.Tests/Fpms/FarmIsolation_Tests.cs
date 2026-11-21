@@ -18,6 +18,16 @@ namespace Capstone.Tests.Fpms;
 public class FarmIsolation_Tests : FpmsTestBase
 {
     [Fact]
+    public async Task The_farm_profile_is_not_readable_without_signing_in()
+    {
+        // DEC-136: a request that names the farm but has no sign-in is refused.
+        AbpSession.UserId = null;
+        await Should.ThrowAsync<AbpAuthorizationException>(() => Resolve<Capstone.Farms.FarmProfileAppService>().Get());
+        LoginAsPilotTechnician();
+        (await Resolve<Capstone.Farms.FarmProfileAppService>().Get()).FarmCode.ShouldNotBeNullOrEmpty();
+    }
+
+    [Fact]
     public async Task Second_farm_sees_only_its_own_ponds()
     {
         LoginAsSecondFarmOwner();

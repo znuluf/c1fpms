@@ -3394,6 +3394,29 @@ Negative:
 - Kept entries live in one browser on one tablet: clearing the browser's data before they are sent loses them. The list says so.
 - A full offline app (reading data without a connection) is still not built.
 
+## Decision DEC-136: The farm profile needs a sign-in; a refused kept entry is shown at once
+
+Status: Accepted 2026-11-21
+Date: 2026-11-21
+Amends: DEC-135
+
+### Context
+Listing every endpoint for docs/api-and-keys.md showed that `FarmProfile.Get` had no sign-in requirement: a request that named a farm (the `Abp.TenantId` header) without signing in got the farm's name, address and contacts. It also showed that ABP answers a refusal by a business rule with status 500 and a message for the person, so the outbox of DEC-135 would have tried such an entry five times, over about two minutes, before showing the reason.
+
+### Decision
+- `FarmProfileAppService` requires `Farm.Profile` (both farm roles have it). Test: `FarmIsolation_Tests.The_farm_profile_is_not_readable_without_signing_in`. No other farm endpoint is open; `Account` (farm code check, registration) and `Session` are open on purpose.
+- The outbox treats a 500 answer with ABP's message for the person as a refusal ("Not accepted: …") straight away; only ABP's generic "An internal error occurred" is tried again.
+- New guides: docs/system-overview.md (diagrams), docs/api-and-keys.md (endpoints, sign-in, secrets), docs/database-queries.md (SQL captured from SQL Server).
+
+### Consequences
+Positive:
+- Nothing about a farm can be read without signing in to it.
+- A refused kept entry shows its reason at the next send.
+Negative:
+- None known.
+
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

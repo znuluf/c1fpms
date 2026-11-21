@@ -919,6 +919,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-133 | Retry-safe harvest and sale saves, version checks on harvests, sales, logs and the farm profile, delivery steps locked, Sales draft, clearer no-connection and sign-in-ended handling (accepted 2026-11-21). |
 | DEC-134 | Tests on a real SQL Server; sales lock the harvest, reads see committed data only, identical saves run one after the other, simultaneous corrections get the clear message (accepted 2026-11-21). |
 | DEC-135 | New log entries, feedings and preparation entries are kept on the tablet without a connection and sent later; drafts on the farm profile and account form (accepted 2026-11-21). |
+| DEC-136 | The farm profile needs a sign-in; a kept entry refused by a rule is shown at once; system, API and query guides (accepted 2026-11-21). |
 
 # **Appendix B. Manuscript alignment notes**
 

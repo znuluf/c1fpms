@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed (DEC-136)
+- **The farm profile can no longer be read without signing in.** Before, a request that named a farm could read its name, address and contacts.
+- **A kept entry the server refuses** shows "Not accepted" with the reason at the next send, instead of after five tries.
+
+### Added (guides)
+- `docs/system-overview.md`: how the system works, with diagrams. `docs/api-and-keys.md`: every endpoint, sign-in and every secret. `docs/database-queries.md`: what the reads and writes look like in SQL.
+
 ### Changed (offline entries and saves on SQL Server, DEC-134, DEC-135)
 - **Recording carries on without a connection.** A new log entry, feeding sheet save or pond preparation entry that cannot reach the farm server is kept on this tablet and sent by itself when the connection is back. The top bar shows how many are waiting; its list shows each one, any the server did not accept and why, with Try again and Discard.
 - **The farm profile and the account form keep a draft** and offer it back after the sign-in ends or the page reloads, like the recording forms. Passwords are never kept.

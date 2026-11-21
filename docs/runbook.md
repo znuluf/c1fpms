@@ -11,7 +11,7 @@ For the System Administrator of a farm server. It covers what runs, what is back
 | Web app | Angular build served by the API (`wwwroot`) | Nothing else to host. |
 | Backups | Scripts in `scripts/backup/`, scheduled | Windows: Task Scheduler (`windows/register-tasks.ps1`). Ubuntu: cron (`schedule/crontab.example`). |
 
-Install, in order: SQL Server and `sqlcmd`; the API package with `ConnectionStrings:Default`, `App:ServerRootAddress` and `SystemAdmin:InitialPassword` set; run `dotnet Capstone.Migrator.dll` (creates or upgrades the database and seeds the System Administrator, reference data and roles); install the HTTPS certificate (section 5); register the backup schedule (section 3); sign in as `admin`, change the password, open **System health** and confirm it shows only the alerts you expect on a new install (no backups yet).
+Install, in order: SQL Server and `sqlcmd`; the API package with `ConnectionStrings:Default`, `App:ServerRootAddress`, `Authentication:JwtBearer:SecurityKey` (a random value of at least 32 characters; the API does not start without it) and `SystemAdmin:InitialPassword` set as environment variables (see `docs/api-and-keys.md`, section 6); run `dotnet Capstone.Migrator.dll` (creates or upgrades the database and seeds the System Administrator, reference data and roles); install the HTTPS certificate (section 5); register the backup schedule (section 3); sign in as `admin`, change the password, open **System health** and confirm it shows only the alerts you expect on a new install (no backups yet).
 
 ## 2. Health page and alerts
 

@@ -135,6 +135,8 @@ public class ChangeFarmCodeResultDto
     public string FarmCode { get; set; }
 }
 
+// Signed-in farm people only: without this, anyone who sent a farm id could read its name, address and contacts (DEC-136).
+[AbpAuthorize(PermissionNames.FarmProfile)]
 public class FarmProfileAppService : CapstoneAppServiceBase
 {
     private readonly IRepository<FarmProfile, int> _profiles;

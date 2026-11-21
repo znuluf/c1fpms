@@ -146,6 +146,9 @@ The start script sets these for the Codespace; you normally do not set them your
 - `cd angular && npx ng build --configuration production`: production build of the client.
 - `cd angular && npx eslint . && npx prettier --check .`: lint and format check.
 - `scripts/backup/`: backup, restore and restore rehearsal for a farm server (see docs/backup-restore.md and docs/runbook.md). Not used in a Codespace.
+- [docs/system-overview.md](docs/system-overview.md): how the system works, with diagrams: the parts, what happens on Save, sign-in, working offline, the data.
+- [docs/api-and-keys.md](docs/api-and-keys.md): every API endpoint and who may call it, how sign-in and tokens work, and every key and secret: what it protects and where it is set.
+- [docs/database-queries.md](docs/database-queries.md): what the reads and writes look like in SQL, captured from SQL Server.
 - [docs/database.md](docs/database.md): how the database is defined in code, how a change reaches SQL Server, what was added recently, and how to redraw the ERD.
 - [docs/reliability.md](docs/reliability.md): how the system handles several people saving at once, saves sent twice, lost connections, ended sign-ins and farm-PC failures, with the code and tests for each.
 
