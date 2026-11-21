@@ -41,7 +41,10 @@ const PROFILE_DRAFT = 'farm-profile';
                             <div class="card-header"><h3 class="card-title">Farm details</h3></div>
                             <div class="card-body">
                                 <dl class="row mb-0 fpms-dl">
-                                    <dt class="col-sm-4">Farm ID</dt><dd class="col-sm-8"><code>{{ p.farmId }}</code><span class="fpms-none ml-2">fixed; used on records and reports</span></dd>
+                                    <dt class="col-sm-4">Farm ID</dt><dd class="col-sm-8">
+                                        @if (p.farmId) { <code>{{ p.farmId }}</code><span class="fpms-none ml-2">{{ p.cityMunicipality }}{{ p.addressLine2 ? ', ' + p.addressLine2 : '' }}</span> } @else { <span class="fpms-none">—</span> }
+                                        <div class="small fpms-none">{{ p.lotCodeNote }}</div>
+                                    </dd>
                                     <dt class="col-sm-4">Farm code</dt><dd class="col-sm-8"><code>{{ p.farmCode }}</code><span class="fpms-none ml-2">used with your username to sign in</span></dd>
                                     <dt class="col-sm-4">Farm name</dt><dd class="col-sm-8">{{ p.farmName }}</dd>
                                     <dt class="col-sm-4">Total farm area</dt>
@@ -107,8 +110,8 @@ const PROFILE_DRAFT = 'farm-profile';
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="farmId">Farm ID</label>
-                                            <input id="farmId" class="form-control fpms-code-field" name="farmId" [ngModel]="p.farmId" readonly aria-describedby="farmIdHelp" />
-                                            <small id="farmIdHelp" class="form-text text-muted">Given by the system and never changes. FRM- followed by your farm's number.</small>
+                                            <input id="farmId" class="form-control fpms-code-field" name="farmId" [ngModel]="p.farmId || '—'" readonly aria-describedby="farmIdHelp" />
+                                            <small id="farmIdHelp" class="form-text text-muted">Area, place and farm number, like 0-24-03. It comes from the farm address and is given by the system. Once a lot code uses it, it never changes.</small>
                                         </div>
                                         <div class="form-group">
                                             <label for="farmCode">Farm code</label>

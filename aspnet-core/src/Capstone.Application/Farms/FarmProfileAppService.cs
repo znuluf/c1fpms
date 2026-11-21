@@ -24,8 +24,8 @@ public class FarmProfileDto
     public string RowVersion { get; set; }
 
     public string FarmCode { get; set; }
-    /// <summary>Permanent farm ID, FRM- and the farm's number with at least 4 digits (FRM-0007). It never changes, unlike the farm code.</summary>
-    public string FarmId { get; set; }
+    /// <summary>Farm ID, A-LL-FF (area, place, farm number), the same three parts as the harvest lot code; "??" for the farm number until it is given (docs/farm-id-proposal.md).</summary>
+    public string FarmId => LotCodeParts;
 
     /// <summary>Output only: the signed-in person is the Farm Owner, who alone may change the farm code (DEC-78).</summary>
     public bool CanChangeFarmCode { get; set; }
@@ -160,7 +160,6 @@ public class FarmProfileAppService : CapstoneAppServiceBase
         {
             RowVersion = Production.Concurrency.Encode(p?.RowVersion),
             FarmCode = tenant.TenancyName,
-            FarmId = $"FRM-{tenant.Id:D4}",
             CanChangeFarmCode = await IsFarmOwnerAsync(),
             NextFarmCodeChange = await FarmCodes.GetNextChangeAllowedAsync(tenant.Id),
             FarmName = string.IsNullOrWhiteSpace(p.FarmName) ? tenant.Name : p.FarmName,
