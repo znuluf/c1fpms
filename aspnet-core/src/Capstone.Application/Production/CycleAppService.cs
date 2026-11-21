@@ -349,9 +349,9 @@ public class CycleAppService : CapstoneAppServiceBase
 
         // Validate every pond and its details before writing anything.
         var plans = new List<(BatchStockingInput Input, Pond Pond, PondPreparationRound Round, DateTime StockedAtUtc, List<EvaluatedReading> Readings)>();
+        foreach (var pondId in input.Batches.Select(b => b.PondId).Distinct().OrderBy(id => id)) await _rowLocker.LockAsync(RowLockTarget.Pond, pondId);
         foreach (var b in input.Batches)
         {
-            await _rowLocker.LockAsync(RowLockTarget.Pond, b.PondId);
             if (await _allocations.GetAll().AnyAsync(a => a.PondId == b.PondId && a.DeliveryId != delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null))
                 throw new UserFriendlyException("This pond is reserved for another fry delivery.");
             var pond = await _ponds.GetAll().Include(p => p.Prefix).FirstOrDefaultAsync(p => p.Id == b.PondId) ?? throw new UserFriendlyException("Pond not found.");
