@@ -66,7 +66,7 @@ public class FryDeliveryEditDto
     public FryDeliveryStatus InitialStatus { get; set; } = FryDeliveryStatus.Ordered;
 
     public string RowVersion { get; set; }
-    public List<FryDeliveryPondAllocationInput> PondAllocations { get; set; } = new();
+    public List<FryDeliveryPondAllocationInput> PondAllocations { get; set; }
 }
 
 public class FryDeliveryPondAllocationInput { public Guid PondId { get; set; } [Range(1, FryDelivery.MaxPl)] public long PlannedPlCount { get; set; } }
@@ -542,7 +542,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
 
         await ValidateAsync(input, delivery.Id);
         Apply(delivery, input);
-        if (!arrived) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
+        if (!arrived && input.PondAllocations != null) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
         return new SaveFryDeliveryResult { Id = delivery.Id, Warnings = await WarningsAsync(input) };
     }
 
