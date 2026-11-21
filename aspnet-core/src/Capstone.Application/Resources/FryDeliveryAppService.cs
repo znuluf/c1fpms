@@ -508,7 +508,8 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         }
 
         // DEC-131: the count belongs to fry that have arrived. An order keeps none; a received delivery must keep one.
-        var arrived = await CurrentStatusAsync(delivery.Id) == FryDeliveryStatus.Received || cycle != null;
+        var currentStatus = await CurrentStatusAsync(delivery.Id);
+        var arrived = currentStatus == FryDeliveryStatus.Received || cycle != null;
         if (!arrived)
         {
             input.PlReceived = null;
@@ -542,7 +543,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
 
         await ValidateAsync(input, delivery.Id);
         Apply(delivery, input);
-        if (!arrived && input.PondAllocations != null) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
+        if (!arrived && currentStatus is FryDeliveryStatus.Ordered or FryDeliveryStatus.InTransit && input.PondAllocations != null) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
         return new SaveFryDeliveryResult { Id = delivery.Id, Warnings = await WarningsAsync(input) };
     }
 
