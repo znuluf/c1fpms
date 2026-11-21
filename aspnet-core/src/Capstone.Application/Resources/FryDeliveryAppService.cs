@@ -569,6 +569,11 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
 
         var changedAt = await StepTimeAsync(input.ChangedAt, lastAt);
         await _changes.InsertAsync(new FryDeliveryStatusChange { DeliveryId = delivery.Id, Status = input.Status, ChangedAtUtc = changedAt, Note = note });
+        if (FryDeliveryFlow.IsEnded(input.Status))
+        {
+            var active = await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).ToListAsync();
+            foreach (var allocation in active) allocation.ReleasedAtUtc = changedAt;
+        }
     }
 
     /// <summary>
@@ -638,6 +643,17 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         }
 
         var last = steps[0];
+        if (FryDeliveryFlow.IsEnded(last.Status))
+        {
+            var released = await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc != null && a.FulfilledAtUtc == null).ToListAsync();
+            foreach (var allocation in released)
+            {
+                await _rowLocker.LockAsync(RowLockTarget.Pond, allocation.PondId);
+                if (await _allocations.GetAll().AnyAsync(a => a.PondId == allocation.PondId && a.DeliveryId != delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null))
+                    throw new UserFriendlyException($"Pond {allocation.PondId} has since been reserved by another delivery; this step cannot be undone.");
+            }
+            foreach (var allocation in released) allocation.ReleasedAtUtc = null;
+        }
         var note = $"Taken back: {reason}";
         last.Note = string.IsNullOrEmpty(last.Note) ? note : $"{last.Note} · {note}";
         if (last.Note.Length > FryDeliveryStatusChange.MaxNoteLength)
