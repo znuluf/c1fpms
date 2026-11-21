@@ -69,7 +69,7 @@ All decisions below were accepted on 2026-10-22 by the capstone development team
 | DEC-59 | PL health certificate on the delivery; dead-at-stocking count | Accepted 2026-10-26 |
 | DEC-60 | Top-up stocking and several deliveries per batch | Rejected 2026-10-26 (one delivery, one stocking per pond) |
 | DEC-61 | Feeding sessions per day configurable (numbered feedings, farm feeding schedule) | Proposed (full write-up) 2026-11-13; built on `feature/flexible-feeding`, not run |
-| DEC-62 | Health milestone hints by DOC (display only) | Accepted 2026-10-26 |
+| DEC-62 | Health milestone hints by DOC (display only) | Superseded by DEC-138 |
 | DEC-63 | Stocking window and Finish stocking | Accepted (full write-up) |
 | DEC-64 | Owner reopening of batches and cycles; cycle outcome at closing | Accepted (full write-up) |
 | DEC-65 | Farming systems, construction types and density bands per construction type | Accepted (full write-up) |
@@ -1316,10 +1316,10 @@ Negative: a change to the session key's meaning, the daily status and calendar s
 
 ## Decision DEC-62: Health milestone hints by DOC
 
-Status: Accepted 2026-10-26, display only (scope permitting)
+Status: Superseded by DEC-138
 Date: 2026-10-25
 
-Show hints such as "PCR test suggested around DOC 30, 45, 60, 75" (Shrimp Farmers' Manual) on the batch timeline. Display only: no tasks, no overdue state (DEC-31 stands). A lab-result log may follow later.
+Historical decision. The display-only PCR timing hint was removed by DEC-138; the batch page no longer suggests or schedules health tests.
 
 ---
 
@@ -3435,6 +3435,29 @@ Positive:
 - The step closes as soon as the profile form saves.
 Negative:
 - A farm without a phone must enter one to save its profile.
+
+---
+
+## Decision DEC-138: Remove the PCR health-test hint from batch pages
+
+Status: Accepted 2026-11-21
+
+### Context
+The batch page displayed a generic PCR reminder at DOC 30, 45, 60 and 75. The referenced Shrimp Farmers' Manual contains a suggested monitoring schedule with different tests and conditions at those milestones; the generic reminder could be read as a universal farm protocol. The FPMS does not record PCR orders or laboratory results.
+
+### Decision
+- Remove the PCR health-test hint and its DOC-based display logic from the batch detail page.
+- Do not replace it with another automatic health-test reminder. Farms and their advisers determine their own sampling and laboratory schedule.
+- Keep production indicators, water-quality monitoring and mortality records unchanged.
+- Mark DEC-62 as superseded. Remove the hint from the requirements and reference descriptions.
+
+### Consequences
+Positive:
+- The application no longer presents a generic PCR schedule as operational guidance.
+- No implication that the application tracks PCR tests or results.
+
+Negative:
+- Users will not see an in-app DOC-based PCR reminder.
 
 ---
 
