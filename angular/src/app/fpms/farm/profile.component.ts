@@ -271,8 +271,8 @@ const PROFILE_DRAFT = 'farm-profile';
                                                 <input id="cname" class="form-control" name="contactName" [(ngModel)]="p.contactName" maxlength="100" />
                                             </div>
                                             <div class="form-group col-md-4">
-                                                <label for="cphone">Phone</label>
-                                                <input id="cphone" class="form-control" name="contactPhone" [(ngModel)]="p.contactPhone" maxlength="50" />
+                                                <label for="cphone">Phone <span class="text-danger">*</span></label>
+                                                <input id="cphone" class="form-control" name="contactPhone" [(ngModel)]="p.contactPhone" required maxlength="50" />
                                             </div>
                                             <div class="form-group col-md-4">
                                                 <label for="cemail">Email</label>

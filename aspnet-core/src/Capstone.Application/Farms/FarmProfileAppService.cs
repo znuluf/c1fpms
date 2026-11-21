@@ -70,7 +70,7 @@ public class FarmProfileDto
     [StringLength(100)]
     public string ContactName { get; set; }
 
-    [StringLength(50)]
+    [Required(ErrorMessage = "Enter the farm's contact phone; it is printed on tally sheets and dispatch receipts."), StringLength(50)]
     public string ContactPhone { get; set; }
 
     [OptionalEmailAddress, StringLength(256)]

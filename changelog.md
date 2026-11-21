@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed (DEC-137)
+- **"Set up your farm" now ticks "Complete the farm profile" when the profile is saved.** The step needed a contact phone the form did not ask for; the phone is now required on the farm profile, and the step says what is missing.
+
 ### Fixed (DEC-136)
 - **The farm profile can no longer be read without signing in.** Before, a request that named a farm could read its name, address and contacts.
 - **A kept entry the server refuses** shows "Not accepted" with the reason at the next send, instead of after five tries.

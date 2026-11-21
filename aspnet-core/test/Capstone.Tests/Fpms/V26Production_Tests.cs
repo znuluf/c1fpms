@@ -411,6 +411,25 @@ public class V26Production_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task The_profile_step_says_what_is_missing_and_is_done_once_the_phone_is_saved()
+    {
+        // DEC-137: the step matched the form only if the optional phone was filled; now it names what is missing.
+        var tenant = GetTenantId(PilotFarm);
+        UsingDbContext(null, c => c.FarmProfiles.IgnoreQueryFilters().Single(p => p.TenantId == tenant).ContactPhone = null);
+        var step = (await Resolve<Dashboard.DashboardAppService>().Get()).SetupTasks.Single(t => t.Key == "profile");
+        step.Done.ShouldBeFalse();
+        step.Label.ShouldBe("Complete the farm profile: add the contact phone");
+
+        var profiles = Resolve<Capstone.Farms.FarmProfileAppService>();
+        var profile = await profiles.Get();
+        profile.ContactPhone = "0917 555 0100";
+        await profiles.Update(profile);
+        step = (await Resolve<Dashboard.DashboardAppService>().Get()).SetupTasks.Single(t => t.Key == "profile");
+        step.Done.ShouldBeTrue();
+        step.Label.ShouldBe("Complete the farm profile");
+    }
+
+    [Fact]
     public async Task Owner_marks_the_standards_reviewed_for_the_setup_checklist()
     {
         var dashboard = Resolve<Dashboard.DashboardAppService>();

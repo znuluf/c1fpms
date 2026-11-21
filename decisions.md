@@ -3417,6 +3417,27 @@ Negative:
 
 ---
 
+## Decision DEC-137: "Complete the farm profile" matches the form and says what is missing
+
+Status: Accepted 2026-11-21
+Date: 2026-11-21
+
+### Context
+The dashboard's setup step "Complete the farm profile" counted as done only with a street, a city and a contact phone, but the profile form made the phone optional. An Owner who filled every required field and saved still saw the step open, with nothing saying why.
+
+### Decision
+- The contact phone is required on the farm profile (form and server: "Enter the farm's contact phone; it is printed on tally sheets and dispatch receipts.").
+- The step names what is missing: "Complete the farm profile: add the contact phone". Test: `V26Production_Tests.The_profile_step_says_what_is_missing_and_is_done_once_the_phone_is_saved`.
+- Registration keeps the phone optional; the step reminds the Owner afterwards.
+
+### Consequences
+Positive:
+- The step closes as soon as the profile form saves.
+Negative:
+- A farm without a phone must enter one to save its profile.
+
+---
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

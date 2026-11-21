@@ -447,9 +447,18 @@ public class DashboardAppService : CapstoneAppServiceBase
 
             dto.FinishStocking = await _deliveries.GetOpenWithPlLeft();
             var userCount = await UserRepository.CountAsync();
+            // The step names what is missing; these are the profile fields the form requires (DEC-137).
+            var profileMissing = new List<string>();
+            if (string.IsNullOrWhiteSpace(profile.AddressLine1)) profileMissing.Add("the street or purok");
+            if (string.IsNullOrWhiteSpace(profile.CityMunicipality)) profileMissing.Add("the city or municipality");
+            if (string.IsNullOrWhiteSpace(profile.ContactPhone)) profileMissing.Add("the contact phone");
             dto.SetupTasks = new List<SetupTaskDto>
             {
-                new() { Key = "profile", Label = "Complete the farm profile", Done = !string.IsNullOrWhiteSpace(profile.AddressLine1) && !string.IsNullOrWhiteSpace(profile.CityMunicipality) && !string.IsNullOrWhiteSpace(profile.ContactPhone), Route = "/app/farm/profile" },
+                new()
+                {
+                    Key = "profile", Done = profileMissing.Count == 0, Route = "/app/farm/profile",
+                    Label = profileMissing.Count == 0 ? "Complete the farm profile" : $"Complete the farm profile: add {string.Join(" and ", profileMissing)}",
+                },
                 new() { Key = "standards", Label = "Review Farm standards (water ranges, density bands, warning thresholds)", Done = profile.StandardsReviewedAtUtc.HasValue, Route = "/app/farm/standards" },
                 new() { Key = "documents", Label = "Record permits and licenses", Done = await _documents.GetAll().AnyAsync(), Route = "/app/farm/documents" },
                 new() { Key = "ponds", Label = "Add ponds", Done = ponds.Count > 0, Route = "/app/ponds" },
