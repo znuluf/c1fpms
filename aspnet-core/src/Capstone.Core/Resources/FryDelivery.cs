@@ -1,4 +1,6 @@
 using Capstone.Domain;
+using Capstone.Ponds;
+using Capstone.Production;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -115,4 +117,25 @@ public class FryDeliveryShortfall : FarmEntity
     public ShortfallReason Reason { get; set; }
     public long Count { get; set; }
     public string Note { get; set; }
+}
+
+
+/// <summary>
+/// A human-planned destination for part of a fry delivery. This is a reservation only: it does not stock a pond or
+/// create a production batch. A reservation is active until released or fulfilled by an actual stocking batch.
+/// </summary>
+public class FryDeliveryPondAllocation : FarmEntity
+{
+    public Guid DeliveryId { get; set; }
+    public Guid PondId { get; set; }
+    public long PlannedPlCount { get; set; }
+
+    /// <summary>Set when the delivery is cancelled/rejected; cleared if that status step is undone.</summary>
+    public DateTime? ReleasedAtUtc { get; set; }
+
+    /// <summary>Set only when an actual PondBatch is created for this planned allocation.</summary>
+    public DateTime? FulfilledAtUtc { get; set; }
+    public Guid? PondBatchId { get; set; }
+
+    public bool IsActive => !ReleasedAtUtc.HasValue && !FulfilledAtUtc.HasValue;
 }
