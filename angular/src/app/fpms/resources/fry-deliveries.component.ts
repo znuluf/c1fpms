@@ -163,6 +163,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                 }
                                                 <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAllocation()">Add destination pond</button>
                                                 <div class="text-muted mt-2">Planned: {{ allocationTotal() | num: 0 }} / {{ (form.plOrdered || 0) | num: 0 }} PL ordered</div>
+                                                @if (allocationTotal() > (form.plOrdered || 0)) { <small class="text-danger">Planned allocation cannot exceed PL ordered.</small> }
                                             </div>
                                         }
                                         <div class="form-row">
@@ -173,7 +174,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                         </div>
                                     </div>
                                     <div class="card-footer">
-                                        <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !f.form.valid">{{ arrived ? 'Save delivery' : 'Save order' }}</button>
+                                        <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !f.form.valid || (!arrived && allocationTotal() > (form.plOrdered || 0))">{{ arrived ? 'Save delivery' : 'Save order' }}</button>
                                         <button type="button" class="btn btn-default" (click)="form = null">Cancel</button>
                                         <fpms-form-hint [form]="f"></fpms-form-hint>
                                     </div>
