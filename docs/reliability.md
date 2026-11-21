@@ -3,12 +3,12 @@
 How the Farm Production Management System (FPMS) behaves when several people work at once, when a connection drops, and
 when something fails on the farm PC; where each behaviour is in the code; and which automated test proves it.
 
-Release 1.0.0 and later. Decisions: DEC-37, DEC-38, DEC-127, DEC-131, DEC-132, DEC-133 (in [`decisions.md`](../decisions.md)).
+Release 1.0.0 and later. Decisions: DEC-37, DEC-38, DEC-127, DEC-131, DEC-132, DEC-133, DEC-134, DEC-135 (in [`decisions.md`](../decisions.md)).
 
 > **Development copy.** This document describes release 1.0.0 in `znuluf/try-prod`. This development project has the same
 > behaviour for everything in sections 2 to 5, except that read-committed snapshot is set by `.devcontainer/start-fpms.sh`
 > rather than a migration. The release-only items of DEC-132 are not here: committed migrations and the CI `migrations` job
-> (section 7 and section 9), the admin-password check (section 7), and INFO logging and the FULL recovery model set by
+> (section 7 and the migration step of section 9; the SQL Server tests run here in the CI job `sqlserver`), the admin-password check (section 7), and INFO logging and the FULL recovery model set by
 > migration (section 6).
 
 ## Contents
@@ -28,17 +28,20 @@ Release 1.0.0 and later. Decisions: DEC-37, DEC-38, DEC-127, DEC-131, DEC-132, D
 
 The farm records feedings, water readings and harvests at the pond edge on shared tablets over the farm's Wi-Fi, with no
 Internet. The system is built so that a real-world mistake (a double tap, a dropped connection, two people on the same pond)
-never silently loses or duplicates a record. It uses five techniques, each chosen for the kind of record it protects:
+never silently loses or duplicates a record. It uses six techniques, each chosen for the kind of record it protects:
 
 | Technique | What it prevents | Used for |
 |---|---|---|
 | **Uniqueness enforced by the database** | Two records where only one can exist | One feeding per pond, day and feeding number; one open batch per pond; unique codes |
 | **Request ID** (idempotency key) | A save sent twice becoming two records | Feedings, log entries, pond preparation, stocking, harvests, sales, tally sheets |
 | **Row version** (optimistic concurrency) | A correction from an out-of-date page overwriting someone else's | Cycles, batches, fry deliveries, harvests, sales, log entries, farm profile |
-| **Row lock** (pessimistic, only where totals are checked) | Two saves both passing a check on the same total | Stocking from a delivery; delivery steps |
+| **Row lock** (pessimistic, only where totals are checked) | Two saves both passing a check on the same total | Stocking from a delivery; delivery steps; sales and corrections of a harvest |
+| **Request lock** | A save and its retry arriving at the same moment both getting through | Every save with a request ID (DEC-134) |
 | **Atomic database step** | Two saves taking the same number | Cycle codes, dispatch receipt numbers, harvest lot codes |
 
-Every save is one database transaction: it is stored completely or not at all, so a failure never leaves half a record.
+Every save is one database transaction: it is stored completely or not at all, so a failure never leaves half a record,
+and pages read only committed data (READ COMMITTED with read-committed snapshot, so reading never waits for a save).
+New pond entries made without a connection are kept on the tablet and sent when it is back (section 5).
 Recording is never blocked by a warning (for example feed drawn beyond the stock on hand is saved and the lot flagged);
 only impossible or conflicting data is refused, always with a message that says what happened and what to do.
 
@@ -51,11 +54,12 @@ only impossible or conflicting data is refused, always with a message that says 
 | Two technicians record the same feeding (same pond, day, feeding number) | The second save is refused: "Feeding 3 of Nov 17 was already recorded by Tomas Technician at 2:20 PM. Reload the sheet to see it, then correct it if needed." | A unique index allows one feeding per pond, day and number. The sheet tells the server which feedings it showed as empty (`ExpectNew`); if one was saved meanwhile, the server names who saved it instead of overwriting. | `FpmsModelConfiguration.cs` (index on `FeedingSession`: TenantId, BatchId, FeedDate, Session); `FeedingAppService.Save` (the `ExpectNew` check); `feeding-sheet.component.ts` (sends `expectNew`) | `BatchTechnician_Tests.A_feeding_the_other_person_saved_meanwhile_is_named_not_overwritten` |
 | Two people stock batches from the same fry delivery at once | The second is refused if together they would stock more PL than were received | The delivery row is locked (`SELECT … WITH (UPDLOCK, ROWLOCK)`) before the PL left is checked, so the two saves run one after the other | `CycleAppService.CreateBatches` (`_rowLocker.LockAsync(RowLockTarget.FryDelivery, …)`); `RowLocker.cs` | `Lifecycle_Tests.AC09_allocations_cannot_exceed_the_pl_received_and_nothing_is_saved` |
 | Two people stock the same pond | The second is refused | A filtered unique index allows one open batch per pond | `FpmsModelConfiguration.cs` (`UX_FpmsPondBatches_OneOpenBatchPerPond`) | `V26Production_Tests.A_batch_cannot_be_reopened_while_its_pond_has_a_new_open_batch` |
-| Two people press the same delivery step (for example Receive fry) at once | The second sees the first step and is refused if it no longer fits ("A delivery that is Received cannot become …") | Each step locks the delivery row before reading its current step | `FryDeliveryAppService.NextStepCheckAsync` and `UndoLastStep` (`_rowLocker.LockAsync`) | Step rules: `Lifecycle_Tests.Delivery_steps_follow_the_flow_and_endings_need_a_reason`. The lock itself needs SQL Server (see section 9). |
-| Two saves need the next cycle code, receipt number or lot code | Each gets its own number; none is repeated | One `MERGE … WITH (HOLDLOCK)` statement reads and increments the counter in a single step | `NumberSequenceGenerator.cs` | `ReferenceSetup_Tests.Number_sequence_counts_up_per_scope` |
+| Two people press the same delivery step (for example Receive fry) at once | The second sees the first step and is refused if it no longer fits ("A delivery that is Received cannot become …") | Each step locks the delivery row before reading its current step | `FryDeliveryAppService.NextStepCheckAsync` and `UndoLastStep` (`_rowLocker.LockAsync`) | Step rules: `Lifecycle_Tests.Delivery_steps_follow_the_flow_and_endings_need_a_reason`; the lock on SQL Server: `SqlServerConcurrency_Tests.A_delivery_step_waits_for_a_step_already_in_progress_then_sees_it` |
+| Two saves need the next cycle code, receipt number or lot code | Each gets its own number; none is repeated | One `MERGE … WITH (HOLDLOCK)` statement reads and increments the counter in a single step | `NumberSequenceGenerator.cs` | `ReferenceSetup_Tests.Number_sequence_counts_up_per_scope`; on SQL Server, the sales test above (five different receipt numbers) |
+| Two sales of the same harvest at the same moment | Each is checked against what the other sold; a sale that would oversell a grade is refused | The harvest row is locked (in id order, so two sales never wait on each other) before kilograms left are checked; a harvest correction takes the same lock | `SaleAppService.ApplyAsync` and `HarvestAppService.Update` (`RowLocker.LockAsync(RowLockTarget.Harvest, …)`) | `SqlServerConcurrency_Tests.Sales_saved_at_the_same_moment_get_different_receipt_numbers_and_never_oversell` (six 20 kg sales from 100 kg: five saved, one refused) |
 | Feed drawn below the stock on hand (two feedings use the last bags) | Both feedings are saved; the lot is flagged for checking | Recording at the pond is never blocked; the shortfall is a warning and a flag (AC-12) | `InventoryManager.RecordUsageAsync` | `Logbook_Tests.Stock_shortfall_warns_saves_and_flags_the_lot` |
 | Several water readings for one pond on one day | All are kept | Allowed on purpose: readings are taken several times a day | `LogAppService.Create` | Logbook tests |
-| Reports and lists open while others save | Nobody waits | Read-committed snapshot isolation: reading never blocks writing | Migration `DatabaseSettings` (`ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON`) | CI job "migrations" (section 9) |
+| Reports and lists open while others save | Nobody waits, and nobody sees a save that is not finished | Read-committed snapshot isolation: reading never blocks writing. Every request reads at READ COMMITTED (ABP's default was READ UNCOMMITTED, which could show a save later rolled back; DEC-134). | Migration `DatabaseSettings` (`ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON`); `CapstoneCoreModule.PreInitialize` (`Configuration.UnitOfWork.IsolationLevel`) | `SqlServerConcurrency_Tests.A_report_reads_while_a_save_is_in_progress_without_waiting` |
 
 ---
 
@@ -66,8 +70,10 @@ protection the farm gets a second harvest, or a second sale with its own receipt
 
 **The protection.** Every form that creates a record makes one random **request ID** when it opens and keeps it with the
 form's draft (so it survives a reload). The server stores the ID with the record; a second save with the same ID returns
-the record already saved, with the same lot code or receipt number, instead of making another. A unique index on the ID
-makes this hold even if both saves arrive at the same moment. The Save button is also disabled while a save is running.
+the record already saved, with the same lot code or receipt number, instead of making another. If the retry arrives
+while the first attempt is still saving, it waits for it (an application lock on the request ID, `IRowLocker.LockRequestAsync`)
+and then returns what the first saved (DEC-134). A unique index on the ID refuses a second copy in any case. The Save button
+is also disabled while a save is running.
 
 | Record | Server | Form | Test |
 |---|---|---|---|
@@ -77,6 +83,7 @@ makes this hold even if both saves arrive at the same moment. The Save button is
 | Stocking (one or more batches) | `CycleAppService.CreateBatches` | `stock-batch.component.ts` | `Lifecycle_Tests.AC09_a_retried_submit_does_not_create_twice` |
 | Harvest | `HarvestAppService.Create` | `harvest-entry.component.ts` | `RetrySafeSaves_Tests.A_retried_harvest_returns_the_harvest_already_saved` |
 | Sale | `SaleAppService.Create` | `sale-entry.component.ts` | `RetrySafeSaves_Tests.A_retried_sale_returns_the_sale_already_saved_with_its_receipt_number` |
+| The same harvest sent four times at once (SQL Server) | `HarvestAppService.Create` (request lock) | `harvest-entry.component.ts` | `SqlServerConcurrency_Tests.The_same_harvest_sent_several_times_at_once_is_saved_once`; `The_database_refuses_a_second_record_with_the_same_request_id` |
 | Harvest and sale together (tally sheet) | `TallySheetAppService.Save` (the sale shares the harvest's ID) | `harvest-entry.component.ts` | `HarvestTally_Tests.A_retried_tally_sheet_returns_the_same_harvest_and_sale` |
 
 The double tap itself is stopped in the browser: every save runs through `FpmsPage.act()`
@@ -108,8 +115,13 @@ All use one helper: `Concurrency.Check` (`aspnet-core/src/Capstone.Application/P
 in `FpmsErrors.ConcurrencyConflict` (`Capstone.Core/Domain/FpmsErrors.cs`). The version column is the `[Timestamp]`
 `RowVersion` property on each entity.
 
-Tests: `RetrySafeSaves_Tests.A_stale_harvest_or_sale_correction_is_refused` and
-`RetrySafeSaves_Tests.A_stale_log_correction_or_farm_profile_save_is_refused`.
+If two corrections are saved at the very same moment, both pass the page's check; SQL Server then keeps the first, and the
+second gets the same message (`CapstoneDbContext.SaveChanges` turns the database's conflict into it; DEC-134).
+
+Tests: `RetrySafeSaves_Tests.A_stale_harvest_or_sale_correction_is_refused`,
+`RetrySafeSaves_Tests.A_stale_log_correction_or_farm_profile_save_is_refused`, and on SQL Server
+`SqlServerConcurrency_Tests.A_correction_from_a_page_loaded_before_another_save_is_refused` and
+`SqlServerConcurrency_Tests.Two_corrections_saved_at_the_same_moment_keep_one_and_refuse_the_other`.
 
 Who may correct what is a separate rule: a technician corrects only their own entries; the Owner may correct any
 (`Farm.Logs.EditAny`, `Farm.Harvests.EditAny`). A refused correction names who recorded the entry.
@@ -120,8 +132,9 @@ Who may correct what is a separate rule: a technician corrects only their own en
 
 | Situation | What the person sees | How it works | Where in the code |
 |---|---|---|---|
-| No connection when saving (Wi-Fi drops) | "Not saved: no connection to the farm server. Check the Wi-Fi, then try again. What you typed is still on this page." | A request with no reply at all (status 0) gets this message; the form stays as it was. Saving again is safe (section 3). | `angular/src/shared/fpms/http-configuration.service.ts` (`handleNonAbpErrorResponse`) |
-| The browser is closed, the tablet restarts or the page reloads mid-entry | On return: "Your unsaved harvest from 2:10 PM was restored", with "Discard it" | Each recording form saves a **draft** on the device as the person types: record operations, feeding sheet, harvest, sale, pond preparation. Drafts are per farm and per user (another person on the same tablet never sees them) and expire after 24 hours. | `angular/src/shared/fpms/drafts.ts` (`FormDrafts`); the five forms call `FormDrafts.save` |
+| No connection when recording at the pond (new log entry, feeding sheet, pond preparation) | "Kept on this tablet: General note, CP-01 … sent by itself when the connection is back. You can keep recording." The top bar shows "1 to send"; its list shows each kept entry with Send now and Discard. | The entry is kept in the browser's storage (per farm and person, no expiry) and sent oldest first when the app opens, when the connection returns and every 20 seconds. Sending twice is harmless (section 3). An entry the server refuses stays in the list with the reason ("Not accepted: …"), Try again and Discard. DEC-135. | `angular/src/shared/fpms/outbox.ts` (`FpmsOutbox`); `app/layout/header-outbox.component.ts`; callers in `log-entry`, `feeding-sheet`, `pond-detail` |
+| No connection for anything else (corrections, harvests, sales, setup) | "Not saved: no connection to the farm server. Check the Wi-Fi, then try again. What you typed is still on this page." | A request with no reply at all (status 0) gets this message; the form stays as it was. Saving again is safe (section 3). Harvests and sales are not kept on the tablet because they give a lot code or receipt number to hand over on the spot. | `angular/src/shared/fpms/http-configuration.service.ts` (`handleNonAbpErrorResponse`) |
+| The browser is closed, the tablet restarts or the page reloads mid-entry | On return: "Your unsaved harvest from 2:10 PM was restored", with "Discard it" | Forms save a **draft** on the device as the person types: record operations, feeding sheet, harvest, sale, pond preparation, and (DEC-135) the farm profile and the account form. Drafts are per farm and per user (another person on the same tablet never sees them) and expire after 24 hours. A farm profile draft is restored only if nobody saved the profile since; the account form never keeps a password. | `angular/src/shared/fpms/drafts.ts` (`FormDrafts`); each form calls `FormDrafts.save` |
 | The sign-in ends (4 hours) | "Your sign-in has ended. Sign in again to continue…", then the same page reloads; after signing in the person returns to it and the draft brings the entry back | The 4-hour session is deliberate (shared tablets, DEC-37). On an ended session the app reloads the current page, not the home page; sign-in returns to the page it was opened from. | `http-configuration.service.ts` (`handleTargetUrl`); `app-auth.service.ts` (`urlAfterSignIn`); token lifetime in `CapstoneWebCoreModule.cs` (`Authentication:JwtBearer:ExpirationMinutes`, default 240) |
 | A user is deactivated or their password reset while signed in | Their next request signs them out | A security-stamp check runs on every request | `Capstone.Core/Identity/SecurityStampValidator.cs` |
 | The wrong person is signed in on a shared tablet | The signed-in name is shown in the sidebar; each entry records who saved it | People sign out before handing over a tablet. The "Switch user" button described in DEC-37 is not built yet (section 8). | DEC-37; `sidebar-user-panel.component.html` |
@@ -155,29 +168,34 @@ These are operational risks. The software limits their damage; the farm's routin
 
 ## 8. Known limits
 
-Recorded in DEC-133 and shown to the farm as they are:
+Recorded in DEC-133 to DEC-135 and shown to the farm as they are:
 
-- **No offline recording.** If there is no connection, a save fails and must be repeated when the connection is back. The
-  entry is kept on the page and, for the five recording forms, in a draft. Saving while disconnected and sending later is a
-  separate, larger project.
-- **Forms without a draft** (farm profile, users, documents, setup pages) lose unsaved typing when the sign-in ends.
+- **Kept entries are on one tablet only** until they are sent. Clearing that browser's data first loses them (the list
+  says so). Until they are sent, the Daily record, the figures and other tablets do not show them, and a later entry for
+  the same feeding can clash with a kept one (the clash is shown when it is sent).
+- **Only new pond entries are kept offline** (log entries, feedings, pond preparation). Corrections, harvests, sales and
+  setup still need a connection; the app cannot show data it has not loaded while offline.
 - **A refused correction must be redone.** When a correction is refused because the record changed, the person refreshes
   and makes their change again; the system does not merge the two.
 - **Inventory items, buyers and users** have no version check: two people editing the same one at the same moment keep the
   later change. These are edited rarely, by the Owner.
-- **The row locks** (section 2) can be demonstrated only on SQL Server, not in the unit tests (see below).
+- **Forms without a draft** (documents and the setup pages) lose unsaved typing when the sign-in ends.
 - **No "Switch user" button yet.** DEC-37 describes one for shared tablets; today people sign out and back in.
 
 ---
 
 ## 9. How to check it yourself
 
-- **Automated tests:** `cd aspnet-core && dotnet test test/Capstone.Tests/Capstone.Tests.csproj` runs 355 tests, including
-  every test named in this document. They run on an in-memory database, which does not stamp row versions, so the version
-  tests set one first; the request-ID, uniqueness and step-rule tests run as on the server.
-- **On real SQL Server:** every push runs the GitHub Actions workflow `Build` (`.github/workflows/build.yml`). Its
-  `migrations` job starts SQL Server 2022, applies all migrations (creating the unique indexes, the read-committed snapshot
-  setting and the FULL recovery model), seeds the data, and runs the Migrator a second time to show it changes nothing.
+- **Automated tests:** `cd aspnet-core && dotnet test test/Capstone.Tests/Capstone.Tests.csproj` runs every test named
+  in this document. Most run on an in-memory database, which has no transactions, row versions or locks, so the version
+  tests there set one first.
+- **On real SQL Server (DEC-134):** `SqlServerConcurrency_Tests` (8 tests) run on a real SQL Server when the
+  environment variable `FPMS_TEST_SQLSERVER` holds a connection string, for example
+  `Server=localhost,1433;User Id=sa;Password=…;TrustServerCertificate=True`. Each test creates its own database from the
+  migrations and drops it afterwards; without the variable they are skipped. They show the delivery and harvest locks, the
+  request lock, row versions, the unique request-ID index, receipt numbers and read-committed snapshot working on the
+  database the farm uses. Every push runs them in the GitHub Actions workflow `Build` (`.github/workflows/build.yml`, job
+  `sqlserver`), against SQL Server 2022.
 - **By hand, two browsers:** sign in as two users on two devices (or a normal and a private window).
   1. Open the same feeding on the feeding sheet in both; save in one, then in the other: the second is refused and names
      the first person.
@@ -185,6 +203,8 @@ Recorded in DEC-133 and shown to the farm as they are:
   3. On the Sales form, start a sale, switch the Wi-Fi off, press Save: the no-connection message appears and the form is
      unchanged. Switch it on and save: one sale, one receipt number.
   4. Start a harvest, close the browser, open it again: the harvest is restored with "Discard it".
+  5. Open Record operations, switch the Wi-Fi off, save a general note: it shows "Kept on this tablet" and the top bar
+     "1 to send". Switch the Wi-Fi on: within 20 seconds "1 kept entry sent." and the note is on the Daily record.
 
 ## Where to read more
 

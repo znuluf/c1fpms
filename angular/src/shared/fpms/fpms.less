@@ -3174,6 +3174,10 @@ i.wq-key.out {
     &.fpms-saved-warn {
         border-left-color: var(--fpms-warning);
     }
+    // Kept on this tablet (DEC-135): not on the server yet, so info, not success.
+    &.fpms-saved-kept {
+        border-left-color: var(--fpms-info);
+    }
 }
 .fpms-saved-h {
     scroll-margin-top: 5rem;
@@ -3191,6 +3195,9 @@ i.wq-key.out {
     }
     .fpms-saved-warn & > .fas {
         color: var(--fpms-warning);
+    }
+    .fpms-saved-kept & > .fas {
+        color: var(--fpms-info);
     }
 }
 .fpms-saved-when {
@@ -3402,4 +3409,73 @@ i.wq-key.out {
     align-items: baseline;
     justify-content: space-between;
     gap: 0 0.5rem;
+}
+
+// ---- Entries kept on this tablet while the farm server could not be reached (DEC-135).
+// The top-bar count names its state in words; color only repeats it (waiting: info, not accepted: error).
+.main-header .navbar-nav .nav-link.fpms-outbox-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    color: var(--fpms-info);
+    font-weight: 600;
+    text-decoration: none;
+}
+.main-header .navbar-nav .nav-link.fpms-outbox-btn.is-refused {
+    color: var(--fpms-error);
+}
+.fpms-outbox-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.fpms-outbox-list > li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 1rem;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--fpms-line);
+}
+.fpms-outbox-what {
+    display: flex;
+    flex-direction: column;
+}
+.fpms-outbox-when {
+    color: var(--fpms-muted);
+}
+.fpms-outbox-state {
+    grid-column: 1;
+    display: flex;
+    gap: 0.4rem;
+    align-items: baseline;
+    margin: 0;
+    color: var(--fpms-info);
+}
+.fpms-outbox-list > li.is-refused .fpms-outbox-state {
+    color: var(--fpms-error);
+}
+.fpms-outbox-actions {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: flex;
+    gap: 0.5rem;
+}
+.fpms-outbox-done {
+    color: var(--fpms-success);
+    display: flex !important;
+    gap: 0.4rem;
+}
+.fpms-outbox-hint {
+    color: var(--fpms-muted);
+}
+@media (max-width: 575.98px) {
+    .fpms-outbox-list > li {
+        grid-template-columns: 1fr;
+    }
+    .fpms-outbox-actions {
+        grid-column: 1;
+        grid-row: auto;
+    }
 }

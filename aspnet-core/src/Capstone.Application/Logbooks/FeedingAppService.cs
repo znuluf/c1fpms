@@ -149,6 +149,7 @@ public class FeedingAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("ClientRequestId is required.");
         }
 
+        await OneRequestAtATimeAsync("feeding", input.ClientRequestId);
         var duplicate = await _sessions.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.ClientRequestId == input.ClientRequestId);
         if (duplicate != null)
         {

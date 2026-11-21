@@ -612,6 +612,7 @@ public class PondAppService : CapstoneAppServiceBase
     {
         if (input.ClientRequestId != Guid.Empty)
         {
+            await OneRequestAtATimeAsync("preparation", input.ClientRequestId);
             var saved = await _entries.GetAll().Where(e => e.ClientRequestId == input.ClientRequestId).Select(e => (Guid?)e.Id).FirstOrDefaultAsync();
             if (saved.HasValue)
             {

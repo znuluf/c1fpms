@@ -230,6 +230,7 @@ public class LogAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("ClientRequestId is required.");
         }
 
+        await OneRequestAtATimeAsync("log", input.ClientRequestId);
         var existing = await _logs.GetAll().AsNoTracking().FirstOrDefaultAsync(l => l.ClientRequestId == input.ClientRequestId);
         if (existing != null)
         {

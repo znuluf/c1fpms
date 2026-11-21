@@ -438,7 +438,9 @@ public class HarvestAppService : CapstoneAppServiceBase
             throw new UserFriendlyException($"This batch is {batch.Status}; its Final harvest is already recorded.");
         }
 
-        // A retried save (lost connection after the server saved) returns the harvest already saved (DEC-133).
+        // A retried save (lost connection after the server saved) returns the harvest already saved (DEC-133), also when
+        // the first attempt is still saving (DEC-134).
+        await OneRequestAtATimeAsync("harvest", input.ClientRequestId);
         if (input.ClientRequestId.HasValue && await _harvests.GetAll().AnyAsync(x => x.ClientRequestId == input.ClientRequestId))
         {
             var existing = await _harvests.GetAll().Where(x => x.ClientRequestId == input.ClientRequestId).Select(x => x.Id).FirstAsync();
@@ -460,6 +462,12 @@ public class HarvestAppService : CapstoneAppServiceBase
         if (!input.Id.HasValue)
         {
             throw new UserFriendlyException("Harvest id is required.");
+        }
+
+        // DEC-134: a correction waits for a sale of this harvest that is saving, then checks against what it sold.
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Harvest, input.Id.Value);
         }
 
         var harvest = await _harvests.GetAll().Include(h => h.GradeLines).Include(h => h.Disposals).Include(h => h.Crates).FirstOrDefaultAsync(h => h.Id == input.Id.Value)

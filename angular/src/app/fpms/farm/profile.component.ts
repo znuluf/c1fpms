@@ -1,12 +1,15 @@
 import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime } from '@shared/fpms/farm-time';
+import { FormDrafts } from '@shared/fpms/drafts';
 import { LAST_FARM_CODE_KEY } from '@shared/auth/app-auth.service';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { TimeListComponent } from '@shared/fpms/time-list.component';
 import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, coverageBarangays, coverageCities, coverageProvinces } from '@shared/fpms/coverage-area';
 
 /** Farm Profile Management (Ref 2.1, D-31). Owners edit; Technicians read. The Ponds tab summarizes pond specifications (D-32). */
+const PROFILE_DRAFT = 'farm-profile';
+
 @Component({
     standalone: true,
     imports: [...FPMS_IMPORTS, TimeListComponent],
@@ -87,8 +90,21 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
                     }
 
                     @if (tab() === 'details' && canEdit) {
+                        @if (restoredAt) {
+                            <div class="alert alert-info d-flex align-items-center" role="status">
+                                <i class="fas fa-history mr-2" aria-hidden="true"></i>
+                                <span class="mr-auto">Your unsaved changes from {{ restoredAt | farmDateTime }} were restored. Save to keep them.</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary ml-2 text-nowrap" [disabled]="busy()" (click)="discardDraft()">Discard them</button>
+                            </div>
+                        } @else if (draftOutdated) {
+                            <div class="alert alert-warning d-flex align-items-center" role="status">
+                                <i class="fas fa-exclamation-triangle mr-2" aria-hidden="true"></i>
+                                <span class="mr-auto">Your unsaved changes were not restored: someone saved the farm profile after you. Make them again if they are still needed.</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="draftOutdated = false">Close</button>
+                            </div>
+                        }
                         <!-- One panel (DEC-109): the profile's parts are sections of it, with Save as its footer. -->
-                        <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="farm profile" novalidate>
+                        <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" (input)="keepDraft()" (change)="keepDraft()" fpmsReview="farm profile" novalidate>
                             <fieldset [disabled]="!canEdit">
                                 <div class="card">
                                     <div class="card-header"><h3 class="card-title">Farm details</h3></div>
@@ -492,6 +508,10 @@ import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, covera
 })
 export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy {
     p: any = null;
+    /** When restored unsaved changes were last kept on this device (DEC-134), else null. */
+    restoredAt: string | null = null;
+    /** A draft was found but the profile was saved by someone since, so it was not restored. */
+    draftOutdated = false;
 
     // Address dropdowns: General Santos City and Sarangani only (shared/fpms/coverage-area.ts).
     provinces(): string[] {
@@ -561,8 +581,43 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
         return !code || (this.p?.country ?? '').trim().toLowerCase() !== 'philippines' || /^[0-9]{4}$/.test(code);
     }
 
-    ngOnInit(): void {
-        this.load();
+    async ngOnInit(): Promise<void> {
+        await this.load();
+        this.restoreDraft();
+    }
+
+    // ------------------------------------------------------------ unsaved changes (DEC-134)
+
+    /**
+     * Unsaved changes come back after the sign-in ends or the page reloads, like the harvest and sales forms. They are
+     * restored only over the version they were made on; if the profile was saved since, they are dropped and the page says so.
+     */
+    private restoreDraft(): void {
+        const draft = FormDrafts.load<any>(PROFILE_DRAFT);
+        this.restoredAt = null;
+        this.draftOutdated = false;
+        if (!draft?.data?.p || !this.p || !this.canEdit) {
+            return;
+        }
+        if (draft.data.p.rowVersion !== this.p.rowVersion) {
+            FormDrafts.clear(PROFILE_DRAFT);
+            this.draftOutdated = true;
+            return;
+        }
+        this.p = { ...this.p, ...draft.data.p };
+        this.restoredAt = new Date(draft.savedAt).toISOString();
+    }
+
+    keepDraft(): void {
+        if (this.p && this.canEdit) {
+            FormDrafts.save(PROFILE_DRAFT, { p: this.p });
+        }
+    }
+
+    async discardDraft(): Promise<void> {
+        FormDrafts.clear(PROFILE_DRAFT);
+        this.restoredAt = null;
+        await this.load();
     }
 
     // ------------------------------------------------------------ farm code (DEC-78)
@@ -670,6 +725,8 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
             if (this.session.tenant) {
                 this.session.tenant.usesSizeGrading = !!this.p.usesSizeGrading;
             }
+            FormDrafts.clear(PROFILE_DRAFT);
+            this.restoredAt = null;
             this.notifySaved('Farm profile saved.');
             if (warnings.length) {
                 this.showWarnings(warnings);

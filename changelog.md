@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (offline entries and saves on SQL Server, DEC-134, DEC-135)
+- **Recording carries on without a connection.** A new log entry, feeding sheet save or pond preparation entry that cannot reach the farm server is kept on this tablet and sent by itself when the connection is back. The top bar shows how many are waiting; its list shows each one, any the server did not accept and why, with Try again and Discard.
+- **The farm profile and the account form keep a draft** and offer it back after the sign-in ends or the page reloads, like the recording forms. Passwords are never kept.
+- **Sales at the same moment never oversell a grade,** and pages never show a save that was not finished.
+- **A save sent twice at the same moment** (a retry while the first is still saving) returns the saved record instead of an error.
+- **Two corrections at the same moment:** the second now gets "This record was changed by someone else. Refresh the page and try again." instead of a general error.
+
 ### Changed (sample data)
 - **The second sample technician is Far Ilusyam** (`filusyam`), and has a quick sign-in button on the development login page, "Far (tech)". Far looks after CP-01, with Kim covering for three days, and shares HP-01 with Kim.
 

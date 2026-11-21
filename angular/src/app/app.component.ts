@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit, Renderer2 } from '@angular/core';
+import { Component, inject, Injector, OnInit, Renderer2 } from '@angular/core';
 import { AppComponentBase } from '@shared/app-component-base';
 import { SignalRAspNetCoreHelper } from '@shared/helpers/SignalRAspNetCoreHelper';
 import { LayoutStoreService } from '@shared/layout/layout-store.service';
@@ -13,15 +13,18 @@ import { ProgressBarComponent } from './layout/progress-bar.component';
 import { SectionTabsComponent } from './layout/section-tabs.component';
 import { LogDrawerComponent } from './layout/log-drawer.component';
 import { ReviewHostComponent, ToastHostComponent } from '@shared/fpms/feedback';
+import { OutboxPanelComponent } from './layout/header-outbox.component';
+import { FpmsOutbox } from '@shared/fpms/outbox';
 import { applyNavMode } from '@shared/fpms/nav-mode';
 
 @Component({
     templateUrl: './app.component.html',
     standalone: true,
-    imports: [HeaderComponent, SidebarComponent, RouterOutlet, FooterComponent, HealthBannerComponent, ProgressBarComponent, SectionTabsComponent, LogDrawerComponent, ReviewHostComponent, ToastHostComponent],
+    imports: [HeaderComponent, SidebarComponent, RouterOutlet, FooterComponent, HealthBannerComponent, ProgressBarComponent, SectionTabsComponent, LogDrawerComponent, OutboxPanelComponent, ReviewHostComponent, ToastHostComponent],
 })
 export class AppComponent extends AppComponentBase implements OnInit {
     sidebarExpanded: boolean;
+    private readonly outbox = inject(FpmsOutbox);
 
     constructor(
         injector: Injector,
@@ -42,6 +45,8 @@ export class AppComponent extends AppComponentBase implements OnInit {
         this.renderer.removeClass(document.body, 'fpms-account');
         FarmTime.setZone(this.appSession.tenant?.timeZone);
         FarmTime.setDisplay(this.appSession.tenant?.dateOrder, this.appSession.tenant?.use24HourTime);
+        // DEC-135: entries kept on this tablet while offline are sent as soon as the app is open again.
+        void this.outbox.flush();
 
         SignalRAspNetCoreHelper.initSignalR();
 

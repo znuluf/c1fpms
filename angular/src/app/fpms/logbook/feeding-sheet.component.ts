@@ -74,6 +74,17 @@ const MINE = 'mine';
                     </div>
                 }
 
+                @if (keptCount) {
+                    <div class="alert alert-info d-flex align-items-center" role="status">
+                        <i class="fas fa-cloud-upload-alt mr-2" aria-hidden="true"></i>
+                        <span class="mr-auto">
+                            {{ keptCount }} feeding{{ keptCount === 1 ? ' is' : 's are' }} kept on this tablet: the farm server could not be reached.
+                            {{ keptCount === 1 ? 'It is' : 'They are' }} sent by {{ keptCount === 1 ? 'itself' : 'themselves' }} when the connection is back; until then the sheet does not show {{ keptCount === 1 ? 'it' : 'them' }}.
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openOutbox()">See kept entries</button>
+                    </div>
+                }
+
                 @if (results.length) {
                     <!-- After saving (DEC-118): what was saved, one feeding per row, and anything to check. Each saved tile is marked too. -->
                     <section class="card fpms-saved" [class.fpms-saved-warn]="hasWarnings" aria-labelledby="fs-saved-h">
@@ -371,7 +382,20 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
         return `feeding.${this.batchFilter ?? 'farm'}.${this.feedDate}`;
     }
 
+    /** Feedings of this visit kept on this tablet (DEC-135). */
+    keptCount = 0;
+
+    openOutbox(): void {
+        this.outbox.panelOpen.set(true);
+    }
+
+    /** The pond code of a row on the sheet, for the kept entry's name. */
+    private pondOf(batchId: string): string {
+        return (this.sheet?.rows ?? []).find((r: any) => r.batchId === batchId)?.pondCode ?? '';
+    }
+
     async load(): Promise<void> {
+        this.keptCount = 0;
         this.results = [];
         this.justSaved = {};
         this.voiding = null;
@@ -629,10 +653,27 @@ export class FeedingSheetComponent extends FpmsPage implements OnInit {
             lines: e.status === 2 ? [] : e.lines.map((l) => ({ lotId: l.lotId, kg: Number(l.kg) })),
         }));
         let res: any[] = [];
-        if (!(await this.act(async () => (res = await this.api.post<any[]>('Feeding', 'SaveSheet', { sessions }))))) {
+        let kept = false;
+        const label = `${sessions.length} feeding${sessions.length === 1 ? '' : 's'}, ${FarmTime.date(this.feedDate)}: ${[...new Set(this.pending().map((p) => this.pondOf(p.batchId)))].join(', ')}`;
+        if (
+            !(await this.act(async () => {
+                const r = await this.outbox.save<any[]>('Feeding', 'SaveSheet', { sessions }, label);
+                kept = r.kept;
+                res = r.kept ? [] : r.result;
+            }))
+        ) {
             return;
         }
         FormDrafts.clear(this.draftKey);
+        if (kept) {
+            // DEC-135: nothing reached the server, so the sheet cannot reload; the entries leave the sheet and wait in the outbox.
+            for (const p of this.pending()) {
+                this.entries[`${p.batchId}.${p.session}`] = this.closedEntry();
+            }
+            this.keptCount += sessions.length;
+            this.feedback.toast({ tone: 'info', text: `Kept ${sessions.length} feeding${sessions.length === 1 ? '' : 's'} on this tablet.`, detail: 'Sent by itself when the farm server can be reached.' });
+            return;
+        }
         await this.load();
         this.results = res;
         this.justSaved = Object.fromEntries(res.map((r) => [`${r.session.batchId}.${r.session.session}`, { warnings: (r.warnings ?? []).map((w: any) => w.message) }]));

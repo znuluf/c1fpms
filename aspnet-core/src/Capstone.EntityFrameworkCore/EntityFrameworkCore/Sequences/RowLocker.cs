@@ -30,10 +30,26 @@ public class RowLocker : IRowLocker, ITransientDependency
         {
             RowLockTarget.FryDelivery => "FpmsFryDeliveries",
             RowLockTarget.HarvestGradeLine => "FpmsHarvestGradeLines",
+            RowLockTarget.Harvest => "FpmsHarvests",
             _ => throw new ArgumentOutOfRangeException(nameof(target)),
         };
 
         // The table name comes from the fixed list above, never from input.
         await context.Database.ExecuteSqlRawAsync($"SELECT Id FROM [{table}] WITH (UPDLOCK, ROWLOCK) WHERE Id = @id", new SqlParameter("@id", id));
+    }
+
+    public async Task LockRequestAsync(string kind, Guid clientRequestId)
+    {
+        var context = await _dbContextProvider.GetDbContextAsync();
+        if (!context.Database.IsSqlServer() || context.Database.CurrentTransaction == null || clientRequestId == Guid.Empty)
+        {
+            return;
+        }
+
+        // An application lock on the request id, owned by this transaction. If it cannot be had in 30 seconds the save
+        // goes on: the unique index on ClientRequestId still refuses a second copy.
+        await context.Database.ExecuteSqlRawAsync(
+            "EXEC sp_getapplock @Resource = @resource, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 30000",
+            new SqlParameter("@resource", $"fpms-request:{kind}:{clientRequestId:N}"));
     }
 }

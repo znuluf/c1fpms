@@ -29,6 +29,12 @@ public abstract class CapstoneAppServiceBase : ApplicationService
 
     public IRepository<User, long> UserRepository { get; set; }
 
+    public Capstone.Domain.IRowLocker RowLocker { get; set; }
+
+    /// <summary>Waits for a save with the same request id that is still in progress (DEC-134). No-op without an id.</summary>
+    protected Task OneRequestAtATimeAsync(string kind, Guid? clientRequestId) =>
+        clientRequestId is { } id && id != Guid.Empty && RowLocker != null ? RowLocker.LockRequestAsync(kind, id) : Task.CompletedTask;
+
     protected CapstoneAppServiceBase()
     {
         LocalizationSourceName = CapstoneConsts.LocalizationSourceName;

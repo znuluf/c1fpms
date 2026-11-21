@@ -276,6 +276,7 @@ public class CycleAppService : CapstoneAppServiceBase
         var requestIds = input.Batches.Select((_, i) => input.ClientRequestId.HasValue ? DeriveRequestId(input.ClientRequestId.Value, i) : Guid.NewGuid()).ToList();
         if (input.ClientRequestId.HasValue)
         {
+            await OneRequestAtATimeAsync("stocking", input.ClientRequestId);
             var existing = await _logs.GetAll().AsNoTracking().Where(l => requestIds.Contains(l.ClientRequestId)).Select(l => l.BatchId).ToListAsync();
             if (existing.Count > 0)
             {

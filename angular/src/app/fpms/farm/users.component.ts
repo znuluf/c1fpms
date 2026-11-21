@@ -2,6 +2,10 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { ClientListFilter } from '@shared/fpms/client-list';
+import { FormDrafts } from '@shared/fpms/drafts';
+
+/** One account form open at a time, so one draft (DEC-134). Never holds a password. */
+const USER_DRAFT = 'farm-user';
 
 const ROLES = [
     { value: 'FarmOwner', label: 'Farm Owner' },
@@ -22,8 +26,15 @@ const ROLES = [
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
                             <div class="card-header"><h3 class="card-title">{{ form.id ? 'Edit account' : 'New account' }}</h3></div>
-                            <form #f="ngForm" (ngSubmit)="save()" fpmsReview="account" [fpmsReviewNew]="!form.id" novalidate autocomplete="off">
+                            <form #f="ngForm" (ngSubmit)="save()" (input)="keepDraft()" (change)="keepDraft()" fpmsReview="account" [fpmsReviewNew]="!form.id" novalidate autocomplete="off">
                                 <div class="card-body">
+                                    @if (restoredAt) {
+                                        <div class="alert alert-info d-flex align-items-center" role="status">
+                                            <i class="fas fa-history mr-2" aria-hidden="true"></i>
+                                            <span class="mr-auto">Your unsaved account from {{ restoredAt | farmDateTime }} was restored.{{ form.id ? '' : ' The temporary password is a new one.' }}</span>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary ml-2 text-nowrap" (click)="discardDraft()">Discard it</button>
+                                        </div>
+                                    }
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
                                             <label for="name">First name <span class="text-danger">*</span></label>
@@ -72,7 +83,7 @@ const ROLES = [
                                 </div>
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !f.form.valid">Save</button>
-                                    <button type="button" class="btn btn-default" (click)="form = null">Cancel</button>
+                                    <button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
                                     <fpms-form-hint [form]="f"></fpms-form-hint>
                                 </div>
                             </form>
@@ -174,6 +185,8 @@ export class FarmUsersComponent extends FpmsPage implements OnInit {
         ['account', 'accounts']
     );
     form: any = null;
+    /** When a restored unsaved account was last kept on this device (DEC-134), else null. */
+    restoredAt: string | null = null;
     reset: { user: any; password: string } | null = null;
 
     /** Set once the Owner types a username; the suggestion then stops replacing it (DEC-75). */
@@ -185,6 +198,63 @@ export class FarmUsersComponent extends FpmsPage implements OnInit {
 
     async load(): Promise<void> {
         this.users.set(await this.api.get<any[]>('FarmUser', 'GetAll'));
+        if (!this.form) {
+            this.reopenDraft();
+        }
+    }
+
+    // ------------------------------------------------------------ unsaved account (DEC-134)
+
+    /**
+     * An account form left unsaved (the sign-in ended, the page reloaded) opens again with what was typed. An edit is
+     * restored only if the account has not changed since; a new account gets a new temporary password.
+     */
+    private reopenDraft(): void {
+        const draft = FormDrafts.load<any>(USER_DRAFT);
+        const d = draft?.data;
+        if (!d?.form) {
+            return;
+        }
+        if (d.form.id) {
+            const u = (this.users() ?? []).find((x) => x.id === d.form.id);
+            if (!u || JSON.stringify(this.editable(u)) !== JSON.stringify(d.base)) {
+                FormDrafts.clear(USER_DRAFT);
+                return;
+            }
+            this.startEdit(u);
+        } else {
+            this.startCreate();
+        }
+        Object.assign(this.form, d.form, this.form.id ? {} : { temporaryPassword: this.form.temporaryPassword });
+        this.userNameEdited = !!d.userNameEdited;
+        this.restoredAt = new Date(draft!.savedAt).toISOString();
+        void this.suggestUserName();
+    }
+
+    private editable(u: any): any {
+        return { name: u.name, surname: u.surname, emailAddress: u.emailAddress, roleName: u.roleName };
+    }
+
+    keepDraft(): void {
+        const f = this.form;
+        if (!f) {
+            return;
+        }
+        const { temporaryPassword, ...typed } = f;
+        const u = f.id ? (this.users() ?? []).find((x) => x.id === f.id) : null;
+        FormDrafts.save(USER_DRAFT, { form: typed, base: u ? this.editable(u) : null, userNameEdited: this.userNameEdited });
+    }
+
+    discardDraft(): void {
+        FormDrafts.clear(USER_DRAFT);
+        this.restoredAt = null;
+        this.form = null;
+    }
+
+    cancel(): void {
+        FormDrafts.clear(USER_DRAFT);
+        this.restoredAt = null;
+        this.form = null;
     }
 
     roleLabel(name: string): string {
@@ -193,6 +263,7 @@ export class FarmUsersComponent extends FpmsPage implements OnInit {
 
     startCreate(): void {
         this.reset = null;
+        this.restoredAt = null;
         this.userNameEdited = false;
         this.form = { name: '', surname: '', userName: '', emailAddress: '', roleName: 'FarmTechnician', temporaryPassword: this.generate() };
     }
@@ -213,6 +284,7 @@ export class FarmUsersComponent extends FpmsPage implements OnInit {
 
     startEdit(u: any): void {
         this.reset = null;
+        this.restoredAt = null;
         this.form = { id: u.id, name: u.name, surname: u.surname, userName: u.userName, emailAddress: u.emailAddress, roleName: u.roleName };
     }
 
@@ -224,6 +296,8 @@ export class FarmUsersComponent extends FpmsPage implements OnInit {
                 : this.api.post('FarmUser', 'Create', f)
         );
         if (ok) {
+            FormDrafts.clear(USER_DRAFT);
+            this.restoredAt = null;
             if (!f.id) {
                 abp.message.info(`Account "${f.userName}" created. Temporary password: ${f.temporaryPassword}`, 'Account created');
             } else {

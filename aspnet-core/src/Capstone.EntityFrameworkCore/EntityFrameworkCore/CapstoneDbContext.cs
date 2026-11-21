@@ -77,6 +77,32 @@ public class CapstoneDbContext : AbpZeroDbContext<Tenant, Role, User, CapstoneDb
     {
     }
 
+    // Two saves of the same record at the same moment both pass the page's version check; SQL Server then updates
+    // only the first, and the second would end in a generic error. It gets the same message as a stale page (DEC-134).
+    public override int SaveChanges()
+    {
+        try
+        {
+            return base.SaveChanges();
+        }
+        catch (Abp.Domain.Uow.AbpDbConcurrencyException e)
+        {
+            throw new Abp.UI.UserFriendlyException(FpmsErrors.ConcurrencyConflict, e.Message);
+        }
+    }
+
+    public override async System.Threading.Tasks.Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+        catch (Abp.Domain.Uow.AbpDbConcurrencyException e)
+        {
+            throw new Abp.UI.UserFriendlyException(FpmsErrors.ConcurrencyConflict, e.Message);
+        }
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

@@ -43,6 +43,11 @@ public class CapstoneCoreModule : AbpModule
         // Store all timestamps in UTC; the client displays farm time (D-10).
         Clock.Provider = ClockProviders.Utc;
 
+        // DEC-134: reads see committed data only. ABP's default is READ UNCOMMITTED, which let a page or a check read a
+        // save that was later rolled back. With read-committed snapshot on (migration DatabaseSettings) this never waits
+        // for a save in progress.
+        Configuration.UnitOfWork.IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted;
+
         Configuration.Auditing.IsEnabledForAnonymousUsers = true;
         Configuration.Auditing.SaveReturnValues = false;
 

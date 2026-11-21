@@ -3327,6 +3327,73 @@ Negative:
 
 ---
 
+## Decision DEC-134: Saves are tested on SQL Server, and what those tests found is fixed
+
+Status: Accepted 2026-11-21
+Date: 2026-11-21
+Amends: DEC-38 (row locks), DEC-133 (retry-safe saves, version checks)
+
+### Context
+The automated tests ran only on EF in-memory, which has no transactions, row versions or locks, so DEC-133's protections were never shown working on the database the farm uses. Eight tests on a real SQL Server 2022 found four faults:
+1. **Two sales at the same moment oversold a grade.** Six 20 kg sales from a 100 kg grade were all saved: the sale checked the kilograms left with no lock, although DEC-38 calls for one.
+2. **Reads saw uncommitted data.** ABP's unit of work defaults to READ UNCOMMITTED, so a page or a check could read a save that was later rolled back. Read-committed snapshot (migration `DatabaseSettings`) only applies at READ COMMITTED.
+3. **The same save sent twice at the same moment** (a retry while the first attempt was still saving) passed the request-id check twice; the unique index refused the second, and the person got a generic error instead of the saved record.
+4. **Two corrections at the same moment** both passed the page's version check; SQL Server kept the first and the second ended in a generic error instead of "This record was changed by someone else".
+
+### Options considered
+1. Keep in-memory tests and document the gap (DEC-133's position).
+2. Run the database-dependent tests on a real SQL Server, each in its own new database, in CI; fix what they find.
+
+### Decision
+Option 2.
+- **SQL Server tests.** `SqlServerTestBase` gives a test its own database built by the migrations, with transactions on as in the API, and drops it afterwards. They run when `FPMS_TEST_SQLSERVER` holds a connection string and are skipped otherwise (`dotnet test` with `FPMS_TEST_SQLSERVER` set; CI job `sqlserver`). `SqlServerConcurrency_Tests`: read-committed snapshot is on; a stale correction is refused; two corrections at once keep one and refuse the other with the usual message; the same harvest sent four times at once is saved once; six sales at once get different receipt numbers and never oversell; a delivery step waits for a step in progress; a read is not blocked by a save in progress and sees only committed data; the unique request-id index refuses a second copy.
+- **Sales and harvest corrections lock the harvest** (`RowLockTarget.Harvest`), in id order, before checking kilograms left.
+- **Reads see committed data only:** `Configuration.UnitOfWork.IsolationLevel = ReadCommitted` (`CapstoneCoreModule`). With read-committed snapshot this never waits.
+- **Saves with the same request id run one after the other** (`IRowLocker.LockRequestAsync`, an application lock held until the transaction ends): the retry waits, then returns the record the first attempt saved. Harvests, sales, log entries, feedings, pond preparation and stocking.
+- **A conflict found by SQL Server gets the same message as a stale page** (`CapstoneDbContext.SaveChanges` turns `AbpDbConcurrencyException` into `FpmsErrors.ConcurrencyConflict`).
+
+### Consequences
+Positive:
+- The protections in docs/reliability.md are now shown on SQL Server on every push, not only argued.
+- No oversold grade, no dirty reads, and a clear message in every simultaneous case.
+Negative:
+- Sales of the same harvest now wait for each other for the length of one save (well under a second at the farm's size).
+- The SQL Server tests take about ten seconds each and need Docker or a SQL Server; without one they are skipped, not failed.
+
+---
+
+## Decision DEC-135: Entries kept on the tablet while the server cannot be reached; drafts on the farm profile and account forms
+
+Status: Accepted 2026-11-21
+Date: 2026-11-21
+Amends: DEC-133 (known limits: no offline recording; forms without a draft)
+
+### Context
+DEC-133 left two limits. With no connection, a save failed and had to be repeated by hand later, though the pond edge is where Wi-Fi drops. And the farm profile and the account form lost unsaved typing when the sign-in ended.
+
+### Options considered
+1. A full offline app (service worker, local database, sync of every record).
+2. An outbox for new entries that are already safe to send twice (they carry a request id, DEC-133 and DEC-134): log entries, the feeding sheet and pond preparation.
+3. Leave it as DEC-133.
+
+### Decision
+Option 2.
+- **Kept on this tablet.** When a new log entry, feeding sheet save or preparation entry gets no response at all (or a gateway error), it is kept on the tablet instead of failing: "Kept on this tablet: …. The farm server could not be reached. This entry is kept on this tablet and is sent by itself when the connection is back." The top bar shows "1 to send"; its list ("Kept on this tablet") shows each entry, Send now, and Discard (asked first).
+- **Sent by itself,** oldest first, when the app opens, when the browser reports the connection is back, and every 20 seconds while entries wait. A sent entry leaves the list ("2 kept entries sent."). An entry the server refuses (for example the batch was closed meanwhile) stays with the server's reason, "Not accepted: …", with Try again and Discard; a server error is tried five times first. An ended sign-in keeps the entry and sends it after signing in.
+- **Kept per farm and person** in the browser's storage, like drafts, with no expiry: an entry leaves only when the server accepts it or the person discards it. Passwords are never kept.
+- **Not kept:** corrections (they need the server's current version), harvests and sales (they give a lot code or receipt number to hand over on the spot), and everything else. Those still say "Not saved: no connection" and keep the typing on the page.
+- **Drafts on the farm profile and the account form,** like the recording forms. The profile draft is restored only over the version it was made on; if someone saved the profile since, the page says the changes were not restored. The account form reopens with what was typed and a new temporary password; an edit is restored only if the account has not changed since.
+- Code: `angular/src/shared/fpms/outbox.ts` (`FpmsOutbox`), `app/layout/header-outbox.component.ts`; callers in `log-entry`, `feeding-sheet` and `pond-detail`; drafts in `farm/profile.component.ts` and `farm/users.component.ts`.
+
+### Consequences
+Positive:
+- Recording at the pond edge carries on through a dropped connection; nothing is typed twice.
+- Sending twice is harmless, so a tablet that sends late, or two tabs sending the same entry, never makes a second record.
+Negative:
+- Until a kept entry is sent, the Daily record, figures and other tablets do not show it, and a later entry for the same feeding can clash with it (the clash is shown when it is sent).
+- Kept entries live in one browser on one tablet: clearing the browser's data before they are sent loses them. The list says so.
+- A full offline app (reading data without a connection) is still not built.
+
 ## Note: glossary of interface terms
 
 Date: 2026-11-14. One word per idea on screen and in API messages. New screens use these; code names (`FeedingSession`, `HarvestType.Total`, `MortalityCause.Others`) stay as they are.

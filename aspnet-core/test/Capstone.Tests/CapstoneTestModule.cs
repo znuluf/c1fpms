@@ -30,7 +30,8 @@ public class CapstoneTestModule : AbpModule
     public override void PreInitialize()
     {
         Configuration.UnitOfWork.Timeout = TimeSpan.FromMinutes(30);
-        Configuration.UnitOfWork.IsTransactional = false;
+        // In-memory tests run without transactions; SQL Server tests use them, as the API does, so locks are held.
+        Configuration.UnitOfWork.IsTransactional = TestDatabase.Requested != null;
 
         // Disable static mapper usage since it breaks unit tests (see https://github.com/aspnetboilerplate/aspnetboilerplate/issues/2052)
         Configuration.Modules.AbpAutoMapper().UseStaticMapper = false;

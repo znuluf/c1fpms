@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, DestroyRef, Directive, QueryList, ViewChildren, inject, signal } from '@angular/core';
+import { FpmsOutbox } from './outbox';
 import { NgForm } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -29,6 +30,8 @@ export abstract class FpmsPage {
     private permissions = inject(PermissionCheckerService);
     private browserTitle = inject(Title);
     protected readonly feedback = inject(FeedbackService);
+    /** Entries kept on this tablet while the farm server cannot be reached (DEC-135). */
+    protected readonly outbox = inject(FpmsOutbox);
 
     readonly L = L;
     readonly Options = L.Options;

@@ -48,16 +48,22 @@ const DRAFT = 'log-entry';
 
                     @if (result) {
                         <!-- After saving (DEC-117): what was saved, anything to check, the figures now, and what to do next. -->
-                        <section class="card fpms-saved" [class.fpms-saved-warn]="result.warnings.length" aria-labelledby="saved-h">
+                        <section class="card fpms-saved" [class.fpms-saved-warn]="result.warnings.length" [class.fpms-saved-kept]="result.kept" aria-labelledby="saved-h">
                             <div class="card-body">
                                 <h3 id="saved-h" class="fpms-saved-h" tabindex="-1">
-                                    <i class="fas" [class.fa-check-circle]="!result.wasDuplicate" [class.fa-info-circle]="result.wasDuplicate" aria-hidden="true"></i>
-                                    {{ result.wasDuplicate ? 'Already saved' : isNew ? 'Saved' : 'Changes saved' }}:
+                                    <i class="fas" [class.fa-check-circle]="!result.wasDuplicate && !result.kept" [class.fa-info-circle]="result.wasDuplicate" [class.fa-cloud-upload-alt]="result.kept" aria-hidden="true"></i>
+                                    {{ result.kept ? 'Kept on this tablet' : result.wasDuplicate ? 'Already saved' : isNew ? 'Saved' : 'Changes saved' }}:
                                     {{ savedType | label: L.LogTypes }}, {{ batch?.pondCode }}
                                     <span class="fpms-saved-when">{{ savedAt | farmDateTime }}</span>
                                 </h3>
                                 @if (result.wasDuplicate) {
                                     <p class="mb-2">This entry was already recorded, so no second copy was made.</p>
+                                }
+                                @if (result.kept) {
+                                    <p class="mb-2">
+                                        The farm server could not be reached. This entry is kept on this tablet and is sent by itself when the connection is back.
+                                        You can keep recording. Until it is sent, the Daily record and the figures do not include it.
+                                    </p>
                                 }
                                 @if (savedRows.length) {
                                     <dl class="fpms-facts mb-2">
@@ -1053,7 +1059,16 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
         const body = this.buildBody();
         const rows = this.feedback.lastRows;
         let res: any;
-        const ok = await this.act(async () => (res = this.isNew ? await this.api.post<any>('Log', 'Create', body) : await this.api.put<any>('Log', 'Update', body)));
+        const label = `${this.L.LogTypes[this.form.logType] ?? 'Entry'}, ${this.batch?.pondCode ?? ''}, ${FarmTime.dateTime(body.observedAt)}`;
+        const ok = await this.act(async () => {
+            if (this.isNew) {
+                // DEC-135: with no connection, a new entry is kept on this tablet and sent later.
+                const r = await this.outbox.save<any>('Log', 'Create', body, label);
+                res = r.kept ? { kept: true, warnings: [], wasDuplicate: false, indicators: null, log: null } : r.result;
+            } else {
+                res = await this.api.put<any>('Log', 'Update', body);
+            }
+        });
         if (!ok) {
             return;
         }

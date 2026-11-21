@@ -540,7 +540,8 @@ public class SaleAppService : CapstoneAppServiceBase
 
     public virtual async Task<SaleDto> Create(SaveSaleInput input)
     {
-        // A retried save returns the sale already saved, with its receipt number, instead of a second sale (DEC-133).
+        // A retried save returns the sale already saved, with its receipt number, instead of a second sale (DEC-133, DEC-134).
+        await OneRequestAtATimeAsync("sale", input.ClientRequestId);
         if (input.ClientRequestId.HasValue)
         {
             var existing = await _sales.GetAll().Where(x => x.ClientRequestId == input.ClientRequestId).Select(x => (Guid?)x.Id).FirstOrDefaultAsync();
@@ -681,6 +682,17 @@ public class SaleAppService : CapstoneAppServiceBase
         }
 
         var harvestIds = gradeLines.Select(g => g.HarvestId).Distinct().ToList();
+
+        // DEC-134: sales and corrections of the same harvest run one at a time, so two sales at once cannot both pass the
+        // kilograms-left check below. Locked in id order, so two sales of the same harvests never wait on each other.
+        if (RowLocker != null)
+        {
+            foreach (var id in harvestIds.OrderBy(x => x))
+            {
+                await RowLocker.LockAsync(RowLockTarget.Harvest, id);
+            }
+        }
+
         var harvests = await _harvests.GetAll().Include(h => h.Disposals).Include(h => h.GradeLines).Where(h => harvestIds.Contains(h.Id)).ToDictionaryAsync(h => h.Id);
         var exceptSale = isNew ? (Guid?)null : sale.Id;
         var soldElsewhere = await SoldByGradeLineAsync(harvests.Values.SelectMany(h => h.GradeLines).Select(g => g.Id).ToList(), exceptSale);

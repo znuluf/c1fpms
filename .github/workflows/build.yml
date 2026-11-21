@@ -1,7 +1,7 @@
 name: Build
 
-# Builds the API and runs its tests, checks that the EF model still produces a migration, and builds the
-# Angular app. Runs on every push and can be started by hand from the Actions tab.
+# Builds the API and runs its tests, checks that the EF model still produces a migration, runs the SQL Server
+# tests on a real SQL Server, and builds the Angular app. Runs on every push and can be started by hand from the Actions tab.
 on:
   push:
   workflow_dispatch:
@@ -30,6 +30,41 @@ jobs:
           dotnet ef migrations add Initial --project src/Capstone.EntityFrameworkCore --startup-project src/Capstone.Web.Host
           echo "Unique indexes on the farm code and username:"
           grep -n -A3 'IX_AbpTenants_TenancyName\|IX_AbpUsers_TenantId_NormalizedUserName' src/Capstone.EntityFrameworkCore/Migrations/*_Initial.cs | grep -n 'unique\|name:' || true
+
+  sqlserver:
+    # The tests that need a real SQL Server (row versions, unique request ids, locks, read-committed snapshot), on a
+    # database built from a freshly generated Initial migration, as in a Codespace.
+    runs-on: ubuntu-latest
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-CU16-ubuntu-22.04
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "Ci-Only-Passw0rd!"
+        ports:
+          - 1433:1433
+    env:
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      FPMS_TEST_SQLSERVER: "Server=localhost,1433;User Id=sa;Password=Ci-Only-Passw0rd!;TrustServerCertificate=True"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "9.0.x"
+      - name: Generate the Initial migration
+        run: |
+          dotnet tool restore
+          cd aspnet-core
+          dotnet ef migrations add Initial --project src/Capstone.EntityFrameworkCore --startup-project src/Capstone.Web.Host
+      - name: Tests on SQL Server
+        working-directory: aspnet-core
+        run: |
+          for i in $(seq 1 20); do
+            if (echo > /dev/tcp/localhost/1433) 2>/dev/null; then break; fi
+            echo "SQL Server not ready; waiting"; sleep 3
+          done
+          dotnet test test/Capstone.Tests -c Release --filter "FullyQualifiedName~SqlServer" --logger "console;verbosity=normal"
 
   frontend:
     runs-on: ubuntu-latest

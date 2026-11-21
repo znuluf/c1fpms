@@ -733,8 +733,17 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
 
     async addPrep(): Promise<void> {
         const body = { pondId: this.pond.id, observedAt: FarmTime.fromLocalInput(this.prep.observedAt), description: this.prep.description, clientRequestId: this.prep.clientRequestId };
-        if (await this.act(() => this.api.post('Pond', 'AddPreparationEntry', body))) {
+        let kept = false;
+        const label = `Preparation entry, ${this.pond.pondCode}, ${FarmTime.dateTime(body.observedAt)}`;
+        if (await this.act(async () => (kept = (await this.outbox.save('Pond', 'AddPreparationEntry', body, label)).kept))) {
             FormDrafts.clear(this.prepDraftKey);
+            if (kept) {
+                // DEC-135: kept on this tablet; the pond's list shows it once it reaches the server.
+                this.prep = this.newPrep();
+                this.prepRestored = false;
+                this.feedback.toast({ tone: 'info', text: 'Preparation entry kept on this tablet.', detail: 'Sent by itself when the farm server can be reached; the list shows it then.' });
+                return;
+            }
             this.notifySaved('Preparation entry added.');
             this.load(this.pond.id);
         }
