@@ -44,6 +44,58 @@ It replaces paper logbooks and spreadsheets with one traceable record. It comput
   - **Backups:** `sqlcmd` scripts on Task Scheduler or cron.
   - **Not used:** files and file storage, payments, email, SMS, analytics, external APIs.
 
+## Why this tech stack
+
+The stack was chosen for one situation: **a shrimp farm with no reliable Internet, a small team building a capstone in one
+semester, and records (feed, harvests, sales, permits) that must never be lost, duplicated or seen by another farm.**
+Every choice below follows from that, and each is recorded as a decision with the options that were turned down
+(DEC-01 to DEC-07 in [decisions.md](decisions.md)).
+
+### The choices in one table
+
+| Layer | Chosen | Main reason | Turned down |
+|---|---|---|---|
+| Where it runs | On a PC at the farm, used over the farm's Wi-Fi (DEC-01) | Works with no Internet; the farm owns its data; no monthly hosting bill | A cloud service (needs Internet the farm lacks, and money); a phone-only app (no shared records) |
+| Framework | ASP.NET Boilerplate 10.2 startup template (DEC-04) | Sign-in, roles and permissions, one-database-many-farms, audit log and a layered project come ready and tested | ASP.NET Zero (paid licence); plain ASP.NET Core and Angular (all of that written by hand) |
+| Server | ASP.NET Core on .NET 9, C# | Fast, typed, mature, free; one language for rules, data and tests | Node.js/Express, PHP/Laravel or Python/Django (all capable, but sign-in, permissions, many farms in one database and auditing would be assembled from separate libraries instead of coming ready together) |
+| Web app | Angular 19 (TypeScript) | Comes with the template, already wired to the server; a complete framework for many forms and tables | React or Vue (would need routing, forms, HTTP and sign-in wiring chosen and built separately) |
+| Database | SQL Server: Express on the farm, the same engine in Docker for development (DEC-03) | Free Express edition; transactions, locks and row versions the safe-save rules rely on; the same SQL in development and production | MySQL or PostgreSQL (good, but the template and its migrations target SQL Server); SQLite (one writer at a time, weak for several tablets); MongoDB (the farm's data is relational: ponds, batches, feedings, harvests and sales all point to each other, which tables and foreign keys check for free) |
+| Data access | Entity Framework Core with migrations | Tables are defined in C#; every query is parameterised; the farm filter is added to every query automatically | Hand-written SQL everywhere (easy to forget the farm filter, open to SQL injection) |
+| Sign-in | JWT tokens, ASP.NET Core Identity password hashing (DEC-02) | Built in and proven; no security code written by hand; works the same if it moves to the cloud | Cookie sessions (extra cross-site protections needed); custom sign-in (high risk) |
+
+### What is great about it, in practice
+
+- **It works without Internet.** Everything (web app, API, database, backups) runs on the farm PC. Tablets need only the
+  farm's Wi-Fi, and new pond entries are kept on the tablet and sent later if even that drops (DEC-135).
+- **Each farm's data stays its own.** Every farm row carries its farm ID, and ABP adds "this farm only" to every query by
+  itself (see [docs/database-queries.md](docs/database-queries.md)). A developer cannot forget it.
+- **Security is built in, not hand-made.** Password hashing, account lockout, tokens that expire after 4 hours,
+  permission checks on every endpoint, and an audit log of who did what all come from the framework. The team added rules
+  on top instead of writing security code.
+- **Records cannot be lost or doubled.** SQL Server's transactions, row versions and locks let the system guarantee that a
+  save is complete or not at all, that a retried save is not stored twice, and that two people saving at once do not
+  overwrite each other. Eight tests prove it on a real SQL Server (see [docs/reliability.md](docs/reliability.md)).
+- **Ready to grow into a service.** The same model already supports many farms in one database (DEC-01). Moving to the
+  cloud later is a hosting change, not a rewrite.
+- **Free to run.** .NET, Angular, ABP's template and SQL Server Express cost nothing; there are no paid services.
+- **Easy to check and maintain.** One typed language per side (C# and TypeScript) catches many mistakes before they run;
+  about 360 automated tests and a build on every push catch most of the rest. The layered projects keep farm rules
+  (`Capstone.Core`) apart from the web and the database.
+- **Changes to the database are safe.** Every change is a reviewed migration that upgrades the farm's database in place,
+  without losing data (see [docs/database.md](docs/database.md)).
+
+### The trade-offs, honestly
+
+| Trade-off | How it is handled |
+|---|---|
+| ASP.NET Boilerplate's support ended in May 2026, and .NET 9's on 10 November 2026 (DEC-05) | Versions are pinned and the server stays on the farm's network, never on the Internet. Moving to .NET 10 (supported to 2028) must happen before any Internet-facing deployment. |
+| SQL Server Express stops at 10 GB per database | The farm is expected to use under 2 GB in five years; the health page warns at 7 GB. |
+| Express has no SQL Agent for scheduled backups | Backups are scripts run by the operating system's scheduler (DEC-36). |
+| The farm runs its own server | Backups, HTTPS certificate renewal and updates are in [docs/runbook.md](docs/runbook.md), and the health page alerts when one is late. |
+| Angular and ABP take time to learn | The project follows the template's patterns and records its own conventions in [CLAUDE.md](CLAUDE.md) and decisions.md. |
+
+More detail: how the parts fit together is in [docs/system-overview.md](docs/system-overview.md), with diagrams.
+
 ## Exact versions (read from the template)
 | Component | Version | Source |
 | :---- | :---- | :---- |
