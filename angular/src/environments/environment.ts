@@ -14,6 +14,7 @@ export const environment = {
         { group: 'Simple sample (FPMS_Simple)', label: 'Abi (owner)', farmCode: 'rkabubba-aqua', userName: 'arkabubba', password: 'Fpms@2026' },
         { group: 'Simple sample (FPMS_Simple)', label: 'Sam (owner)', farmCode: 'rkabubba-aqua', userName: 'samsedel', password: 'Fpms@2026' },
         { group: 'Simple sample (FPMS_Simple)', label: 'Kim (tech)', farmCode: 'rkabubba-aqua', userName: 'konacsus', password: 'Fpms@2026' },
+        { group: 'Simple sample (FPMS_Simple)', label: 'Far (tech)', farmCode: 'rkabubba-aqua', userName: 'filusyam', password: 'Fpms@2026' },
         { group: 'System Administrator', label: 'Admin', farmCode: '', userName: 'admin', password: 'Fpms@2026' },
     ] as DevAccount[],
 };

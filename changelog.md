@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (sample data)
+- **The second sample technician is Far Ilusyam** (`filusyam`), and has a quick sign-in button on the development login page, "Far (tech)". Far looks after CP-01, with Kim covering for three days, and shares HP-01 with Kim.
+
 ### Changed (safe saves, DEC-133)
 - **Saving again after a dropped connection never makes a second harvest or sale.** The second save returns the one already saved, with the same lot code or receipt number.
 - **Two people correcting the same record find out.** Harvests, sales, log entries and the farm profile now refuse a correction from an out-of-date page: "This record was changed by someone else. Refresh the page and try again."

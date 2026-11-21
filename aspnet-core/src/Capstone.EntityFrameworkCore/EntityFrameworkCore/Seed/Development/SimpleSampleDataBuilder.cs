@@ -18,7 +18,7 @@ namespace Capstone.EntityFrameworkCore.Seed.Development;
 
 /// <summary>
 /// The small sample for the Codespace "FPMS_Simple" database (Seed:SimpleSampleData=true). One test farm in General Santos
-/// City with two Owners (Abi Rkabubba, Sam Amsedel) and one Technician (Kim Onacsus); three ponds, one of each construction
+/// City with two Owners (Abi Rkabubba, Sam Amsedel) and two Technicians (Kim Onacsus, Far Ilusyam); three ponds, one of each construction
 /// type, all run intensive; and one finished 75-day cycle: ponds prepared in late January, stocked 2 Feb 2026, total
 /// harvest 18 Apr 2026 (DOC 75), graded crate by crate and sold the same day with each buyer's crates on their receipt,
 /// ponds cleaned and the cycle closed by 30 Apr 2026. The ponds then stand idle through the lean season (May to June). A
@@ -81,7 +81,7 @@ public class SimpleSampleDataBuilder
         var abi = farms.EnsureUser(farm.Id, "arkabubba", "Abi", "Rkabubba", StaticRoleNames.Tenants.FarmOwner, pw);
         farms.EnsureUser(farm.Id, "samsedel", "Sam", "Amsedel", StaticRoleNames.Tenants.FarmOwner, pw);
         var kim = farms.EnsureUser(farm.Id, "konacsus", "Kim", "Onacsus", StaticRoleNames.Tenants.FarmTechnician, pw);
-        var jun = farms.EnsureUser(farm.Id, "jdelarosa", "Jun", "Dela Rosa", StaticRoleNames.Tenants.FarmTechnician, pw);
+        var far = farms.EnsureUser(farm.Id, "filusyam", "Far", "Ilusyam", StaticRoleNames.Tenants.FarmTechnician, pw);
 
         if (_context.Ponds.IgnoreQueryFilters().Any(p => p.TenantId == farm.Id))
         {
@@ -91,7 +91,7 @@ public class SimpleSampleDataBuilder
         _t = farm.Id;
         _ownerId = abi.Id;
         _techId = kim.Id;
-        _tech2Id = jun.Id;
+        _tech2Id = far.Id;
         _parameters = _context.ParameterDefinitions.AsNoTracking().ToDictionary(p => p.Id);
 
         var profile = _context.FarmProfiles.IgnoreQueryFilters().First(p => p.Id == _t);
@@ -474,8 +474,8 @@ public class SimpleSampleDataBuilder
     }
 
     /// <summary>
-    /// Who looks after each running batch (DEC-127): Kim has EP-01; Jun has CP-01, with Kim covering his days off until three
-    /// days from now; HP-01 is shared by Kim and Jun as equals. The closed cycle's batches were all Kim's.
+    /// Who looks after each running batch (DEC-127): Kim has EP-01; Far has CP-01, with Kim covering their days off until three
+    /// days from now; HP-01 is shared by Kim and Far as equals. The closed cycle's batches were all Kim's.
     /// </summary>
     private void SeedTechnicians(List<PondBatch> running)
     {

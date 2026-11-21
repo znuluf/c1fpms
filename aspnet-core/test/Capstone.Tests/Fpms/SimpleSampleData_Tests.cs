@@ -130,15 +130,15 @@ public class SimpleSampleData_Tests : FpmsTestBase
         asOwner["EP-01"].TechnicianNames.ShouldBe(new[] { "Kim Onacsus" });
         asOwner["HP-01"].TechnicianNames.Count.ShouldBe(2); // shared, as equals
         asOwner["HP-01"].TechnicianName.ShouldContain(" and ");
-        asOwner["CP-01"].CoverActive.ShouldBeTrue(); // Kim covers Jun's days off
+        asOwner["CP-01"].CoverActive.ShouldBeTrue(); // Kim covers Far's days off
         asOwner["CP-01"].LookingAfterName.ShouldBe("Kim Onacsus");
 
         var kim = await OpenAs("konacsus");
         kim.Values.ShouldAllBe(b => b.IsMine); // own, shared and covering
-        var jun = await OpenAs("jdelarosa");
-        jun["CP-01"].IsMine.ShouldBeTrue();
-        jun["HP-01"].IsMine.ShouldBeTrue();
-        jun["EP-01"].IsMine.ShouldBeFalse();
+        var far = await OpenAs("filusyam");
+        far["CP-01"].IsMine.ShouldBeTrue();
+        far["HP-01"].IsMine.ShouldBeTrue();
+        far["EP-01"].IsMine.ShouldBeFalse();
 
         // Daily log status puts the person's own ponds first.
         var rows = (await Resolve<Capstone.Logbooks.FeedingAppService>().GetDailyStatus(new Capstone.Logbooks.Dto.GetDailyLogStatusInput())).Rows;
