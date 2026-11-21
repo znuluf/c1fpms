@@ -172,6 +172,9 @@ public class Lifecycle_Tests : FpmsTestBase
         var planned = await service.Get(first.Id);
         planned.PondAllocations.Count.ShouldBe(1);
         planned.PondAllocations[0].PlannedPlCount.ShouldBe(40000);
+        var reservedPond = await Resolve<PondAppService>().Get(PondId("GP-03"));
+        reservedPond.IsReserved.ShouldBeTrue();
+        reservedPond.Status.ShouldBe(PondDisplayStatus.Prepared); // reservation is separate from physical readiness
         await Should.ThrowAsync<UserFriendlyException>(() => service.Create(Order("HL-PLAN-B")));
 
         await service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = first.Id, Status = FryDeliveryStatus.Cancelled, Note = "Order cancelled" });
