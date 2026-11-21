@@ -128,6 +128,7 @@ public class FryDeliveryPondAllocation : FarmEntity
 {
     public Guid DeliveryId { get; set; }
     public Guid PondId { get; set; }
+    public Pond Pond { get; set; }
     public long PlannedPlCount { get; set; }
 
     /// <summary>Set when the delivery is cancelled/rejected; cleared if that status step is undone.</summary>
