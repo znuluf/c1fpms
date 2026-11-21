@@ -543,7 +543,12 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
 
         await ValidateAsync(input, delivery.Id);
         Apply(delivery, input);
-        if (!arrived && (currentStatus is FryDeliveryStatus.Ordered or FryDeliveryStatus.InTransit) && input.PondAllocations != null) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
+        if (!arrived && (currentStatus is FryDeliveryStatus.Ordered or FryDeliveryStatus.InTransit))
+        {
+            if (input.PondAllocations != null) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
+            else if (await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).SumAsync(a => (long?)a.PlannedPlCount) > (input.PlOrdered ?? 0))
+                throw new UserFriendlyException("PL ordered cannot be less than the total planned pond allocation.");
+        }
         return new SaveFryDeliveryResult { Id = delivery.Id, Warnings = await WarningsAsync(input) };
     }
 
