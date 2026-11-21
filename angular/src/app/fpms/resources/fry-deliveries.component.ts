@@ -152,7 +152,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                                     <option [value]="pond.id" [disabled]="pond.isReserved || pondAlreadySelected(pond.id, $index)">{{ pond.pondCode }} — {{ pond.name }}{{ pond.isReserved ? ' (reserved)' : '' }}</option>
                                                                 }
                                                             </select>
-                                                            @if (allocation.pondId && pondOptions().find(p => p.id === allocation.pondId)?.isReserved) { <small class="text-danger">This pond is already reserved.</small> }
+                                                            @if (allocation.pondId && pondIsReserved(allocation.pondId)) { <small class="text-danger">This pond is already reserved.</small> }
                                                         </div>
                                                         <div class="form-group col-md-4 mb-1">
                                                             <label [for]="'alloc-pl-' + $index">Planned PL</label>
@@ -363,6 +363,8 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
     allocationTotal(): number { return (this.form?.pondAllocations ?? []).reduce((sum: number, x: any) => sum + (Number(x.plannedPlCount) || 0), 0); }
 
     pondAlreadySelected(id: string, except: number): boolean { return this.form.pondAllocations.some((x: any, i: number) => i !== except && x.pondId === id); }
+
+    pondIsReserved(id: string): boolean { return this.pondOptions().some((p) => p.id === id && p.isReserved); }
 
     /** "+3,000 (+1.0%)" in the list: the farm's count against the papers; a dash when the papers' count was not entered. */
     papersDiff(d: any): string {
