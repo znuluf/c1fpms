@@ -572,7 +572,8 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         await _changes.InsertAsync(new FryDeliveryStatusChange { DeliveryId = delivery.Id, Status = input.Status, ChangedAtUtc = changedAt, Note = note });
         if (FryDeliveryFlow.IsEnded(input.Status))
         {
-            var active = await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).ToListAsync();
+            var active = await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).OrderBy(a => a.PondId).ToListAsync();
+            foreach (var allocation in active) await _rowLocker.LockAsync(RowLockTarget.Pond, allocation.PondId);
             foreach (var allocation in active) allocation.ReleasedAtUtc = changedAt;
         }
     }
@@ -646,7 +647,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         var last = steps[0];
         if (FryDeliveryFlow.IsEnded(last.Status))
         {
-            var released = await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc != null && a.FulfilledAtUtc == null).ToListAsync();
+            var released = await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc != null && a.FulfilledAtUtc == null).OrderBy(a => a.PondId).ToListAsync();
             foreach (var allocation in released)
             {
                 await _rowLocker.LockAsync(RowLockTarget.Pond, allocation.PondId);
