@@ -138,6 +138,33 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                         } @else {
                                             <p class="text-muted">The farm's count and the papers are entered with <strong>Receive fry</strong> when the fry arrive.</p>
                                         }
+                                        @if (!arrived) {
+                                            <div class="form-group mt-3">
+                                                <label>Planned destination ponds</label>
+                                                <p class="text-muted mb-2">Record the ponds the farm has already chosen. These are reservations only; actual stocking is recorded separately.</p>
+                                                @for (allocation of form.pondAllocations; track $index) {
+                                                    <div class="form-row align-items-end mb-2">
+                                                        <div class="form-group col-md-6 mb-1">
+                                                            <label [for]="'alloc-pond-' + $index">Destination pond</label>
+                                                            <select class="form-control" [id]="'alloc-pond-' + $index" [name]="'allocPond' + $index" [(ngModel)]="allocation.pondId" required>
+                                                                <option value="">Choose pond</option>
+                                                                @for (pond of pondOptions(); track pond.id) {
+                                                                    <option [value]="pond.id" [disabled]="pond.isReserved || pondAlreadySelected(pond.id, $index)">{{ pond.pondCode }} — {{ pond.name }}{{ pond.isReserved ? ' (reserved)' : '' }}</option>
+                                                                }
+                                                            </select>
+                                                            @if (allocation.pondId && pondOptions().find(p => p.id === allocation.pondId)?.isReserved) { <small class="text-danger">This pond is already reserved.</small> }
+                                                        </div>
+                                                        <div class="form-group col-md-4 mb-1">
+                                                            <label [for]="'alloc-pl-' + $index">Planned PL</label>
+                                                            <input class="form-control" type="number" min="1" max="10000000" step="1" [id]="'alloc-pl-' + $index" [name]="'allocPl' + $index" [(ngModel)]="allocation.plannedPlCount" required />
+                                                        </div>
+                                                        <div class="form-group col-md-2 mb-1"><button type="button" class="btn btn-outline-danger btn-block" (click)="removeAllocation($index)">Remove</button></div>
+                                                    </div>
+                                                }
+                                                <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAllocation()">Add destination pond</button>
+                                                <div class="text-muted mt-2">Planned: {{ allocationTotal() | num: 0 }} / {{ (form.plOrdered || 0) | num: 0 }} PL ordered</div>
+                                            </div>
+                                        }
                                         <div class="form-row">
                                             <div class="form-group col-md-12 mb-0">
                                                 <label for="n">Notes</label>
@@ -236,6 +263,7 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
 
     list = signal<any[] | null>(null);
     hatcheries = signal<any[]>([]);
+    pondOptions = signal<any[]>([]);
     counts = signal<Record<number, number>>({});
     total = signal(0);
     status: number | null = null;
@@ -305,6 +333,7 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
     async startCreate(arrived = true): Promise<void> {
         const list = (await this.api.get<any[]>('Hatchery', 'GetLookup'));
         this.hatcheries.set(list);
+        this.pondOptions.set(arrived ? [] : await this.api.get<any[]>('FryDelivery', 'GetPondAllocationOptions'));
         this.form = {
             id: EMPTY_GUID,
             hatcheryId: list[0]?.id ?? '',
@@ -322,8 +351,17 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
             timePacked: '',
             receivedAt: FarmTime.nowInput(),
             initialStatus: arrived ? 3 : 1,
+            pondAllocations: [],
         };
     }
+
+    addAllocation(): void { this.form.pondAllocations.push({ pondId: '', plannedPlCount: null }); }
+
+    removeAllocation(index: number): void { this.form.pondAllocations.splice(index, 1); }
+
+    allocationTotal(): number { return (this.form?.pondAllocations ?? []).reduce((sum: number, x: any) => sum + (Number(x.plannedPlCount) || 0), 0); }
+
+    pondAlreadySelected(id: string, except: number): boolean { return this.form.pondAllocations.some((x: any, i: number) => i !== except && x.pondId === id); }
 
     /** "+3,000 (+1.0%)" in the list: the farm's count against the papers; a dash when the papers' count was not entered. */
     papersDiff(d: any): string {
@@ -355,6 +393,7 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
                     timePacked: this.arrived && this.form.timePacked ? FarmTime.fromLocalInput(this.form.timePacked) : null,
                     receivedAt: this.arrived ? FarmTime.fromLocalInput(this.form.receivedAt) : null,
                     plReceived: this.arrived ? this.form.plReceived : null,
+                    pondAllocations: this.arrived ? [] : this.form.pondAllocations.filter((x: any) => x.pondId && x.plannedPlCount > 0),
                 })))) {
             this.notifySaved(this.arrived ? 'Fry delivery recorded.' : 'Order recorded.');
             if (result?.warnings?.length) {
