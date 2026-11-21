@@ -103,6 +103,25 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </ul>
                         }
                     </section>
+                    @if (d.pondAllocations?.length) {
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title">Planned destination ponds</h3></div>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-sm mb-0">
+                                    <thead><tr><th>Pond</th><th class="text-right">Planned PL</th><th>Status</th></tr></thead>
+                                    <tbody>
+                                        @for (a of d.pondAllocations; track a.id) {
+                                            <tr>
+                                                <td><a [routerLink]="['/app/ponds', a.pondId]">{{ a.pondCode }}</a><div class="small text-muted">{{ a.pondName }}</div></td>
+                                                <td class="text-right">{{ a.plannedPlCount | num: 0 }}</td>
+                                                <td>{{ a.fulfilledAtUtc ? 'Stocked' : a.releasedAtUtc ? 'Released' : 'Reserved' }}</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
                     <!-- The form takes the width on a laptop; the status column sits beside it from 1,200 px (DEC-111). -->
                         <!-- DEC-131: the delivery's steps, and only the next ones that make sense. -->
                         <div class="card">
