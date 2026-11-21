@@ -114,7 +114,7 @@ export class HelpComponent extends FpmsPage {
     readonly c = HELP_CONTACT;
 
     get intro(): string {
-        return `Shrimp.io was built by ${this.c.builtBy}. For help with the system, contact ${this.c.whoAnswers}.`;
+        return `Farm.Shrimp.io was built by ${this.c.builtBy}. For help with the system, contact ${this.c.whoAnswers}.`;
     }
 
     get hasBlanks(): boolean {

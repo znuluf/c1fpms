@@ -4,7 +4,7 @@ import { signedOutGuard } from '@shared/auth/signed-out-guard';
 
 const routes: Routes = [
     // Home page for visitors: Sign in and Create account. A signed-in user goes straight to their start page
-    // in the app instead. The tab shows just "Shrimp.io".
+    // in the app instead. The tab shows just "Farm.Shrimp.io".
     {
         path: '',
         pathMatch: 'full',

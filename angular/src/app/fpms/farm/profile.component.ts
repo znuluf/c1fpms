@@ -41,7 +41,8 @@ const PROFILE_DRAFT = 'farm-profile';
                             <div class="card-header"><h3 class="card-title">Farm details</h3></div>
                             <div class="card-body">
                                 <dl class="row mb-0 fpms-dl">
-                                    <dt class="col-sm-4">Farm ID</dt><dd class="col-sm-8"><code>{{ p.farmCode }}</code><span class="fpms-none ml-2">used with your username to sign in</span></dd>
+                                    <dt class="col-sm-4">Farm ID</dt><dd class="col-sm-8"><code>{{ p.farmId }}</code><span class="fpms-none ml-2">fixed; used on records and reports</span></dd>
+                                    <dt class="col-sm-4">Farm code</dt><dd class="col-sm-8"><code>{{ p.farmCode }}</code><span class="fpms-none ml-2">used with your username to sign in</span></dd>
                                     <dt class="col-sm-4">Farm name</dt><dd class="col-sm-8">{{ p.farmName }}</dd>
                                     <dt class="col-sm-4">Total farm area</dt>
                                     <dd class="col-sm-8">
@@ -105,7 +106,12 @@ const PROFILE_DRAFT = 'farm-profile';
                                     <div class="card-header"><h3 class="card-title">Farm details</h3></div>
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <label for="farmCode">Farm ID</label>
+                                            <label for="farmId">Farm ID</label>
+                                            <input id="farmId" class="form-control fpms-code-field" name="farmId" [ngModel]="p.farmId" readonly aria-describedby="farmIdHelp" />
+                                            <small id="farmIdHelp" class="form-text text-muted">Given by the system and never changes. FRM- followed by your farm's number.</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="farmCode">Farm code</label>
                                             <div class="input-group fpms-code-field-group">
                                                 <input id="farmCode" class="form-control fpms-code-field" name="farmCode" [ngModel]="p.farmCode" readonly aria-describedby="farmCodeHelp" />
                                                 @if (p.canChangeFarmCode) {
@@ -405,12 +411,12 @@ const PROFILE_DRAFT = 'farm-profile';
             <div class="fpms-dialog-backdrop">
                 <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="codeDlgTitle">
                     <div class="fpms-dialog-head">
-                        <h2 id="codeDlgTitle" class="mr-auto">{{ d.done ? 'Farm ID changed' : 'Change farm ID' }}</h2>
+                        <h2 id="codeDlgTitle" class="mr-auto">{{ d.done ? 'Farm code changed' : 'Change farm code' }}</h2>
                         <button type="button" class="fpms-dialog-close" aria-label="Close" (click)="closeCodeDlg()"><span aria-hidden="true">&times;</span></button>
                     </div>
                     @if (d.done) {
                         <div class="fpms-dialog-body">
-                            <p class="mb-2">The new farm ID is</p>
+                            <p class="mb-2">The new farm code is</p>
                             <p class="h3 mb-3"><code>{{ d.done.farmCode }}</code></p>
                             <div class="alert alert-info small mb-0">
                                 <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
@@ -423,11 +429,11 @@ const PROFILE_DRAFT = 'farm-profile';
                             <button type="button" class="btn btn-primary" (click)="closeCodeDlg()">Done</button>
                         </div>
                     } @else {
-                        <form (ngSubmit)="saveCode()" fpmsReview="farm ID" novalidate autocomplete="off">
+                        <form (ngSubmit)="saveCode()" fpmsReview="farm code" novalidate autocomplete="off">
                             <div class="fpms-dialog-body">
                                 <div class="alert alert-warning small">
                                     <i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>
-                                    The farm ID is what staff type, with their username, to sign in. After the change:
+                                    The farm code is what staff type, with their username, to sign in. After the change:
                                     <ul class="mb-0 pl-3 mt-1">
                                         <li>everyone must sign in with the new code, and saved links or bookmarks that use the old one stop working;</li>
                                         <li>exports and reports made earlier keep the old code;</li>
@@ -589,7 +595,7 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
         await this.load();
     }
 
-    // ------------------------------------------------------------ farm ID (DEC-78)
+    // ------------------------------------------------------------ farm code (DEC-78)
 
     get canSaveCode(): boolean {
         const d = this.codeDlg;
@@ -664,9 +670,9 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
         const code = this.codeDlg?.done?.farmCode ?? '';
         try {
             await navigator.clipboard.writeText(code);
-            this.notifySaved('Farm ID copied.');
+            this.notifySaved('Farm code copied.');
         } catch {
-            abp.message.info(code, 'Farm ID');
+            abp.message.info(code, 'Farm code');
         }
     }
 

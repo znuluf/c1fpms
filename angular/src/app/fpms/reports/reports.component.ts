@@ -124,7 +124,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                                 <div>
                                     <div class="fpms-doc-farm">{{ r.header.farmName }}</div>
                                     <div class="small">{{ r.header.farmAddress }}</div>
-                                    <div class="small">Farm ID {{ r.header.farmCode }}</div>
+                                    <div class="small">Farm code {{ r.header.farmCode }}</div>
                                 </div>
                                 <div class="text-right">
                                     <div class="fpms-doc-title">{{ title() }}</div>

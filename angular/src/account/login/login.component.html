@@ -1,9 +1,9 @@
 <div [@routerTransition]>
     <h1 class="fpms-auth-title">Sign in</h1>
-    <p class="fpms-auth-lead">Use your farm ID and username.</p>
+    <p class="fpms-auth-lead">Use your farm code and username.</p>
     <form novalidate autocomplete="off" #loginForm="ngForm" (ngSubmit)="login()">
         <div class="form-group">
-            <label for="farmCode">Farm ID</label>
+            <label for="farmCode">Farm code</label>
             <input
                 id="farmCode"
                 type="text"
@@ -82,7 +82,7 @@
     <p class="text-muted small mt-3 mb-1">
         Forgot your password? Ask a Farm Owner of your farm to reset it, or contact the System Administrator.
     </p>
-    <p class="mb-0 mt-2 small"><a [routerLink]="['/']">What is Shrimp.io?</a></p>
+    <p class="mb-0 mt-2 small"><a [routerLink]="['/']">What is Farm.Shrimp.io?</a></p>
     @if (registrationEnabled()) {
         <a class="btn btn-block fpms-auth-secondary mt-3" [routerLink]="['../register']">Register a farm account</a>
     }

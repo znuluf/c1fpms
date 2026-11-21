@@ -5,7 +5,7 @@ All notable changes to this project are documented here.
 ## Unreleased
 
 ### Changed (capstone consultation, 21 Nov 2026)
-- **Plainer for farm owners and technicians.** The app is named Shrimp.io (Farm Production Information System). "Farm code" is now "Farm ID". The sidebar lists Farm management above Production management. Registration steps read "1. Farm", "2. Owner account", "3. Review".
+- **Plainer for farm owners and technicians.** The tagline is now "Farm Production Information System" (the name stays Farm.Shrimp.io, and "Farm code" stays). Each farm also gets a fixed **Farm ID**, FRM- and the farm number (FRM-0007), shown on the farm profile. The sidebar lists Farm management above Production management. Registration steps read "1. Farm", "2. Owner account", "3. Review".
 - **Fewer fields.** Removed time zone, coordinates, country and postal code (farm profile and registration), "Time packed at the hatchery", the transport permits (fry delivery, sales, trace report) and the hatchery Active/Inactive switch.
 - **Pond area is worked out** from length and width; units sit beside the field label.
 - **Permit numbers** keep their format; a renewal updates the year in the number for you.
