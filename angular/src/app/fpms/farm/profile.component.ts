@@ -58,6 +58,10 @@ const PROFILE_DRAFT = 'farm-profile';
                                         @if (p.lotCodeParts) { <code>YY-{{ p.lotCodeParts }}-PP-HH</code> }
                                         <div class="small" [class.text-warning-dark]="!p.lotCodeParts" [class.fpms-none]="p.lotCodeParts">{{ p.lotCodeNote }}</div>
                                     </dd>
+                                    <dt class="col-sm-4">Coordinates</dt>
+                                    <dd class="col-sm-8">
+                                        @if (p.latitude != null && p.longitude != null) { {{ p.latitude | num: 6 }}, {{ p.longitude | num: 6 }} } @else { <span class="fpms-none">—</span> }
+                                    </dd>
                                 </dl>
                             </div>
                         </div>
@@ -238,6 +242,27 @@ const PROFILE_DRAFT = 'farm-profile';
                                                     }
                                                 </select>
                                                 <small class="form-text text-muted">Covered: General Santos City and Sarangani.</small>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="postal">Postal code</label>
+                                                <input id="postal" class="form-control" name="postalCode" [(ngModel)]="p.postalCode" maxlength="10" inputmode="numeric" />
+                                                @if (!postalOk) {
+                                                    <small class="text-danger">4 digits, e.g. 9502.</small>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="country">Country <span class="text-danger">*</span></label>
+                                                <input id="country" class="form-control" name="country" [(ngModel)]="p.country" required maxlength="100" />
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="lat">Latitude</label>
+                                                <input id="lat" type="number" step="0.000001" min="-90" max="90" class="form-control" name="latitude" [(ngModel)]="p.latitude" />
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="lng">Longitude</label>
+                                                <input id="lng" type="number" step="0.000001" min="-180" max="180" class="form-control" name="longitude" [(ngModel)]="p.longitude" />
                                             </div>
                                         </div>
                                         @if (p.fullAddress) {

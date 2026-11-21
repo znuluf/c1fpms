@@ -80,6 +80,8 @@ export class TenantLoginInfoDto {
     tenancyName: string;
     name: string;
     farmName: string;
+    /** A-LL-FF, or null until the farm has its number. */
+    farmId: string | null;
     timeZone: string;
     /** 1 = Month first, 2 = Day first. */
     dateOrder: number;

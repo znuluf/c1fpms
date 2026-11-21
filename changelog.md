@@ -6,7 +6,7 @@ All notable changes to this project are documented here.
 
 ### Changed (capstone consultation, 21 Nov 2026)
 - **Plainer for farm owners and technicians.** The tagline is now "Farm Production Information System" (the name stays Farm.Shrimp.io, and "Farm code" stays). The farm profile shows the **Farm ID** in the format of docs/farm-id-proposal.md, `A-LL-FF` (area, place, farm number, e.g. 0-24-03), which is the farm part of the harvest lot code. The sidebar lists Farm management above Production management. Registration steps read "1. Farm", "2. Owner account", "3. Review".
-- **Fewer fields.** Removed time zone, coordinates, country and postal code (farm profile and registration), "Time packed at the hatchery", the transport permits (fry delivery, sales, trace report) and the hatchery Active/Inactive switch.
+- **Fewer fields.** Removed time zone (farm profile), "Time packed at the hatchery", the transport permits (fry delivery, sales, trace report) and the hatchery Active/Inactive switch.
 - **Pond area is worked out** from length and width; units sit beside the field label.
 - **Permit numbers** keep their format; a renewal updates the year in the number for you.
 - **Getting started** shows two steps: farm profile, then ponds.

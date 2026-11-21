@@ -25,6 +25,8 @@ public class SystemFarmDto
 {
     public int TenantId { get; set; }
     public string FarmCode { get; set; }
+    /// <summary>A-LL-FF, or null while the farm has not been given its number.</summary>
+    public string FarmId { get; set; }
     public string Name { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreationTime { get; set; }
@@ -35,6 +37,16 @@ public class SetFarmActiveInput
 {
     public int TenantId { get; set; }
     public bool IsActive { get; set; }
+}
+
+public class SetFarmIdInput
+{
+    public int TenantId { get; set; }
+    /// <summary>0 General Santos City, 1 Sarangani.</summary>
+    [Range(0, 9)] public int Area { get; set; }
+    [Range(1, 99)] public int Place { get; set; }
+    [Range(1, 99)] public int FarmNumber { get; set; }
+    [Required, StringLength(300)] public string Reason { get; set; }
 }
 
 public class RegistrationSettingDto
@@ -50,27 +62,69 @@ public class RegistrationSettingDto
 public class SystemFarmAppService : CapstoneAppServiceBase
 {
     private readonly IRepository<Tenant, int> _tenants;
+    private readonly IRepository<Capstone.Farms.FarmProfile, int> _profiles;
 
-    public SystemFarmAppService(IRepository<Tenant, int> tenants)
+    public SystemFarmAppService(IRepository<Tenant, int> tenants, IRepository<Capstone.Farms.FarmProfile, int> profiles)
     {
         _tenants = tenants;
+        _profiles = profiles;
     }
 
     public virtual async Task<List<SystemFarmDto>> GetFarms()
     {
         var tenants = await _tenants.GetAll().AsNoTracking().OrderBy(t => t.TenancyName).ToListAsync();
         Dictionary<int, int> counts;
-        using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
+        Dictionary<int, string> farmIds;
+        using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
         {
+            // Only the three digits of the Farm ID are read from the farm's profile, nothing else.
+            farmIds = (await _profiles.GetAll().AsNoTracking().Where(f => f.LotFarmNumber != null)
+                .Select(f => new { f.Id, f.LotAreaCode, f.LotPlaceCode, f.LotFarmNumber }).ToListAsync())
+                .ToDictionary(f => f.Id, f => $"{f.LotAreaCode}-{f.LotPlaceCode:00}-{f.LotFarmNumber:00}");
             counts = await UserRepository.GetAll().Where(u => u.TenantId != null).GroupBy(u => u.TenantId.Value)
                 .Select(g => new { g.Key, N = g.Count() }).ToDictionaryAsync(x => x.Key, x => x.N);
         }
 
         return tenants.Select(t => new SystemFarmDto
         {
-            TenantId = t.Id, FarmCode = t.TenancyName, Name = t.Name, IsActive = t.IsActive, CreationTime = t.CreationTime,
+            TenantId = t.Id, FarmCode = t.TenancyName, FarmId = farmIds.TryGetValue(t.Id, out var fid) ? fid : null, Name = t.Name, IsActive = t.IsActive, CreationTime = t.CreationTime,
             UserCount = counts.TryGetValue(t.Id, out var n) ? n : 0,
         }).ToList();
+    }
+
+    /// <summary>
+    /// Corrects a Farm ID given in error (docs/farm-id-proposal.md section 4). Only the System Administrator may, with a reason;
+    /// the new ID must be free, because an ID is never shared or reused. The reason and both IDs go to the log.
+    /// </summary>
+    public virtual async Task SetFarmId(SetFarmIdInput input)
+    {
+        if (string.IsNullOrWhiteSpace(input.Reason))
+        {
+            throw new Abp.UI.UserFriendlyException("Give the reason for the correction.");
+        }
+
+        var max = input.Area == Capstone.Harvests.LotPlaces.GenSanArea ? Capstone.Harvests.LotPlaces.GenSanBarangays.Count
+            : input.Area == Capstone.Harvests.LotPlaces.SaranganiArea ? Capstone.Harvests.LotPlaces.SaranganiMunicipalities.Count : 0;
+        if (input.Place > max)
+        {
+            throw new Abp.UI.UserFriendlyException("That place is not on the list. General Santos is area 0 (places 01–26); Sarangani is area 1 (places 01–07).");
+        }
+
+        using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+        {
+            if (await _profiles.GetAll().AnyAsync(f => f.Id != input.TenantId && f.LotAreaCode == input.Area && f.LotPlaceCode == input.Place && f.LotFarmNumber == input.FarmNumber))
+            {
+                throw new Abp.UI.UserFriendlyException($"{input.Area}-{input.Place:00}-{input.FarmNumber:00} already belongs to another farm.");
+            }
+
+            var profile = await _profiles.FirstOrDefaultAsync(f => f.Id == input.TenantId)
+                          ?? throw new Abp.UI.UserFriendlyException("This farm has no profile yet.");
+            var old = profile.LotFarmNumber.HasValue ? $"{profile.LotAreaCode}-{profile.LotPlaceCode:00}-{profile.LotFarmNumber:00}" : "none";
+            profile.LotAreaCode = input.Area;
+            profile.LotPlaceCode = input.Place;
+            profile.LotFarmNumber = input.FarmNumber;
+            Logger.Warn($"Farm ID of farm {input.TenantId} corrected from {old} to {input.Area}-{input.Place:00}-{input.FarmNumber:00}. Reason: {input.Reason}");
+        }
     }
 
     public virtual async Task SetFarmActive(SetFarmActiveInput input)

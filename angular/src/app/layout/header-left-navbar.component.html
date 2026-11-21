@@ -7,7 +7,7 @@
                         @if (isHost && $first) {
                             <i class="fas fa-shield-alt mr-1" aria-hidden="true"></i>
                         }
-                        <span [attr.aria-current]="last ? 'page' : null">{{ c }}</span>
+                        <span [attr.aria-current]="last ? 'page' : null">{{ c }}</span>@if ($first && !isHost && farmId) {<span class="text-muted ml-2" title="Farm ID">{{ farmId }}</span>}
                     </li>
                 }
             </ol>

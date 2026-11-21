@@ -70,6 +70,12 @@ public class TraceAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("Enter a lot code, for example 26-0-24-03-07-02.");
         }
 
+        // A Farm ID (A-LL-FF, three parts) names the farm, not one harvest: point to the list that finds all of its lot codes.
+        if (System.Text.RegularExpressions.Regex.IsMatch(code, @"^\d-\d{2}-\d{2}$"))
+        {
+            throw new UserFriendlyException($"{code} is a Farm ID, not a lot code. Search it in Harvests to see this farm's lot codes, then open one here.");
+        }
+
         var harvest = await _harvests.GetAll().AsNoTracking().Where(h => h.LotCode == code)
             .Select(h => new { h.Id, h.BatchId, h.HarvestedAtUtc }).FirstOrDefaultAsync()
             ?? throw new UserFriendlyException($"No harvest has the lot code {code}.");

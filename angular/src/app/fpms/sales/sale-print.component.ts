@@ -60,6 +60,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 <div class="fpms-doc-farm">{{ s.farmName }}</div>
                                 <div class="small">{{ s.farmAddress }}</div>
                                 @if (s.farmContact) { <div class="small">{{ s.farmContact }}</div> }
+                                @if (session.tenant?.farmId) { <div class="small">Farm ID {{ session.tenant?.farmId }}</div> }
                                 <div class="small">BFAR registration no.: {{ s.bfarRegistrationNo || '—' }}</div>
                                 @if (s.sfscNos) {
                                     <div class="small">Shrimp Fry Source Certificate no.: {{ s.sfscNos }}</div>

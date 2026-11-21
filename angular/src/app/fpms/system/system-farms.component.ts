@@ -25,24 +25,58 @@ import { unbroken } from '@shared/fpms/labels';
                         }
                     </div>
                 </div>
+                @if (fix(); as f) {
+                    <div class="card card-outline card-warning">
+                        <div class="card-header"><h3 class="card-title">Correct the Farm ID of {{ f.name }}</h3></div>
+                        <form (ngSubmit)="saveFix()" #ff="ngForm" novalidate>
+                            <div class="card-body">
+                                <p class="small text-muted">Use this only for an ID given in error. The ID is printed on lot codes and receipts, so a farm keeps its ID once it is in use. The reason is kept in the log.</p>
+                                <div class="form-row">
+                                    <div class="form-group col-md-3">
+                                        <label for="fx-a">Area (0 General Santos, 1 Sarangani)</label>
+                                        <input id="fx-a" type="number" min="0" max="9" class="form-control" name="area" [(ngModel)]="f.area" required />
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label for="fx-p">Place (01 to 26)</label>
+                                        <input id="fx-p" type="number" min="1" max="99" class="form-control" name="place" [(ngModel)]="f.place" required />
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label for="fx-n">Farm number (01 to 99)</label>
+                                        <input id="fx-n" type="number" min="1" max="99" class="form-control" name="farmNumber" [(ngModel)]="f.farmNumber" required />
+                                    </div>
+                                </div>
+                                <div class="form-group mb-0">
+                                    <label for="fx-r">Reason</label>
+                                    <input id="fx-r" class="form-control" name="reason" [(ngModel)]="f.reason" required maxlength="300" />
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary" [disabled]="busy() || !ff.form.valid">Save Farm ID</button>
+                                <button type="button" class="btn btn-default ml-1" (click)="fix.set(null)">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                }
                 <div class="card">
                     <div class="card-body p-0 table-responsive">
                         @if (!farms()) {
                             <fpms-loading></fpms-loading>
                         } @else {
-                            <!-- Five columns (DEC-122): the farm as its code tag and name; actions stack. -->
+                            <!-- Six columns (DEC-122): the farm as its code tag and name; actions stack. -->
                             <table class="table table-hover mb-0">
-                                <thead><tr><th>Farm</th><th>Registered</th><th class="text-right">Accounts</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                                <thead><tr><th>Farm</th><th>Farm ID</th><th>Registered</th><th class="text-right">Accounts</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
                                 <tbody>
                                     @for (x of farms(); track x.tenantId) {
                                         <tr [class.text-muted]="!x.isActive">
                                             <td><span class="fpms-pond-tag">{{ unbroken(x.farmCode) }}</span><div class="mt-1">{{ x.name }}</div></td>
+                                            <td class="text-nowrap">@if (x.farmId) { <code>{{ x.farmId }}</code> } @else { <span class="text-muted">Not given yet</span> }</td>
                                             <td class="text-nowrap">{{ x.creationTime | farmDate }}</td>
                                             <td class="text-right">{{ x.userCount }}</td>
                                             <td><fpms-badge [text]="x.isActive ? 'Active' : 'Inactive'" [tone]="x.isActive ? 'success' : 'secondary'"></fpms-badge></td>
                                             <td class="text-right">
                                                 <div class="fpms-actions-stack">
                                                     <a class="btn btn-sm btn-outline-primary" routerLink="/app/system/recovery" [queryParams]="{ tenantId: x.tenantId }" [attr.aria-label]="'Account recovery for ' + x.name">Account recovery</a>
+                                                    <button class="btn btn-sm btn-outline-secondary" [disabled]="busy()" (click)="startFix(x)">Correct Farm ID</button>
                                                     <button class="btn btn-sm" [class.btn-outline-danger]="x.isActive" [class.btn-outline-success]="!x.isActive" [disabled]="busy()" (click)="toggleFarm(x)">
                                                         {{ x.isActive ? 'Deactivate' : 'Activate' }}
                                                     </button>
@@ -50,7 +84,7 @@ import { unbroken } from '@shared/fpms/labels';
                                             </td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="5" class="text-center text-muted py-3">No farms registered.</td></tr>
+                                        <tr><td colspan="6" class="text-center text-muted py-3">No farms registered.</td></tr>
                                     }
                                 </tbody>
                             </table>
@@ -65,6 +99,21 @@ export class SystemFarmsComponent extends FpmsPage implements OnInit {
     readonly unbroken = unbroken;
     farms = signal<any[] | null>(null);
     registration = signal<boolean | null>(null);
+    fix = signal<any | null>(null);
+
+    startFix(x: any): void {
+        const [area, place, farmNumber] = x.farmId ? x.farmId.split('-').map(Number) : [0, null, null];
+        this.fix.set({ tenantId: x.tenantId, name: x.name, area, place, farmNumber, reason: '' });
+    }
+
+    async saveFix(): Promise<void> {
+        const f = this.fix();
+        if (f && (await this.act(() => this.api.post('SystemFarm', 'SetFarmId', { tenantId: f.tenantId, area: Number(f.area), place: Number(f.place), farmNumber: Number(f.farmNumber), reason: f.reason })))) {
+            this.notifySaved('Farm ID saved.');
+            this.fix.set(null);
+            this.load();
+        }
+    }
 
     ngOnInit(): void {
         this.load();

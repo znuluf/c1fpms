@@ -13,6 +13,9 @@ public class TenantLoginInfoDto : EntityDto
 
     public string FarmName { get; set; }
 
+    /// <summary>A-LL-FF once the farm has its number (docs/farm-id-proposal.md); null before.</summary>
+    public string FarmId { get; set; }
+
     public string TimeZone { get; set; }
 
     /// <summary>1 = Month first, 2 = Day first (FarmDateOrder).</summary>

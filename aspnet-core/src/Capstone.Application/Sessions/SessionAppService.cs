@@ -28,6 +28,7 @@ public class SessionAppService : CapstoneAppServiceBase, ISessionAppService
             var profile = await Farm.GetProfileAsync();
             output.Tenant.FarmName = string.IsNullOrWhiteSpace(profile.FarmName) ? output.Tenant.Name : profile.FarmName;
             output.Tenant.TimeZone = profile.TimeZone;
+            output.Tenant.FarmId = profile.LotFarmNumber.HasValue ? $"{profile.LotAreaCode}-{profile.LotPlaceCode:00}-{profile.LotFarmNumber:00}" : null;
             output.Tenant.DateOrder = (int)profile.DateOrder;
             output.Tenant.Use24HourTime = profile.Use24HourTime;
             output.Tenant.UsesSizeGrading = profile.UsesSizeGrading;

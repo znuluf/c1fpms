@@ -145,6 +145,7 @@ public class FarmProfileAppService : CapstoneAppServiceBase
     private readonly IRepository<Pond, Guid> _ponds;
 
     public FarmCodeManager FarmCodes { get; set; }
+    public Capstone.Harvests.HarvestLotCoder LotCoder { get; set; }
 
     public FarmProfileAppService(IRepository<FarmProfile, int> profiles, IRepository<Pond, Guid> ponds)
     {
@@ -156,6 +157,18 @@ public class FarmProfileAppService : CapstoneAppServiceBase
     {
         var p = await Farm.GetProfileAsync();
         var tenant = await GetCurrentTenantAsync();
+        // The Owner opening the profile is what gives the farm its number (docs/farm-id-proposal.md section 4), as long as the
+        // address names a known place. Otherwise the number is given with the first harvest lot code, as before.
+        if (p?.LotFarmNumber == null && await IsFarmOwnerAsync())
+        {
+            var (given, _) = await LotCoder.EnsureFarmIdentityAsync(tenant.Id);
+            if (given?.LotFarmNumber != null)
+            {
+                await CurrentUnitOfWork.SaveChangesAsync();
+                p = given;
+            }
+        }
+
         return new FarmProfileDto
         {
             RowVersion = Production.Concurrency.Encode(p?.RowVersion),
@@ -328,7 +341,7 @@ internal static class FarmLotCodeDisplay
         }
 
         dto.LotCodeParts = $"{place.Value.Area}-{place.Value.Place:00}-??";
-        dto.LotCodeNote = "The farm number (??) is given with the first harvest lot code. From then on the area, place and farm number stay fixed.";
+        dto.LotCodeNote = "The farm number (??) is given when the Farm Owner opens this page, or with the first harvest lot code. From then on the area, place and farm number stay fixed.";
         return dto;
     }
 }

@@ -41,6 +41,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="fpms-doc-head">
                             <div>
                                 <div class="fpms-doc-farm">{{ t.farmName }}</div>
+                                @if (session.tenant?.farmId) { <div class="small">Farm ID {{ session.tenant?.farmId }}</div> }
                                 <div class="small">{{ t.farmAddress }}</div>
                                 @if (t.farmContact) { <div class="small">{{ t.farmContact }}</div> }
                             </div>

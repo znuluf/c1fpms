@@ -46,6 +46,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <div class="fpms-doc-head">
                         <div>
                             <div class="fpms-doc-farm">{{ session.tenant?.name }}</div>
+                            @if (session.tenant?.farmId) { <div class="small">Farm ID {{ session.tenant?.farmId }}</div> }
                             <div class="small">Fill in at the pond; enter into FPMS afterwards</div>
                         </div>
                         <div class="text-right">

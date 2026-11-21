@@ -239,7 +239,7 @@ public class SimpleSampleDataBuilder
         {
             TenantId = _t, CreatorUserId = _ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = "GSH-B0202", DeliveryDate = Stocking, PlAgeDays = 12,
             PlReceived = pls.Sum() + deadOnArrival + countDifference, CostPhp = Math.Round((pls.Sum() + deadOnArrival + countDifference) * 0.36m, 0),
-            PlHealthCertificateNo = "PLHC-20260202", TransportPermitNo = "DTP-20260202-GSH", SfscNo = "SFSC-2026-GSH-0202", TransportMode = TransportMode.Truck, TimePackedUtc = Local(Stocking, 4, 30),
+            PlHealthCertificateNo = "PLHC-20260202", SfscNo = "SFSC-2026-GSH-0202", TransportMode = TransportMode.Truck,
             StockingFinishedAtUtc = Local(Stocking, 11), StockingFinishedByUserId = _ownerId, ReceivedAtUtc = Local(Stocking, 5),
             Notes = "Picked up at the hatchery in Brgy. Tinoto, Maasim; oxygenated bags, by truck to the farm.",
         };
@@ -533,7 +533,7 @@ public class SimpleSampleDataBuilder
         {
             TenantId = _t, CreatorUserId = _ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = "SNA-B0914", DeliveryDate = stocking, PlAgeDays = 12,
             PlReceived = pls.Sum() + 4000, PlOrdered = pls.Sum() + 6500, CostPhp = Math.Round((pls.Sum() + 4000) * 0.33m, 0), // DEC-93: 2,500 fewer than the papers
-            PlHealthCertificateNo = "PLHC-20260914", TransportPermitNo = "DTP-20260914-SNA", SfscNo = null, TransportMode = TransportMode.Truck, TimePackedUtc = Local(stocking, 4, 0), // the SFSC paper has not arrived yet: shows the DEC-79 warnings until it is typed in
+            PlHealthCertificateNo = "PLHC-20260914", SfscNo = null, TransportMode = TransportMode.Truck, // the SFSC paper has not arrived yet: shows the DEC-79 warnings until it is typed in
             StockingFinishedAtUtc = Local(stocking, 11), StockingFinishedByUserId = _ownerId, ReceivedAtUtc = Local(stocking, 5),
             Notes = "Delivered by the hatchery truck from Brgy. Tuyan, Malapatan; oxygenated bags. SFSC to follow from the hatchery.",
         };
@@ -723,8 +723,8 @@ public class SimpleSampleDataBuilder
         var delivery = new FryDelivery
         {
             TenantId = _t, CreatorUserId = _ownerId, HatcheryId = hatchery.Id, HatcheryBatchNumber = $"RDX-B{today:MMdd}", DeliveryDate = today, PlAgeDays = 12,
-            PlReceived = 303000, PlOrdered = 300000, CostPhp = Math.Round(303000 * 0.34m, 0), PlHealthCertificateNo = $"PLHC-{today:yyyyMMdd}", TransportPermitNo = $"DTP-{today:yyyyMMdd}-RDX",
-            ReceivedAtUtc = Local(today, 0, 30), TransportMode = TransportMode.Truck, TimePackedUtc = Local(today.AddDays(-1), 21),
+            PlReceived = 303000, PlOrdered = 300000, CostPhp = Math.Round(303000 * 0.34m, 0), PlHealthCertificateNo = $"PLHC-{today:yyyyMMdd}",
+            ReceivedAtUtc = Local(today, 0, 30), TransportMode = TransportMode.Truck,
             Notes = "Delivered by the hatchery truck from Bawing; oxygenated bags. Planned for EP-02 (170,000 PL) and HP-02 (130,000 PL). Shrimp Fry Source Certificate to follow.",
         };
         _context.FryDeliveries.Add(delivery);
@@ -995,7 +995,6 @@ public class SimpleSampleDataBuilder
             sale.DriverName = "R. Santos (test)";
             sale.PlateNo = "TST 1234";
             sale.LoadedAtUtc = Local(HarvestDate, 5);
-            sale.LocalTransportPermitNo = $"LTP-R12-260418-{number:000}";
             sale.TemperatureNote = interIsland ? "Packed in ice, 0–2 °C, re-iced at the port; about two days in transit" : "Ice slurry, 0–2 °C in insulated boxes";
         }
 
@@ -1121,7 +1120,6 @@ public class SimpleSampleDataBuilder
             var credit = NewSale(_manila, day, "Net 30 days", day.AddDays(30), Line());
             credit.Transporter = "Closed van to Makar Wharf, then RoRo ferry to Manila (test)";
             credit.Destination = _manila.Address;
-            credit.LocalTransportPermitNo = $"LTP-R12-{day:yyMMdd}-{_saleNo:000}";
             _context.Sales.AddRange(duplicate, credit);
             _context.SaveChanges();
             foreach (var c in h.Crates.Where(c => c.CrateNo <= 4))

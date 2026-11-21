@@ -28,6 +28,7 @@ export class HeaderLeftNavbarComponent implements OnInit {
     private router = inject(Router);
     readonly isHost = !this.session.tenant;
     readonly farmName = this.session.tenant?.farmName || this.session.tenant?.name;
+    readonly farmId = this.session.tenant?.farmId;
 
     private url = signal(effectiveUrl(this.router.url));
     private title = signal(pageTitleOf(this.router.routerState.snapshot.root));

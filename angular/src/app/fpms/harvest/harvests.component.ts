@@ -32,7 +32,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                 <!-- Filters on the page ground, the list in one panel (DEC-107). -->
                 <div class="fpms-list-filters">
                         <fpms-list-toolbar
-                            placeholder="Search by lot code, pond, batch or cycle"
+                            placeholder="Search by lot code, Farm ID, pond, batch or cycle"
                             [search]="f.search"
                             [resultText]="resultText()"
                             [chips]="chips()"
