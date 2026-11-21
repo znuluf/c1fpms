@@ -779,19 +779,16 @@ public class SaleAppService : CapstoneAppServiceBase
         sale.SaleDate = input.SaleDate;
         sale.PaymentTerms = Clean(input.PaymentTerms);
         sale.DueDate = input.DueDate;
-        sale.Transporter = Clean(input.Transporter);
-        sale.DriverName = Clean(input.DriverName);
-        sale.PlateNo = Clean(input.PlateNo);
-        sale.LoadedAtUtc = input.LoadedAt.HasValue ? FarmClock.ToUtc(input.LoadedAt.Value) : null;
-        sale.Destination = Clean(input.Destination);
-        // The local transport permit is no longer asked for on the screen (capstone consultation, 21 Nov 2026); a value is set only
-        // when one is sent, so an edit from the screen keeps what was recorded earlier.
-        if (!string.IsNullOrWhiteSpace(input.LocalTransportPermitNo))
-        {
-            sale.LocalTransportPermitNo = Clean(input.LocalTransportPermitNo);
-        }
-
-        sale.TemperatureNote = Clean(input.TemperatureNote);
+        // Transport details (transporter, driver, plate, loaded at, destination, permit, temperature) are no longer asked for on
+        // the screens (capstone consultation, 21 Nov 2026). A value is set only when one is sent, so an edit from the screens
+        // keeps what was recorded earlier.
+        if (!string.IsNullOrWhiteSpace(input.Transporter)) sale.Transporter = Clean(input.Transporter);
+        if (!string.IsNullOrWhiteSpace(input.DriverName)) sale.DriverName = Clean(input.DriverName);
+        if (!string.IsNullOrWhiteSpace(input.PlateNo)) sale.PlateNo = Clean(input.PlateNo);
+        if (input.LoadedAt.HasValue) sale.LoadedAtUtc = FarmClock.ToUtc(input.LoadedAt.Value);
+        if (!string.IsNullOrWhiteSpace(input.Destination)) sale.Destination = Clean(input.Destination);
+        if (!string.IsNullOrWhiteSpace(input.LocalTransportPermitNo)) sale.LocalTransportPermitNo = Clean(input.LocalTransportPermitNo);
+        if (!string.IsNullOrWhiteSpace(input.TemperatureNote)) sale.TemperatureNote = Clean(input.TemperatureNote);
 
         foreach (var existing in sale.Lines.ToList())
         {

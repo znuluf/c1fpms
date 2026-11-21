@@ -299,7 +299,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     <tr>
                                                         <td>
                                                             <a [routerLink]="['/app/sales', s.saleId]">{{ s.dispatchReceiptNo }}</a>
-                                                            @if (transportOf(s); as tr) { <span class="ts-d">{{ tr }}</span> } @else { <span class="ts-d ts-missing">Transport not recorded</span> }
                                                         </td>
                                                         <td>{{ s.saleDate | farmDate }}</td>
                                                         <td>{{ s.sizeLabel }}</td>
@@ -874,12 +873,6 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
         return Math.abs(n);
     }
 
-    /** A sale's transport details as one line, or '' when none is recorded. */
-    transportOf(s: any): string {
-        return [s.transporter, s.driverName, s.plateNo, s.destination ? 'to ' + s.destination : '', s.localTransportPermitNo ? 'permit ' + s.localTransportPermitNo : '']
-            .filter((v) => !!v).join(' · ');
-    }
-
     /** Lot sheet: the latest earliest-safe-harvest date among the treatments before the harvest, if any has a withdrawal period. */
     lastSafeDate = computed<string | null>(() => {
         this.tick();
@@ -908,11 +901,6 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
         }
         for (const x of t.treatments ?? []) {
             if (x.withdrawalDays == null) out.push({ what: `Withdrawal period for ${x.product || 'a treatment'}`, where: 'Grow-out · chemicals and supplements', action: 'Open inventory', link: ['/app/inventory'], when: x.date });
-        }
-        for (const s of t.sales ?? []) {
-            if (!s.transporter && !s.driverName && !s.plateNo && !s.destination && !s.localTransportPermitNo) {
-                out.push({ what: `Transport details for ${s.dispatchReceiptNo}`, where: `Where it went · sale to ${s.buyerName}`, action: 'Open sale', link: ['/app/sales', s.saleId, 'edit'] });
-            }
         }
         return out;
     });

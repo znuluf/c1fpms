@@ -153,27 +153,6 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                             </div>
                         }
                         <div class="card">
-                            <div class="card-header">
-                                <a href="javascript:;" class="card-title text-reset" role="button" (click)="showTransport = !showTransport" [attr.aria-expanded]="showTransport">
-                                    <i class="fas mr-1" [class.fa-chevron-right]="!showTransport" [class.fa-chevron-down]="showTransport" aria-hidden="true"></i>Transport details (optional)
-                                </a>
-                            </div>
-                            @if (showTransport) {
-                                <div class="card-body">
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4"><label for="tr">Transporter</label><input id="tr" class="form-control" name="transporter" [(ngModel)]="m.transporter" maxlength="100" /></div>
-                                        <div class="form-group col-md-4"><label for="dr">Driver</label><input id="dr" class="form-control" name="driverName" [(ngModel)]="m.driverName" maxlength="100" /></div>
-                                        <div class="form-group col-md-4"><label for="pl">Plate no.</label><input id="pl" class="form-control" name="plateNo" [(ngModel)]="m.plateNo" maxlength="20" /></div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4"><label for="la">Loaded at</label><input id="la" type="datetime-local" class="form-control" name="loadedAt" [(ngModel)]="m.loadedAt" /></div>
-                                        <div class="form-group col-md-8"><label for="de">Destination</label><input id="de" class="form-control" name="destination" [(ngModel)]="m.destination" maxlength="200" /></div>
-                                    </div>
-                                    <div class="form-group mb-0"><label for="tn">Temperature / icing note</label><input id="tn" class="form-control" name="temperatureNote" [(ngModel)]="m.temperatureNote" maxlength="200" placeholder="e.g. iced 1:1, 4 °C" /></div>
-                                </div>
-                            }
-                        </div>
-                        <div class="card">
                             <div class="card-header"><h3 class="card-title">Payment</h3></div>
                             <div class="card-body">
                                 <fpms-sale-payment [m]="m" key="pay" [total]="total()" [minDue]="m.saleDate" [showPaidNow]="isNew"></fpms-sale-payment>
@@ -211,7 +190,6 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
     review = false;
     /** When a restored draft was last saved on this device (DEC-133), else null. */
     restoredAt: string | null = null;
-    showTransport = false;
     buyers: any[] = [];
     sellable: any[] = [];
     original: any = null;
@@ -253,15 +231,12 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
             const o = this.original;
             this.m = {
                 id: o.id, buyerId: o.buyerId, saleDate: o.saleDate, dueDate: o.dueDate ?? '', paymentTerms: o.paymentTerms ?? '',
-                transporter: o.transporter, driverName: o.driverName, plateNo: o.plateNo, loadedAt: o.loadedAtUtc ? FarmTime.toLocalInput(o.loadedAtUtc) : '',
-                destination: o.destination, localTransportPermitNo: o.localTransportPermitNo, temperatureNote: o.temperatureNote,
                 lines: o.lines.map((l: any) => ({
                     harvestGradeLineId: l.harvestGradeLineId, kg: l.kg, buyerAcceptedKg: l.buyerAcceptedKg, pricePerKg: l.pricePerKg,
                     priceMethod: l.priceMethod ?? 1, basePricePerKg: l.basePricePerKg, baseAbwG: l.baseAbwG, stepPerG: l.stepPerG, priceAbwG: l.priceAbwG,
                     baseCountPerKg: l.baseCountPerKg, stepPerCount: l.stepPerCount, priceCountPerKg: l.priceCountPerKg, priceTableId: l.priceTableId ?? '',
                 })),
             };
-            this.showTransport = !!(o.transporter || o.driverName || o.plateNo || o.loadedAtUtc || o.destination || o.localTransportPermitNo || o.temperatureNote);
         } else {
             this.m = {
                 buyerId: this.buyers[0]?.id ?? '', saleDate: this.today, dueDate: '', paymentTerms: '', paidNow: null, paidMethod: '', paidInFull: true,
@@ -600,9 +575,6 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
             id: this.m.id,
             clientRequestId: this.isNew ? (this.m.clientRequestId ??= newGuid()) : null,
             rowVersion: this.isNew ? null : this.original?.rowVersion, buyerId: this.m.buyerId, saleDate: this.m.saleDate, dueDate: this.m.dueDate || null, paymentTerms: this.m.paymentTerms,
-            transporter: this.m.transporter, driverName: this.m.driverName, plateNo: this.m.plateNo,
-            loadedAt: this.m.loadedAt ? FarmTime.fromLocalInput(this.m.loadedAt) : null, destination: this.m.destination,
-            localTransportPermitNo: this.m.localTransportPermitNo, temperatureNote: this.m.temperatureNote,
             lines: this.validLines().map((l: any) => ({
                 harvestGradeLineId: l.harvestGradeLineId, kg: Number(l.kg), buyerAcceptedKg: this.num(l.buyerAcceptedKg), pricePerKg: Number(l.pricePerKg),
                 ...pricingBody(l),

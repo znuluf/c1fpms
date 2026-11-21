@@ -174,16 +174,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             <div class="fpms-doc-section">Crate tally{{ g.lotCode ? ' · lot ' + g.lotCode : '' }}</div>
                             <fpms-crate-grid [crates]="g.crates" [gradeSummary]="true"></fpms-crate-grid>
                         }
-                        @if (hasTransport()) {
-                            <div class="fpms-doc-grid">
-                                <div><span>Transporter</span>{{ s.transporter || '—' }}</div>
-                                <div><span>Driver</span>{{ s.driverName || '—' }}</div>
-                                <div><span>Plate no.</span>{{ s.plateNo || '—' }}</div>
-                                <div><span>Loaded</span>{{ s.loadedAtUtc ? (s.loadedAtUtc | farmDateTime) : '—' }}</div>
-                                <div><span>Destination</span>{{ s.destination || '—' }}</div>
-                                <div><span>Temperature / icing</span>{{ s.temperatureNote || '—' }}</div>
-                            </div>
-                        }
                         <div class="row mt-5 mb-3 small fpms-doc-signs">
                             <div class="col-4"><div class="fpms-sign">Released by (farm)</div></div>
                             <div class="col-4"><div class="fpms-sign">Driver</div></div>
@@ -257,11 +247,6 @@ export class SalePrintComponent extends FpmsPage implements OnInit {
         this.crateGroups = this.buildCrateGroups();
         this.setFooter(this.s ? `${this.s.farmName} · Dispatch receipt ${this.s.dispatchReceiptNo}` : 'Dispatch receipt');
         this.setPageTitle(this.s ? `Dispatch receipt ${this.s.dispatchReceiptNo}` : null);
-    }
-
-    hasTransport(): boolean {
-        const s = this.s;
-        return !!(s.transporter || s.driverName || s.plateNo || s.loadedAtUtc || s.destination || s.localTransportPermitNo || s.temperatureNote);
     }
 
     async removePayment(p: any): Promise<void> {
