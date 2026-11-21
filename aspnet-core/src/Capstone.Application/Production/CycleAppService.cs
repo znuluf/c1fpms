@@ -54,15 +54,17 @@ public class CycleAppService : CapstoneAppServiceBase
     private readonly IRepository<ReopenEvent, Guid> _reopenings;
     private readonly IRepository<FryDeliveryShortfall, Guid> _shortfalls;
     private readonly IRepository<BatchFailure, Guid> _failures;
+    private readonly IRepository<FryDeliveryPondAllocation, Guid> _allocations;
 
     public CycleAppService(IRepository<ProductionCycle, Guid> cycles, IRepository<PondBatch, Guid> batches, IRepository<FryDelivery, Guid> deliveries,
         IRepository<FryDeliveryStatusChange, Guid> deliveryChanges, IRepository<Pond, Guid> ponds, IRepository<PondPreparationRound, Guid> rounds,
         IRepository<HatcheryCertificate, Guid> certificates, IRepository<ProductionLog, Guid> logs, IRepository<WaterQualityMeasurement, Guid> measurements,
         BatchDataLoader loader, WaterQualityEvaluator waterQuality, FarmAlertPublisher alerts, INumberSequenceGenerator sequences, IRowLocker rowLocker,
         DensityEvaluator density, IRepository<ReopenEvent, Guid> reopenings, IRepository<FryDeliveryShortfall, Guid> shortfalls,
-        IRepository<BatchFailure, Guid> failures)
+        IRepository<BatchFailure, Guid> failures, IRepository<FryDeliveryPondAllocation, Guid> allocations)
     {
         _failures = failures;
+        _allocations = allocations;
         _reopenings = reopenings;
         _shortfalls = shortfalls;
         _cycles = cycles;
@@ -337,6 +339,10 @@ public class CycleAppService : CapstoneAppServiceBase
             throw new UserFriendlyException($"The ponds are allocated {requested:N0} PL but only {plLeft:N0} PL are left in this delivery.");
         }
 
+        var plannedAllocations = await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).ToListAsync();
+        if (plannedAllocations.Count > 0 && input.Batches.Any(b => !plannedAllocations.Any(a => a.PondId == b.PondId)))
+            throw new UserFriendlyException("This delivery has planned destination ponds. Stock only into those reserved ponds, or update the plan before stocking.");
+
         var zone = await Farm.GetTimeZoneAsync();
         var profile = await Farm.GetProfileAsync();
         var result = new CreateBatchesResultDto();
@@ -345,6 +351,7 @@ public class CycleAppService : CapstoneAppServiceBase
         var plans = new List<(BatchStockingInput Input, Pond Pond, PondPreparationRound Round, DateTime StockedAtUtc, List<EvaluatedReading> Readings)>();
         foreach (var b in input.Batches)
         {
+            await _rowLocker.LockAsync(RowLockTarget.Pond, b.PondId);
             var pond = await _ponds.GetAll().Include(p => p.Prefix).FirstOrDefaultAsync(p => p.Id == b.PondId) ?? throw new UserFriendlyException("Pond not found.");
             if (pond.IsArchived)
             {
@@ -452,6 +459,12 @@ public class CycleAppService : CapstoneAppServiceBase
             var certificate = HatcheryCertificate.CurrentHealthCertificate(certificates, stockingDate);
             batch.HatcheryCertificationStatusAtStocking = delivery.Hatchery.DescribeCertification(certificate, stockingDate);
             batch.Id = await _batches.InsertAndGetIdAsync(batch);
+            var planned = plannedAllocations.FirstOrDefault(a => a.PondId == pond.Id);
+            if (planned != null)
+            {
+                planned.FulfilledAtUtc = stockedAtUtc;
+                planned.PondBatchId = batch.Id;
+            }
             round.UsedAtUtc = stockedAtUtc;
 
             var log = new ProductionLog
