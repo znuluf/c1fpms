@@ -291,6 +291,20 @@ public static class FpmsModelConfiguration
             });
         });
 
+        b.Entity<FryDeliveryPondAllocation>(e =>
+        {
+            e.ToTable("FpmsFryDeliveryPondAllocations");
+            e.HasOne<FryDelivery>().WithMany().HasForeignKey(x => x.DeliveryId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<Pond>().WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<PondBatch>().WithMany().HasForeignKey(x => x.PondBatchId).OnDelete(DeleteBehavior.Restrict);
+            // One active reservation per pond across all deliveries. Fulfilled/released rows remain as history.
+            e.HasIndex(x => new { x.TenantId, x.PondId }).IsUnique()
+                .HasFilter("[ReleasedAtUtc] IS NULL AND [FulfilledAtUtc] IS NULL AND [IsDeleted] = 0")
+                .HasDatabaseName("UX_FpmsFryDeliveryPondAllocations_OneActivePerPond");
+            e.HasIndex(x => new { x.TenantId, x.DeliveryId });
+            e.ToTable(t => t.HasCheckConstraint("CK_FpmsFryDeliveryPondAllocations_PlannedPlCount", "[PlannedPlCount] > 0 AND [PlannedPlCount] <= 10000000"));
+        });
+
         b.Entity<FryDeliveryShortfall>(e =>
         {
             e.ToTable("FpmsFryDeliveryShortfalls");
