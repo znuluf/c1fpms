@@ -35,6 +35,7 @@ public class CapstoneDbContext : AbpZeroDbContext<Tenant, Role, User, CapstoneDb
     public DbSet<PondPreparationEntry> PondPreparationEntries { get; set; }
     public DbSet<FryDelivery> FryDeliveries { get; set; }
     public DbSet<FryDeliveryStatusChange> FryDeliveryStatusChanges { get; set; }
+    public DbSet<FryDeliveryPondAllocation> FryDeliveryPondAllocations { get; set; }
     public DbSet<BatchFailure> BatchFailures { get; set; }
     public DbSet<HatcherySource> HatcherySources { get; set; }
     public DbSet<HatcheryCertificate> HatcheryCertificates { get; set; }
