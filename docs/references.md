@@ -15,7 +15,7 @@ Status key: **Verified** = checked against the source document. **To verify** = 
 | PNS/BAFS 338:2022 | Traceability standard, Annex B records | Trace report, feeding time, transport details | DEC-55, DEC-71, DEC-72 |
 | BFAR FAO 225-1, s. 2007 | Fisheries Administrative Order on vannamei: farm accreditation (3 years), Shrimp Fry Source Certification (SFSC), nine records per pond per cycle | SFSC field, Farm Certification preset, record checklist | DEC-70, DEC-74 |
 | Draft BFAR Administrative Circular (2026, "draft for pubcon") | Not in force. Farm Certification via GAqP (3 years, yearly monitoring), SFSC Sec. 10(g), DTP Sec. 9(h), Annex A diseases, Annex B certification | Context for DEC-70, DEC-74; watch for the final text | DEC-70, DEC-74 |
-| Shrimp Farmers' Manual | Stocking and harvest forms, PCR timing hint | Dead-at-stocking, dead-at-harvest, PCR hint | DEC-55, DEC-59, DEC-62 |
+| Shrimp Farmers' Manual | Stocking and harvest forms | Dead-at-stocking, dead-at-harvest | DEC-55, DEC-59 |
 | Capstone 1 manuscript | Objectives, Tables 3 to 6, definition of terms (e.g. final FCR) | Scope, pond master data, indicator definitions | spec v2.6 |
 | Data Privacy Act of 2012 (RA 10173) | Personal data handling | Account retention | D-25 |
 | BIR books-of-accounts preservation rule | Financial record retention (at least 5 years) | Retention | D-25 |
