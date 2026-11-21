@@ -146,6 +146,7 @@ The start script sets these for the Codespace; you normally do not set them your
 - `cd angular && npx ng build --configuration production`: production build of the client.
 - `cd angular && npx eslint . && npx prettier --check .`: lint and format check.
 - `scripts/backup/`: backup, restore and restore rehearsal for a farm server (see docs/backup-restore.md and docs/runbook.md). Not used in a Codespace.
+- [docs/reliability.md](docs/reliability.md): how the system handles several people saving at once, saves sent twice, lost connections, ended sign-ins and farm-PC failures, with the code and tests for each.
 
 ## Current status
 - **Specification:** at v2.6 (26 Oct 2026): decisions DEC-01 to DEC-68, with DEC-60 rejected and DEC-61 waiting on the partner farm. v2.6 changes are planning only; the code follows later. Every open item is either resolved or marked † for confirmation.

@@ -107,6 +107,22 @@ public class RetrySafeSaves_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task A_retried_log_entry_returns_the_entry_already_saved()
+    {
+        var logs = Resolve<LogAppService>();
+        SaveLogInput Note(Guid id) => new()
+        {
+            BatchId = BatchId(CurrentBatch), LogType = LogType.GeneralNote, ObservedAt = DateTime.UtcNow.AddMinutes(-5), Notes = "Aerator 3 restarted",
+            ClientRequestId = id,
+        };
+        var id = Guid.NewGuid();
+        var first = await logs.Create(Note(id));
+        var again = await logs.Create(Note(id));
+        again.Log.Id.ShouldBe(first.Log.Id);
+        Count(c => c.ProductionLogs.IgnoreQueryFilters().Where(l => l.ClientRequestId == id)).ShouldBe(1);
+    }
+
+    [Fact]
     public async Task A_stale_log_correction_or_farm_profile_save_is_refused()
     {
         var logs = Resolve<LogAppService>();
