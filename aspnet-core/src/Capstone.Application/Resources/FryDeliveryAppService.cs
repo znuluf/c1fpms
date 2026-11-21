@@ -543,7 +543,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
 
         await ValidateAsync(input, delivery.Id);
         Apply(delivery, input);
-        if (!arrived && currentStatus is FryDeliveryStatus.Ordered or FryDeliveryStatus.InTransit && input.PondAllocations != null) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
+        if (!arrived && (currentStatus is FryDeliveryStatus.Ordered or FryDeliveryStatus.InTransit) && input.PondAllocations != null) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
         return new SaveFryDeliveryResult { Id = delivery.Id, Warnings = await WarningsAsync(input) };
     }
 
