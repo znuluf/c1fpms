@@ -13,6 +13,8 @@ interface PondCard {
     purpose: number;
     status: number;
     archived: boolean;
+    isReserved: boolean;
+    reservedByDelivery: string | null;
     purposeLabel: string;
     batchId: string | null;
     batchCode: string | null;
@@ -90,7 +92,7 @@ interface PondCard {
                                                     {{ p.name }} · {{ p.areaM2 | num: 0 }} m²
                                                 </div>
                                             </div>
-                                            <fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge>
+                                            <div class="text-right"><fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge>@if (p.isReserved) { <div class="small text-warning-dark mt-1">Reserved for {{ p.reservedByDelivery }}</div> }</div>
                                         </div>
 
                                         @if (p.batchId) {
@@ -435,6 +437,8 @@ export class PondsComponent extends FpmsPage implements OnInit {
                     purpose: p.purpose,
                     status: p.status,
                     archived: !!p.isArchived,
+                    isReserved: !!p.isReserved,
+                    reservedByDelivery: p.reservedByDelivery ?? null,
                     purposeLabel: this.L.PondPurposes[p.purpose] ?? '',
                     batchId: t?.batchId ?? null,
                     batchCode: t?.batchCode ?? null,
