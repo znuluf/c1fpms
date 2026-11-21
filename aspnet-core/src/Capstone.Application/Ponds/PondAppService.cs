@@ -5,6 +5,7 @@ using Abp.UI;
 using Capstone.Authorization;
 using Capstone.Domain;
 using Capstone.Production;
+using Capstone.Resources;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -103,6 +104,8 @@ public class PondListDto
     public PondManualStatus ManualStatus { get; set; }
     public PondDisplayStatus Status { get; set; }
     public bool IsArchived { get; set; }
+    public bool IsReserved { get; set; }
+    public string ReservedByDelivery { get; set; }
     public Guid? CurrentBatchId { get; set; }
     public string CurrentBatchCode { get; set; }
     public BatchStatus? CurrentBatchStatus { get; set; }
@@ -126,6 +129,8 @@ public class PondDetailDto : PondEditDto
     public PondManualStatus ManualStatus { get; set; }
     public PondDisplayStatus Status { get; set; }
     public bool IsArchived { get; set; }
+    public bool IsReserved { get; set; }
+    public string ReservedByDelivery { get; set; }
 
     /// <summary>True when the pond can be archived now: it has no open batch and no preparation round in progress.</summary>
     public bool CanArchive { get; set; }
@@ -276,9 +281,12 @@ public class PondAppService : CapstoneAppServiceBase
     private readonly IRepository<PondBatch, Guid> _batches;
     private readonly IRepository<PondPreparationRound, Guid> _rounds;
     private readonly IRepository<PondPreparationEntry, Guid> _entries;
+    private readonly IRepository<FryDeliveryPondAllocation, Guid> _allocations;
+    private readonly IRepository<FryDelivery, Guid> _deliveries;
 
     public PondAppService(IRepository<Pond, Guid> ponds, IRepository<PondNamePrefix, Guid> prefixes, IRepository<PondHistory, Guid> history,
-        IRepository<PondBatch, Guid> batches, IRepository<PondPreparationRound, Guid> rounds, IRepository<PondPreparationEntry, Guid> entries)
+        IRepository<PondBatch, Guid> batches, IRepository<PondPreparationRound, Guid> rounds, IRepository<PondPreparationEntry, Guid> entries,
+        IRepository<FryDeliveryPondAllocation, Guid> allocations, IRepository<FryDelivery, Guid> deliveries)
     {
         _ponds = ponds;
         _prefixes = prefixes;
@@ -286,6 +294,8 @@ public class PondAppService : CapstoneAppServiceBase
         _batches = batches;
         _rounds = rounds;
         _entries = entries;
+        _allocations = allocations;
+        _deliveries = deliveries;
     }
 
     /// <summary>
@@ -325,11 +335,17 @@ public class PondAppService : CapstoneAppServiceBase
         var open = await _batches.GetAll().AsNoTracking().Where(b => b.Status != BatchStatus.Closed)
             .Select(b => new { b.PondId, b.Id, b.BatchCode, b.Status }).ToListAsync();
         var rounds = await _rounds.GetAll().AsNoTracking().Where(r => r.UsedAtUtc == null).Select(r => new { r.PondId, r.PreparedAtUtc }).ToListAsync();
+        var reservations = await _allocations.GetAll().AsNoTracking().Where(a => a.ReleasedAtUtc == null && a.FulfilledAtUtc == null)
+            .Select(a => new { a.PondId, a.DeliveryId }).ToListAsync();
+        var reservationDeliveryIds = reservations.Select(a => a.DeliveryId).Distinct().ToList();
+        var reservationDeliveries = await _deliveries.GetAll().AsNoTracking().Where(d => reservationDeliveryIds.Contains(d.Id))
+            .Select(d => new { d.Id, d.HatcheryBatchNumber }).ToListAsync();
         return ponds.Select(p =>
         {
             var batch = open.FirstOrDefault(b => b.PondId == p.Id);
             var round = rounds.FirstOrDefault(r => r.PondId == p.Id);
             var system = p.EffectiveFarmingSystem(farmSystem);
+            var reservation = reservations.FirstOrDefault(a => a.PondId == p.Id);
             return new PondListDto
             {
                 Id = p.Id, PondCode = p.PondCode, Name = PondNaming.DisplayName(p.Prefix?.Name, p.Number), PrefixId = p.PrefixId, Number = p.Number,
@@ -337,7 +353,8 @@ public class PondAppService : CapstoneAppServiceBase
                 Purpose = p.Purpose, ConstructionType = p.ConstructionType, FarmingSystem = system, FarmingSystemOverride = p.FarmingSystemOverride,
                 ManualStatus = p.ManualStatus,
                 Status = p.IsArchived ? PondDisplayStatus.Archived : DeriveStatus(p.ManualStatus, batch?.Status, round != null, round?.PreparedAtUtc != null),
-                IsArchived = p.IsArchived,
+                IsArchived = p.IsArchived, IsReserved = reservation != null,
+                ReservedByDelivery = reservation == null ? null : reservationDeliveries.FirstOrDefault(d => d.Id == reservation.DeliveryId)?.HatcheryBatchNumber,
                 CurrentBatchId = batch?.Id, CurrentBatchCode = batch?.BatchCode, CurrentBatchStatus = batch?.Status,
                 SystemWarning = PondSystemRules.GetWarning(p.ConstructionType, system),
             };
@@ -365,6 +382,9 @@ public class PondAppService : CapstoneAppServiceBase
             Entries = entries.Where(e => e.RoundId == r.Id).Select(e => new PreparationEntryDto { Id = e.Id, ObservedAtUtc = e.ObservedAtUtc, Description = e.Description, RecordedBy = NameOf(names, e.CreatorUserId) }).ToList(),
         };
         var status = p.IsArchived ? PondDisplayStatus.Archived : DeriveStatus(p.ManualStatus, open?.Status, openRound != null, openRound?.PreparedAtUtc != null);
+        var reservation = await _allocations.GetAll().AsNoTracking().Where(a => a.PondId == id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null)
+            .Select(a => new { a.DeliveryId }).FirstOrDefaultAsync();
+        var reservedBy = reservation == null ? null : await _deliveries.GetAll().AsNoTracking().Where(d => d.Id == reservation.DeliveryId).Select(d => d.HatcheryBatchNumber).FirstOrDefaultAsync();
         var canPrepare = await IsGrantedAsync(PermissionNames.Ponds_Prepare);
         int? preparedDays = openRound?.PreparedAtUtc == null ? null : Math.Max(0, (int)(DateTime.UtcNow - openRound.PreparedAtUtc.Value).TotalDays);
         return new PondDetailDto
@@ -374,7 +394,7 @@ public class PondAppService : CapstoneAppServiceBase
             Purpose = p.Purpose, ConstructionType = p.ConstructionType, InletType = p.InletType, OutletType = p.OutletType,
             AerationSystem = p.AerationSystem, FarmingSystemOverride = p.FarmingSystemOverride, FarmingSystem = system, FarmFarmingSystem = farmSystem,
             Latitude = p.Latitude, Longitude = p.Longitude, Notes = p.Notes,
-            ManualStatus = p.ManualStatus, Status = status, IsArchived = p.IsArchived, CanArchive = !p.IsArchived && open == null && openRound == null,
+            ManualStatus = p.ManualStatus, Status = status, IsArchived = p.IsArchived, IsReserved = reservation != null, ReservedByDelivery = reservedBy, CanArchive = !p.IsArchived && open == null && openRound == null,
             CurrentBatchId = open?.Id, CurrentBatchCode = open?.BatchCode,
             OpenRound = openRound == null ? null : MapRound(openRound),
             PastRounds = rounds.Where(r => r.UsedAtUtc != null).Select(MapRound).ToList(),
