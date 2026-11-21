@@ -546,8 +546,11 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         if (!arrived && (currentStatus is FryDeliveryStatus.Ordered or FryDeliveryStatus.InTransit))
         {
             if (input.PondAllocations != null) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
-            else if (await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).SumAsync(a => (long?)a.PlannedPlCount) > (input.PlOrdered ?? 0))
-                throw new UserFriendlyException("PL ordered cannot be less than the total planned pond allocation.");
+            else
+            {
+                var plannedTotal = await _allocations.GetAll().Where(a => a.DeliveryId == delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).SumAsync(a => (long?)a.PlannedPlCount) ?? 0;
+                if (plannedTotal > (input.PlOrdered ?? 0)) throw new UserFriendlyException("PL ordered cannot be less than the total planned pond allocation.");
+            }
         }
         return new SaveFryDeliveryResult { Id = delivery.Id, Warnings = await WarningsAsync(input) };
     }
