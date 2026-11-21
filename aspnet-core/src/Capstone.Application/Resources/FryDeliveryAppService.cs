@@ -739,6 +739,8 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
     private async Task SaveAllocationsAsync(Guid deliveryId, List<FryDeliveryPondAllocationInput> input, long? plOrdered)
     {
         var requested = input ?? new List<FryDeliveryPondAllocationInput>();
+        if (requested.Any(x => x == null || x.PondId == Guid.Empty || x.PlannedPlCount <= 0 || x.PlannedPlCount > FryDelivery.MaxPl))
+            throw new UserFriendlyException("Choose a destination pond and enter a planned PL count greater than zero.");
         if (requested.Select(x => x.PondId).Distinct().Count() != requested.Count) throw new UserFriendlyException("Choose each destination pond only once.");
         if (requested.Sum(x => x.PlannedPlCount) > (plOrdered ?? 0)) throw new UserFriendlyException("The total planned PL allocation cannot exceed PL ordered.");
         var existing = await _allocations.GetAll().Where(a => a.DeliveryId == deliveryId && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).ToListAsync();
