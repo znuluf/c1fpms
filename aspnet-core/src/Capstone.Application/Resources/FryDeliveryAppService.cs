@@ -71,7 +71,7 @@ public class FryDeliveryEditDto
 
 public class FryDeliveryPondAllocationInput { public Guid PondId { get; set; } [Range(1, FryDelivery.MaxPl)] public long PlannedPlCount { get; set; } }
 public class FryDeliveryPondAllocationDto { public Guid Id { get; set; } public Guid PondId { get; set; } public string PondCode { get; set; } public string PondName { get; set; } public long PlannedPlCount { get; set; } public DateTime? ReleasedAtUtc { get; set; } public DateTime? FulfilledAtUtc { get; set; } public Guid? PondBatchId { get; set; } }
-public class FryDeliveryPondOptionDto { public Guid Id { get; set; } public string PondCode { get; set; } public string Name { get; set; } public PondDisplayStatus Status { get; set; } public bool IsReserved { get; set; } public string ReservedByDelivery { get; set; } }
+public class FryDeliveryPondOptionDto { public Guid Id { get; set; } public string PondCode { get; set; } public string Name { get; set; } public bool IsReserved { get; set; } public string ReservedByDelivery { get; set; } }
 
 public class FryDeliveryDto
 {
@@ -425,7 +425,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         return ponds.Where(p => p.Purpose == PondPurpose.GrowOut && p.ManualStatus == PondManualStatus.Active && !open.Contains(p.Id)).Select(p =>
         {
             var reservation = reserved.FirstOrDefault(x => x.PondId == p.Id);
-            return new FryDeliveryPondOptionDto { Id = p.Id, PondCode = p.PondCode, Name = PondNaming.DisplayName(p.Prefix?.Name, p.Number), Status = PondDisplayStatus.Available, IsReserved = reservation != null, ReservedByDelivery = reservation == null ? null : deliveries.FirstOrDefault(d => d.Id == reservation.DeliveryId)?.HatcheryBatchNumber };
+            return new FryDeliveryPondOptionDto { Id = p.Id, PondCode = p.PondCode, Name = PondNaming.DisplayName(p.Prefix?.Name, p.Number), IsReserved = reservation != null, ReservedByDelivery = reservation == null ? null : deliveries.FirstOrDefault(d => d.Id == reservation.DeliveryId)?.HatcheryBatchNumber };
         }).ToList();
     }
 
