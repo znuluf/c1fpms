@@ -352,6 +352,8 @@ public class CycleAppService : CapstoneAppServiceBase
         foreach (var b in input.Batches)
         {
             await _rowLocker.LockAsync(RowLockTarget.Pond, b.PondId);
+            if (await _allocations.GetAll().AnyAsync(a => a.PondId == b.PondId && a.DeliveryId != delivery.Id && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null))
+                throw new UserFriendlyException("This pond is reserved for another fry delivery.");
             var pond = await _ponds.GetAll().Include(p => p.Prefix).FirstOrDefaultAsync(p => p.Id == b.PondId) ?? throw new UserFriendlyException("Pond not found.");
             if (pond.IsArchived)
             {
