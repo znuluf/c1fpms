@@ -171,7 +171,7 @@ public static class FpmsModelConfiguration
         {
             e.ToTable("FpmsPondHistories");
             e.Property(x => x.Description).HasMaxLength(PondHistory.MaxDescriptionLength);
-            e.HasOne<Pond>().WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(x => x.Pond).WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
             e.HasIndex(x => new { x.TenantId, x.PondId, x.ChangeDateUtc });
         });
 
