@@ -45,10 +45,13 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 }
                             </div>
                         </dl>
-                        @if (pond.preparationWarning || pond.isArchived || systemWarning) {
+                        @if (pond.preparationWarning || pond.isArchived || pond.isReserved || systemWarning) {
                             <ul class="fpms-notices">
                                 @if (pond.preparationWarning) {
                                     <li class="warn" role="status"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i><span>{{ pond.preparationWarning }}</span></li>
+                                }
+                                @if (pond.isReserved) {
+                                    <li role="status"><i class="fas fa-calendar-check" aria-hidden="true"></i><span>This pond is reserved for fry delivery <strong>{{ pond.reservedByDelivery }}</strong>. Its physical status remains {{ pond.status | label: L.PondDisplayStatuses }}.</span></li>
                                 }
                                 @if (pond.isArchived) {
                                     <li role="status">
