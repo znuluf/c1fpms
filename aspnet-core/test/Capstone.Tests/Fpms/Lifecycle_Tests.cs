@@ -188,6 +188,27 @@ public class Lifecycle_Tests : FpmsTestBase
         restored.PondAllocations.Single().ReleasedAtUtc.ShouldBeNull();
     }
 
+    [Fact]
+    public async Task Planned_pond_reservation_is_fulfilled_by_the_actual_stocking_batch()
+    {
+        var deliveries = Resolve<FryDeliveryAppService>();
+        var order = await deliveries.Create(new FryDeliveryEditDto
+        {
+            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = "HL-PLAN-STOCK",
+            DeliveryDate = DateOnly.FromDateTime(DateTime.UtcNow), PlOrdered = 100000,
+            PondAllocations = new() { new() { PondId = PondId("GP-03"), PlannedPlCount = 40000 } },
+        });
+        await deliveries.Receive(new ReceiveFryInput { DeliveryId = order.Id, PlReceived = 100000 });
+        var stocked = await Resolve<CycleAppService>().CreateBatches(new CreateBatchesInput
+        {
+            FryDeliveryId = order.Id, ClientRequestId = Guid.NewGuid(), Batches = new() { Stocking("GP-03", 39000) },
+        });
+        var detail = await deliveries.Get(order.Id);
+        detail.PondAllocations.Single().FulfilledAtUtc.ShouldNotBeNull();
+        detail.PondAllocations.Single().PondBatchId.ShouldBe(stocked.Batches.Single().Id);
+        detail.PondAllocations.Single().PlannedPlCount.ShouldBe(40000); // the plan is retained; actual stocking is separate
+    }
+
     // ---------------------------------------------------------------- AC-07 pond preparation
     [Fact]
     public async Task AC07_first_entry_opens_preparation_and_mark_prepared_needs_an_entry()
