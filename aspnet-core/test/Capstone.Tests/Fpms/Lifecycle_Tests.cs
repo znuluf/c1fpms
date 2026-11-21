@@ -159,6 +159,32 @@ public class Lifecycle_Tests : FpmsTestBase
         await Should.ThrowAsync<UserFriendlyException>(() => service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = stocked.Id, Status = FryDeliveryStatus.Rejected }));
     }
 
+    [Fact]
+    public async Task Fry_delivery_orders_reserve_human_selected_ponds_and_cancellation_releases_them()
+    {
+        var service = Resolve<FryDeliveryAppService>();
+        FryDeliveryEditDto Order(string number) => new()
+        {
+            HatcheryId = HatcheryId(GetTenantId(PilotFarm)), HatcheryBatchNumber = number, DeliveryDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(3),
+            PlOrdered = 100000, PondAllocations = new() { new() { PondId = PondId("GP-03"), PlannedPlCount = 40000 } },
+        };
+        var first = await service.Create(Order("HL-PLAN-A"));
+        var planned = await service.Get(first.Id);
+        planned.PondAllocations.Count.ShouldBe(1);
+        planned.PondAllocations[0].PlannedPlCount.ShouldBe(40000);
+        await Should.ThrowAsync<UserFriendlyException>(() => service.Create(Order("HL-PLAN-B")));
+
+        await service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = first.Id, Status = FryDeliveryStatus.Cancelled, Note = "Order cancelled" });
+        var second = await service.Create(Order("HL-PLAN-C"));
+        await Should.ThrowAsync<UserFriendlyException>(() => service.UndoLastStep(new UndoDeliveryStepInput { DeliveryId = first.Id, Reason = "Restore the order" }));
+
+        await service.UpdateStatus(new UpdateFryDeliveryStatusInput { DeliveryId = second.Id, Status = FryDeliveryStatus.Cancelled, Note = "Second order cancelled" });
+        await service.UndoLastStep(new UndoDeliveryStepInput { DeliveryId = first.Id, Reason = "Restore the order" });
+        var restored = await service.Get(first.Id);
+        restored.Status.ShouldBe(FryDeliveryStatus.Ordered);
+        restored.PondAllocations.Single().ReleasedAtUtc.ShouldBeNull();
+    }
+
     // ---------------------------------------------------------------- AC-07 pond preparation
     [Fact]
     public async Task AC07_first_entry_opens_preparation_and_mark_prepared_needs_an_entry()
