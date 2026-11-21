@@ -3436,7 +3436,7 @@ Positive:
 Negative:
 - A farm without a phone must enter one to save its profile.
 
-## Decision DEC-138: Plainer forms after the capstone consultation; one phone format; Farm ID
+## Decision DEC-139: Plainer forms after the capstone consultation; one phone format; Farm ID
 
 Status: Accepted 2026-11-21
 Date: 2026-11-21

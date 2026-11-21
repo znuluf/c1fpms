@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Capstone.Tests.Fpms;
 
-/// <summary>DEC-138: one phone number format, mobile or landline, and nothing else.</summary>
+/// <summary>DEC-139: one phone number format, mobile or landline, and nothing else.</summary>
 public class PhilippinePhone_Tests : FpmsTestBase
 {
     [Theory]
