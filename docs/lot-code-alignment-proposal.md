@@ -1,135 +1,92 @@
-# Proposal: lot codes aligned with the Shrimp.io processors
+# Proposal: linking FPMS lot codes to the Shrimp.io processors' lot codes
 
 **Status: proposed, not built.** For discussion with the adviser and the Shrimp.io developer. When it is agreed, it
-becomes a decision in [decisions.md](../decisions.md) and replaces the format in [harvest-lot-code.md](harvest-lot-code.md)
-(DEC-83).
+becomes a decision in [decisions.md](../decisions.md).
+
+FPMS keeps its own numbering. The farm's [Farm ID](farm-id-proposal.md) and the harvest lot code
+([harvest-lot-code.md](harvest-lot-code.md), DEC-83) stay as they are, with FPMS's two-digit place list. This proposal
+only adds what is needed to **find a harvest from a processor's lot code**, and the other way round.
 
 ---
 
-## 1. Why change anything
+## 1. Why
 
-FPMS gives every harvest a lot code at the farm (DEC-83). The Shrimp.io traceability system used by the processors (for
-example ECA Cold Store Plus) gives every **processing run** its own lot code when the shrimp are packed. Both codes
-describe the same things (year, area, place, farm, pond), but they number them differently. The same pond's shrimp
-would carry two unrelated numbers:
+FPMS gives every harvest a lot code at the farm. The Shrimp.io system used by the processors (for example ECA Cold Store
+Plus) gives every **processing run** its own lot code when the shrimp are packed. The two number places and farms
+differently, so the same pond's shrimp carry two unrelated codes:
 
 | Same pond in Tambler, General Santos | Code |
 |---|---|
-| FPMS today | `26-0-24-03-07-02` (place **24** = Tambler, farm **03** given by FPMS) |
-| Shrimp.io at ECA | `2026` `0` `7` `07` `PP` … (place **7** = Tambler, farm **07** given by ECA) |
+| FPMS (farm) | `26-0-24-03-07-02`: area 0, place **24** = Tambler, farm **03** (FPMS's Farm ID `0-24-03`), pond 7, harvest 2 |
+| Shrimp.io (processor) | `2026` `0` `7` `07` `PP` `-` …: area 0, place **7** = Tambler (their list), farm **07** (given by ECA), pond, production code |
 
-In a recall, a buyer or BFAR quotes the processor's code. If FPMS cannot be searched with it, the farm cannot quickly
-show which pond, batch, feed and treatments the shrimp came from, which is the whole point of the lot code.
-
-**The goal:** the farm's code and the processor's code read the same where they describe the same thing, and each can be
-found from the other.
+In a recall, a buyer or BFAR quotes the processor's code. FPMS must be able to go from that code to the harvest, pond,
+batch, feed and treatments.
 
 ---
 
 ## 2. The two schemes side by side
 
-| Part | FPMS today (DEC-83) | Shrimp.io (`lotCode.ts`, `processingBatches.ts`) |
+| Part | FPMS (kept) | Shrimp.io (`lotCode.ts`, `processingBatches.ts`) |
 |---|---|---|
-| What it names | One **harvest** at the farm | One **processing run** at a plant |
-| When made | When the harvest is saved | When the processing run is created (at packing) |
-| Shape | `YY-A-LL-FF-PP-HH` (16 characters) | `YYYYABFFPP-{production code}` (10 digits, a hyphen, the run's code) |
-| Year | 2 digits, the harvest's year | 4 digits, the earliest harvest date in the run |
-| Area `A` | 0 General Santos, 1 Sarangani | Same ✓ |
-| Place | 2 digits, our list of all 26 GenSan barangays and 7 Sarangani municipalities | 1 digit (`B`), coastal places only (`LOT_PLACES`) |
-| Farm `FF` | Next free number for the place, given by FPMS | Given by **each processor** to each farm it buys from (`processor_farm_numbers`, one per farm per plant); locked once a run uses it |
-| Pond `PP` | `Pond.LotNumber`, farm-wide, never reused | `farm_ponds.pond_no` in Shrimp.io |
-| End | Harvest number of the pond in the year (`HH`) | The processor's production code |
-
-The Shrimp.io place list, as sent by their developer (append-only, "a code printed on a carton must keep naming the same
-place"):
-
-| Code | Area | Place | | Code | Area | Place |
-|---|---|---|---|---|---|---|
-| `00` | General Santos | Baluan | | `10` | Sarangani | Alabel |
-| `01` | General Santos | Bawing | | `11` | Sarangani | Glan |
-| `02` | General Santos | Buayan | | `12` | Sarangani | Kiamba |
-| `03` | General Santos | Bula | | `13` | Sarangani | Maasim |
-| `04` | General Santos | Calumpang | | `14` | Sarangani | Maitum |
-| `05` | General Santos | Labangal | | `15` | Sarangani | Malapatan |
-| `06` | General Santos | Siguel | | | | |
-| `07` | General Santos | Tambler | | | | |
+| Names | One **harvest** at the farm | One **processing run** at a plant |
+| Made | When the harvest is saved | When the processing run is created (at packing) |
+| Shape | `YY-A-LL-FF-PP-HH` | `YYYYABFFPP-{production code}` |
+| Year | 2 digits, the harvest's year | 4 digits, the earliest harvest in the run |
+| Area | `0` General Santos, `1` Sarangani | Same |
+| Place | **2 digits**, all 26 GenSan barangays and 7 Sarangani municipalities; Bawing is part of Siguel (`22`) | **1 digit**, coastal places only; Bawing (`1`) and Siguel (`6`) listed separately |
+| Farm | FPMS's farm number in the place (Farm ID `A-LL-FF`) | The farm no. each processor gives the farm |
+| Pond | `Pond.LotNumber`, farm-wide | The processor's pond no. for the farm |
+| End | Harvest number of the pond in the year | The processor's production code |
 
 ---
 
 ## 3. The proposal
 
-### 3.1 New farm lot code format: `YYYYABFFPP-HH`
+### 3.1 Record the processor's numbers on the buyer
 
-The `ABFF` digits are the farm's **Farm ID** (`A-B-FF`), proposed in [farm-id-proposal.md](farm-id-proposal.md).
+A processor shows the farm a **Lot code location** and a **Farm no.** (ECA's "Lot codes" dialog). The Owner copies them
+onto that buyer in FPMS:
 
-The first ten digits are laid out **exactly like the Shrimp.io lot no.**; FPMS adds the harvest number after a hyphen,
-where Shrimp.io puts its production code.
-
-| Part | Digits | Meaning | Source in FPMS |
-|---|---|---|---|
-| `YYYY` | 4 | Year of the harvest (farm time) | The harvest date |
-| `A` | 1 | Area: 0 General Santos, 1 Sarangani | The farm's lot place (3.2) |
-| `B` | 1 | Place within the area, **from the Shrimp.io list** | The farm's lot place (3.2) |
-| `FF` | 2 | The farm's number **as given by its main processor** | Farm profile, typed by the Owner (3.3) |
-| `PP` | 2 | The pond's lot number | `Pond.LotNumber`, shown on the pond page (3.4) |
-| `HH` | 2 | The pond's harvest number in the year | Counted by FPMS, as today |
-
-**Example.** A farm in Tambler whose number at ECA is 07 harvests pond 12 for the second time in 2026:
-
-```
-2026 0 7 07 12 - 02   →   2026070712-02
-│    │ │ │  │     └── 2nd harvest of pond 12 in 2026 (FPMS)
-│    │ │ │  └──────── pond 12
-│    │ │ └─────────── farm no. 07 (given by ECA)
-│    │ └───────────── place 7 = Tambler (Shrimp.io list)
-│    └─────────────── area 0 = General Santos
-└──────────────────── 2026
-```
-
-When ECA packs these shrimp, its lot no. begins `2026070712`, the same ten digits. Anyone holding either label can find
-the other.
-
-### 3.2 Place: the Shrimp.io list replaces ours
-
-- Farm profile gets a **Lot code location** choice with the Shrimp.io list (General Santos: Baluan … Tambler;
-  Sarangani: Alabel … Malapatan), suggested from the farm address and confirmed by the Owner.
-- The list is kept in one place in FPMS (`LotPlaces`), with the same codes, and only grows, as Shrimp.io's does.
-- A farm whose place is not on the list (an inland barangay, or Malungon) gets no lot code until the place is agreed with
-  the processors; its harvests still save, with a notice saying why (as today, "flag, never block").
-
-### 3.3 Farm number: from the processor, not from FPMS
-
-The processor assigns the farm number, and a farm selling to two plants can have two numbers. So FPMS stops inventing it:
-
-| Where | New field | Meaning |
+| Buyer field (processors only) | Example | Meaning |
 |---|---|---|
-| Farm profile | **Farm no. (main processor)** | The number the farm's main processor gave it, 01–99. Used in the farm's own lot code (3.1). |
-| Buyer (type processor) | **Our farm no. at this processor** | The number that processor gave the farm, when it differs or there is no main processor. |
+| Processor's lot code location | `0-7` | Area and place digits the processor uses for this farm |
+| Our farm no. at this processor | `07` | The number the processor gave this farm |
 
-Both lock once a lot code uses them, as in Shrimp.io, because codes may already be printed. If the farm has no processor
-yet, the Owner enters the number when one is assigned; until then, harvests save without a lot code and the setup
-checklist says so.
+Both are optional and can be filled in when the farm first sells to that processor.
 
-### 3.4 Pond number: the same on both sides
+### 3.2 The same pond number on both sides
 
-- The pond page shows **Pond no. for lot codes: 12** next to the pond code (EP-01, CP-01), so the farm gives each
-  processor the same number.
-- `Pond.LotNumber` stays farm-wide and is never reused, so a pond code that repeats a number across types (EP-01, CP-01)
-  never clashes.
+The pond page shows **Pond no. for lot codes: 07** next to the pond code (EP-01, CP-01), so the farm gives each processor
+the same pond numbers FPMS uses.
 
-### 3.5 Linking to the processor's code
+### 3.3 Show the processor's expected lot no. on the sale
 
-On a sale to a processor:
+On a sale to a processor whose numbers are recorded, each line shows what that processor's lot no. should begin with:
 
-1. The sale form and dispatch receipt show **"Processor lot no. should begin 2026070712"**, worked out from the
-   processor's farm number for that buyer, so the farm can check the processor's label.
-2. An optional field **Processor lot code** records the full code from the processor's receipt (for example
-   `2026070712-202610261`).
-3. The trace report and the Harvests search accept either code: the farm's `2026070712-02` or the processor's
-   `2026070712-…`, and lead to the harvest, the pond, the batch, its feed and its treatments.
+```
+FPMS lot code      26-0-24-03-07-02
+ECA lot no. from   2026 0 7 07 07   →  2026070707
+                   │    │ │ │  └── pond 7 (same pond number)
+                   │    │ │ └───── our farm no. at ECA
+                   │    │ └─────── ECA's place digit for this farm
+                   │    └───────── area
+                   └────────────── harvest year
+```
 
-There is no live connection between the two systems (the farm has no Internet), so the link is made by the matching
-digits and by the code typed from the processor's receipt.
+It also prints on the dispatch receipt to that buyer, so the processor's staff and the farm can check that the label
+matches the shrimp delivered.
+
+### 3.4 Record the processor's full code, and search with either
+
+- The sale gets an optional **Processor lot code** per line, typed from the processor's receipt or label
+  (for example `2026070707-202610261`).
+- The trace report and the Harvests search accept **either code**: FPMS's `26-0-24-03-07-02`, the processor's full code,
+  or just its first ten digits. A processor code leads to the sale lines it was recorded on, and from there to the
+  harvest, pond, batch, feed and treatments.
+
+There is no live connection between the two systems (the farm has no Internet), so the link is the numbers the Owner
+records and the code typed from the processor's paper.
 
 ---
 
@@ -137,44 +94,34 @@ digits and by the code typed from the processor's receipt.
 
 | Area | Change |
 |---|---|
-| Data | `FarmProfile`: lot place code (A, B), main processor farm no. `Buyer`: farm no. at this processor. `Sale`: processor lot code (optional). `Harvest.LotCode` keeps its column, new format. |
-| Lot code builder | `HarvestLotCoder` builds `YYYYABFFPP-HH`; `LotPlaces` becomes the Shrimp.io list. |
-| Screens | Farm profile (lot location, farm no.), buyer form (farm no. at this processor), pond page (pond no.), sale form and dispatch receipt (expected processor lot no., processor lot code), trace and Harvests search (either code). |
-| Codes already given | Codes are never changed once given (DEC-83). In development the sample data is rebuilt; on a farm already using 1.0.0, earlier harvests keep their old codes and new harvests get the new format from the day it is installed, with both searchable. |
-| Docs | harvest-lot-code.md rewritten; a new decision; changelog. |
+| Data | `Buyer`: processor's lot location (area, place digit), our farm no. at this processor. `SaleLine`: processor lot code (optional). No change to `Harvest.LotCode` or the Farm ID. |
+| Screens | Buyer form (two fields, processors only); pond page (pond no. for lot codes); sale form and dispatch receipt (expected processor lot no., processor lot code); trace and Harvests search (either code). |
+| Lot codes already given | Unchanged. |
+| Docs | harvest-lot-code.md gains a "Processors' codes" section; a new decision; changelog. |
+
+About one to two days, with tests.
 
 ---
 
 ## 5. Rules kept from DEC-83
 
-- A code is given when the harvest is saved, and never changes or is reused, even if the harvest's date is corrected.
-- Unique per farm; the harvest number never repeats within a pond and year.
-- A harvest always saves; a missing piece (place, farm number) is a notice with what to fix, never a block.
+- An FPMS lot code is given when the harvest is saved, and never changes or is reused.
+- A harvest and a sale always save; a missing processor number or code is a notice, never a block.
 
 ---
 
-## 6. Questions before building
+## 6. Questions
 
 **For the Shrimp.io developer**
 
-1. **Bawing and Siguel.** As far as we know, Bawing is part of Barangay Siguel (FPMS lists "Siguel (Bawing)"), but the
-   list has Bawing `01` and Siguel `06`. Which does a farm in Bawing use?
-2. **Room in the list.** The place is one digit, so an area holds at most 10 places; General Santos already uses 8. What
-   happens with a ninth and tenth coastal barangay?
-3. **Places not on the list.** Is a farm in an inland barangay or in Malungon out of scope, or will it get a code?
-4. **Pond numbers.** Is `PP` the farm's own pond number, so the farm can give the processor the numbers FPMS shows?
-5. **What is printed and quoted.** Is the whole `lotNo-productionCode` printed on cartons, and is that what a buyer or
-   BFAR quotes in a recall?
+1. **Bawing and Siguel.** Bawing is part of Barangay Siguel, but your list has Bawing `01` and Siguel `06`. Which should a
+   farm in Siguel (including Bawing) use? One code for both would match the barangay.
+2. **One farm no. per farm, or per plant?** Your screen says the location and farm no. "apply to every customer". Does a
+   farm keep the same farm no. at every plant?
+3. **Pond numbers.** Is `PP` the farm's own pond number, so the farm can give you the numbers FPMS shows?
+4. **What is quoted in a recall.** The whole `lotNo-productionCode`, or the lot no. only?
 
 **For the adviser**
 
-6. Is a farm-side lot code still wanted when the processor makes its own? (This proposal says yes: it covers harvests
-   sold to markets and individuals, which never reach a processor.)
-7. Should the farm's code use the **main** processor's farm number, or a number of its own when it sells to several?
-
----
-
-## 7. Effort
-
-About two to three days: the data fields and migration, the lot code builder and its tests, five screens, the trace
-search, and the documents. Nothing else in the system depends on the old format except the lot code itself.
+5. Is it enough to link the processor's code to FPMS's (this proposal), or should FPMS print the processor's numbers on
+   its own lot code as well?
