@@ -21,6 +21,13 @@ public enum DisposalReason { StaffOrHomeUse = 1, GivenAway = 2, SpoiledOrLost = 
 /// <summary>Harvest record (Ref 7.1). Quality checks are optional: null means not assessed.</summary>
 public class Harvest : FarmEntity
 {
+    /// <summary>Set by the form that created the record (DEC-133): a retried save returns this record instead of a second one.</summary>
+    public Guid? ClientRequestId { get; set; }
+
+    /// <summary>Optimistic concurrency (DEC-133): a correction from a stale page is refused, not saved over another.</summary>
+    [System.ComponentModel.DataAnnotations.Timestamp]
+    public byte[] RowVersion { get; set; }
+
     public const int MaxNotesLength = 1000;
 
     public Guid BatchId { get; set; }

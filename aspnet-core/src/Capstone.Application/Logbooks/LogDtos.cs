@@ -108,6 +108,9 @@ public class PondActivityInput
 
 public class SaveLogInput
 {
+    /// <summary>Corrections: the version the page loaded; a stale one is refused (DEC-133).</summary>
+    public string RowVersion { get; set; }
+
     /// <summary>Empty for a new log.</summary>
     public Guid? Id { get; set; }
 
@@ -161,6 +164,8 @@ public class UsageDto
 
 public class LogDto
 {
+    public string RowVersion { get; set; }
+
     public Guid Id { get; set; }
     public Guid BatchId { get; set; }
     public string BatchCode { get; set; }

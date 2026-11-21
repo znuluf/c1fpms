@@ -999,6 +999,8 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
             observedAt: FarmTime.fromLocalInput(this.form.observedAt),
             notes: this.form.notes,
             clientRequestId: this.form.clientRequestId,
+            // DEC-133: a correction from a stale page is refused instead of saved over someone else's.
+            rowVersion: this.log?.rowVersion ?? null,
         };
         switch (this.form.logType) {
             case 2:

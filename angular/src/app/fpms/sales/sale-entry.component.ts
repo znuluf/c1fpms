@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
-import { FarmTime } from '@shared/fpms/farm-time';
+import { FarmTime, newGuid } from '@shared/fpms/farm-time';
+import { FormDrafts } from '@shared/fpms/drafts';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { PRICE_METHODS, applyTerms, countFromAbw, pricingBody, referencePrice, termsEmpty, usedAbw, usedCount } from '@shared/fpms/pricing';
 import { PriceTermsComponent, SalePaymentComponent, initialPaymentOf } from '@shared/fpms/pricing-ui';
@@ -35,7 +36,14 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                     </div>
                 } @else {
                     <!-- One panel (DEC-107): the sale's parts are sections of it, with Review sale as its footer. -->
-                    <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="review = true" novalidate>
+                    @if (restoredAt) {
+                        <div class="alert alert-info d-flex align-items-center" role="status">
+                            <i class="fas fa-history mr-2" aria-hidden="true"></i>
+                            <span class="mr-auto">Your unsaved sale from {{ restoredAt | farmDateTime }} was restored.</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="discardDraft()">Discard it</button>
+                        </div>
+                    }
+                    <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="review = true" (input)="keepDraft()" (change)="keepDraft()" novalidate>
                         <div class="card">
                             <div class="card-body">
                                 <div class="form-row">
@@ -202,6 +210,8 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
     loading = true;
     isNew = true;
     review = false;
+    /** When a restored draft was last saved on this device (DEC-133), else null. */
+    restoredAt: string | null = null;
     showTransport = false;
     buyers: any[] = [];
     sellable: any[] = [];
@@ -257,11 +267,22 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
             this.m = {
                 buyerId: this.buyers[0]?.id ?? '', saleDate: this.today, dueDate: '', paymentTerms: '', paidNow: null, paidMethod: '', paidInFull: true,
                 lines: this.sellable.length ? [this.blankLine(this.sellable[0].harvestGradeLineId)] : [],
+                clientRequestId: newGuid(),
             };
             await this.startFromHarvest(this.query('harvestId'));
+            // DEC-133: an unsaved sale on this device (connection lost, sign-in ended) comes back, with its request id.
+            const draft = FormDrafts.load<any>(this.draftKey);
+            this.restoredAt = null;
+            if (draft?.data?.m) {
+                this.m = { ...this.m, ...draft.data.m };
+                this.crateText = { ...(draft.data.crateText ?? {}) };
+                this.restoredAt = new Date(draft.savedAt).toISOString();
+            }
         }
         this.crateSource = {};
-        this.crateText = {};
+        if (!this.restoredAt) {
+            this.crateText = {};
+        }
         const onSale: Record<string, number[]> = {};
         for (const c of this.original?.crates ?? []) {
             (onSale[c.harvestId] ??= []).push(c.crateNo);
@@ -559,9 +580,27 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         return this.buyers.find((b) => b.id === this.m.buyerId)?.name ?? '';
     }
 
+    private get draftKey(): string {
+        return `sale.${this.query('harvestId') ?? 'new'}`;
+    }
+
+    keepDraft(): void {
+        if (this.isNew && !this.loading) {
+            FormDrafts.save(this.draftKey, { m: this.m, crateText: this.crateText });
+        }
+    }
+
+    discardDraft(): void {
+        FormDrafts.clear(this.draftKey);
+        this.restoredAt = null;
+        void this.init();
+    }
+
     async save(): Promise<void> {
         const body: any = {
-            id: this.m.id, buyerId: this.m.buyerId, saleDate: this.m.saleDate, dueDate: this.m.dueDate || null, paymentTerms: this.m.paymentTerms,
+            id: this.m.id,
+            clientRequestId: this.isNew ? (this.m.clientRequestId ??= newGuid()) : null,
+            rowVersion: this.isNew ? null : this.original?.rowVersion, buyerId: this.m.buyerId, saleDate: this.m.saleDate, dueDate: this.m.dueDate || null, paymentTerms: this.m.paymentTerms,
             transporter: this.m.transporter, driverName: this.m.driverName, plateNo: this.m.plateNo,
             loadedAt: this.m.loadedAt ? FarmTime.fromLocalInput(this.m.loadedAt) : null, destination: this.m.destination,
             localTransportPermitNo: this.m.localTransportPermitNo, temperatureNote: this.m.temperatureNote,
@@ -578,6 +617,9 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         let sale: any;
         const ok = await this.act(async () => (sale = this.isNew ? await this.api.post<any>('Sale', 'Create', body) : await this.api.put<any>('Sale', 'Update', body)));
         if (ok) {
+            if (this.isNew) {
+                FormDrafts.clear(this.draftKey);
+            }
             this.notifySaved(this.isNew ? `Sale saved as ${sale.dispatchReceiptNo}.` : 'Sale saved.');
             if (sale?.warnings?.length) {
                 this.showWarnings(sale.warnings);

@@ -20,6 +20,9 @@ namespace Capstone.Farms;
 
 public class FarmProfileDto
 {
+    /// <summary>The version the page loaded; a save from a stale page is refused (DEC-133).</summary>
+    public string RowVersion { get; set; }
+
     public string FarmCode { get; set; }
 
     /// <summary>Output only: the signed-in person is the Farm Owner, who alone may change the farm code (DEC-78).</summary>
@@ -151,6 +154,7 @@ public class FarmProfileAppService : CapstoneAppServiceBase
         var tenant = await GetCurrentTenantAsync();
         return new FarmProfileDto
         {
+            RowVersion = Production.Concurrency.Encode(p?.RowVersion),
             FarmCode = tenant.TenancyName,
             CanChangeFarmCode = await IsFarmOwnerAsync(),
             NextFarmCodeChange = await FarmCodes.GetNextChangeAllowedAsync(tenant.Id),
@@ -234,6 +238,10 @@ public class FarmProfileAppService : CapstoneAppServiceBase
         {
             profile = new FarmProfile { Id = tenantId, TenantId = tenantId };
             await _profiles.InsertAsync(profile);
+        }
+        else
+        {
+            Production.Concurrency.Check(profile.RowVersion, input.RowVersion);
         }
 
         profile.FarmName = input.FarmName.Trim();

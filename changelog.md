@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (safe saves, DEC-133)
+- **Saving again after a dropped connection never makes a second harvest or sale.** The second save returns the one already saved, with the same lot code or receipt number.
+- **Two people correcting the same record find out.** Harvests, sales, log entries and the farm profile now refuse a correction from an out-of-date page: "This record was changed by someone else. Refresh the page and try again."
+- **Delivery steps taken at the same moment** (two people pressing Receive fry) run one after the other; the second is refused if it no longer fits.
+- **The Sales form keeps a draft** and offers it back, like the harvest form.
+- **Clearer messages** when there is no connection ("Not saved: no connection to the farm server") and when the sign-in ends (you come back to the same page after signing in again).
+
 ### Changed (fry delivery steps, DEC-131; branch `feature/batch-technician`)
 - **Sample farm shows every step.** The Codespace sample farm now has a delivery logged at the gate, an order not here yet, one in transit, a cancelled order and fry rejected at the gate; a second technician (Jun) shares HP-01 with Kim and looks after CP-01, with Kim covering his days off.
 - **Record fry received, or record an order.** Fry logged at the gate are recorded with the farm's count; an order is recorded with the PL ordered (PO) and counted later.

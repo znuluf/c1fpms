@@ -524,6 +524,8 @@ public static class FpmsModelConfiguration
 
         b.Entity<Harvest>(e =>
         {
+            // DEC-133: one record per form submission; older records have none.
+            e.HasIndex(x => new { x.TenantId, x.ClientRequestId }).IsUnique().HasFilter("[ClientRequestId] IS NOT NULL");
             e.ToTable("FpmsHarvests");
             e.Property(x => x.TotalKg).HasPrecision(14, 3);
             e.Property(x => x.AbwG).HasPrecision(8, 2);
@@ -625,6 +627,8 @@ public static class FpmsModelConfiguration
 
         b.Entity<Sale>(e =>
         {
+            // DEC-133: one record per form submission; older records have none.
+            e.HasIndex(x => new { x.TenantId, x.ClientRequestId }).IsUnique().HasFilter("[ClientRequestId] IS NOT NULL");
             e.ToTable("FpmsSales");
             e.Property(x => x.DispatchReceiptNo).IsRequired().HasMaxLength(Sale.MaxReceiptNoLength);
             e.Property(x => x.PaymentTerms).HasMaxLength(Sale.MaxTextLength);

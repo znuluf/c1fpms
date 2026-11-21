@@ -277,6 +277,7 @@ public class LogAppService : CapstoneAppServiceBase
         }
 
         var log = await _logs.FirstOrDefaultAsync(l => l.Id == input.Id.Value) ?? throw new UserFriendlyException("Log entry not found.");
+        Production.Concurrency.Check(log.RowVersion, input.RowVersion);
         if (log.LogType != input.LogType)
         {
             throw new UserFriendlyException("The log type cannot be changed.");
@@ -732,6 +733,7 @@ public class LogAppService : CapstoneAppServiceBase
 
         return logs.Select(l => new LogDto
         {
+            RowVersion = Production.Concurrency.Encode(l.RowVersion),
             Id = l.Id,
             BatchId = l.BatchId,
             BatchCode = l.Batch?.BatchCode,

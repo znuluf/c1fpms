@@ -24,6 +24,13 @@ public enum PriceMethod { Fixed = 1, BaseAbw = 2, BaseCount = 3, Table = 4 }
 /// </summary>
 public class Sale : FarmEntity
 {
+    /// <summary>Set by the form that created the record (DEC-133): a retried save returns this record instead of a second one.</summary>
+    public Guid? ClientRequestId { get; set; }
+
+    /// <summary>Optimistic concurrency (DEC-133): a correction from a stale page is refused, not saved over another.</summary>
+    [System.ComponentModel.DataAnnotations.Timestamp]
+    public byte[] RowVersion { get; set; }
+
     public const int MaxTextLength = 200;
     public const int MaxShortLength = 100;
     public const int MaxReceiptNoLength = 30;

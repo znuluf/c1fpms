@@ -916,6 +916,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-129 | "PL ordered (PO)" names the count on the purchase order (proposed); no PO number field. Amends DEC-93 wording. |
 | DEC-130 | Form rows line up (shared directive), forms use a grid of thirds, one footer order (proposed). |
 | DEC-131 | Fry delivery steps (proposed): Record fry received or an order; Ordered → In transit → Received → Stocked; Receive fry takes the count; Cancelled and Rejected need a reason; Owner takes back a step. |
+| DEC-133 | Retry-safe harvest and sale saves, version checks on harvests, sales, logs and the farm profile, delivery steps locked, Sales draft, clearer no-connection and sign-in-ended handling (accepted 2026-11-21). |
 
 # **Appendix B. Manuscript alignment notes**
 

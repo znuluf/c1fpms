@@ -3299,6 +3299,32 @@ Positive:
 Negative:
 - Columns and a status value change: the Codespace database must be recreated (with DEC-127 and DEC-128's reset).
 
+## Decision DEC-133: Saves are safe to retry, corrections do not overwrite each other, sign-in ends gently
+
+Status: Accepted 2026-11-21
+Date: 2026-11-21
+Amends: DEC-37 (how an ended sign-in is handled; the 4-hour session stays)
+
+### Context
+A production review (21 Nov 2026) found five gaps. Harvest and sale saves had no request id, so a save retried after a lost connection could make a second harvest or a second sale with its own receipt number. Only cycles, batches and deliveries had a version check; a correction to a log entry, harvest, sale or the farm profile silently replaced someone else's. Two people taking the same delivery step at once could both pass the step check. The Sales form kept no draft, and a lost connection showed "An error has occurred! Error details were not sent by server." An ended sign-in reloaded the home page, so the person lost their place.
+
+### Decision
+- **Retry-safe saves.** Harvests and sales carry a `ClientRequestId` (unique per farm when present). A new harvest form, sale form or tally sheet makes one id and keeps it in its draft; a retry with the same id returns the record already saved, with the same lot code or receipt number. The tally sheet's sale shares the harvest's id. Records saved without an id (older clients) behave as before.
+- **Version checks** (optimistic concurrency) on harvests, sales, log entries and the farm profile, as already on cycles, batches and deliveries: a correction sends the version its page loaded, and a stale one is refused with "This record was changed by someone else. Refresh the page and try again."
+- **Delivery steps run one at a time.** Mark in transit, Receive fry, Cancel, Reject and Take back lock the delivery row before reading its current step (as stocking does), so the second of two simultaneous steps sees the first and is refused if it no longer fits.
+- **Sales form draft**, restored with "Discard it", like the harvest form.
+- **No connection** (no response at all): "Not saved: no connection to the farm server. Check the Wi-Fi, then try again. What you typed is still on this page."
+- **Sign-in ended:** "Your sign-in has ended", then this page reloads; signing in again returns to it and the form's draft brings the entry back. The 4-hour session of DEC-37 is kept, because tablets are shared.
+- New columns: `ClientRequestId` and `RowVersion` on harvests and sales, `RowVersion` on log entries and the farm profile (the Codespace database must be recreated).
+
+### Consequences
+Positive:
+- A dropped Wi-Fi at the pond edge or a double tap never makes a second harvest, sale or receipt; two people correcting the same record find out instead of losing a change.
+Negative:
+- A person who loads a record, waits while someone else corrects it, then saves, must refresh and redo their change.
+- Forms without a draft (for example the farm profile or users) still lose unsaved typing when the sign-in ends.
+- Full offline recording (saving while disconnected and sending later) is still not built.
+
 ---
 
 ## Note: glossary of interface terms

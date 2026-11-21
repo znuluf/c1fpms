@@ -83,6 +83,12 @@ public class CrateDto
 public class SaveHarvestInput
 {
     public Guid? Id { get; set; }
+
+    /// <summary>New harvests: one id per form; a retry with the same id returns the saved harvest (DEC-133).</summary>
+    public Guid? ClientRequestId { get; set; }
+
+    /// <summary>Corrections: the version the page loaded; a stale one is refused (DEC-133).</summary>
+    public string RowVersion { get; set; }
     public Guid BatchId { get; set; }
     public DateTime HarvestedAt { get; set; }
     public HarvestType HarvestType { get; set; }
@@ -182,6 +188,8 @@ public class GetHarvestsInput : PagedInput
 
 public class HarvestDto
 {
+    public string RowVersion { get; set; }
+
     public Guid Id { get; set; }
     public Guid BatchId { get; set; }
     public string BatchCode { get; set; }
@@ -430,7 +438,14 @@ public class HarvestAppService : CapstoneAppServiceBase
             throw new UserFriendlyException($"This batch is {batch.Status}; its Final harvest is already recorded.");
         }
 
-        var harvest = new Harvest { Id = Guid.NewGuid(), BatchId = batch.Id };
+        // A retried save (lost connection after the server saved) returns the harvest already saved (DEC-133).
+        if (input.ClientRequestId.HasValue && await _harvests.GetAll().AnyAsync(x => x.ClientRequestId == input.ClientRequestId))
+        {
+            var existing = await _harvests.GetAll().Where(x => x.ClientRequestId == input.ClientRequestId).Select(x => x.Id).FirstAsync();
+            return await Get(existing);
+        }
+
+        var harvest = new Harvest { Id = Guid.NewGuid(), BatchId = batch.Id, ClientRequestId = input.ClientRequestId };
         var warnings = await ApplyAsync(harvest, batch, input, isNew: true);
         await IssueLotCodeAsync(harvest, batch, warnings);
         await _harvests.InsertAsync(harvest);
@@ -449,6 +464,7 @@ public class HarvestAppService : CapstoneAppServiceBase
 
         var harvest = await _harvests.GetAll().Include(h => h.GradeLines).Include(h => h.Disposals).Include(h => h.Crates).FirstOrDefaultAsync(h => h.Id == input.Id.Value)
                       ?? throw new UserFriendlyException("Harvest not found.");
+        Production.Concurrency.Check(harvest.RowVersion, input.RowVersion);
         var batch = await _batches.GetAsync(harvest.BatchId);
         batch.EnsureNotClosed();
         if (harvest.CreatorUserId != AbpSession.UserId && !await IsGrantedAsync(PermissionNames.Harvests_EditAny))
@@ -874,6 +890,7 @@ public class HarvestAppService : CapstoneAppServiceBase
             var graded = lines.Sum(l => l.Kg);
             return new HarvestDto
             {
+                RowVersion = Production.Concurrency.Encode(h.RowVersion),
                 Id = h.Id, BatchId = h.BatchId, BatchCode = h.Batch?.BatchCode, PondCode = h.Batch?.Pond?.PondCode, CycleCode = h.Batch?.Cycle?.CycleCode,
                 BatchStatus = h.Batch?.Status ?? BatchStatus.Stocked, HarvestedAtUtc = h.HarvestedAtUtc, HarvestType = h.HarvestType, TotalKg = h.TotalKg, LotCode = h.LotCode,
                 BuyerId = h.BuyerId, BuyerName = h.Buyer?.Name, WeighedBy = h.WeighedBy,

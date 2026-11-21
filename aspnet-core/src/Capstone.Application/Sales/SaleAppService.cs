@@ -112,6 +112,12 @@ public class AddPaymentInput : PaymentInput
 
 public class SaveSaleInput
 {
+    /// <summary>New sales: one id per form; a retry with the same id returns the saved sale (DEC-133).</summary>
+    public Guid? ClientRequestId { get; set; }
+
+    /// <summary>Corrections: the version the page loaded; a stale one is refused (DEC-133).</summary>
+    public string RowVersion { get; set; }
+
     public Guid? Id { get; set; }
     public Guid BuyerId { get; set; }
     public DateOnly SaleDate { get; set; }
@@ -242,6 +248,7 @@ public class SalePaymentDto
 
 public class SaleDto
 {
+    public string RowVersion { get; set; }
     public Guid Id { get; set; }
     public string DispatchReceiptNo { get; set; }
     public Guid BuyerId { get; set; }
@@ -533,7 +540,17 @@ public class SaleAppService : CapstoneAppServiceBase
 
     public virtual async Task<SaleDto> Create(SaveSaleInput input)
     {
-        var sale = new Sale { Id = Guid.NewGuid() };
+        // A retried save returns the sale already saved, with its receipt number, instead of a second sale (DEC-133).
+        if (input.ClientRequestId.HasValue)
+        {
+            var existing = await _sales.GetAll().Where(x => x.ClientRequestId == input.ClientRequestId).Select(x => (Guid?)x.Id).FirstOrDefaultAsync();
+            if (existing.HasValue)
+            {
+                return await Get(existing.Value);
+            }
+        }
+
+        var sale = new Sale { Id = Guid.NewGuid(), ClientRequestId = input.ClientRequestId };
         var warnings = await ApplyAsync(sale, input, isNew: true);
         sale.DispatchReceiptNo = $"DR-{input.SaleDate:yyyy}-{await _sequences.NextAsync(NumberSequenceType.DispatchReceipt, input.SaleDate.ToString("yyyy")):0000}";
         await _sales.InsertAsync(sale);
@@ -556,6 +573,7 @@ public class SaleAppService : CapstoneAppServiceBase
 
         var sale = await _sales.GetAll().Include(s => s.Lines).Include(s => s.Payments).FirstOrDefaultAsync(s => s.Id == input.Id.Value)
                    ?? throw new UserFriendlyException("Sale not found.");
+        Production.Concurrency.Check(sale.RowVersion, input.RowVersion);
         var warnings = await ApplyAsync(sale, input, isNew: false);
         await CurrentUnitOfWork.SaveChangesAsync();
         return await WithWarningsAsync(sale.Id, warnings);
@@ -921,6 +939,7 @@ public class SaleAppService : CapstoneAppServiceBase
                 : null;
             return new SaleDto
             {
+                RowVersion = Production.Concurrency.Encode(s.RowVersion),
                 Id = s.Id, DispatchReceiptNo = s.DispatchReceiptNo, BuyerId = s.BuyerId, BuyerName = s.Buyer?.Name, BuyerContact = s.Buyer?.ContactPerson,
                 BuyerPhone = s.Buyer?.Phone, BuyerAddress = s.Buyer?.Address, SaleDate = s.SaleDate, PaymentTerms = s.PaymentTerms, DueDate = s.DueDate,
                 PaymentStatus = s.Status, IsOverdue = s.IsOverdue(today), Total = s.Total, Paid = s.Paid, Balance = Math.Max(0, s.Total - s.Paid), Overpaid = Math.Max(0, s.Paid - s.Total),

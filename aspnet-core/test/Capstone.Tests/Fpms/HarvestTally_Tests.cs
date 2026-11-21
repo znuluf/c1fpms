@@ -259,6 +259,24 @@ public class HarvestTally_Tests : FpmsTestBase
         result.Warnings.ShouldNotContain(w => w.Kind == "PriceFormula");
     }
 
+    /// <summary>DEC-133: a tally sheet saved again after a lost connection returns the same harvest and sale.</summary>
+    [Fact]
+    public async Task A_retried_tally_sheet_returns_the_same_harvest_and_sale()
+    {
+        var sheet = SheetWithSale();
+        sheet.Harvest.ClientRequestId = Guid.NewGuid();
+        var first = await Resolve<TallySheetAppService>().Save(sheet);
+        var harvests = Q(c => c.Harvests.IgnoreQueryFilters().Count());
+        var sales = Q(c => c.Sales.IgnoreQueryFilters().Count());
+
+        var again = await Resolve<TallySheetAppService>().Save(sheet);
+        again.Harvest.Id.ShouldBe(first.Harvest.Id);
+        again.Sale.Id.ShouldBe(first.Sale.Id);
+        again.Sale.DispatchReceiptNo.ShouldBe(first.Sale.DispatchReceiptNo);
+        Q(c => c.Harvests.IgnoreQueryFilters().Count()).ShouldBe(harvests);
+        Q(c => c.Sales.IgnoreQueryFilters().Count()).ShouldBe(sales);
+    }
+
     /// <summary>DEC-85: recording a sale on the harvest form or on the Sales form gives the same price and amount.</summary>
     [Fact]
     public async Task The_harvest_form_and_the_sales_form_price_the_same_terms_the_same()

@@ -7,6 +7,10 @@ namespace Capstone.Production;
 /// <summary>Logbook entry header; one type-specific detail row per log (D-11). Recorder = CreatorUserId.</summary>
 public class ProductionLog : FarmEntity
 {
+    /// <summary>Optimistic concurrency (DEC-133): a correction from a stale page is refused, not saved over another.</summary>
+    [System.ComponentModel.DataAnnotations.Timestamp]
+    public byte[] RowVersion { get; set; }
+
     public const int MaxNotesLength = 2000;
     public const int MaxVoidReasonLength = 500;
 

@@ -244,10 +244,13 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
     private readonly IRepository<FryDeliveryShortfall, Guid> _shortfalls;
     private readonly ReferenceData.FarmStandardsProvider _standards;
 
+    private readonly IRowLocker _rowLocker;
+
     public FryDeliveryAppService(IRepository<FryDelivery, Guid> deliveries, IRepository<FryDeliveryStatusChange, Guid> changes,
         IRepository<HatcherySource, Guid> hatcheries, IRepository<ProductionCycle, Guid> cycles, IRepository<PondBatch, Guid> batches,
-        IRepository<FryDeliveryShortfall, Guid> shortfalls, ReferenceData.FarmStandardsProvider standards)
+        IRepository<FryDeliveryShortfall, Guid> shortfalls, ReferenceData.FarmStandardsProvider standards, IRowLocker rowLocker)
     {
+        _rowLocker = rowLocker;
         _shortfalls = shortfalls;
         _standards = standards;
         _deliveries = deliveries;
@@ -590,6 +593,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
     public virtual async Task UndoLastStep(UndoDeliveryStepInput input)
     {
         var delivery = await _deliveries.GetAsync(input.DeliveryId);
+        await _rowLocker.LockAsync(RowLockTarget.FryDelivery, delivery.Id);
         if (await _cycles.GetAll().AnyAsync(c => c.FryDeliveryId == delivery.Id))
         {
             throw new UserFriendlyException("This delivery is already stocked into a production cycle; its steps can no longer change.");
@@ -627,6 +631,8 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
     /// <summary>The delivery's current step and its time, after checking that <paramref name="next"/> may follow it.</summary>
     private async Task<(FryDeliveryStatus Current, DateTime LastAt)> NextStepCheckAsync(Guid deliveryId, FryDeliveryStatus next)
     {
+        // Two people pressing the same step at once run one after the other: the second then sees the first's step (DEC-133).
+        await _rowLocker.LockAsync(RowLockTarget.FryDelivery, deliveryId);
         if (!Enum.IsDefined(next))
         {
             throw new UserFriendlyException("Choose the next step.");

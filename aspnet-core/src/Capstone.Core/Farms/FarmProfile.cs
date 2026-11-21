@@ -14,6 +14,10 @@ public enum FarmDateOrder { MonthFirst = 1, DayFirst = 2 }
 /// <summary>Farm details (Ref 2.1). Id equals the farm's TenantId (1-to-1 with AbpTenants).</summary>
 public class FarmProfile : AuditedEntity<int>, IMustHaveTenant
 {
+    /// <summary>Optimistic concurrency (DEC-133): a correction from a stale page is refused, not saved over another.</summary>
+    [System.ComponentModel.DataAnnotations.Timestamp]
+    public byte[] RowVersion { get; set; }
+
     public const int MaxFarmNameLength = 150;
     public const int MaxAddressLineLength = 200;
     public const int MaxCityLength = 100;

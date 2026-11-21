@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
-import { FarmTime } from '@shared/fpms/farm-time';
+import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { PRICE_METHODS, applyTerms, countFromAbw, num, pricingBody, referencePrice, termsEmpty } from '@shared/fpms/pricing';
@@ -623,6 +623,8 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             batchId, harvestType: 1, harvestedAt: FarmTime.nowInput(), totalKg: null, boxes: null, abwG: null, abwSampleWeightG: null, abwSamplePieces: null,
             finalCount: null, deadAtHarvest: null, smoothShell: null, intactAppendages: null, noNecrosis: null, qualityNotes: '', gradeLines: [], disposals: [], crates: [],
             buyerId: '', weighedBy: null, sell: false, sale: this.blankSale(), gradeCrates: false,
+            // DEC-133: one id per new harvest, kept in the draft, so a retried save returns the harvest already saved.
+            clientRequestId: newGuid(),
         };
     }
 
@@ -1046,6 +1048,8 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     async save(confirmed = false): Promise<void> {
         const body = {
             id: this.isNew ? null : this.h.id,
+            clientRequestId: this.isNew ? (this.m.clientRequestId ??= newGuid()) : null,
+            rowVersion: this.isNew ? null : this.h?.rowVersion,
             batchId: this.m.batchId,
             harvestedAt: FarmTime.fromLocalInput(this.m.harvestedAt),
             harvestType: this.m.harvestType,

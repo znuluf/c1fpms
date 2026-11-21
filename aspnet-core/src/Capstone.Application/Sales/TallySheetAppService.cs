@@ -285,6 +285,8 @@ public class TallySheetAppService : CapstoneAppServiceBase
         var perLine = gradeLines.Count > 1 && s.PriceMethod is PriceMethod.BaseCount or PriceMethod.Table;
         var sale = await _saleService.Create(new SaveSaleInput
         {
+            // The sale of a tally sheet shares the harvest's request id, so a retry returns both (DEC-133).
+            ClientRequestId = h.ClientRequestId,
             BuyerId = h.BuyerId.Value, SaleDate = saleDate, PaymentTerms = s.PaymentTerms, DueDate = s.DueDate, InitialPayment = s.InitialPayment,
             // One buyer took the whole harvest, so every crate is on this sale (DEC-86).
             Crates = harvest.Crates.Select(c => new SaleCrateInput { HarvestId = harvest.Id, CrateNo = c.CrateNo }).ToList(),
