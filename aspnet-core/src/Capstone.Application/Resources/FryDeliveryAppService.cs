@@ -415,6 +415,21 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
     }
 
     [AbpAuthorize(PermissionNames.FryDeliveries_Manage)]
+    public virtual async Task<List<FryDeliveryPondOptionDto>> GetPondAllocationOptions()
+    {
+        var ponds = await _ponds.GetAll().AsNoTracking().Include(p => p.Prefix).Where(p => !p.IsArchived).OrderBy(p => p.PondCode).ToListAsync();
+        var open = await _batches.GetAll().AsNoTracking().Where(b => b.Status != BatchStatus.Closed).Select(b => b.PondId).ToListAsync();
+        var reserved = await _allocations.GetAll().AsNoTracking().Where(a => a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).Select(a => new { a.PondId, a.DeliveryId }).ToListAsync();
+        var deliveryIds = reserved.Select(x => x.DeliveryId).Distinct().ToList();
+        var deliveries = await _deliveries.GetAll().AsNoTracking().Where(d => deliveryIds.Contains(d.Id)).Select(d => new { d.Id, d.HatcheryBatchNumber }).ToListAsync();
+        return ponds.Where(p => p.Purpose == PondPurpose.GrowOut && p.ManualStatus == PondManualStatus.Active && !open.Contains(p.Id)).Select(p =>
+        {
+            var reservation = reserved.FirstOrDefault(x => x.PondId == p.Id);
+            return new FryDeliveryPondOptionDto { Id = p.Id, PondCode = p.PondCode, Name = PondNaming.DisplayName(p.Prefix?.Name, p.Number), Status = PondDisplayStatus.Available, IsReserved = reservation != null, ReservedByDelivery = reservation == null ? null : deliveries.FirstOrDefault(d => d.Id == reservation.DeliveryId)?.HatcheryBatchNumber };
+        }).ToList();
+    }
+
+    [AbpAuthorize(PermissionNames.FryDeliveries_Manage)]
     public virtual async Task<SaveFryDeliveryResult> Create(FryDeliveryEditDto input)
     {
         var hatchery = await _hatcheries.FirstOrDefaultAsync(h => h.Id == input.HatcheryId) ?? throw new UserFriendlyException("Choose a hatchery.");
@@ -470,6 +485,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         {
             DeliveryId = id, Status = input.InitialStatus, ChangedAtUtc = receivedAtUtc ?? DateTime.UtcNow, Note = arrived ? "Recorded at arrival" : "Order recorded",
         });
+        if (!arrived) await SaveAllocationsAsync(id, input.PondAllocations, input.PlOrdered);
         return new SaveFryDeliveryResult { Id = id, Warnings = await WarningsAsync(input) };
     }
 
@@ -526,6 +542,7 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
 
         await ValidateAsync(input, delivery.Id);
         Apply(delivery, input);
+        if (!arrived) await SaveAllocationsAsync(delivery.Id, input.PondAllocations, input.PlOrdered);
         return new SaveFryDeliveryResult { Id = delivery.Id, Warnings = await WarningsAsync(input) };
     }
 
@@ -692,6 +709,31 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         await _changes.GetAll().Where(c => c.DeliveryId == deliveryId)
             .OrderByDescending(c => c.ChangedAtUtc).ThenByDescending(c => c.CreationTime)
             .Select(c => (FryDeliveryStatus?)c.Status).FirstOrDefaultAsync();
+
+    private async Task SaveAllocationsAsync(Guid deliveryId, List<FryDeliveryPondAllocationInput> input, long? plOrdered)
+    {
+        var requested = input ?? new List<FryDeliveryPondAllocationInput>();
+        if (requested.Select(x => x.PondId).Distinct().Count() != requested.Count) throw new UserFriendlyException("Choose each destination pond only once.");
+        if (requested.Sum(x => x.PlannedPlCount) > (plOrdered ?? 0)) throw new UserFriendlyException("The total planned PL allocation cannot exceed PL ordered.");
+        var existing = await _allocations.GetAll().Where(a => a.DeliveryId == deliveryId && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null).ToListAsync();
+        var pondIds = existing.Select(a => a.PondId).Concat(requested.Select(x => x.PondId)).Distinct().OrderBy(x => x).ToList();
+        foreach (var pondId in pondIds) await _rowLocker.LockAsync(RowLockTarget.Pond, pondId);
+        var requestedIds = requested.Select(x => x.PondId).ToList();
+        if (await _allocations.GetAll().AnyAsync(a => requestedIds.Contains(a.PondId) && a.DeliveryId != deliveryId && a.ReleasedAtUtc == null && a.FulfilledAtUtc == null))
+            throw new UserFriendlyException("One or more selected ponds are already reserved for another fry delivery.");
+        var ponds = await _ponds.GetAll().Where(p => requestedIds.Contains(p.Id)).ToListAsync();
+        if (ponds.Count != requested.Count) throw new UserFriendlyException("One or more selected ponds could not be found.");
+        foreach (var pond in ponds)
+            if (pond.IsArchived || pond.Purpose != PondPurpose.GrowOut || pond.ManualStatus != PondManualStatus.Active || await _batches.GetAll().AnyAsync(b => b.PondId == pond.Id && b.Status != BatchStatus.Closed))
+                throw new UserFriendlyException($"Pond {pond.PondCode} is not eligible for a fry-delivery reservation.");
+        foreach (var old in existing.Where(a => !requestedIds.Contains(a.PondId))) old.ReleasedAtUtc = DateTime.UtcNow;
+        foreach (var item in requested)
+        {
+            var old = existing.FirstOrDefault(a => a.PondId == item.PondId);
+            if (old != null) old.PlannedPlCount = item.PlannedPlCount;
+            else await _allocations.InsertAsync(new FryDeliveryPondAllocation { DeliveryId = deliveryId, PondId = item.PondId, PlannedPlCount = item.PlannedPlCount });
+        }
+    }
 
     private async Task ValidateAsync(FryDeliveryEditDto input, Guid? exceptId)
     {
