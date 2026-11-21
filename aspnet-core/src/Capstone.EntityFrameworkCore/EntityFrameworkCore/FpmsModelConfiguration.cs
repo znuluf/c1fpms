@@ -294,6 +294,7 @@ public static class FpmsModelConfiguration
         b.Entity<FryDeliveryPondAllocation>(e =>
         {
             e.ToTable("FpmsFryDeliveryPondAllocations");
+            e.Ignore(x => x.IsActive);
             e.HasOne<FryDelivery>().WithMany().HasForeignKey(x => x.DeliveryId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne<Pond>().WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne<PondBatch>().WithMany().HasForeignKey(x => x.PondBatchId).OnDelete(DeleteBehavior.Restrict);
