@@ -6,6 +6,7 @@ using Capstone.Authorization;
 using Capstone.Common;
 using Capstone.Production.Dto;
 using Capstone.Domain;
+using Capstone.Ponds;
 using Capstone.Production;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -65,7 +66,12 @@ public class FryDeliveryEditDto
     public FryDeliveryStatus InitialStatus { get; set; } = FryDeliveryStatus.Ordered;
 
     public string RowVersion { get; set; }
+    public List<FryDeliveryPondAllocationInput> PondAllocations { get; set; } = new();
 }
+
+public class FryDeliveryPondAllocationInput { public Guid PondId { get; set; } [Range(1, FryDelivery.MaxPl)] public long PlannedPlCount { get; set; } }
+public class FryDeliveryPondAllocationDto { public Guid Id { get; set; } public Guid PondId { get; set; } public string PondCode { get; set; } public string PondName { get; set; } public long PlannedPlCount { get; set; } public DateTime? ReleasedAtUtc { get; set; } public DateTime? FulfilledAtUtc { get; set; } public Guid? PondBatchId { get; set; } }
+public class FryDeliveryPondOptionDto { public Guid Id { get; set; } public string PondCode { get; set; } public string Name { get; set; } public PondDisplayStatus Status { get; set; } public bool IsReserved { get; set; } public string ReservedByDelivery { get; set; } }
 
 public class FryDeliveryDto
 {
@@ -105,6 +111,7 @@ public class FryDeliveryDto
     public long PlStocked { get; set; }
     public long PlLeft { get; set; }
     public string RowVersion { get; set; }
+    public List<FryDeliveryPondAllocationDto> PondAllocations { get; set; } = new();
 }
 
 public class FryDeliveryDetailDto : FryDeliveryDto
@@ -242,16 +249,21 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
     private readonly IRepository<ProductionCycle, Guid> _cycles;
     private readonly IRepository<PondBatch, Guid> _batches;
     private readonly IRepository<FryDeliveryShortfall, Guid> _shortfalls;
+    private readonly IRepository<FryDeliveryPondAllocation, Guid> _allocations;
+    private readonly IRepository<Pond, Guid> _ponds;
     private readonly ReferenceData.FarmStandardsProvider _standards;
 
     private readonly IRowLocker _rowLocker;
 
     public FryDeliveryAppService(IRepository<FryDelivery, Guid> deliveries, IRepository<FryDeliveryStatusChange, Guid> changes,
         IRepository<HatcherySource, Guid> hatcheries, IRepository<ProductionCycle, Guid> cycles, IRepository<PondBatch, Guid> batches,
-        IRepository<FryDeliveryShortfall, Guid> shortfalls, ReferenceData.FarmStandardsProvider standards, IRowLocker rowLocker)
+        IRepository<FryDeliveryShortfall, Guid> shortfalls, IRepository<FryDeliveryPondAllocation, Guid> allocations, IRepository<Pond, Guid> ponds,
+        ReferenceData.FarmStandardsProvider standards, IRowLocker rowLocker)
     {
         _rowLocker = rowLocker;
         _shortfalls = shortfalls;
+        _allocations = allocations;
+        _ponds = ponds;
         _standards = standards;
         _deliveries = deliveries;
         _changes = changes;
@@ -321,6 +333,8 @@ public class FryDeliveryAppService : CapstoneAppServiceBase
         dto.CanEdit = await IsGrantedAsync(PermissionNames.FryDeliveries_Manage);
         dto.CanUpdateStatus = !dto.IsStocked && !dto.IsStockingFinished && await IsGrantedAsync(PermissionNames.FryDeliveries_UpdateStatus);
         dto.CanFinishStocking = dto.IsStocked && !dto.IsStockingFinished && dto.CanEdit;
+        var allocations = await _allocations.GetAll().AsNoTracking().Include(a => a.Pond).ThenInclude(p => p.Prefix).Where(a => a.DeliveryId == id).OrderBy(a => a.Pond.PondCode).ToListAsync();
+        dto.PondAllocations = allocations.Select(a => new FryDeliveryPondAllocationDto { Id = a.Id, PondId = a.PondId, PondCode = a.Pond.PondCode, PondName = PondNaming.DisplayName(a.Pond.Prefix?.Name, a.Pond.Number), PlannedPlCount = a.PlannedPlCount, ReleasedAtUtc = a.ReleasedAtUtc, FulfilledAtUtc = a.FulfilledAtUtc, PondBatchId = a.PondBatchId }).ToList();
         return dto;
     }
 
