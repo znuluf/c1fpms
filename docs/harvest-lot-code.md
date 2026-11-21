@@ -4,6 +4,8 @@ Every harvest gets one short lot code, for example `26-0-24-03-07-02`. The code 
 
 The format is the adviser's (year, area, barangay or municipality, farm, pond), with a harvest number added at the end. Without it the code would name a pond for a whole year, not one harvest.
 
+> **Proposed change:** align this code with the Shrimp.io processors' lot codes. See [lot-code-alignment-proposal.md](lot-code-alignment-proposal.md) (not built yet).
+
 Decision: [DEC-83](../decisions.md) (proposed until the adviser confirms the points under [Open questions](#open-questions)). Spec: Harvest data model and AC-49 in [Capstone-Planning.md](Capstone-Planning.md).
 
 ## Format: `YY-A-LL-FF-PP-HH`
