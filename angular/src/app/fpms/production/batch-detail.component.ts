@@ -234,7 +234,7 @@ interface CalMonth {
                                 @if (i.cultureDays != null) { <div><dt>Days of culture</dt><dd>{{ i.cultureDays }}</dd></div> }
                             </dl>
                         }
-                        @if (b.failureReason || b.isReadOnly || (b.earliestSafeHarvestDate && !b.isReadOnly) || (b.status === 2 && docHint) || b.technicianName || (canManage && !b.isReadOnly)) {
+                        @if (b.failureReason || b.isReadOnly || (b.earliestSafeHarvestDate && !b.isReadOnly) || b.technicianName || (canManage && !b.isReadOnly)) {
                             <ul class="fpms-notices">
                                 <!-- DEC-127: who looks after this batch day to day, and a cover for days off. A name, not a lock. -->
                                 @if (b.technicianName || (canManage && !b.isReadOnly)) {
@@ -285,9 +285,6 @@ interface CalMonth {
                                             Earliest safe harvest, after treatment withdrawal: <strong>{{ b.earliestSafeHarvestDate | farmDate }}</strong>{{ safeLater ? '. A harvest before then saves with a warning.' : ' (passed).' }}
                                         </span>
                                     </li>
-                                }
-                                @if (b.status === 2 && docHint) {
-                                    <li><i class="fas fa-vial" aria-hidden="true"></i><span>{{ docHint }}</span></li>
                                 }
                             </ul>
                         }
@@ -719,17 +716,6 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
     calStats = { days: 0, full: 0, partial: 0, empty: 0, pct: 0, fullPct: 0, partialPct: 0, emptyPct: 0 };
     readonly weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-    /** DEC-62: display-only health test hint by DOC (Shrimp Farmers' Manual); no tasks or overdue state. */
-    get docHint(): string | null {
-        const doc = this.b?.indicators?.doc;
-        if (doc == null) {
-            return null;
-        }
-        const next = [30, 45, 60, 75].find((d) => d >= doc - 2);
-        return next == null
-            ? null
-            : `PCR health check suggested at DOC 30, 45, 60 and 75. Next: DOC ${next}${next - doc > 0 ? `, in ${next - doc} day${next - doc === 1 ? '' : 's'}` : ', now'}.`;
-    }
 
     assigning: { technicianUserIds: number[]; coverUserId: number | null; coverUntil: string | null } | null = null;
     people: any[] | null = null;
