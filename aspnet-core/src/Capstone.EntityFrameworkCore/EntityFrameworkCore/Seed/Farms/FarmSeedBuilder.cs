@@ -63,6 +63,11 @@ public class FarmSeedBuilder
             _context.FarmSettings.Add(new FarmSettings { Id = tenant.Id, TenantId = tenant.Id });
         }
 
+        if (!_context.FarmSettings.IgnoreQueryFilters().Any(s => s.Id == tenant.Id))
+        {
+            _context.FarmSettings.Add(new FarmSettings { Id = tenant.Id, TenantId = tenant.Id });
+        }
+
         foreach (var c in FarmDefaults.DocumentCategories)
         {
             var category = _context.DocumentCategories.IgnoreQueryFilters().FirstOrDefault(x => x.TenantId == tenant.Id && x.Name == c.Name);
