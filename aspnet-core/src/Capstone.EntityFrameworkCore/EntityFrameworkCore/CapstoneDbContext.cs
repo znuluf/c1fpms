@@ -14,6 +14,7 @@ using Capstone.ReferenceData;
 using Capstone.Resources;
 using Capstone.Sales;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Capstone.EntityFrameworkCore;
 
