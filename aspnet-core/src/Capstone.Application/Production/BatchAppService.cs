@@ -508,6 +508,15 @@ public class BatchAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("Confirm that the batch's records will become read-only.");
         }
 
+        // Recalculate from persisted sales and append-only dispositions at close time; the screen's check can be stale or bypassed.
+        var accounting = new CloseCheckDto();
+        await FillUnaccountedAsync(accounting, batch.Id);
+        if (accounting.UnaccountedKg > 0.0005m)
+        {
+            throw new UserFriendlyException(
+                $"Cannot close this batch: {accounting.UnaccountedKg:0.###} kg of harvested shrimp is not yet accounted for. Record the remaining sales or not-sold outcome first.");
+        }
+
         var facts = await _loader.LoadAsync(batch.Id, await Farm.GetTimeZoneAsync());
         var ind = IndicatorCalculator.Compute(facts, await Farm.GetTodayAsync());
         var failure = await _failures.FirstOrDefaultAsync(f => f.BatchId == batch.Id);
