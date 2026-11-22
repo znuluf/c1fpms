@@ -246,7 +246,7 @@ public class ComplianceAppService : CapstoneAppServiceBase
 
     public virtual async Task<List<ComplianceDocumentDto>> GetDocuments(GetDocumentsInput input)
     {
-        var profile = await Farm.GetProfileAsync();
+        var settings = await Farm.GetSettingsAsync();
         var today = await Farm.GetTodayAsync();
         var search = input.Search?.Trim();
         var docs = await _documents.GetAll().AsNoTracking().Include(d => d.Category)
@@ -257,7 +257,7 @@ public class ComplianceAppService : CapstoneAppServiceBase
 
         var names = await GetUserNamesAsync(docs.SelectMany(d => new[] { d.CreatorUserId, d.LastModifierUserId }));
         return docs
-            .Select(d => Map(d, today, profile.DocumentExpiryAlertDays, names))
+            .Select(d => Map(d, today, settings.DocumentExpiryAlertDays, names))
             .Where(d => !input.Status.HasValue || d.ExpiryStatus == input.Status.Value)
             // Most urgent first: expired, expiring soon, active, then no expiry; archived last.
             .OrderBy(d => d.IsArchived)
