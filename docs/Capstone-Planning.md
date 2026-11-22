@@ -922,6 +922,7 @@ Feature-Driven Development; each milestone ends with its acceptance tests passin
 | DEC-136 | The farm profile needs a sign-in; a kept entry refused by a rule is shown at once; system, API and query guides (accepted 2026-11-21). |
 | DEC-137 | The farm profile requires the contact phone; the setup step says what is missing (accepted 2026-11-21). |
 | DEC-139 | Plainer forms after the capstone consultation: pond length and width stored, one phone format, Farm ID given by its own call, safer permit renewal (accepted 2026-11-21). |
+| DEC-140 | Emergency as its own harvest type with a shrimp-left indicator; biomass from the current ABW; held unsold stock with a farm-set follow-up; Base 10 pricing per gram (10 g ABW, about ₱5 per gram) with farm-set terms (proposed 2026-11-22). |
 
 # **Appendix B. Manuscript alignment notes**
 

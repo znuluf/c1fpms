@@ -87,6 +87,7 @@ All decisions below were accepted on 2026-10-22 by the capstone development team
 | DEC-77 | A pond's construction type is fixed at creation; ponds are archived, never deleted | Accepted (full write-up); extends DEC-35 |
 | DEC-78 | The Farm Owner can change the farm code; old codes stay reserved and point to the new one | Accepted (full write-up); extends DEC-75 |
 | DEC-79 | A missing SFSC number is warned at stocking and at sale, and listed at Close Batch and on the trace report | Accepted; settles the hold under DEC-70 |
+| DEC-140 | Harvest types (Emergency), remaining-shrimp figures, held unsold stock, Base 10 pricing per gram with farm-set terms | Proposed (full write-up); terms marked † need the partner farm |
 | DEC-84 | Trace report for one harvest lot code | Proposed (full write-up); built on `feature/lot-trace` (from `feature/harvest-tally`), not run |
 | DEC-83 | Harvest lot code YY-A-LL-FF-PP-HH (year, area, barangay or municipality, farm, pond, harvest) | Proposed (full write-up); format from the adviser; built on `feature/harvest-tally`, not run |
 | DEC-82 | Pricing by count and by price table, a size grade per crate, and a printable tally sheet | Proposed (full write-up); built on `feature/harvest-tally`, not run |
@@ -3484,6 +3485,83 @@ Positive:
 
 Negative:
 - Users will not see an in-app DOC-based PCR reminder.
+
+
+---
+
+## Decision DEC-140: Harvest types, remaining-shrimp figures, held stock, and Base 10 pricing per gram
+
+Date: 2026-11-22
+Owners: Capstone development team
+Status: Proposed. Items marked † need the partner farm or the adviser.
+Builds on: DEC-53, DEC-67, DEC-80, DEC-82, DEC-139
+Supersedes in part: DEC-82 (count and price-table pricing are not restored; Base ABW is), the Partial/Total-only harvest types
+
+### Context
+The consultation notes ask for one change: the farmer records only what they see or decide, and the system works out totals, estimates, balances and status, explains each estimate, and keeps the history behind it. A review of the code and the farm-practice sources changed three points in the first draft of the plan.
+
+- **"Base 10" is 10 g ABW, not 10 pieces per kg.** A 2025 value-chain study in Glan, Sarangani (fieldwork Feb to Apr 2024) says prices start from a reference of 10 g average body weight, "base 10", and rise by about ₱5 for each additional gram. It gives no base price and does not say how prices move below 10 g. The partner farm's tally sheet fits it: ₱210 + (12.08 − 10) × ₱5 = ₱220.40. A per-piece reading cannot work: 12.08 g is 82.78 pieces per kg, so ₱200 + (10 − 82.78) × ₱5 comes to −₱164 per kg. 10 g is 100 pieces per kg.
+- **The one-week follow-up for unsold shrimp was an example.** Nothing in the code or the documents fixes it.
+- **Dead at harvest looks like part of the harvested pieces.** The harvest check warns when it is larger than the harvested pieces, so subtracting it again would double-count.
+
+Code facts checked on this branch: `BatchIndicators` takes the current ABW from the latest growth sample or harvest, but estimated biomass still multiplies by `LatestAbwG` (the growth sample), so a newer harvest sample changes the ABW shown and not the biomass. `HarvestFact` does not carry `DeadAtHarvest`. Emergency was retired as a harvest type in step E and became Partial or Total by batch status, which guesses the pond's state and loses that it was an emergency. New sales send only a fixed price.
+
+### Decision
+
+**1. Harvest types.**
+- Three types: Partial, Final (the stored `Total`, shown as Final) and Emergency.
+- Emergency is always its own type, even when it empties the pond. It is a classification, never a batch failure; failing a batch stays a separate action.
+- An Emergency harvest records "Shrimp left in the pond: Yes or No". Partial implies Yes and Final implies No. The batch is marked Harvested when the harvest is Final, or Emergency with No shrimp left, not by the type alone.
+- An Emergency harvest records a reason (disease concern, poor water, weather, market opportunity, other) and a short note.
+- Weighed On and the quality checks and notes leave the normal form. Their saved data is kept (as in DEC-139).
+
+**2. Harvest arithmetic, on the server.** Crate net kg = scale reading − crate weight; total kg = sum of crates; crates counted; ABW = sample weight ÷ sample pieces (not editable when a full sample exists); count per kg = 1,000 ÷ ABW; estimated pieces = kg × 1,000 ÷ ABW. Example: 5,002 g ÷ 414 = 12.08 g, 82.78 pieces per kg, and 500 kg is about 41,391 pieces. The screen calls this "Estimated pieces"; an actual count is typed only when someone really counted. Dead at harvest stays an optional count, shown separately and treated as part of the harvested pieces, not subtracted again †.
+
+**3. Batch indicators.**
+- Estimated biomass = estimated population × the current ABW, whichever of growth sample or harvest it came from. This fixes the `LatestAbwG` use.
+- A harvest sample is its own observation with its date and source and never replaces a growth sample in the history.
+- The batch page shows estimated shrimp remaining, biomass, current ABW and where it came from, estimated survival, and the basis, each labelled as an estimate.
+- Recorded mortality, estimated survival and estimated remaining stay three separate figures. Unexplained loss is not turned into mortality. Cumulative mortality = recorded deaths ÷ stocked × 100. No generic mortality target is added.
+
+**4. Unsold kilograms.**
+- A new not-sold reason, "Held for later sale", has a follow-up date. It stays on the harvest as unsold stock with the status "Unsold, awaiting outcome" and is never counted as sold or as "All accounted for".
+- When the date passes the system reminds the user to record the outcome (a later sale, staff use, given away, spoiled, other). It never marks the kilograms consumed on its own.
+- Outcomes are added as new rows; the first entry is not overwritten.
+- The follow-up period is a farm setting, `UnsoldFollowUpDays`, 1 to 60. It starts at 7 as a placeholder †, and the date on a held entry can be changed.
+
+**5. Base 10 pricing, per gram.**
+- Base ABW pricing (DEC-80) is restored for new sales: price = base price + (ABW − base ABW) × step per gram. ABW is rounded to 0.01 g and the price to centavos. The agreed price is still what is saved; a different one warns and is never blocked.
+- The base price is typed on each sale, prefilled from that buyer's last sale. The terms used are stored on the sale line, so changing a setting never changes a saved sale.
+- Farm settings (Owner edits, in Farm settings):
+
+| Field | Default | Meaning |
+| :---- | :---- | :---- |
+| `BaseAbwG` | 10 | The reference weight, in grams |
+| `PriceStepPerGram` | 5.00 | Pesos per gram above the base † |
+| `BelowBasePricing` | Same step | Same step, No adjustment, or Own step † |
+| `BelowBaseStepPerGram` | empty | Used only with Own step |
+
+- A new sale starts from the buyer's last terms, else these defaults; every value can be changed on the line.
+- Pricing by piece count and by price table are not restored: no evidence supports them.
+
+**6. Smaller items.** The Ponds page opens as a table with a tile option, and the choice is remembered per user. Feed supplier is already stored on the inventory lot; the feeding form shows supplier beside the feed name and lot, and feed history and the batch feed report include it. A feeding with two lots keeps one entry per lot.
+
+### Order of work
+1. Harvest types, form and arithmetic. 2. Batch indicators (the biomass and dead-at-harvest fixes first). 3. Held stock and the follow-up setting. 4. Base ABW pricing and its settings. 5. Mortality indicators, the Ponds table and feed supplier.
+
+### Tests
+Emergency on an active batch does not fail it; Emergency with shrimp left keeps the batch active; Emergency with none left, or Final, closes it as Harvested; a harvest ABW changes biomass; a partial harvest subtracts the right pieces; dead at harvest is not counted twice; held stock can be sold or given an outcome and keeps its history; 12.08 g gives ₱220.40 from ₱210; the below-base setting is respected; changing settings leaves saved sales alone; supplier shows from receipt to batch usage; old harvests and sales survive the migration.
+
+### Consequences
+Positive: the figures a farmer reads match what was recorded; the farm's own numbers replace guessed ones; history is kept.
+Negative: a new harvest type value and columns on harvests, farm settings and sale lines, so the development database is recreated (see DEC-139); more settings to explain.
+
+### Questions for the partner farm †
+- Is the step exactly ₱5 per gram, and does it change?
+- What is paid below 10 g?
+- Does the buyer or the farm set the base price?
+- What follow-up period does the farm use for unsold shrimp?
+- Is dead at harvest already inside the weighed kilograms?
 
 ---
 
