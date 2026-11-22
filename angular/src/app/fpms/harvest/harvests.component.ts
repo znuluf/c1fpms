@@ -7,7 +7,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
 import { ToolbarChip } from '@shared/fpms/ui';
 
 /**
- * Harvest list (Ref 7.1). Each row shows where its kilograms went as one balance (sold, not sold, not yet accounted for;
+ * Harvest list (Ref 7.1). Each row shows where its kilograms went as one balance (sold, not sold, available to sell;
  * DEC-67) and a sale status. Filters: search, sale status chips, type, buyer and dates, shown as removable tags
  * (DEC-85 step 5).
  */
@@ -145,7 +145,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                 <div class="small text-muted mt-1">
                                                     Sold {{ h.soldKg | num: 2 : true }} kg{{ h.notSoldKg > 0 ? ' · not sold ' + (h.notSoldKg | num: 2 : true) + ' kg' : '' }}
                                                     @if (h.unaccountedKg > 0) {
-                                                        <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg unsold, awaiting outcome@if (h.followUpDue) { · follow-up due }</div>
+                                                        <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg available to sell@if (h.followUpDue) { · follow-up due }</div>
                                                     }
                                                 </div>
                                             </td>
@@ -170,7 +170,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                         <td colspan="2">{{ list()!.length === total() ? 'All matching harvests' : 'This page' }}</td>
                                         <td class="text-right">{{ pageTotals().kg | num: 2 }}</td>
                                         @if (grading) { <td></td> }
-                                        <td class="small text-wrap">Sold {{ pageTotals().sold | num: 2 }} · not sold {{ pageTotals().notSold | num: 2 }} · not accounted for {{ pageTotals().unaccounted | num: 2 }}</td>
+                                        <td class="small text-wrap">Sold {{ pageTotals().sold | num: 2 }} · not sold {{ pageTotals().notSold | num: 2 }} · available to sell {{ pageTotals().unaccounted | num: 2 }}</td>
                                         <td></td>
                                     </tr>
                                 </tfoot>
@@ -216,7 +216,7 @@ export class HarvestsComponent extends FpmsPage implements OnInit {
         return [
             { value: null, label: 'All', count: this.statuses.reduce((n, s) => n + (c[s.value] ?? 0), 0) },
             ...this.statuses.map((s) => ({ value: s.value, label: s.label, count: c[s.value] ?? 0 })),
-            { value: 'open', label: 'Unsold, awaiting outcome', count: c[9] ?? 0 },
+            { value: 'open', label: 'Available to sell', count: c[9] ?? 0 },
         ];
     });
 
@@ -274,7 +274,7 @@ export class HarvestsComponent extends FpmsPage implements OnInit {
         const tags: { label: string; clear: () => void }[] = [];
         const add = (label: string, clear: () => void) => tags.push({ label, clear: () => { clear(); this.apply(); } });
         if (f.search) { add(`"${f.search}"`, () => (f.search = '')); }
-        if (f.unaccountedOnly) { add('Unsold, awaiting outcome', () => (f.unaccountedOnly = false)); }
+        if (f.unaccountedOnly) { add('Available to sell', () => (f.unaccountedOnly = false)); }
         if (f.saleStatus != null) { add(this.statuses.find((s) => s.value === f.saleStatus)?.label ?? 'Status', () => (f.saleStatus = null)); }
         if (f.type != null) { add(this.Options.harvestType.find((o: any) => o.value === f.type)?.label ?? 'Type', () => (f.type = null)); }
         if (f.buyerId) { add(this.buyers().find((b) => b.id === f.buyerId)?.name ?? 'Buyer', () => (f.buyerId = null)); }
