@@ -181,7 +181,7 @@ interface CalMonth {
                                     <div class="alert alert-warning small">
                                         <strong>{{ closeCheck.unaccountedKg | num: 3 }} kg harvested but still unsold, awaiting an outcome:</strong>
                                         harvested {{ closeCheck.harvestedKg | num: 3 }} kg, sold {{ closeCheck.soldKg | num: 3 }} kg, not sold (home use, given away, spoiled) {{ closeCheck.notSoldKg | num: 3 }} kg.
-                                        Record the remaining sales or not-sold kg first, or close anyway.
+                                        Record the remaining sales or not-sold kg before closing this batch.
                                     </div>
                                 } @else if (closeCheck && closeCheck.harvestedKg > 0) {
                                     <p class="small text-success"><i class="fas fa-check mr-1"></i>All {{ closeCheck.harvestedKg | num: 3 }} harvested kg are sold or recorded as not sold.</p>
@@ -192,7 +192,7 @@ interface CalMonth {
                                 </div>
                             </div>
                             <div class="card-footer">
-                                <button class="btn btn-warning mr-2" [disabled]="busy() || !closing.confirm" (click)="close()">Close batch</button>
+                                <button class="btn btn-warning mr-2" [disabled]="busy() || !closing.confirm || closeCheck == null || closeCheck.unaccountedKg > 0.0005" (click)="close()">Close batch</button>
                                 <button class="btn btn-default" (click)="closing = null">Cancel</button>
                             </div>
                         </div></div></div></div>
@@ -962,7 +962,7 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
     async startClose(): Promise<void> {
         this.closing = { confirm: false };
         this.closeCheck = null;
-        this.closeCheck = (await this.run(() => this.api.get<any>('Batch', 'GetCloseCheck', { id: this.b.id }))) ?? { blankDaysTotal: 0, notFedSlots: 0, blankDays: [] };
+        this.closeCheck = await this.run(() => this.api.get<any>('Batch', 'GetCloseCheck', { id: this.b.id }));
     }
 
     async close(): Promise<void> {
