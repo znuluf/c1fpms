@@ -107,6 +107,9 @@ public class SaveHarvestInput
     /// <summary>Emergency harvests only (DEC-140): are there still shrimp in the pond afterwards?</summary>
     public bool? ShrimpLeft { get; set; }
 
+    /// <summary>Required for a Final harvest: staff explicitly confirm no shrimp remain in the pond.</summary>
+    public bool PondEmptiedConfirmed { get; set; }
+
     /// <summary>Emergency harvests only (DEC-140): why the harvest was made.</summary>
     public EmergencyReason? EmergencyReason { get; set; }
 
@@ -645,6 +648,13 @@ public class HarvestAppService : CapstoneAppServiceBase
         if (!Enum.IsDefined(input.HarvestType))
         {
             throw new UserFriendlyException("Choose Partial, Final or Emergency harvest.");
+        }
+
+        // A Final harvest is a physical declaration that the pond is empty, not just a harvest-type selection.
+        // Require an explicit confirmation on both create and edit; the server is authoritative.
+        if (input.HarvestType == HarvestType.Total && !input.PondEmptiedConfirmed)
+        {
+            throw new UserFriendlyException("Confirm that no shrimp remain in the pond after this Final harvest.");
         }
 
         // DEC-140: an Emergency harvest says whether shrimp are left and why. Only that answer decides whether the pond is emptied.
