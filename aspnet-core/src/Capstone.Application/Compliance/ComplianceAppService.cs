@@ -334,7 +334,7 @@ public class ComplianceAppService : CapstoneAppServiceBase
 
     public virtual async Task<ComplianceStatusDto> GetStatus()
     {
-        var profile = await Farm.GetProfileAsync();
+        var settings = await Farm.GetSettingsAsync();
         var today = await Farm.GetTodayAsync();
         var required = await _presets.GetAll().AsNoTracking().Include(p => p.Category)
             .Where(p => p.IsActive && p.IsRequired && p.Category.IsActive)
@@ -358,7 +358,7 @@ public class ComplianceAppService : CapstoneAppServiceBase
         result.MissingPermits = await _checker.GetMissingRequiredPermitsAsync(today);
         foreach (var d in docs)
         {
-            switch (d.GetExpiryStatus(today, profile.DocumentExpiryAlertDays))
+            switch (d.GetExpiryStatus(today, settings.DocumentExpiryAlertDays))
             {
                 case ExpiryStatus.Active: result.ActiveCount++; break;
                 case ExpiryStatus.ExpiringSoon: result.ExpiringSoonCount++; break;
