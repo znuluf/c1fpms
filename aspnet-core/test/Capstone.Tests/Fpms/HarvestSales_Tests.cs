@@ -90,6 +90,27 @@ public class HarvestSales_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task A_fully_disposed_and_sold_harvest_is_not_offered_for_another_sale()
+    {
+        SetSizeGrading(false);
+        var harvests = Resolve<HarvestAppService>();
+        var input = Harvest(HarvestType.Partial, 100);
+        input.Disposals = new List<DisposalInput> { new() { Kg = 25, Reason = DisposalReason.StaffOrHomeUse } };
+        var harvest = await harvests.Create(input);
+        var line = harvest.GradeLines.Single();
+
+        var sales = Resolve<SaleAppService>();
+        await sales.Create(new SaveSaleInput
+        {
+            BuyerId = Buyer,
+            SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = line.Id, Kg = 75, PricePerKg = 200 } },
+        });
+
+        (await sales.GetSellableLines(null)).ShouldNotContain(x => x.HarvestId == harvest.Id);
+    }
+
+    [Fact]
     public async Task Total_harvest_marks_the_batch_harvested_and_is_the_last_harvest()
     {
         var harvests = Resolve<HarvestAppService>();
