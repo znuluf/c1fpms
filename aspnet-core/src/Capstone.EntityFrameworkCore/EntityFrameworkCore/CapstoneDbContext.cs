@@ -83,6 +83,7 @@ public class CapstoneDbContext : AbpZeroDbContext<Tenant, Role, User, CapstoneDb
     // only the first, and the second would end in a generic error. It gets the same message as a stale page (DEC-134).
     public override int SaveChanges()
     {
+        EnsureHarvestDisposalsAreAppendOnly();
         try
         {
             return base.SaveChanges();
@@ -95,6 +96,7 @@ public class CapstoneDbContext : AbpZeroDbContext<Tenant, Role, User, CapstoneDb
 
     public override async System.Threading.Tasks.Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken = default)
     {
+        EnsureHarvestDisposalsAreAppendOnly();
         try
         {
             return await base.SaveChangesAsync(cancellationToken);
@@ -102,6 +104,15 @@ public class CapstoneDbContext : AbpZeroDbContext<Tenant, Role, User, CapstoneDb
         catch (Abp.Domain.Uow.AbpDbConcurrencyException e)
         {
             throw new Abp.UI.UserFriendlyException(FpmsErrors.ConcurrencyConflict, e.Message);
+        }
+    }
+
+    /// <summary>Disposition entries are audit history: only inserts are permitted, never updates or deletes.</summary>
+    private void EnsureHarvestDisposalsAreAppendOnly()
+    {
+        if (ChangeTracker.Entries<HarvestDisposal>().Any(e => e.State == EntityState.Modified || e.State == EntityState.Deleted))
+        {
+            throw new InvalidOperationException("Harvest dispositions are append-only. Record a new disposition instead of editing or deleting an existing entry.");
         }
     }
 
