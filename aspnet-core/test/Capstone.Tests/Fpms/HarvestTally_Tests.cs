@@ -691,7 +691,7 @@ public class HarvestTally_Tests : FpmsTestBase
     }
 
     [Fact]
-    public async Task Editing_a_harvest_can_remove_an_unsold_grade_line_and_a_not_sold_entry()
+    public async Task Editing_a_harvest_preserves_not_sold_history_and_new_disposals_reduce_the_ungraded_line()
     {
         var harvests = Resolve<HarvestAppService>();
         var input = new SaveHarvestInput
@@ -702,19 +702,25 @@ public class HarvestTally_Tests : FpmsTestBase
         };
         var harvest = await harvests.Create(input);
 
+        // Editing the weighing details may replace grade allocations, but cannot rewrite a recorded disposition.
         input.Id = harvest.Id;
         input.GradeLines = new() { new() { SizeGradeId = Grade("50/60"), Kg = 90 } };
         input.Disposals = new();
         var edited = await harvests.Update(input);
         edited.GradeLines.Single().IsUngraded.ShouldBeTrue();
-        edited.GradeLines.Single().Kg.ShouldBe(100m);
-        edited.Disposals.ShouldBeEmpty();
+        edited.GradeLines.Single().Kg.ShouldBe(90m);
+        edited.Disposals.Count.ShouldBe(1);
+        edited.Disposals.Single().Kg.ShouldBe(10m);
 
-        // Recording a later disposal reduces the ungraded line.
-        input.Disposals = new() { new() { Kg = 5, Reason = DisposalReason.GivenAway } };
-        var again = await harvests.Update(input);
-        again.GradeLines.Single().Kg.ShouldBe(95m);
-        again.Disposals.Single().Kg.ShouldBe(5m);
+        // A later outcome is appended as a new, separately auditable entry.
+        var again = await harvests.RecordDisposal(new RecordDisposalInput
+        {
+            HarvestId = harvest.Id, Kg = 5, Reason = DisposalReason.GivenAway,
+        });
+        again.GradeLines.Single().Kg.ShouldBe(90m);
+        again.Disposals.Count.ShouldBe(2);
+        again.Disposals.Sum(d => d.Kg).ShouldBe(15m);
+        again.UnaccountedKg.ShouldBe(85m);
     }
 
     [Fact]
