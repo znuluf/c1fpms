@@ -75,6 +75,16 @@ public static class FpmsModelConfiguration
             e.HasIndex(x => x.TenantId).IsUnique();
         });
 
+        b.Entity<FarmSettings>(e =>
+        {
+            e.ToTable("FpmsFarmSettings");
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.TimeZone).IsRequired().HasMaxLength(64);
+            e.Property(x => x.FeedingTimes).IsRequired().HasMaxLength(Production.FeedingSchedule.MaxTimesLength);
+            e.ToTable(t => t.HasCheckConstraint("CK_FpmsFarmSettings_DocumentAlertDays", "[DocumentExpiryAlertDays] BETWEEN 1 AND 365"));
+            e.HasIndex(x => x.TenantId).IsUnique();
+        });
+
         b.Entity<DocumentCategory>(e =>
         {
             e.ToTable("FpmsDocumentCategories");
