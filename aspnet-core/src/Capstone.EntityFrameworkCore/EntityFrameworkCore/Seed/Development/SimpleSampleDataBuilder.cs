@@ -748,7 +748,7 @@ public class SimpleSampleDataBuilder
             ($"RDX-T{today:MMdd}", today, 180000, new[]
             {
                 (FryDeliveryStatus.Ordered, Local(today.AddDays(-7), 9), "Order recorded", false),
-                (FryDeliveryStatus.InTransit, Local(today, 3), "Left the hatchery 3 AM", true),
+                (FryDeliveryStatus.InTransit, Local(today.AddDays(-1), 23), "Left the hatchery at 11 PM", true),
             }),
             ($"RDX-C{today.AddDays(-20):MMdd}", today.AddDays(-20), 200000, new[]
             {
