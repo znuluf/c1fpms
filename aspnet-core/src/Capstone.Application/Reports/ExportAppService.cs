@@ -413,7 +413,7 @@ public class ExportAppService : CapstoneAppServiceBase
             default:
             {
                 var r = await _reports.GetFailureReport(new FailureReportInput { BatchId = input.BatchId, CycleId = input.CycleId });
-                name = "BatchFailureReport";
+                name = "HistoricalBatchIncidents";
                 record = input.BatchId.HasValue ? r.Batches.FirstOrDefault()?.BatchCode : r.CycleCode;
                 csv = new CsvBuilder(zone, "Cycle", "Hatchery", "Hatchery code", "Pond", "Batch", "Stocking date", "PL stocked", "Hatchery lot", "Failure date", "Reason", "Estimated loss", "DOC at failure", "Mortality events", "Treatments", "Inventory cost");
                 foreach (var b in r.Batches)
