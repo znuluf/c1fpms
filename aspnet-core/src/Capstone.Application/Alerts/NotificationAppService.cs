@@ -113,14 +113,14 @@ public class NotificationAppService : CapstoneAppServiceBase
     /// <summary>Creates one reminder per document when it enters the alert window and one when it expires (AC-03).</summary>
     internal async Task RefreshDocumentAlertsAsync()
     {
-        var profile = await Farm.GetProfileAsync();
+        var settings = await Farm.GetSettingsAsync();
         var today = await Farm.GetTodayAsync();
-        var horizon = today.AddDays(profile.DocumentExpiryAlertDays);
+        var horizon = today.AddDays(settings.DocumentExpiryAlertDays);
         var docs = await _documents.GetAll().AsNoTracking().Include(d => d.Category)
             .Where(d => !d.IsArchived && d.ExpiryDate != null && d.ExpiryDate <= horizon).ToListAsync();
         foreach (var d in docs)
         {
-            var status = d.GetExpiryStatus(today, profile.DocumentExpiryAlertDays);
+            var status = d.GetExpiryStatus(today, settings.DocumentExpiryAlertDays);
             if (status == ExpiryStatus.Expired)
             {
                 await _publisher.PublishAsync(FarmNotificationType.DocumentExpired, "ComplianceDocument", d.Id,
