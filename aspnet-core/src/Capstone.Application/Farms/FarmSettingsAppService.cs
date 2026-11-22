@@ -26,13 +26,8 @@ public class FarmSettingsDto
 public class FarmSettingsAppService : CapstoneAppServiceBase
 {
     private readonly IRepository<FarmSettings, int> _settings;
-    private readonly IRepository<FarmProfile, int> _profiles;
 
-    public FarmSettingsAppService(IRepository<FarmSettings, int> settings, IRepository<FarmProfile, int> profiles)
-    {
-        _settings = settings;
-        _profiles = profiles;
-    }
+    public FarmSettingsAppService(IRepository<FarmSettings, int> settings) => _settings = settings;
 
     public virtual async Task<FarmSettingsDto> Get()
     {
