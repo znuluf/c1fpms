@@ -344,7 +344,7 @@ public class CycleAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("This delivery has planned destination ponds. Stock only into those reserved ponds, or update the plan before stocking.");
 
         var zone = await Farm.GetTimeZoneAsync();
-        var profile = await Farm.GetProfileAsync();
+        var settings = await Farm.GetSettingsAsync();
         var result = new CreateBatchesResultDto();
 
         // Validate every pond and its details before writing anything.
@@ -453,7 +453,7 @@ public class CycleAppService : CapstoneAppServiceBase
                 Status = BatchStatus.Stocked, StockedAtUtc = stockedAtUtc, StockingDate = stockingDate, PlCountStocked = b.PlCount,
                 PondAreaM2AtStocking = pond.AreaM2,
                 AcclimationMinutes = b.AcclimationMinutes, InitialSurvivalEstimatePct = b.InitialSurvivalEstimatePct, DeadAtStocking = b.DeadAtStocking,
-                FarmingSystemAtStocking = pond.EffectiveFarmingSystem(profile.FarmingSystem), ConstructionTypeAtStocking = pond.ConstructionType,
+                FarmingSystemAtStocking = pond.EffectiveFarmingSystem(settings.FarmingSystem), ConstructionTypeAtStocking = pond.ConstructionType,
                 Technicians = (b.TechnicianUserIds ?? new()).Distinct().Select(id => new BatchTechnician { UserId = id }).ToList(),
             };
             var judgement = await _density.JudgeAsync(batch.FarmingSystemAtStocking.Value, pond.ConstructionType, batch.StockingDensityPerM2);
