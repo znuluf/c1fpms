@@ -60,7 +60,18 @@ public class FarmSeedBuilder
 
         if (!_context.FarmSettings.IgnoreQueryFilters().Any(x => x.Id == tenant.Id))
         {
-            _context.FarmSettings.Add(new FarmSettings { Id = tenant.Id, TenantId = tenant.Id });
+            var legacyProfile = _context.FarmProfiles.IgnoreQueryFilters().FirstOrDefault(p => p.Id == tenant.Id);
+            _context.FarmSettings.Add(new FarmSettings
+            {
+                Id = tenant.Id, TenantId = tenant.Id,
+                TimeZone = legacyProfile?.TimeZone ?? FarmClock.DefaultTimeZone,
+                DocumentExpiryAlertDays = legacyProfile?.DocumentExpiryAlertDays ?? 30,
+                FarmingSystem = legacyProfile?.FarmingSystem ?? FarmingSystem.SemiIntensive,
+                DateOrder = legacyProfile?.DateOrder ?? FarmDateOrder.MonthFirst,
+                Use24HourTime = legacyProfile?.Use24HourTime ?? false,
+                FeedingTimes = legacyProfile?.FeedingTimes ?? Capstone.Production.FeedingSchedule.DefaultTimes,
+                WaterQualityDaily = legacyProfile?.WaterQualityDaily ?? true,
+            });
         }
 
         foreach (var c in FarmDefaults.DocumentCategories)
