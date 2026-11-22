@@ -661,6 +661,27 @@ public class HarvestAppService : CapstoneAppServiceBase
             throw new UserFriendlyException($"The final count cannot be more than the stocking count ({batch.PlCountStocked:N0}).");
         }
 
+        // Validate the submitted tally before collapsing it to the single ungraded line. Disabling size grading must not
+        // make malformed legacy/API input (duplicate grades, unknown grades or more kg than the harvest) silently valid.
+        var submittedLines = input.GradeLines ?? new List<GradeLineInput>();
+        if (submittedLines.GroupBy(l => l.SizeGradeId).Any(g => g.Count() > 1))
+        {
+            throw new UserFriendlyException("Each size grade can appear only once in a harvest.");
+        }
+
+        var submittedGradeIds = submittedLines.Select(l => l.SizeGradeId).ToList();
+        var submittedGrades = await _grades.GetAll().Where(g => submittedGradeIds.Contains(g.Id)).Select(g => g.Id).ToListAsync();
+        if (submittedGrades.Count != submittedGradeIds.Count)
+        {
+            throw new UserFriendlyException("Choose a size grade of this farm for every grade line.");
+        }
+
+        var submittedKg = submittedLines.Sum(l => l.Kg);
+        if (submittedKg > input.TotalKg)
+        {
+            throw new UserFriendlyException($"Grade lines total {submittedKg:0.###} kg, which is more than the harvest total of {input.TotalKg:0.###} kg.");
+        }
+
         // A farm that does not grade by size (DEC-100): the harvest is its total kg, kept as one "Ungraded / mixed" line of
         // the kg not recorded as not sold, so sales sell from it as before. A harvest graded before the farm turned grading
         // off keeps the grade lines it was sent with.
