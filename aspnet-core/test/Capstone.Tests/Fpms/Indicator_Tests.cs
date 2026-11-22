@@ -37,6 +37,41 @@ public class Indicator_Tests : FpmsTestBase
     }
 
     [Fact]
+    public void Estimated_population_can_reach_zero_without_being_a_batch_status()
+    {
+        var sampleAt = new DateTime(2026, 6, 10, 8, 0, 0, DateTimeKind.Utc);
+        var facts = new BatchFacts
+        {
+            PlCountStocked = 100_000,
+            GrowthSamples = new List<GrowthSampleFact>
+            {
+                new()
+                {
+                    LogId = Guid.NewGuid(),
+                    Date = new DateOnly(2026, 6, 10),
+                    ObservedAtUtc = sampleAt,
+                    AbwG = 10m,
+                    EstimatedSurvivalPct = 100m,
+                },
+            },
+            Mortalities = new List<MortalityFact>
+            {
+                new()
+                {
+                    Date = new DateOnly(2026, 6, 11),
+                    ObservedAtUtc = sampleAt.AddDays(1),
+                    Count = 100_000,
+                },
+            },
+        };
+
+        var indicators = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 11));
+
+        indicators.EstimatedPopulation.ShouldBe(0m);
+        // IndicatorCalculator reports an estimate only; it does not set or change PondBatch.Status.
+    }
+
+    [Fact]
     public void Doc_counts_stocking_day_as_zero()
     {
         IndicatorCalculator.Doc(new DateOnly(2026, 6, 1), new DateOnly(2026, 6, 1)).ShouldBe(0);
