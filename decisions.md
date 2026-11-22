@@ -3511,7 +3511,7 @@ Code facts checked on this branch: `BatchIndicators` takes the current ABW from 
 **1. Harvest types.**
 - Three types: Partial, Final (the stored `Total`, shown as Final) and Emergency.
 - Emergency is always its own type, even when it empties the pond. It is a classification, never a batch failure; failing a batch stays a separate action.
-- An Emergency harvest records "Shrimp left in the pond: Yes or No". Partial implies Yes and Final implies No. The batch is marked Harvested when the harvest is Final, or Emergency with No shrimp left, not by the type alone.
+- An Emergency harvest records "Shrimp left in the pond: Yes or No". Partial implies Yes. A Final harvest requires staff to explicitly confirm "No shrimp remain in the pond" before it can be saved; this confirmation is separate from the estimated remaining-population indicator. The batch is marked Harvested only after a confirmed Final harvest, or an Emergency harvest with No shrimp left.
 - An Emergency harvest records a reason (disease concern, poor water, weather, market opportunity, other) and a short note.
 - Weighed on, the quality checks and notes, and Dead at harvest leave the harvest form. Their saved data is kept, still sent back unchanged on an edit, and still shown in the trace report and exports (as in DEC-139). Dead at harvest is not on the partner farm's paper tally sheet, no calculation uses it, and it is returned to the form only if the adviser says the standard (135:2025, 8.4.2.6) requires it †.
 
