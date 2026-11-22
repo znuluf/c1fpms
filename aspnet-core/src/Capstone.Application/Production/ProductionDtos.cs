@@ -286,6 +286,11 @@ public class BatchDetailDto : BatchListDto
 
     /// <summary>Latest (EndDate or log date) + WithdrawalDays across the batch's treatments (DEC-57).</summary>
     public DateOnly? EarliestSafeHarvestDate { get; set; }
+    public bool HarvestReadinessReached { get; set; }
+    public bool HarvestReadinessSampleIsRecent { get; set; }
+    public int HarvestReadinessDocTarget { get; set; }
+    public decimal HarvestReadinessAbwTargetG { get; set; }
+    public DateOnly? HarvestReadinessSampleDate { get; set; }
 
     /// <summary>Owner, Closed batch, cycle not Closed, and no other open batch in the pond (DEC-64).</summary>
     public bool CanReopen { get; set; }
