@@ -8,7 +8,7 @@ export interface GridCrate {
     crateNo: number;
     kg: number;
     tareKg?: number | null;
-    sizeLabel?: string | null;
+    
     /** A one- or two-character key explained in the legend, e.g. "A" for the first dispatch receipt. */
     mark?: string | null;
 }
@@ -48,9 +48,8 @@ export interface GridCrate {
                                 <td class="box">
                                     <span class="no">{{ c.crateNo }}</span>
                                     <span class="kg">{{ blank > 0 ? '' : (c.kg | num: 2) }}</span>
-                                    @if (c.sizeLabel || c.mark) {
+                                    @if (c.mark) {
                                         <span class="sub">
-                                            <span>{{ c.sizeLabel }}</span>
                                             @if (c.mark) { <b>{{ c.mark }}</b> }
                                         </span>
                                     }
@@ -88,7 +87,7 @@ export interface GridCrate {
                 }
             </p>
         }
-        @if (gradeSummary && grades().length > 1) {
+        @if (false && gradeSummary && grades().length > 1) {
             <table class="fpms-doc-table fpms-crate-grades">
                 <caption class="sr-only">Kilograms per size grade</caption>
                 <thead><tr><th scope="col">Size grade</th><th scope="col" class="num">Crates</th><th scope="col" class="num">Kg</th></tr></thead>
