@@ -168,7 +168,7 @@ public class CycleAppService : CapstoneAppServiceBase
         return dto;
     }
 
-    /// <summary>Failed when every batch of the cycle failed, otherwise Completed (DEC-64). The Owner can change it.</summary>
+    /// <summary>Discontinued when every batch has a historical incident record, otherwise Completed (DEC-64). The Owner can change it.</summary>
     private async Task<CycleOutcome> SuggestOutcomeAsync(Guid cycleId)
     {
         var ids = await _batches.GetAll().Where(b => b.CycleId == cycleId).Select(b => b.Id).ToListAsync();
@@ -543,7 +543,7 @@ public class CycleAppService : CapstoneAppServiceBase
 
         if (input.Outcome is not { } outcome || !Enum.IsDefined(outcome))
         {
-            throw new UserFriendlyException("Confirm the cycle's outcome: Completed or Failed.");
+            throw new UserFriendlyException("Confirm the cycle's outcome: Completed or Discontinued.");
         }
 
         cycle.Status = CycleStatus.Closed;
