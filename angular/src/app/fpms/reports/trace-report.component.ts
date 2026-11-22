@@ -134,7 +134,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 <div class="ts-fig"><dt>Harvested</dt><dd>{{ t.harvestedKg | num: 1 }} <small>kg</small></dd></div>
                                 <div class="ts-fig"><dt>Sold</dt><dd>{{ t.soldKg | num: 1 }} <small>kg · {{ buyers().length }} {{ buyers().length === 1 ? 'buyer' : 'buyers' }}</small></dd></div>
                                 <div class="ts-fig"><dt>Not sold</dt><dd>{{ t.disposedKg | num: 1 }} <small>kg</small></dd></div>
-                                <div class="ts-fig" [class.is-warn]="t.unaccountedKg > 0"><dt>Not accounted for</dt><dd>{{ t.unaccountedKg | num: 1 }} <small>kg</small></dd></div>
+                                <div class="ts-fig" [class.is-warn]="t.unaccountedKg > 0"><dt>Available to sell</dt><dd>{{ t.unaccountedKg | num: 1 }} <small>kg</small></dd></div>
                             </dl>
                         }
 
@@ -280,7 +280,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                             <td>Not sold@if (t.disposals.length) { <span class="ts-d">@for (d of t.disposals; track $index; let last = $last) { {{ d.reason | label: L.DisposalReasons }} {{ d.kg | num: 1 }} kg{{ d.note ? ' (' + d.note + ')' : '' }}@if (!last) { · } }</span> }</td>
                                             <td class="n">− {{ t.disposedKg | num: 1 }} kg</td>
                                         </tr>
-                                        <tr class="is-total" [class.is-warn]="t.unaccountedKg > 0"><td>Not accounted for</td><td class="n">{{ t.unaccountedKg | num: 1 }} kg</td></tr>
+                                        <tr class="is-total" [class.is-warn]="t.unaccountedKg > 0"><td>Available to sell</td><td class="n">{{ t.unaccountedKg | num: 1 }} kg</td></tr>
                                     </tbody>
                                 </table>
                             }
