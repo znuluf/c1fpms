@@ -15,7 +15,7 @@ const PROFILE_DRAFT = 'farm-profile';
     standalone: true,
     imports: [...FPMS_IMPORTS, TimeListComponent],
     template: `
-        <fpms-page-header [narrow]="true" title="Farm profile" subtitle="Your farm, how dates show, and the production settings."></fpms-page-header>
+        <fpms-page-header [narrow]="true" title="Farm profile" subtitle="Farm identity, location and contact information."></fpms-page-header>
         <section class="content px-2 pb-3">
             <div class="container-fluid fpms-narrow">
                 @if (!p) {
@@ -73,19 +73,6 @@ const PROFILE_DRAFT = 'farm-profile';
                                     <dt class="col-sm-4">Contact person</dt><dd class="col-sm-8">{{ p.contactName || '—' }}</dd>
                                     <dt class="col-sm-4">Phone</dt><dd class="col-sm-8">{{ p.contactPhone || '—' }}</dd>
                                     <dt class="col-sm-4">Email</dt><dd class="col-sm-8">{{ p.contactEmail || '—' }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Settings</h3></div>
-                            <div class="card-body">
-                                <dl class="row mb-0 fpms-dl">
-                                    <dt class="col-sm-4">Farming system</dt><dd class="col-sm-8">{{ p.farmingSystem | label: L.FarmingSystems }}</dd>
-                                    <dt class="col-sm-4">Permit alert</dt><dd class="col-sm-8">{{ p.documentExpiryAlertDays }} days</dd>
-                                    <dt class="col-sm-4">Date display</dt><dd class="col-sm-8">{{ p.dateOrder === 2 ? 'Day first' : 'Month first' }}</dd>
-                                    <dt class="col-sm-4">Time display</dt><dd class="col-sm-8">{{ p.use24HourTime ? '24-hour (14:30)' : '12-hour (2:30 PM)' }}</dd>
-                                    <dt class="col-sm-4">Feeding schedule</dt><dd class="col-sm-8">{{ feedingCount() }} a day: {{ p.feedingTimes }}</dd>
-                                    <dt class="col-sm-4">Water quality</dt><dd class="col-sm-8">{{ p.waterQualityDaily === false ? 'Tested on some days; a day without a reading is not a gap' : 'Tested every day' }}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -157,36 +144,6 @@ const PROFILE_DRAFT = 'farm-profile';
                                                 Check the total area or the pond areas. You can still save.
                                             </div>
                                         }
-                                    </div>
-                                </div>
-                                <!-- How the farm works (DEC-109): the settings that change what other screens ask for and count. -->
-                                <div class="card">
-                                    <div class="card-header"><h3 class="card-title">How the farm works</h3></div>
-                                    <div class="card-body">
-                                        <div class="form-row">
-                                            <div class="form-group col-lg-5">
-                                                <label for="fsys">Farming system</label>
-                                                <select id="fsys" class="form-control" name="farmingSystem" [(ngModel)]="p.farmingSystem">
-                                                    @for (o of Options.farmingSystem; track o.value) {
-                                                        <option [ngValue]="o.value">{{ o.label }}</option>
-                                                    }
-                                                </select>
-                                                <small class="form-text text-muted">Every pond uses this unless the pond sets its own.</small>
-                                            </div>
-                                            <div class="form-group col-lg-7">
-                                                <span class="fpms-group-label" id="ftimes-l">Feeding schedule</span>
-                                                <!-- One time picker per feeding instead of typed text (DEC-123). -->
-                                                <fpms-time-list name="feedingTimes" [(ngModel)]="p.feedingTimes"></fpms-time-list>
-                                                <small class="form-text text-muted">One feeding a day per time, 1 to 8. The feeding sheet shows them in this order.</small>
-                                            </div>
-                                        </div>
-                                        <div class="fpms-setting">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="wqd" name="waterQualityDaily" [(ngModel)]="p.waterQualityDaily" />
-                                                <label class="custom-control-label" for="wqd">Water quality is tested every day</label>
-                                            </div>
-                                            <small class="form-text text-muted">Untick if the farm tests water on some days only. Readings are still checked against the farm's ranges, but a day without one is not counted as a gap.</small>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="card">
@@ -279,36 +236,6 @@ const PROFILE_DRAFT = 'farm-profile';
                                             <div class="form-group col-md-4">
                                                 <label for="cemail">Email</label>
                                                 <input id="cemail" type="email" email class="form-control" name="contactEmail" [(ngModel)]="p.contactEmail" maxlength="256" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- How dates and times show, and when permits warn (DEC-109). -->
-                                <div class="card">
-                                    <div class="card-header"><h3 class="card-title">Dates, times and reminders</h3></div>
-                                    <div class="card-body">
-                                        <div class="form-row">
-                                            <div class="form-group col-md-6">
-                                                <label for="alert">Permit reminder</label>
-                                                <div class="input-group">
-                                                    <input id="alert" type="number" min="1" max="365" class="form-control" name="documentExpiryAlertDays" [(ngModel)]="p.documentExpiryAlertDays" required />
-                                                    <div class="input-group-append"><span class="input-group-text">days</span></div>
-                                                </div>
-                                                <small class="form-text text-muted">Permits expiring within this many days show "Expiring soon".</small>
-                                            </div>
-                                            <div class="form-group col-md-6 mb-md-0">
-                                                <label for="dord">Date display</label>
-                                                <select id="dord" class="form-control" name="dateOrder" [(ngModel)]="p.dateOrder">
-                                                    <option [ngValue]="1">Month first</option>
-                                                    <option [ngValue]="2">Day first</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-md-6 mb-0">
-                                                <label for="tfmt">Time display</label>
-                                                <select id="tfmt" class="form-control" name="use24HourTime" [(ngModel)]="p.use24HourTime">
-                                                    <option [ngValue]="false">12-hour (2:30 PM)</option>
-                                                    <option [ngValue]="true">24-hour (14:30)</option>
-                                                </select>
                                             </div>
                                         </div>
                                     </div>
