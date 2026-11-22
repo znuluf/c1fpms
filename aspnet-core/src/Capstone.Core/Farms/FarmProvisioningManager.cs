@@ -58,7 +58,6 @@ public class FarmProvisioningManager : DomainService
     private readonly IPermissionManager _permissionManager;
     private readonly IRepository<FarmProfile, int> _profiles;
     private readonly IRepository<FarmSettings, int> _settings;
-    private readonly IRepository<FarmSettings, int> _settings;
     private readonly IRepository<DocumentCategory, Guid> _documentCategories;
     private readonly IRepository<DocumentPreset, Guid> _documentPresets;
     private readonly IRepository<PondNamePrefix, Guid> _pondPrefixes;
