@@ -534,6 +534,59 @@ public class HarvestAppService : CapstoneAppServiceBase
         return await WithWarningsAsync(await Get(harvest.Id), warnings);
     }
 
+    /// <summary>Records an additional not-sold outcome without rewriting earlier disposition entries.</summary>
+    [AbpAuthorize(PermissionNames.Harvests_Create)]
+    public virtual async Task<HarvestDto> RecordDisposal(Guid harvestId, DisposalInput input)
+    {
+        if (input == null || input.Kg <= 0)
+        {
+            throw new UserFriendlyException("Not-sold kg must be greater than zero.");
+        }
+
+        if (!Enum.IsDefined(input.Reason))
+        {
+            throw new UserFriendlyException("Choose a reason for this not-sold entry.");
+        }
+
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Harvest, harvestId);
+        }
+
+        var harvest = await _harvests.GetAll()
+            .Include(h => h.Disposals)
+            .Include(h => h.GradeLines)
+            .FirstOrDefaultAsync(h => h.Id == harvestId)
+            ?? throw new UserFriendlyException("Harvest not found.");
+
+        var batch = await _batches.GetAsync(harvest.BatchId);
+        batch.EnsureNotClosed();
+        if (harvest.CreatorUserId != AbpSession.UserId && !await IsGrantedAsync(PermissionNames.Harvests_EditAny))
+        {
+            throw new AbpAuthorizationException("You can only record dispositions for harvests you recorded.");
+        }
+
+        var sold = (await SoldByGradeLineAsync(harvest.GradeLines.Select(g => g.Id).ToList())).Values.Sum();
+        var alreadyNotSold = harvest.Disposals.Sum(d => d.Kg);
+        if (sold + alreadyNotSold + input.Kg > harvest.TotalKg)
+        {
+            throw new UserFriendlyException(
+                $"Sold {sold:0.###} kg + already not sold {alreadyNotSold:0.###} kg + this entry {input.Kg:0.###} kg is more than the harvest total of {harvest.TotalKg:0.###} kg.");
+        }
+
+        harvest.Disposals.Add(new HarvestDisposal
+        {
+            HarvestId = harvest.Id,
+            TenantId = AbpSession.TenantId ?? throw new AbpAuthorizationException("A farm tenant is required."),
+            Kg = input.Kg,
+            Reason = input.Reason,
+            Note = string.IsNullOrWhiteSpace(input.Note) ? null : input.Note.Trim(),
+        });
+
+        await CurrentUnitOfWork.SaveChangesAsync();
+        return await Get(harvest.Id);
+    }
+
     /// <summary>
     /// Gives the harvest its lot code (DEC-83) from the farm-local harvest date. When the farm's address does not allow one
     /// yet, the harvest still saves (flag-never-block) and says what to fix; the code is given on its next save.

@@ -105,6 +105,28 @@ public class HarvestSales_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task Additional_disposition_entries_are_recorded_without_replacing_prior_entries()
+    {
+        var harvests = Resolve<HarvestAppService>();
+        var harvest = await harvests.Create(Harvest(HarvestType.Partial, 100));
+
+        var first = await harvests.RecordDisposal(harvest.Id,
+            new DisposalInput { Kg = 10, Reason = DisposalReason.StaffOrHomeUse });
+        first.NotSoldKg.ShouldBe(10m);
+        first.UnaccountedKg.ShouldBe(90m);
+
+        var second = await harvests.RecordDisposal(harvest.Id,
+            new DisposalInput { Kg = 25, Reason = DisposalReason.SpoiledOrLost, Note = "Damaged during handling" });
+        second.NotSoldKg.ShouldBe(35m);
+        second.UnaccountedKg.ShouldBe(65m);
+        second.Disposals.Count.ShouldBe(2);
+        second.Disposals.Sum(d => d.Kg).ShouldBe(35m);
+
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.RecordDisposal(harvest.Id,
+            new DisposalInput { Kg = 66, Reason = DisposalReason.GivenAway }));
+    }
+
+    [Fact]
     public async Task A_fully_disposed_and_sold_harvest_is_not_offered_for_another_sale()
     {
         SetSizeGrading(false);
