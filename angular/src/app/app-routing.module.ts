@@ -17,6 +17,7 @@ const routes: Routes = [
             { path: 'account', title: 'My account', loadComponent: () => import('./fpms/account/my-account.component').then((m) => m.MyAccountComponent), ...page() },
 
             { path: 'farm/profile', title: 'Farm profile', loadComponent: () => import('./fpms/farm/profile.component').then((m) => m.FarmProfileComponent), ...page('Farm.Profile') },
+            { path: 'farm/settings', title: 'Farm settings', loadComponent: () => import('./fpms/farm/settings.component').then((m) => m.FarmSettingsComponent), ...page('Farm.Profile') },
             { path: 'farm/standards', title: 'Farm standards', loadComponent: () => import('./fpms/farm/standards.component').then((m) => m.FarmStandardsComponent), ...page('Farm.Profile') },
             { path: 'farm/users', title: 'Users', loadComponent: () => import('./fpms/farm/users.component').then((m) => m.FarmUsersComponent), ...page('Farm.Users') },
             { path: 'farm/documents', title: 'Permits and licenses', loadComponent: () => import('./fpms/farm/documents.component').then((m) => m.DocumentsComponent), ...page('Farm.Compliance') },
