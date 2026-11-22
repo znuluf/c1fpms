@@ -6,7 +6,7 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
 
 /**
  * Farm Settings: operational defaults and display preferences.
- * Uses the existing FarmProfile endpoint so settings retain one source of truth.
+ * Uses the dedicated FarmSettings endpoint so operational preferences stay separate from farm identity.
  */
 @Component({
     standalone: true,
@@ -142,8 +142,7 @@ export class FarmSettingsComponent extends FpmsPage implements OnInit {
     }
 
     async save(): Promise<void> {
-        let warnings: any[] = [];
-        if (await this.act(async () => (warnings = (await this.api.put<void>('FarmSettings', 'Update', this.p)) ?? []))) {
+        if (await this.act(async () => this.api.put<void>('FarmSettings', 'Update', this.p))) {
             FarmTime.setZone(this.p.timeZone);
             FarmTime.setDisplay(this.p.dateOrder, this.p.use24HourTime);
             this.notifySaved('Farm settings saved.');
