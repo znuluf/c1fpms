@@ -95,13 +95,14 @@ public class SimpleSampleDataBuilder
         _parameters = _context.ParameterDefinitions.AsNoTracking().ToDictionary(p => p.Id);
 
         var profile = _context.FarmProfiles.IgnoreQueryFilters().First(p => p.Id == _t);
-        profile.FarmingSystem = FarmingSystem.Intensive;
+        var settings = _context.FarmSettings.IgnoreQueryFilters().First(s => s.Id == _t);
+        settings.FarmingSystem = FarmingSystem.Intensive;
         profile.PostalCode = "9500";
         profile.ContactName = "Abi Rkabubba";
         profile.ContactPhone = "0917 000 1111";
         profile.TotalAreaHectares = 0.5m;
         // The partner farm tests water about three times a week (DEC-94).
-        profile.WaterQualityDaily = false;
+        settings.WaterQualityDaily = false;
         // The partner farm sells harvests ungraded (DEC-100); the sample's graded harvests show how earlier grades still read.
         profile.UsesSizeGrading = false;
         // Harvest lot code identity (DEC-83): General Santos (0), Tambler (24), the first farm there (01).
