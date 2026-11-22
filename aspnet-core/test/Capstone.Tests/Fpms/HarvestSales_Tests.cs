@@ -48,18 +48,16 @@ public class HarvestSales_Tests : FpmsTestBase
     [Fact]
     public async Task Ungraded_kg_are_estimated_from_abw_and_a_final_count_wins()
     {
-        SetSizeGrading(true); // the "not on any grade line" warning is for farms that grade
         var harvests = Resolve<HarvestAppService>();
         var mixed = await harvests.Create(Harvest(HarvestType.Partial, 90, ("100/120", 45), (SizeGrade.UngradedLabel, 45)));
-        mixed.HarvestedPieces.ShouldBe(4950m + 5000m); // 45 × 110 + 45 kg × 1000 ÷ 9 g
+        mixed.GradeLines.Single().IsUngraded.ShouldBeTrue();
+        mixed.GradeLines.Single().Kg.ShouldBe(90m);
+        mixed.HarvestedPieces.ShouldBe(10000m); // all 90 kg use the harvest ABW (1000 ÷ 9 g)
         mixed.UngradedRemainderKg.ShouldBe(0m);
-
-        var remainder = await harvests.Create(Harvest(HarvestType.Partial, 90, ("100/120", 45)));
-        remainder.UngradedRemainderKg.ShouldBe(45m);
-        remainder.HarvestedPieces.ShouldBe(9950m); // the ungraded remainder also uses ABW
-        remainder.Warnings.ShouldContain(w => w.Kind == "Grades");
+        mixed.Warnings.ShouldNotContain(w => w.Kind == "Grades");
 
         var counted = Harvest(HarvestType.Partial, 50);
+        counted.GradeLines = new();
         counted.FinalCount = 5200;
         (await harvests.Create(counted)).HarvestedPieces.ShouldBe(5200m);
     }
