@@ -330,7 +330,7 @@ public class PondAppService : CapstoneAppServiceBase
     /// <summary>The farm's ponds. Archived ponds are left out unless asked for.</summary>
     public virtual async Task<List<PondListDto>> GetAll(bool includeArchived = false)
     {
-        var farmSystem = (await Farm.GetProfileAsync()).FarmingSystem;
+        var farmSystem = (await Farm.GetSettingsAsync()).FarmingSystem;
         var ponds = await _ponds.GetAll().AsNoTracking().Include(p => p.Prefix).Where(p => includeArchived || !p.IsArchived).OrderBy(p => p.PondCode).ToListAsync();
         var open = await _batches.GetAll().AsNoTracking().Where(b => b.Status != BatchStatus.Closed)
             .Select(b => new { b.PondId, b.Id, b.BatchCode, b.Status }).ToListAsync();
