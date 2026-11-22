@@ -60,6 +60,21 @@ interface CalMonth {
                 @if (!b) {
                     <fpms-loading></fpms-loading>
                 } @else {
+                    @if (b.harvestReadinessReached) {
+                        <div class="alert alert-success border" role="status">
+                            <strong><i class="fas fa-check-circle mr-1" aria-hidden="true"></i>Ready for harvest</strong>
+                            <div>DOC {{ b.doc }} and ABW {{ b.indicators.latestSampleAbwG }} g reach this farm's targets (DOC {{ b.harvestReadinessDocTarget }}, {{ b.harvestReadinessAbwTargetG }} g).</div>
+                            @if (b.earliestSafeHarvestDate && b.earliestSafeHarvestDate > today) {
+                                <div class="mt-1"><i class="fas fa-hourglass-half mr-1" aria-hidden="true"></i>Withdrawal period is still active. Safe harvest date: {{ b.earliestSafeHarvestDate | farmDate }}.</div>
+                            }
+                            <div class="small mt-1">This is guidance only. It does not change the batch status or prevent recording a harvest.</div>
+                        </div>
+                    } @else if (b.doc >= b.harvestReadinessDocTarget && !b.harvestReadinessSampleIsRecent) {
+                        <div class="alert alert-info border" role="status">
+                            <strong>Harvest readiness check</strong>
+                            <div>DOC target reached, but there is no ABW sample from the last 7 days. Record a recent growth sample to check the farm's ABW target of {{ b.harvestReadinessAbwTargetG }} g.</div>
+                        </div>
+                    }
                     @if (assigning) {
                         <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-primary mb-0 border-0">
                             <div class="card-header"><h3 class="card-title"><i class="fas fa-user" aria-hidden="true"></i>Who looks after {{ b.pondCode }}</h3></div>
