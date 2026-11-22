@@ -78,11 +78,26 @@ public class HarvestSales_Tests : FpmsTestBase
         harvest.GradeLines.Single().Kg.ShouldBe(90m);
         harvest.Warnings.ShouldNotContain(w => w.Kind == "Grades");
 
-        // Recording more as not sold shrinks the single ungraded line.
+        // Replacing a disposition soft-deletes the prior entry instead of erasing its audit history.
         var edit = Harvest(HarvestType.Partial, 100);
         edit.Id = harvest.Id;
         edit.Disposals = new List<DisposalInput> { new() { Kg = 25, Reason = DisposalReason.SpoiledOrLost } };
         (await harvests.Update(edit)).GradeLines.Single().Kg.ShouldBe(75m);
+
+        var history = Q(c => c.HarvestDisposals.IgnoreQueryFilters()
+            .Where(d => d.HarvestId == harvest.Id)
+            .OrderBy(d => d.CreationTime)
+            .Select(d => new { d.Kg, d.IsDeleted, d.CreatorUserId, d.DeleterUserId, d.DeletionTime })
+            .ToList());
+        history.Count.ShouldBe(2);
+        history[0].Kg.ShouldBe(10m);
+        history[0].IsDeleted.ShouldBeTrue();
+        history[0].CreatorUserId.ShouldNotBeNull();
+        history[0].DeleterUserId.ShouldNotBeNull();
+        history[0].DeletionTime.ShouldNotBeNull();
+        history[1].Kg.ShouldBe(25m);
+        history[1].IsDeleted.ShouldBeFalse();
+        history[1].CreatorUserId.ShouldNotBeNull();
 
         var suppliedGrade = await harvests.Create(Harvest(HarvestType.Partial, 50, ("100/120", 50)));
         suppliedGrade.GradeLines.Single().IsUngraded.ShouldBeTrue();
