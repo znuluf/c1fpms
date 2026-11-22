@@ -64,8 +64,6 @@ public static class FarmThresholds
         new ThresholdDefinition(DailyMortalityPct, "Daily mortality above (share of estimated population)", "%", 1, 0.1m, 50, TeamDefault),
         new ThresholdDefinition(AbwDropPct, "ABW drop from the previous sample above", "%", 20, 1, 90, TeamDefault),
         new ThresholdDefinition(BuyerWeightDiffPct, "Buyer's accepted kg differs from farm kg by more than", "%", 10, 1, 50, TeamDefault),
-    };
-
         new ThresholdDefinition(HarvestReadyFromDoc, "Harvest ready from DOC", "days", 90, 1, 365, TeamDefault),
         new ThresholdDefinition(HarvestReadyAtAbw, "Harvest ready at ABW", "g", 20, 1, 100, TeamDefault),
     };
