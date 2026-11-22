@@ -122,7 +122,7 @@ public class PondBatch : FarmEntity
     public bool AllowsFeeding => Status is BatchStatus.Stocked or BatchStatus.Harvested or BatchStatus.Failed;
 }
 
-/// <summary>Declare Batch Failure (Ref 7.4): one row per failed batch.</summary>
+/// <summary>Historical compatibility record for a batch incident declared under the retired failure workflow.</summary>
 public class BatchFailure : FarmEntity
 {
     public const int MaxReasonLength = 1000;
