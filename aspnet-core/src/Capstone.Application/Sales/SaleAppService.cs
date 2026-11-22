@@ -474,6 +474,16 @@ public class SaleAppService : CapstoneAppServiceBase
             .Where(h => harvestIds.Contains(h.Id)).ToDictionaryAsync(h => h.Id);
         var sold = await SoldByGradeLineAsync(lines.Select(l => l.Id).ToList(), saleId);
         var onSale = saleId.HasValue ? await _lines.GetAll().Where(l => l.SaleId == saleId).Select(l => l.HarvestGradeLineId).ToListAsync() : new List<Guid>();
+
+        // A harvest can have no saleable stock even when an individual grade line still has an unsold balance:
+        // earlier non-sale dispositions consume the harvest's aggregate balance. Keep lines already on the sale
+        // being edited, but do not offer a fully accounted harvest for a new sale.
+        var availableByHarvest = harvests.ToDictionary(
+            pair => pair.Key,
+            pair => Math.Max(0m, pair.Value.TotalKg
+                - pair.Value.Disposals.Sum(d => d.Kg)
+                - pair.Value.GradeLines.Sum(g => sold.TryGetValue(g.Id, out var kg) ? kg : 0m)));
+
         return lines.Where(l => harvests.ContainsKey(l.HarvestId))
             .Select(l =>
             {
@@ -486,7 +496,7 @@ public class SaleAppService : CapstoneAppServiceBase
                     HarvestAbwG = h.AbwG, HarvestBuyerId = h.BuyerId, LotCode = h.LotCode, DefaultCountPerKg = DefaultCount(l, h),
                 };
             })
-            .Where(l => l.UnsoldKg > 0 || onSale.Contains(l.HarvestGradeLineId))
+            .Where(l => availableByHarvest[l.HarvestId] > 0m && (l.UnsoldKg > 0 || onSale.Contains(l.HarvestGradeLineId)))
             .OrderBy(l => l.HarvestedAtUtc).ThenBy(l => l.SizeLabel)
             .ToList();
     }
