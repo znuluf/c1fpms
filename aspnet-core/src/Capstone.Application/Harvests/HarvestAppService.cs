@@ -847,9 +847,9 @@ public class HarvestAppService : CapstoneAppServiceBase
             await CurrentUnitOfWork.SaveChangesAsync();
         }
 
-        var sentGrades = (input.GradeLines ?? new List<GradeLineInput>()).Select(l => l.SizeGradeId)
-            .Concat(harvest.GradeLines.Select(g => g.SizeGradeId)).Distinct().ToList();
-        if (sentGrades.Any(id => id != ungraded.Id))
+        // Existing graded harvests retain their original grade-line identities so historical sales remain linked.
+        // New harvests (and existing ungraded harvests) are always collapsed into one ungraded/mixed line.
+        if (harvest.GradeLines.Any(g => g.SizeGradeId != ungraded.Id))
         {
             return;
         }
