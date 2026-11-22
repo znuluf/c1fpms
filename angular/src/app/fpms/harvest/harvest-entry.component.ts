@@ -440,13 +440,14 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                         @if (h.disposals?.length) {
                                             <div class="table-responsive mb-3">
                                                 <table class="table table-sm mb-0">
-                                                    <thead><tr><th>Recorded outcome</th><th>Note</th><th class="text-right">Kg</th><th>Recorded</th></tr></thead>
+                                                    <thead><tr><th>Recorded outcome</th><th>Note</th><th class="text-right">Kg</th><th>Recorded by</th><th>Recorded</th></tr></thead>
                                                     <tbody>
                                                         @for (d of h.disposals; track d.id) {
                                                             <tr>
                                                                 <td>{{ DisposalReasons[d.reason] || 'Other' }}</td>
                                                                 <td>{{ d.note || '—' }}</td>
                                                                 <td class="text-right">{{ d.kg | num: 3 }}</td>
+                                                                <td>{{ d.recordedBy || '—' }}</td>
                                                                 <td>{{ d.creationTime | farmDateTime }}</td>
                                                             </tr>
                                                         }
