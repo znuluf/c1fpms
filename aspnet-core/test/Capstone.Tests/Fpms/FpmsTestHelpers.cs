@@ -1,4 +1,6 @@
 using Capstone.EntityFrameworkCore;
+using Abp.Domain.Repositories;
+using Capstone.Production;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -15,6 +17,19 @@ public abstract class FpmsTestBase : CapstoneTestBase
     {
         var tenantId = GetTenantId(PilotFarm);
         UsingDbContext(null, c => c.FarmProfiles.IgnoreQueryFilters().Single(p => p.TenantId == tenantId).UsesSizeGrading = on);
+    }
+
+    /// <summary>Seeds a pre-existing legacy failure record to verify historical compatibility; new records must use Emergency harvests.</summary>
+    protected async Task SeedLegacyFailureAsync(Guid batchId, DateOnly date, string reason, decimal? estimatedLossPhp = null)
+    {
+        await Resolve<IRepository<BatchFailure, Guid>>().InsertAsync(new BatchFailure
+        {
+            BatchId = batchId,
+            FailedOn = date,
+            Reason = reason,
+            EstimatedLossPhp = estimatedLossPhp,
+        });
+        UsingDbContext(null, c => c.PondBatches.IgnoreQueryFilters().Single(b => b.Id == batchId).Status = BatchStatus.Failed);
     }
 
     protected Guid PondId(string code)
