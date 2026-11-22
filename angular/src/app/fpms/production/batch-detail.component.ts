@@ -590,7 +590,7 @@ interface CalMonth {
                                                         <div class="small text-muted mt-1">
                                                             Sold {{ h.soldKg | num: 2 : true }} kg{{ h.notSoldKg > 0 ? ' · not sold ' + (h.notSoldKg | num: 2 : true) + ' kg' : '' }}
                                                             @if (h.unaccountedKg > 0) {
-                                                                <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg unsold, awaiting outcome@if (h.followUpDue) { · follow-up due }</div>
+                                                                <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg available to sell@if (h.followUpDue) { · follow-up due }</div>
                                                             } @else {
                                                                 <div class="text-success"><i class="fas fa-check mr-1" aria-hidden="true"></i>All accounted for</div>
                                                             }
