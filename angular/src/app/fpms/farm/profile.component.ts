@@ -1,7 +1,6 @@
 import { PHONE_MESSAGE, tidyPhone } from '@shared/fpms/phone';
 import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
-import { FarmTime } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { LAST_FARM_CODE_KEY } from '@shared/auth/app-auth.service';
 import { FPMS_IMPORTS } from '../shared-imports';
@@ -662,8 +661,6 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
     async save(): Promise<void> {
         let warnings: any[] = [];
         if (await this.act(async () => (warnings = (await this.api.put<any[]>('FarmProfile', 'Update', this.p)) ?? []))) {
-            FarmTime.setZone(this.p.timeZone);
-            FarmTime.setDisplay(this.p.dateOrder, this.p.use24HourTime);
             FormDrafts.clear(PROFILE_DRAFT);
             this.restoredAt = null;
             this.notifySaved('Farm profile saved.');
@@ -674,8 +671,4 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
         }
     }
 
-    /** Number of feedings a day in the farm's schedule (DEC-61). */
-    feedingCount(): number {
-        return String(this.p?.feedingTimes ?? '').split(',').filter((t) => t.trim()).length;
-    }
 }
