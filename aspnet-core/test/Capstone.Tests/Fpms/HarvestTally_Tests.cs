@@ -586,7 +586,7 @@ public class HarvestTally_Tests : FpmsTestBase
     }
 
     [Fact]
-    public async Task Graded_crates_make_the_grade_lines()
+    public async Task Crate_tally_is_kept_but_new_harvest_uses_one_ungraded_line()
     {
         var input = TallySheet();
         input.Crates = new()
@@ -600,30 +600,28 @@ public class HarvestTally_Tests : FpmsTestBase
         var harvest = await Resolve<HarvestAppService>().Create(input);
 
         harvest.TotalKg.ShouldBe(105m);
-        harvest.GradeLines.Count.ShouldBe(3);
-        harvest.GradeLines.Single(g => g.SizeLabel == "50/60").Kg.ShouldBe(60m);
-        harvest.GradeLines.Single(g => g.SizeLabel == "100/120").Kg.ShouldBe(25m);
-        harvest.GradeLines.Single(g => g.IsUngraded).Kg.ShouldBe(20m);
-        harvest.Crates.First().SizeLabel.ShouldBe("50/60");
-        harvest.Crates.Last().SizeGradeId.ShouldBeNull();
+        harvest.GradeLines.Count.ShouldBe(1);
+        harvest.GradeLines.Single().IsUngraded.ShouldBeTrue();
+        harvest.GradeLines.Single().Kg.ShouldBe(105m);
+        harvest.Crates.ShouldAllBe(c => c.SizeGradeId == null);
     }
 
     [Fact]
-    public async Task Tally_sheet_prices_each_grade_from_its_count_with_a_table()
+    public async Task Tally_sheet_sells_one_ungraded_line_at_a_fixed_price()
     {
-        var table = await Table("GenSan by count", Buyer, (51, 60, 380), (61, 100, 300), (101, 120, 250));
         var sheet = SheetWithSale();
         sheet.Harvest.Crates = new()
         {
             new() { Kg = 30, SizeGradeId = Grade("50/60") },
             new() { Kg = 20, SizeGradeId = Grade("100/120") },
         };
-        sheet.Sale = new TallySaleInput { PriceMethod = PriceMethod.Table, PriceTableId = table };
+        sheet.Sale = new TallySaleInput { PriceMethod = PriceMethod.Fixed, PricePerKg = 200m };
         var result = await Resolve<TallySheetAppService>().Save(sheet);
 
-        result.Sale.Lines.Single(l => l.SizeLabel == "50/60").PricePerKg.ShouldBe(380m);   // 55 pcs/kg
-        result.Sale.Lines.Single(l => l.SizeLabel == "100/120").PricePerKg.ShouldBe(250m); // 110 pcs/kg
-        result.Sale.Total.ShouldBe(30 * 380m + 20 * 250m);
+        result.Harvest.GradeLines.Single().IsUngraded.ShouldBeTrue();
+        result.Sale.Lines.Single().Kg.ShouldBe(50m);
+        result.Sale.Lines.Single().PricePerKg.ShouldBe(200m);
+        result.Sale.Total.ShouldBe(10000m);
         result.Warnings.ShouldNotContain(w => w.Kind == "PriceFormula");
     }
 
@@ -657,14 +655,14 @@ public class HarvestTally_Tests : FpmsTestBase
         input.GradeLines = new() { new() { SizeGradeId = Grade("50/60"), Kg = 90 } };
         input.Disposals = new();
         var edited = await harvests.Update(input);
-        edited.GradeLines.Single().Kg.ShouldBe(90m);
+        edited.GradeLines.Single().IsUngraded.ShouldBeTrue();
+        edited.GradeLines.Single().Kg.ShouldBe(100m);
         edited.Disposals.ShouldBeEmpty();
 
-        // And add them back in a later edit.
-        input.GradeLines = new() { new() { SizeGradeId = Grade("50/60"), Kg = 60 }, new() { SizeGradeId = Grade("100/120"), Kg = 30 } };
+        // Recording a later disposal reduces the ungraded line.
         input.Disposals = new() { new() { Kg = 5, Reason = DisposalReason.GivenAway } };
         var again = await harvests.Update(input);
-        again.GradeLines.Count.ShouldBe(2);
+        again.GradeLines.Single().Kg.ShouldBe(95m);
         again.Disposals.Single().Kg.ShouldBe(5m);
     }
 
