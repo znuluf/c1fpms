@@ -126,7 +126,7 @@ export class FarmSettingsComponent extends FpmsPage implements OnInit {
     p: any = null;
 
     get canEdit(): boolean {
-        return this.can('Farm.Profile.Edit');
+        return this.can('Farm.Settings.Edit');
     }
 
     ngOnInit(): void {
@@ -134,7 +134,7 @@ export class FarmSettingsComponent extends FpmsPage implements OnInit {
     }
 
     async load(): Promise<void> {
-        this.p = await this.api.get<any>('FarmProfile', 'Get');
+        this.p = await this.api.get<any>('FarmSettings', 'Get');
     }
 
     feedingCount(): number {
@@ -143,13 +143,10 @@ export class FarmSettingsComponent extends FpmsPage implements OnInit {
 
     async save(): Promise<void> {
         let warnings: any[] = [];
-        if (await this.act(async () => (warnings = (await this.api.put<any[]>('FarmProfile', 'Update', this.p)) ?? []))) {
+        if (await this.act(async () => (warnings = (await this.api.put<void>('FarmSettings', 'Update', this.p)) ?? []))) {
             FarmTime.setZone(this.p.timeZone);
             FarmTime.setDisplay(this.p.dateOrder, this.p.use24HourTime);
             this.notifySaved('Farm settings saved.');
-            if (warnings.length) {
-                this.showWarnings(warnings);
-            }
             await this.load();
         }
     }
