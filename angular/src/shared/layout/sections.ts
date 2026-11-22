@@ -113,7 +113,7 @@ export const SECTIONS: Section[] = [
         prefixes: ['/app/farm'],
         tabs: [
             { label: 'Profile', route: '/app/farm/profile', permission: 'Farm.Profile' },
-            { label: 'Farm Settings', route: '/app/farm/settings', permission: 'Farm.Profile' },
+            { label: 'Farm Settings', route: '/app/farm/settings', permission: 'Farm.Settings' },
             { label: 'Farm standards', route: '/app/farm/standards', permission: 'Farm.Profile' },
             { label: 'Users', route: '/app/farm/users', permission: 'Farm.Users' },
             { label: 'Permits and licenses', route: '/app/farm/documents', permission: 'Farm.Compliance' },
