@@ -268,7 +268,6 @@ public class DashboardAppService : CapstoneAppServiceBase
         var today = FarmClock.Today(zone);
         var profile = await Farm.GetProfileAsync();
         var settings = await Farm.GetSettingsAsync();
-        var settings = await Farm.GetSettingsAsync();
         var isOwner = await IsGrantedAsync(PermissionNames.Dashboard_Full);
         var parameters = await _waterQuality.GetParametersAsync();
         var dto = new DashboardDto { FarmName = profile.FarmName, Today = today, IsOwner = isOwner };
