@@ -74,10 +74,15 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                             <label [for]="'g' + $index">{{ grading ? 'Harvest grade' : 'Harvest' }}</label>
                                             <select [id]="'g' + $index" class="form-control" [name]="'g' + $index" [(ngModel)]="l.harvestGradeLineId" (ngModelChange)="onGrade(l)" required>
                                                 @for (o of sellable; track o.harvestGradeLineId) {
-                                                    <option [value]="o.harvestGradeLineId" [disabled]="used(o.harvestGradeLineId, l)">{{ o.harvestDate | farmDate }} · {{ o.pondCode }}{{ o.lotCode ? ' · lot ' + o.lotCode : '' }}{{ gradeText(o) }} ({{ unsold(o) | num: 3 : true }} kg left)</option>
+                                                    <option [value]="o.harvestGradeLineId" [disabled]="used(o.harvestGradeLineId, l)">{{ o.harvestDate | farmDate }} · {{ o.pondCode }}{{ o.lotCode ? ' · lot ' + o.lotCode : '' }}{{ gradeText(o) }} ({{ unsold(o) | num: 3 : true }} kg grade balance; {{ o.harvestAvailableKg | num: 3 : true }} kg harvest available)</option>
                                                 }
                                             </select>
-                                            @if (over(l)) { <small class="form-text text-danger">More than the {{ unsold(option(l)) | num: 3 : true }} kg left to sell.</small> }
+                                            @if (over(l)) {
+                                                <small class="form-text text-danger">
+                                                    @if (gradeOver(l)) { More than the {{ unsold(option(l)) | num: 3 : true }} kg left in this grade. }
+                                                    @else { The sale lines total more than the {{ option(l)?.harvestAvailableKg | num: 3 : true }} kg available from this harvest after not-sold entries. }
+                                                </small>
+                                            }
                                         </div>
                                         <div class="rm">
                                             @if (m.lines.length > 1) {
@@ -281,9 +286,23 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         return this.m.lines.some((l: any) => l !== self && l.harvestGradeLineId === id);
     }
 
-    over(l: any): boolean {
+    gradeOver(l: any): boolean {
         const o = this.option(l);
         return !!o && Number(l.kg) > o.unsoldKg + 0.0005;
+    }
+
+    /** A disposition is harvest-wide, not grade-specific: all sale lines from that harvest share the remaining balance. */
+    harvestOver(l: any): boolean {
+        const o = this.option(l);
+        if (!o) return false;
+        const total = this.m.lines
+            .filter((x: any) => this.option(x)?.harvestId === o.harvestId)
+            .reduce((sum: number, x: any) => sum + (Number(x.kg) || 0), 0);
+        return total > o.harvestAvailableKg + 0.0005;
+    }
+
+    over(l: any): boolean {
+        return this.gradeOver(l) || this.harvestOver(l);
     }
 
     anyOver(): boolean {
@@ -444,7 +463,11 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         if (!own.length) {
             return;
         }
-        this.m.lines = own.map((o) => ({ ...this.blankLine(o.harvestGradeLineId), kg: o.unsoldKg }));
+        const gradeBalance = own.reduce((sum, o) => sum + o.unsoldKg, 0);
+        const harvestAvailable = own[0].harvestAvailableKg;
+        // Dispositions are harvest-wide, not grade-specific. Do not silently assign their kg to an arbitrary grade.
+        const canPrefillAll = gradeBalance <= harvestAvailable + 0.0005;
+        this.m.lines = own.map((o) => ({ ...this.blankLine(o.harvestGradeLineId), kg: canPrefillAll ? o.unsoldKg : null }));
         const buyerId = own[0].harvestBuyerId;
         if (buyerId && this.buyers.some((b) => b.id === buyerId && b.isActive)) {
             this.m.buyerId = buyerId;
