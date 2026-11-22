@@ -41,14 +41,14 @@ public class ReferenceSetup_Tests : FpmsTestBase
     [Fact]
     public async Task Date_order_and_clock_settings_are_saved()
     {
-        var profiles = Resolve<FarmProfileAppService>();
-        var p = await profiles.Get();
+        var settings = Resolve<FarmSettingsAppService>();
+        var p = await settings.Get();
         p.DateOrder.ShouldBe(FarmDateOrder.MonthFirst);
         p.Use24HourTime.ShouldBeFalse();
         p.DateOrder = FarmDateOrder.DayFirst;
         p.Use24HourTime = true;
-        await profiles.Update(p);
-        var saved = await Resolve<FarmProfileAppService>().Get();
+        await settings.Update(p);
+        var saved = await Resolve<FarmSettingsAppService>().Get();
         saved.DateOrder.ShouldBe(FarmDateOrder.DayFirst);
         saved.Use24HourTime.ShouldBeTrue();
     }
