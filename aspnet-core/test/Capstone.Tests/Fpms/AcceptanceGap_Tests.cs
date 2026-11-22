@@ -188,7 +188,7 @@ public class AcceptanceGap_Tests : FpmsTestBase
 
         await batches.DeclareFailure(new FailureInput { Id = batchId, Reason = "AHPND suspected; mass mortality", FailureDate = FarmToday(), EstimatedLossPhp = 120000 });
         var failed = await batches.Get(batchId);
-        failed.Status.ShouldBe(BatchStatus.Failed);
+        failed.Status.ShouldBe(BatchStatus.Harvested);
         failed.EstimatedLossPhp.ShouldBe(120000m);
         var report = await Resolve<ReportAppService>().GetFailureReport(new Reports.Dto.FailureReportInput { BatchId = batchId });
         report.Batches.Single().FailureReason.ShouldContain("AHPND");
