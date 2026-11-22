@@ -28,7 +28,7 @@ public static class FarmRolePermissions
     public static readonly IReadOnlyList<string> FarmTechnician = new[]
     {
         PermissionNames.Dashboard,
-        PermissionNames.FarmProfile,
+        PermissionNames.FarmProfile, PermissionNames.FarmSettings,
         PermissionNames.Ponds, PermissionNames.Ponds_Prepare,
         PermissionNames.Hatcheries,
         PermissionNames.FryDeliveries, PermissionNames.FryDeliveries_UpdateStatus,
