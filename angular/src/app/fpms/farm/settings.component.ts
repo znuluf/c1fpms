@@ -67,8 +67,8 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                             <div class="form-group col-md-6">
                                                 <label for="dord">Date display</label>
                                                 <select id="dord" class="form-control" name="dateOrder" [(ngModel)]="p.dateOrder">
-                                                    <option [ngValue]="1">Month first (MM/DD/YYYY)</option>
-                                                    <option [ngValue]="2">Day first (DD/MM/YYYY)</option>
+                                                    <option [ngValue]="1">Month first (Oct 22, 2026)</option>
+                                                    <option [ngValue]="2">Day first (22 Oct 2026)</option>
                                                 </select>
                                             </div>
                                             <div class="form-group col-md-6 mb-0">
@@ -87,7 +87,7 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                     @if (busy()) { <i class="fas fa-spinner fa-spin mr-1"></i> }
                                     Save settings
                                 </button>
-                                <button type="button" class="btn btn-default" [disabled]="busy()" (click)="load()">Cancel</button>
+                                <button type="button" class="btn btn-default" [disabled]="busy()" (click)="f.form.markAsPristine(); load()">Cancel</button>
                                 <fpms-form-hint [form]="f"></fpms-form-hint>
                             </div>
                         </form>
