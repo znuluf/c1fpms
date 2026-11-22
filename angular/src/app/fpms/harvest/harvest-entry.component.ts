@@ -389,9 +389,9 @@ import { DisposalReasons } from '@shared/fpms/labels';
                             </div>
                             }
                             <div class="card">
-                                <div class="card-header"><h3 class="card-title">Not sold (optional)</h3></div>
+                                <div class="card-header"><h3 class="card-title">Record what was not sold (optional)</h3></div>
                                 <div class="card-body">
-                                    <p class="small text-muted">Harvest kept for staff or home use, given away, or spoiled, so every kilogram is accounted for. Shrimp not sold and not listed here stay as unsold shrimp, awaiting an outcome, until they are sold or listed.</p>
+                                    <p class="small text-muted">Use this only for shrimp that will no longer be sold: staff or home use, given away, spoiled, or lost. Shrimp kept for a later sale stay in the unsold balance and remain available to sell. You can record their outcome later without changing the original harvest.</p>
                                     @if (isNew || h?.unaccountedKg > 0) {
                                         <div class="form-row">
                                             <div class="form-group col-md-4">
