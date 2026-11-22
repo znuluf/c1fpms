@@ -22,12 +22,16 @@ public abstract class FpmsTestBase : CapstoneTestBase
     /// <summary>Seeds a pre-existing legacy failure record to verify historical compatibility; new records must use Emergency harvests.</summary>
     protected async Task SeedLegacyFailureAsync(Guid batchId, DateOnly date, string reason, decimal? estimatedLossPhp = null)
     {
-        await Resolve<IRepository<BatchFailure, Guid>>().InsertAsync(new BatchFailure
+        await InUow(async () =>
         {
-            BatchId = batchId,
-            FailedOn = date,
-            Reason = reason,
-            EstimatedLossPhp = estimatedLossPhp,
+            await Resolve<IRepository<BatchFailure, Guid>>().InsertAsync(new BatchFailure
+            {
+                BatchId = batchId,
+                FailedOn = date,
+                Reason = reason,
+                EstimatedLossPhp = estimatedLossPhp,
+            });
+            return true;
         });
         UsingDbContext(null, c => c.PondBatches.IgnoreQueryFilters().Single(b => b.Id == batchId).Status = BatchStatus.Failed);
     }
