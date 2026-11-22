@@ -37,11 +37,12 @@ public class HarvestSales_Tests : FpmsTestBase
 
     // ---------------------------------------------------------------- harvests
     [Fact]
-    public async Task Partial_harvest_keeps_the_batch_stocked_and_counts_pieces_from_grades()
+    public async Task Partial_harvest_keeps_the_batch_stocked_and_estimates_pieces_from_abw()
     {
         var harvest = await Resolve<HarvestAppService>().Create(Harvest(HarvestType.Partial, 300, ("100/120", 300)));
-        harvest.HarvestedPieces.ShouldBe(33000m); // 300 kg × 110 (mid of 100/120)
-        harvest.GradeLines.Single().SizeLabel.ShouldBe("100/120");
+        harvest.HarvestedPieces.ShouldBe(33333m); // 300 kg × (1,000 ÷ 9 g ABW)
+        harvest.GradeLines.Single().IsUngraded.ShouldBeTrue();
+        harvest.GradeLines.Single().Kg.ShouldBe(300m);
         (await Resolve<BatchAppService>().Get(BatchId(CurrentBatch))).Status.ShouldBe(BatchStatus.Stocked);
     }
 
@@ -76,14 +77,15 @@ public class HarvestSales_Tests : FpmsTestBase
         harvest.GradeLines.Single().Kg.ShouldBe(90m);
         harvest.Warnings.ShouldNotContain(w => w.Kind == "Grades");
 
-        // Recording more as not sold shrinks the line; a graded harvest sent in full keeps its grades.
+        // Recording more as not sold shrinks the single ungraded line.
         var edit = Harvest(HarvestType.Partial, 100);
         edit.Id = harvest.Id;
         edit.Disposals = new List<DisposalInput> { new() { Kg = 25, Reason = DisposalReason.SpoiledOrLost } };
         (await harvests.Update(edit)).GradeLines.Single().Kg.ShouldBe(75m);
 
-        var graded = await harvests.Create(Harvest(HarvestType.Partial, 50, ("100/120", 50)));
-        graded.GradeLines.Single().SizeLabel.ShouldBe("100/120");
+        var suppliedGrade = await harvests.Create(Harvest(HarvestType.Partial, 50, ("100/120", 50)));
+        suppliedGrade.GradeLines.Single().IsUngraded.ShouldBeTrue();
+        suppliedGrade.GradeLines.Single().Kg.ShouldBe(50m);
     }
 
     [Fact]
@@ -160,13 +162,11 @@ public class HarvestSales_Tests : FpmsTestBase
         });
 
         input.Id = harvest.Id;
-        input.GradeLines = new() { new() { SizeGradeId = Grade("100/120"), Kg = 150 } };
-        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Update(input));
-        input.GradeLines = new() { new() { SizeGradeId = Grade("90/100"), Kg = 300 } };
+        input.TotalKg = 150; // the ungraded line is derived from the harvest total, not client-supplied grade allocations
         await Should.ThrowAsync<UserFriendlyException>(() => harvests.Update(input));
 
-        // Raising it keeps the same grade line (the sale still points at it).
-        input.GradeLines = new() { new() { SizeGradeId = Grade("100/120"), Kg = 280 } };
+        // Raising the harvest total above the sold amount keeps the same line identity.
+        input.TotalKg = 280;
         var updated = await harvests.Update(input);
         updated.GradeLines.Single().Id.ShouldBe(harvest.GradeLines.Single().Id);
         updated.GradeLines.Single().SoldKg.ShouldBe(200m);
