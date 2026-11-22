@@ -171,7 +171,7 @@ public static class FpmsModelConfiguration
         {
             e.ToTable("FpmsPondHistories");
             e.Property(x => x.Description).HasMaxLength(PondHistory.MaxDescriptionLength);
-            e.HasOne(x => x.Pond).WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<Pond>().WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
             e.HasIndex(x => new { x.TenantId, x.PondId, x.ChangeDateUtc });
         });
 
@@ -296,7 +296,7 @@ public static class FpmsModelConfiguration
             e.ToTable("FpmsFryDeliveryPondAllocations");
             e.Ignore(x => x.IsActive);
             e.HasOne<FryDelivery>().WithMany().HasForeignKey(x => x.DeliveryId).OnDelete(DeleteBehavior.Restrict);
-            e.HasOne<Pond>().WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(x => x.Pond).WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne<PondBatch>().WithMany().HasForeignKey(x => x.PondBatchId).OnDelete(DeleteBehavior.Restrict);
             // One active reservation per pond across all deliveries. Fulfilled/released rows remain as history.
             e.HasIndex(x => new { x.TenantId, x.PondId }).IsUnique()
