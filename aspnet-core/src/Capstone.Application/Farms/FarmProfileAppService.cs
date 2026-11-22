@@ -78,31 +78,6 @@ public class FarmProfileDto
     [OptionalEmailAddress, StringLength(256)]
     public string ContactEmail { get; set; }
 
-    [Required, StringLength(64)]
-    public string TimeZone { get; set; }
-
-    [Range(1, 365)]
-    public int DocumentExpiryAlertDays { get; set; }
-
-    /// <summary>Farm-level farming system; ponds inherit it unless they have their own override.</summary>
-    public FarmingSystem FarmingSystem { get; set; } = FarmingSystem.SemiIntensive;
-
-    /// <summary>Month first (Oct 22, 2026) or Day first (22 Oct 2026).</summary>
-    public FarmDateOrder DateOrder { get; set; } = FarmDateOrder.MonthFirst;
-
-    /// <summary>False: 12-hour times; true: 24-hour times.</summary>
-    public bool Use24HourTime { get; set; }
-
-    /// <summary>Feeding schedule (DEC-61): usual feeding times, 24-hour "HH:mm" separated by commas, 1 to 8 of them. Blank is the default 06:00,10:00,14:00,18:00.</summary>
-    [StringLength(100)]
-    public string FeedingTimes { get; set; }
-
-    /// <summary>Water quality is a daily record (DEC-94). Left out (null) keeps the current setting.</summary>
-    public bool? WaterQualityDaily { get; set; }
-
-    /// <summary>The farm grades harvests by size (DEC-100). Left out (null) keeps the current setting.</summary>
-    public bool? UsesSizeGrading { get; set; }
-
     /// <summary>Read only: sum of the areas of the farm's ponds, in hectares (1 ha = 10,000 m²).</summary>
     public decimal PondAreaHectares { get; set; }
 
@@ -176,7 +151,6 @@ public class FarmProfileAppService : CapstoneAppServiceBase
             ContactName = p.ContactName,
             ContactPhone = p.ContactPhone,
             ContactEmail = p.ContactEmail,
-            UsesSizeGrading = false,
             PondAreaHectares = await GetPondAreaHectaresAsync(),
             FullAddress = p.FormatAddress(),
         }.WithLotCode(p);
