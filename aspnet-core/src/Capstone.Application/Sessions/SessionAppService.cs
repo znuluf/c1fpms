@@ -26,11 +26,12 @@ public class SessionAppService : CapstoneAppServiceBase, ISessionAppService
         {
             output.Tenant = ObjectMapper.Map<TenantLoginInfoDto>(await GetCurrentTenantAsync());
             var profile = await Farm.GetProfileAsync();
+            var settings = await Farm.GetSettingsAsync();
             output.Tenant.FarmName = string.IsNullOrWhiteSpace(profile.FarmName) ? output.Tenant.Name : profile.FarmName;
-            output.Tenant.TimeZone = profile.TimeZone;
+            output.Tenant.TimeZone = settings.TimeZone;
             output.Tenant.FarmId = profile.LotFarmNumber.HasValue ? $"{profile.LotAreaCode}-{profile.LotPlaceCode:00}-{profile.LotFarmNumber:00}" : null;
-            output.Tenant.DateOrder = (int)profile.DateOrder;
-            output.Tenant.Use24HourTime = profile.Use24HourTime;
+            output.Tenant.DateOrder = (int)settings.DateOrder;
+            output.Tenant.Use24HourTime = settings.Use24HourTime;
             output.Tenant.UsesSizeGrading = profile.UsesSizeGrading;
         }
 
