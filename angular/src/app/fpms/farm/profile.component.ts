@@ -5,7 +5,6 @@ import { FarmTime } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { LAST_FARM_CODE_KEY } from '@shared/auth/app-auth.service';
 import { FPMS_IMPORTS } from '../shared-imports';
-import { TimeListComponent } from '@shared/fpms/time-list.component';
 import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, coverageBarangays, coverageCities, coverageProvinces } from '@shared/fpms/coverage-area';
 
 /** Farm Profile Management (Ref 2.1, D-31). Owners edit; Technicians read. The Ponds tab summarizes pond specifications (D-32). */
@@ -13,7 +12,7 @@ const PROFILE_DRAFT = 'farm-profile';
 
 @Component({
     standalone: true,
-    imports: [...FPMS_IMPORTS, TimeListComponent],
+    imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header [narrow]="true" title="Farm profile" subtitle="Farm identity, location and contact information."></fpms-page-header>
         <section class="content px-2 pb-3">
