@@ -351,13 +351,13 @@ public class Lifecycle_Tests : FpmsTestBase
 
     // ---------------------------------------------------------------- AC-15, AC-16, AC-17
     [Fact]
-    public async Task Legacy_early_ending_records_are_presented_as_harvested_and_keep_their_history()
+    public async Task Legacy_failure_records_remain_readable_but_new_declarations_are_rejected()
     {
         var batches = Resolve<BatchAppService>();
         var id = BatchId(CurrentBatch);
         var today = Domain.FarmClock.Today(Domain.FarmClock.Resolve(Domain.FarmClock.DefaultTimeZone));
-        await Should.ThrowAsync<UserFriendlyException>(() => batches.DeclareFailure(new FailureInput { Id = id, Reason = "x", FailureDate = today.AddDays(1) }));
-        await batches.DeclareFailure(new FailureInput { Id = id, Reason = "WSSV outbreak", FailureDate = today, EstimatedLossPhp = 250000 });
+        await Should.ThrowAsync<UserFriendlyException>(() => batches.DeclareFailure(new FailureInput { Id = id, Reason = "WSSV outbreak", FailureDate = today, EstimatedLossPhp = 250000 }));
+        await SeedLegacyFailureAsync(id, today, "WSSV outbreak", 250000m);
 
         var detail = await batches.Get(id);
         detail.Status.ShouldBe(BatchStatus.Harvested);
@@ -401,7 +401,7 @@ public class Lifecycle_Tests : FpmsTestBase
 
         var today = Domain.FarmClock.Today(Domain.FarmClock.Resolve(Domain.FarmClock.DefaultTimeZone));
         await batches.Close(new CloseBatchInput { Id = BatchId(ReferenceBatch), ConfirmReadOnly = true });
-        await batches.DeclareFailure(new FailureInput { Id = BatchId(CurrentBatch), Reason = "Crop lost", FailureDate = today });
+        await SeedLegacyFailureAsync(BatchId(CurrentBatch), today, "Crop lost");
         (await cycles.Get(cycleId)).CanClose.ShouldBeFalse();
         await batches.Close(new CloseBatchInput { Id = BatchId(CurrentBatch), ConfirmReadOnly = true });
 
