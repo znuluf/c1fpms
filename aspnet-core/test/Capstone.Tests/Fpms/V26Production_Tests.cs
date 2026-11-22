@@ -288,7 +288,7 @@ public class V26Production_Tests : FpmsTestBase
 
         failedBatch = await batches.Get(BatchId(CurrentBatch));
         await batches.Reopen(new ReopenInput { Id = failedBatch.Id, Reason = "Mortality entered on the wrong pond", RowVersion = failedBatch.RowVersion });
-        (await batches.Get(failedBatch.Id)).Status.ShouldBe(BatchStatus.Failed); // it has a failure record
+        (await batches.Get(failedBatch.Id)).Status.ShouldBe(BatchStatus.Harvested); // legacy history is preserved; lifecycle display is Harvested
     }
 
     [Fact]
