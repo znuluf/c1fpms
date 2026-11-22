@@ -60,7 +60,7 @@ public class BatchAppService : CapstoneAppServiceBase
     internal static BatchListDto MapList(PondBatch b, string cycleCode, BatchIndicators ind) => new()
     {
         Id = b.Id, BatchCode = b.BatchCode, Letter = b.Letter, CycleId = b.CycleId, CycleCode = cycleCode, PondId = b.PondId, PondCode = b.Pond?.PondCode,
-        Status = b.Status, StockingDate = b.StockingDate, PlCountStocked = b.PlCountStocked,
+        Status = b.Status == BatchStatus.Failed ? BatchStatus.Harvested : b.Status, StockingDate = b.StockingDate, PlCountStocked = b.PlCountStocked,
         Doc = b.Status == BatchStatus.Stocked ? ind.Doc : null,
         CurrentAbwG = b.Status == BatchStatus.Closed ? b.FinalAbwG : ind.CurrentAbwG,
         FcrToDate = b.Status == BatchStatus.Closed ? b.FinalFcr : ind.FcrToDate,
@@ -103,7 +103,7 @@ public class BatchAppService : CapstoneAppServiceBase
         var batches = await Matching(_batches.GetAll().AsNoTracking().Include(b => b.Pond).Include(b => b.Cycle).Include(b => b.Technicians), input.Search)
             .Where(b => !input.CycleId.HasValue || b.CycleId == input.CycleId)
             .Where(b => !input.PondId.HasValue || b.PondId == input.PondId)
-            .Where(b => !input.Status.HasValue || b.Status == input.Status)
+            .Where(b => !input.Status.HasValue || (input.Status == BatchStatus.Harvested ? b.Status == BatchStatus.Harvested || b.Status == BatchStatus.Failed : b.Status == input.Status))
             .Where(b => !input.OpenOnly || b.Status != BatchStatus.Closed)
             .OrderBy(b => b.Status == BatchStatus.Closed).ThenBy(b => b.Pond.PondCode).ThenByDescending(b => b.StockedAtUtc)
             .ToListAsync();
@@ -151,7 +151,7 @@ public class BatchAppService : CapstoneAppServiceBase
     public virtual async Task<List<StatusCountDto>> GetStatusCounts(GetBatchStatusCountsInput input)
     {
         var query = Matching(_batches.GetAll().AsNoTracking(), input.Search).Where(b => !input.OpenOnly || b.Status != BatchStatus.Closed);
-        return await query.GroupBy(b => b.Status).Select(g => new StatusCountDto { Status = (int)g.Key, Count = g.Count() }).ToListAsync();
+        return await query.GroupBy(b => b.Status == BatchStatus.Failed ? BatchStatus.Harvested : b.Status).Select(g => new StatusCountDto { Status = (int)g.Key, Count = g.Count() }).ToListAsync();
     }
 
     /// <summary>
@@ -224,7 +224,6 @@ public class BatchAppService : CapstoneAppServiceBase
         };
         await FillPeopleAsync(new BatchListDto[] { dto });
 
-        dto.CanDeclareFailure = isOwner && b.Status == BatchStatus.Stocked;
         dto.CanClose = isOwner && (b.Status == BatchStatus.Harvested || b.Status == BatchStatus.Failed);
         dto.CanAddHarvest = canHarvest && (b.Status == BatchStatus.Stocked || b.Status == BatchStatus.Failed);
         if (b.Status == BatchStatus.Closed && isOwner)
@@ -369,7 +368,7 @@ public class BatchAppService : CapstoneAppServiceBase
         });
     }
 
-    /// <summary>Declare Batch Failure (Ref 7.4, AC-15): the batch becomes Failed and the pond Post-harvest. A salvage harvest is still allowed.</summary>
+    /// <summary>Legacy compatibility only. New production endings are recorded as Emergency Harvests, which retain their event details on the harvest record.</summary>
     [AbpAuthorize(PermissionNames.Production_Manage)]
     public virtual async Task DeclareFailure(FailureInput input)
     {
