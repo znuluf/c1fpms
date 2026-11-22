@@ -5,12 +5,7 @@
  * 1 Fixed · 2 Base ABW (base price at a base ABW + step per gram) · 3 Base count (base price at a base count + step per
  * piece fewer) · 4 Price table (the row covering the count).
  */
-export const PRICE_METHODS = [
-    { value: 1, label: 'Fixed price' },
-    { value: 2, label: 'Base ABW price' },
-    { value: 3, label: 'Base count price' },
-    { value: 4, label: 'From a price table' },
-];
+export const PRICE_METHODS = [{ value: 1, label: 'Fixed price' }];
 
 const money = (v: number) => Math.round(v * 100) / 100;
 
@@ -75,9 +70,9 @@ export function referencePrice(t: any, abwG: number | null, countPerKg: number |
 
 /** The fields to send for a method; the others are sent empty. */
 export function pricingBody(t: any): any {
-    const m = t.priceMethod ?? 1;
+    const m = 1;
     return {
-        priceMethod: m,
+        priceMethod: 1,
         basePricePerKg: m === 2 || m === 3 ? num(t.basePricePerKg) : null,
         baseAbwG: m === 2 ? num(t.baseAbwG) : null,
         stepPerG: m === 2 ? num(t.stepPerG) : null,
@@ -91,7 +86,7 @@ export function pricingBody(t: any): any {
 
 /** Copies a buyer's last terms (from Sale/GetBuyerPriceTerms) onto a line when the method matches and nothing is typed yet. */
 export function applyTerms(target: any, terms: any): boolean {
-    if (!terms || terms.priceMethod !== target.priceMethod) {
+    if (!terms || terms.priceMethod !== 1 || target.priceMethod !== 1) {
         return false;
     }
     switch (terms.priceMethod) {
