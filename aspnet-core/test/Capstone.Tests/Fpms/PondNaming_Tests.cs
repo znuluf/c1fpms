@@ -112,10 +112,10 @@ public class PondNaming_Tests : FpmsTestBase
         (await ponds.Get(PondId("GP-01"))).FarmingSystem.ShouldBe(FarmingSystem.SemiIntensive);
         (await ponds.Get(PondId("GP-03"))).FarmingSystem.ShouldBe(FarmingSystem.Intensive);
 
-        var profiles = Resolve<FarmProfileAppService>();
-        var profile = await profiles.Get();
-        profile.FarmingSystem = FarmingSystem.Extensive;
-        await profiles.Update(profile);
+        var settings = Resolve<FarmSettingsAppService>();
+        var farmSettings = await settings.Get();
+        farmSettings.FarmingSystem = FarmingSystem.Extensive;
+        await settings.Update(farmSettings);
 
         ponds = Resolve<PondAppService>(); // a new request reads the saved farm setting
         var inherited = await ponds.Get(PondId("GP-01"));
