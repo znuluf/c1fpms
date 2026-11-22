@@ -268,7 +268,7 @@ public class V26Production_Tests : FpmsTestBase
         var batches = Resolve<BatchAppService>();
         var cycleId = CycleId("C-2026-01");
         await batches.Close(new CloseBatchInput { Id = BatchId(ReferenceBatch), ConfirmReadOnly = true });
-        await batches.DeclareFailure(new FailureInput { Id = BatchId(CurrentBatch), Reason = "Crop lost", FailureDate = Today });
+        await SeedLegacyFailureAsync(BatchId(CurrentBatch), Today, "Crop lost");
         await batches.Close(new CloseBatchInput { Id = BatchId(CurrentBatch), ConfirmReadOnly = true });
         await cycles.Close(new CloseCycleInput { Id = cycleId, Outcome = CycleOutcome.Completed });
 
@@ -292,13 +292,13 @@ public class V26Production_Tests : FpmsTestBase
     }
 
     [Fact]
-    public async Task Outcome_is_suggested_as_failed_when_every_batch_failed()
+    public async Task Legacy_failure_history_preserves_the_historical_cycle_outcome()
     {
         var cycles = Resolve<CycleAppService>();
         var batches = Resolve<BatchAppService>();
         var created = await cycles.CreateBatches(new CreateBatchesInput { FryDeliveryId = DeliveryId(NewDelivery), Batches = new() { Stocking("GP-03", 100000) } });
         var batchId = created.Batches.Single().Id;
-        await batches.DeclareFailure(new FailureInput { Id = batchId, Reason = "WSSV outbreak", FailureDate = Today });
+        await SeedLegacyFailureAsync(batchId, Today, "WSSV outbreak");
         await batches.Close(new CloseBatchInput { Id = batchId, ConfirmReadOnly = true });
         var cycle = await cycles.Get(created.CycleId);
         cycle.SuggestedOutcome.ShouldBe(CycleOutcome.Failed);
