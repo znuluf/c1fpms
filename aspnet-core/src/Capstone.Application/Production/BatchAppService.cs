@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Capstone.Production;
 
-/// <summary>Batches: details and indicators, Declare Batch Failure (Ref 7.4, AC-15) and Close Batch (Ref 5.5, AC-16).</summary>
+/// <summary>Batches: details and indicators, historical incident compatibility, and Close Batch (Ref 5.5, AC-16).</summary>
 [AbpAuthorize(PermissionNames.Production)]
 public class BatchAppService : CapstoneAppServiceBase
 {
