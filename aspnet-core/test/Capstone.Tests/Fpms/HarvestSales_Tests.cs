@@ -162,7 +162,8 @@ public class HarvestSales_Tests : FpmsTestBase
         });
 
         input.Id = harvest.Id;
-        input.TotalKg = 150; // the ungraded line is derived from the harvest total, not client-supplied grade allocations
+        input.GradeLines = new(); // the ungraded line is derived from the harvest total, not client-supplied grade allocations
+        input.TotalKg = 150;
         await Should.ThrowAsync<UserFriendlyException>(() => harvests.Update(input));
 
         // Raising the harvest total above the sold amount keeps the same line identity.
