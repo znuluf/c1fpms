@@ -175,6 +175,7 @@ public class DisposalDto
     public DisposalReason Reason { get; set; }
     public string Note { get; set; }
     public DateTime CreationTime { get; set; }
+    public string RecordedBy { get; set; }
 }
 
 /// <summary>Where a harvest stands against its sales (DEC-85 step 5). Kilos recorded as not sold count as accounted for.</summary>
@@ -1062,7 +1063,8 @@ public class HarvestAppService : CapstoneAppServiceBase
     {
         var zone = await Farm.GetTimeZoneAsync();
         var sold = await SoldByGradeLineAsync(harvests.SelectMany(h => h.GradeLines).Select(g => g.Id).ToList());
-        var names = await GetUserNamesAsync(harvests.Select(h => h.CreatorUserId));
+        var names = await GetUserNamesAsync(harvests.Select(h => h.CreatorUserId)
+            .Concat(harvests.SelectMany(h => h.Disposals).Select(d => d.CreatorUserId)));
         var canEditAny = await IsGrantedAsync(PermissionNames.Harvests_EditAny);
         var canCreate = await IsGrantedAsync(PermissionNames.Harvests_Create);
         var followUpDays = (await Farm.GetSettingsAsync()).UnsoldFollowUpDays;
@@ -1095,7 +1097,11 @@ public class HarvestAppService : CapstoneAppServiceBase
                 Boxes = h.Boxes, AbwG = h.AbwG, AbwSampleWeightG = h.AbwSampleWeightG, AbwSamplePieces = h.AbwSamplePieces, FinalCount = h.FinalCount, DeadAtHarvest = h.DeadAtHarvest,
                 SmoothShell = h.SmoothShell, IntactAppendages = h.IntactAppendages, NoNecrosis = h.NoNecrosis, QualityNotes = h.QualityNotes,
                 GradeLines = lines,
-                Disposals = h.Disposals.OrderBy(d => d.CreationTime).Select(d => new DisposalDto { Id = d.Id, Kg = d.Kg, Reason = d.Reason, Note = d.Note, CreationTime = d.CreationTime }).ToList(),
+                Disposals = h.Disposals.OrderBy(d => d.CreationTime).Select(d => new DisposalDto
+                {
+                    Id = d.Id, Kg = d.Kg, Reason = d.Reason, Note = d.Note, CreationTime = d.CreationTime,
+                    RecordedBy = NameOf(names, d.CreatorUserId),
+                }).ToList(),
                 Crates = h.Crates.OrderBy(c => c.CrateNo)
                     .Select(c => new CrateDto
                     {
