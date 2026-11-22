@@ -176,14 +176,7 @@ public class FarmProfileAppService : CapstoneAppServiceBase
             ContactName = p.ContactName,
             ContactPhone = p.ContactPhone,
             ContactEmail = p.ContactEmail,
-            TimeZone = p.TimeZone,
-            DocumentExpiryAlertDays = p.DocumentExpiryAlertDays,
-            FarmingSystem = p.FarmingSystem,
-            DateOrder = p.DateOrder,
-            Use24HourTime = p.Use24HourTime,
-            FeedingTimes = FeedingSchedule.Format(FeedingSchedule.Times(p.FeedingTimes)),
-            WaterQualityDaily = p.WaterQualityDaily,
-            UsesSizeGrading = p.UsesSizeGrading,
+            UsesSizeGrading = false,
             PondAreaHectares = await GetPondAreaHectaresAsync(),
             FullAddress = p.FormatAddress(),
         }.WithLotCode(p);
@@ -294,26 +287,7 @@ public class FarmProfileAppService : CapstoneAppServiceBase
         profile.ContactName = input.ContactName;
         profile.ContactPhone = FarmAddress.Clean(input.ContactPhone);
         profile.ContactEmail = input.ContactEmail;
-        profile.TimeZone = input.TimeZone;
-        profile.DocumentExpiryAlertDays = input.DocumentExpiryAlertDays;
-        profile.FarmingSystem = Enum.IsDefined(input.FarmingSystem) ? input.FarmingSystem : FarmingSystem.SemiIntensive;
-        profile.DateOrder = Enum.IsDefined(input.DateOrder) ? input.DateOrder : FarmDateOrder.MonthFirst;
-        profile.Use24HourTime = input.Use24HourTime;
-        if (input.FeedingTimes != null)
-        {
-            // Left out (null) keeps the current schedule; blank restores the default.
-            profile.FeedingTimes = FeedingSchedule.Format(FeedingSchedule.Parse(input.FeedingTimes));
-        }
 
-        if (input.WaterQualityDaily.HasValue)
-        {
-            profile.WaterQualityDaily = input.WaterQualityDaily.Value;
-        }
-
-        if (input.UsesSizeGrading.HasValue)
-        {
-            profile.UsesSizeGrading = input.UsesSizeGrading.Value;
-        }
 
         // Keep the tenant display name in step with the farm name.
         var tenant = await GetCurrentTenantAsync();
