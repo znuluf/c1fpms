@@ -181,7 +181,7 @@ public class BatchAppService : CapstoneAppServiceBase
         var harvestAbwTarget = await _standards.GetAsync(FarmThresholds.HarvestReadyAtAbw);
         var latestGrowthSample = facts.GrowthSamples.OrderByDescending(g => g.ObservedAtUtc).FirstOrDefault();
         var sampleIsRecent = latestGrowthSample != null && latestGrowthSample.Date <= today && latestGrowthSample.Date >= today.AddDays(-7);
-        var harvestReadinessReached = b.Status == BatchStatus.Stocked && ind.Doc >= harvestDocTarget && sampleIsRecent && latestGrowthSample.AbwG >= harvestAbwTarget;
+        var harvestReadinessReached = b.Status == BatchStatus.Stocked && ind.Doc.HasValue && ind.Doc.Value >= harvestDocTarget && sampleIsRecent && latestGrowthSample.AbwG >= harvestAbwTarget;
         var counts = await _logs.GetAll().Where(l => l.BatchId == id).GroupBy(l => l.LogType).Select(g => new { g.Key, N = g.Count() }).ToListAsync();
         var hasFinal = await _harvests.GetAll().AnyAsync(h => h.BatchId == id && h.HarvestType == HarvestType.Total);
         var hasHarvest = await _harvests.GetAll().AnyAsync(h => h.BatchId == id);
