@@ -87,7 +87,7 @@ export function whereItWent(h: any, sales: any[], reasonLabels: Record<number, s
         rows.push({ to: `Not sold: ${reasonLabels[d.reason] ?? 'Other'}${d.note ? ' (' + d.note + ')' : ''}`, kg: d.kg });
     }
     if (h.unaccountedKg > 0) {
-        rows.push({ to: 'Not yet accounted for', kg: h.unaccountedKg });
+        rows.push({ to: 'Unsold, awaiting outcome', kg: h.unaccountedKg });
     }
     return rows;
 }

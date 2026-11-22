@@ -108,6 +108,9 @@ public class SaveHarvestInput
     [StringLength(Harvest.MaxEmergencyNoteLength)]
     public string EmergencyNote { get; set; }
 
+    /// <summary>Optional day to follow up shrimp still unsold (DEC-140); empty uses the farm's follow-up period.</summary>
+    public DateOnly? FollowUpOn { get; set; }
+
     [Range(0.001, 100000000, ErrorMessage = "Total kg must be greater than zero.")]
     public decimal TotalKg { get; set; }
 
@@ -248,12 +251,36 @@ public class HarvestDto
     /// <summary>Unsold, Partly sold or Sold (DEC-85 step 5).</summary>
     public HarvestSaleStatus SaleStatus { get; set; }
 
+    /// <summary>
+    /// While kilos are still unsold: the day to follow up (the farmer's choice, else the harvest date plus the farm's follow-up
+    /// days); null once every kilo is sold or recorded as not sold (DEC-140).
+    /// </summary>
+    public DateOnly? FollowUpOn { get; set; }
+
+    /// <summary>True when unsold kilos remain and the follow-up day is today or past.</summary>
+    public bool FollowUpDue { get; set; }
+
+    /// <summary>The day the farmer chose, when they chose one; null when the farm's follow-up days are used.</summary>
+    public DateOnly? FollowUpChosenOn { get; set; }
+
     public string RecordedBy { get; set; }
     public DateTime CreationTime { get; set; }
     public bool CanEdit { get; set; }
 
     /// <summary>Set on save: e.g. a harvest before a treatment's safe harvest date (DEC-57).</summary>
     public List<WarningDto> Warnings { get; set; } = new();
+}
+
+/// <summary>A harvest whose unsold kilos are due for a follow-up (DEC-140).</summary>
+public class HarvestFollowUpDto
+{
+    public Guid HarvestId { get; set; }
+    public string LotCode { get; set; }
+    public string PondCode { get; set; }
+    public string BatchCode { get; set; }
+    public decimal UnaccountedKg { get; set; }
+    public DateOnly FollowUpOn { get; set; }
+    public DateTime HarvestedAtUtc { get; set; }
 }
 
 public class SizeGradeOptionDto
@@ -522,6 +549,22 @@ public class HarvestAppService : CapstoneAppServiceBase
         }
     }
 
+    /// <summary>
+    /// Harvests whose unsold kilos are due for a follow-up, oldest follow-up first, for the dashboard (DEC-140). Closed batches
+    /// are left out: Close Batch already lists their unsold kilos. Nothing here changes a record.
+    /// </summary>
+    internal async Task<List<HarvestFollowUpDto>> GetFollowUpsDueAsync()
+    {
+        var open = await Query().Where(h => h.Batch.Status != BatchStatus.Closed).ToListAsync();
+        return (await MapAsync(open)).Where(h => h.FollowUpDue)
+            .OrderBy(h => h.FollowUpOn).ThenBy(h => h.HarvestedAtUtc)
+            .Select(h => new HarvestFollowUpDto
+            {
+                HarvestId = h.Id, LotCode = h.LotCode, PondCode = h.PondCode, BatchCode = h.BatchCode,
+                UnaccountedKg = h.UnaccountedKg, FollowUpOn = h.FollowUpOn!.Value, HarvestedAtUtc = h.HarvestedAtUtc,
+            }).ToList();
+    }
+
     private IQueryable<Harvest> Query() => _harvests.GetAll().AsNoTracking()
         .Include(h => h.GradeLines).ThenInclude(g => g.SizeGrade)
         .Include(h => h.Disposals)
@@ -567,6 +610,11 @@ public class HarvestAppService : CapstoneAppServiceBase
         }
 
         var day = FarmClock.LocalDate(at, zone);
+        if (input.FollowUpOn.HasValue && input.FollowUpOn.Value < day)
+        {
+            throw new UserFriendlyException("The follow-up day cannot be before the harvest date.");
+        }
+
         if (batch.StockingDate.HasValue && day < batch.StockingDate.Value)
         {
             throw new UserFriendlyException($"The harvest date cannot be before the stocking date ({batch.StockingDate:yyyy-MM-dd}).");
@@ -777,6 +825,7 @@ public class HarvestAppService : CapstoneAppServiceBase
         harvest.ShrimpLeft = emergency ? input.ShrimpLeft : null;
         harvest.EmergencyReason = emergency ? input.EmergencyReason : null;
         harvest.EmergencyNote = emergency && !string.IsNullOrWhiteSpace(input.EmergencyNote) ? input.EmergencyNote.Trim() : null;
+        harvest.FollowUpOn = input.FollowUpOn;
         harvest.BuyerId = input.BuyerId;
         harvest.WeighedBy = input.WeighedBy;
         harvest.TotalKg = input.TotalKg;
@@ -940,6 +989,8 @@ public class HarvestAppService : CapstoneAppServiceBase
         var names = await GetUserNamesAsync(harvests.Select(h => h.CreatorUserId));
         var canEditAny = await IsGrantedAsync(PermissionNames.Harvests_EditAny);
         var canCreate = await IsGrantedAsync(PermissionNames.Harvests_Create);
+        var followUpDays = (await Farm.GetSettingsAsync()).UnsoldFollowUpDays;
+        var today = FarmClock.Today(zone);
         return harvests.Select(h =>
         {
             var lines = h.GradeLines
@@ -956,6 +1007,9 @@ public class HarvestAppService : CapstoneAppServiceBase
             var soldKg = lines.Sum(l => l.SoldKg);
             var notSold = h.Disposals.Sum(d => d.Kg);
             var graded = lines.Sum(l => l.Kg);
+            DateOnly? followUpOn = h.TotalKg - soldKg - notSold > 0
+                ? h.FollowUpOn ?? FarmClock.LocalDate(h.HarvestedAtUtc, zone).AddDays(followUpDays)
+                : null;
             return new HarvestDto
             {
                 RowVersion = Production.Concurrency.Encode(h.RowVersion),
@@ -977,6 +1031,7 @@ public class HarvestAppService : CapstoneAppServiceBase
                 GradedKg = graded, UngradedRemainderKg = Math.Max(0, h.TotalKg - graded),
                 HarvestedPieces = Math.Round(IndicatorCalculator.HarvestedPieces(HarvestFact.From(h, FarmClock.LocalDate(h.HarvestedAtUtc, zone)), null), 0),
                 SoldKg = soldKg, NotSoldKg = notSold, UnaccountedKg = Math.Max(0, h.TotalKg - soldKg - notSold),
+                FollowUpOn = followUpOn, FollowUpDue = followUpOn.HasValue && followUpOn.Value <= today, FollowUpChosenOn = h.FollowUpOn,
                 SaleStatus = soldKg <= 0 ? HarvestSaleStatus.Unsold : h.TotalKg - soldKg - notSold >= 0.001m ? HarvestSaleStatus.PartlySold : HarvestSaleStatus.Sold,
                 RecordedBy = NameOf(names, h.CreatorUserId), CreationTime = h.CreationTime,
                 CanEdit = canCreate && h.Batch?.Status != BatchStatus.Closed && (canEditAny || h.CreatorUserId == AbpSession.UserId),

@@ -712,6 +712,19 @@ export class DashboardComponent extends FpmsPage implements OnInit {
                 actionLink: ['/app/inventory'],
             });
         }
+        // Shrimp still unsold past the follow-up day (DEC-140): a reminder only; nothing is marked sold or used by the system.
+        for (const u of (dash.unsoldFollowUps as any[]) ?? []) {
+            admin.push({
+                title: `Unsold shrimp: ${Number(u.unaccountedKg).toFixed(2)} kg from ${u.pondCode}`,
+                detail: 'Record what happened to it: a later sale, staff use, given away, spoiled or another reason.',
+                where: u.lotCode ?? u.batchCode,
+                whereSub: u.pondCode,
+                whereLink: ['/app/harvests', u.harvestId],
+                since: `Follow up ${this.shortDate(String(u.followUpOn).substring(0, 10))}`,
+                action: 'Open harvest',
+                actionLink: ['/app/harvests', u.harvestId],
+            });
+        }
         for (const f of (dash.finishStocking as any[]) ?? []) {
             admin.push({
                 title: 'Fry delivery with PL not stocked yet',
@@ -757,7 +770,7 @@ export class DashboardComponent extends FpmsPage implements OnInit {
         return [
             { key: 'act', title: 'Act today', clear: 'No water alerts or high mortality in the last 7 days.', icon: 'fa-exclamation-triangle', rows: act },
             { key: 'catchup', title: 'Catch up on entry', clear: 'Nothing missed before today.', icon: 'fa-pen', rows: catchUp },
-            { key: 'admin', title: 'Admin and supply', clear: 'Stock and permits are in order.', icon: 'fa-clock', rows: admin },
+            { key: 'admin', title: 'Admin and supply', clear: 'Stock, permits and unsold shrimp are in order.', icon: 'fa-clock', rows: admin },
         ];
     });
 

@@ -180,6 +180,9 @@ public class DashboardDto
     public List<HarvestReadinessAlertDto> HarvestReadinessAlerts { get; set; } = new();
     public List<StockAlertDto> StockAlerts { get; set; } = new();
     public List<DocumentAlertDto> DocumentAlerts { get; set; } = new();
+
+    /// <summary>Harvests whose unsold shrimp are due for a follow-up (DEC-140). Empty for users without harvest access.</summary>
+    public List<Capstone.Harvests.HarvestFollowUpDto> UnsoldFollowUps { get; set; } = new();
     public List<string> MissingRequiredDocuments { get; set; } = new();
     public List<RecentLogDto> RecentLogs { get; set; } = new();
     public List<SetupTaskDto> SetupTasks { get; set; } = new();
@@ -217,6 +220,7 @@ public class DashboardAppService : CapstoneAppServiceBase
     private readonly Resources.FryDeliveryAppService _deliveries;
     private readonly FarmStandardsProvider _standards;
     private readonly TreatmentWithdrawal _withdrawal;
+    private readonly Capstone.Harvests.HarvestAppService _harvestsApp;
 
     public DashboardAppService(
         IRepository<Pond, Guid> ponds,
@@ -237,8 +241,10 @@ public class DashboardAppService : CapstoneAppServiceBase
         WaterQualityEvaluator waterQuality,
         ComplianceChecker compliance,
         NotificationAppService notifications,
-        Resources.FryDeliveryAppService deliveries, FarmStandardsProvider standards, TreatmentWithdrawal withdrawal)
+        Resources.FryDeliveryAppService deliveries, FarmStandardsProvider standards, TreatmentWithdrawal withdrawal,
+        Capstone.Harvests.HarvestAppService harvestsApp)
     {
+        _harvestsApp = harvestsApp;
         _deliveries = deliveries;
         _standards = standards;
         _withdrawal = withdrawal;
@@ -457,6 +463,11 @@ public class DashboardAppService : CapstoneAppServiceBase
         }).ToList();
 
         dto.MonitoringGuidance = string.Join("; ", parameters.Values.Where(p => p.IsActive).OrderBy(p => p.SortOrder).Select(p => $"{p.Name}: {p.GuidanceFrequency}"));
+
+        if (await IsGrantedAsync(PermissionNames.Harvests))
+        {
+            dto.UnsoldFollowUps = await _harvestsApp.GetFollowUpsDueAsync();
+        }
 
         if (isOwner)
         {

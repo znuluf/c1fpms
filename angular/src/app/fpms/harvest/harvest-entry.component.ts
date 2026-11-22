@@ -52,7 +52,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                 <div class="fpms-balance-key small">
                                     <span><i class="sold" aria-hidden="true"></i>Sold {{ h.soldKg | num: 2 }} kg</span>
                                     <span><i class="notsold" aria-hidden="true"></i>Not sold {{ h.notSoldKg | num: 2 }} kg</span>
-                                    <span><i class="open" aria-hidden="true"></i>Not yet accounted for {{ h.unaccountedKg | num: 2 }} kg</span>
+                                    <span><i class="open" aria-hidden="true"></i>Unsold, awaiting outcome {{ h.unaccountedKg | num: 2 }} kg</span>
                                     <span class="ml-auto">of <strong>{{ h.totalKg | num: 2 }} kg</strong> harvested</span>
                                 </div>
                             </div>
@@ -391,7 +391,19 @@ import { DisposalReasons } from '@shared/fpms/labels';
                             <div class="card">
                                 <div class="card-header"><h3 class="card-title">Not sold (optional)</h3></div>
                                 <div class="card-body">
-                                    <p class="small text-muted">Harvest kept for staff or home use, given away, or spoiled, so every kilogram is accounted for.</p>
+                                    <p class="small text-muted">Harvest kept for staff or home use, given away, or spoiled, so every kilogram is accounted for. Shrimp not sold and not listed here stay as unsold shrimp, awaiting an outcome, until they are sold or listed.</p>
+                                    @if (isNew || h?.unaccountedKg > 0) {
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="fu">Follow up unsold shrimp on</label>
+                                                <input id="fu" type="date" class="form-control" name="followUpOn" [(ngModel)]="m.followUpOn" (ngModelChange)="keepDraft()" [min]="(m.harvestedAt || '').substring(0, 10)" />
+                                                <small class="form-text text-muted">
+                                                    Leave empty to use the farm's follow-up days (Farm settings).
+                                                    @if (!isNew && h?.followUpOn) { Now: {{ h.followUpOn | farmDate }}{{ h.followUpDue ? ', due' : '' }}. }
+                                                </small>
+                                            </div>
+                                        </div>
+                                    }
                                     @for (d of m.disposals; track $index) {
                                         <div class="form-row align-items-end">
                                             <div class="form-group col-4">
@@ -461,7 +473,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                             <p class="small text-muted">
                                 Recorded by {{ h.recordedBy }}, {{ h.creationTime | farmDateTime }} · {{ h.harvestedPieces | num: 0 }} pieces ·
                                 sold {{ h.soldKg | num: 2 }} kg · not sold {{ h.notSoldKg | num: 2 }} kg
-                                @if (h.unaccountedKg > 0) { · <span class="text-warning-dark">{{ h.unaccountedKg | num: 2 }} kg neither sold nor recorded</span> }
+                                @if (h.unaccountedKg > 0) { · <span class="text-warning-dark">{{ h.unaccountedKg | num: 2 }} kg unsold, awaiting outcome · follow up {{ h.followUpDue ? 'was due' : 'by' }} {{ h.followUpOn | farmDate }}</span> }
                             </p>
                         }
                         @if (!readOnly) {
@@ -593,6 +605,8 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
                 disposals: h.disposals.map((d: any) => ({ ...d })),
                 // The scale reading is shown again: gross when a container weight was subtracted, else net.
                 buyerId: h.buyerId ?? '',
+                // Only a day the farmer chose is kept; the farm's default day is shown but never saved as a choice (DEC-140).
+                followUpOn: h.followUpChosenOn ?? '',
                 crates: (h.crates ?? []).map((c: any) => ({ kg: c.grossKg ?? c.kg, containerTypeId: c.containerTypeId ?? '', containerName: c.containerName, tareKg: c.tareKg, sizeGradeId: c.sizeGradeId ?? '' })),
                 gradeCrates: (h.crates ?? []).some((c: any) => c.sizeGradeId),
             };
@@ -611,7 +625,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     private blank(batchId: string): any {
         return {
             batchId, harvestType: 1, harvestedAt: FarmTime.nowInput(), totalKg: null, boxes: null, abwG: null, abwSampleWeightG: null, abwSamplePieces: null,
-            finalCount: null, deadAtHarvest: null, shrimpLeft: null, emergencyReason: null, emergencyNote: '', smoothShell: null, intactAppendages: null, noNecrosis: null, qualityNotes: '', gradeLines: [], disposals: [], crates: [],
+            finalCount: null, deadAtHarvest: null, shrimpLeft: null, emergencyReason: null, emergencyNote: '', followUpOn: '', smoothShell: null, intactAppendages: null, noNecrosis: null, qualityNotes: '', gradeLines: [], disposals: [], crates: [],
             buyerId: '', weighedBy: null, sell: false, sale: this.blankSale(), gradeCrates: false,
             // DEC-133: one id per new harvest, kept in the draft, so a retried save returns the harvest already saved.
             clientRequestId: newGuid(),
@@ -1043,6 +1057,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             batchId: this.m.batchId,
             harvestedAt: FarmTime.fromLocalInput(this.m.harvestedAt),
             harvestType: this.m.harvestType,
+            followUpOn: this.m.followUpOn || null,
             shrimpLeft: this.m.harvestType === 3 ? this.m.shrimpLeft : null,
             emergencyReason: this.m.harvestType === 3 ? this.m.emergencyReason : null,
             emergencyNote: this.m.harvestType === 3 ? this.m.emergencyNote || null : null,

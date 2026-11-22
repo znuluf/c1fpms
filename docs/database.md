@@ -81,10 +81,11 @@ erDiagram
 | | `LotCode` | | The harvest lot code for tracing (DEC-83). |
 | | `ClientRequestId`, `RowVersion` | | Retry-safe saves and version checks (DEC-133). |
 | | `ShrimpLeft`, `EmergencyReason`, `EmergencyNote` | | Emergency harvests (type 3): whether shrimp are left in the pond, why, and a short note. Null for other types (DEC-140). |
+| | `FollowUpOn` | | The day the farmer chose to follow up unsold shrimp; null uses the farm's `UnsoldFollowUpDays` after the harvest date (DEC-140). |
 | `FpmsSales` | `ClientRequestId`, `RowVersion` | | Retry-safe saves and version checks (DEC-133). |
 | `FpmsSaleLines` | `PriceMethod`, `BaseAbwG`, `BasePricePerKg`, `StepPerG`, `BaseCountPerKg`, `StepPerCount`, `PriceAbwG`, `PriceCountPerKg`, `ReferencePricePerKg`, `PriceTableId`, `PriceTableName`, `PriceTableRowLabel` | | How a line's price per kg was worked out, with its inputs kept (DEC-80, DEC-82). Names are copied so a later edit of the price table never changes a saved sale. |
 | `FpmsProductionLogs` | `RowVersion` | | Version check on log entry corrections (DEC-133). |
-| `FpmsFarmSettings` | `TimeZone`, `DocumentExpiryAlertDays`, `FarmingSystem`, `DateOrder`, `Use24HourTime`, `FeedingTimes`, `WaterQualityDaily` | | One-to-one operational and display preferences for each farm. The settings row uses the tenant ID as both its primary key and TenantId. |
+| `FpmsFarmSettings` | `TimeZone`, `DocumentExpiryAlertDays`, `UnsoldFollowUpDays` (DEC-140), `FarmingSystem`, `DateOrder`, `Use24HourTime`, `FeedingTimes`, `WaterQualityDaily` | | One-to-one operational and display preferences for each farm. The settings row uses the tenant ID as both its primary key and TenantId. |
 | `FpmsFarmProfiles` | `TimeZone`, `DocumentExpiryAlertDays`, `FarmingSystem`, `DateOrder`, `Use24HourTime`, `FeedingTimes`, `WaterQualityDaily` | | Legacy copies retained for compatibility with existing farm profile data; new settings reads and writes use `FpmsFarmSettings`. |
 | | `UsesSizeGrading` | | Legacy field only; size grading is no longer exposed as a farm preference. |
 | | `LotAreaCode`, `LotPlaceCode`, `LotFarmNumber` | | Parts of the harvest lot code (DEC-83). |

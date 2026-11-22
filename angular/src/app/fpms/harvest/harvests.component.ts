@@ -145,7 +145,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                 <div class="small text-muted mt-1">
                                                     Sold {{ h.soldKg | num: 2 : true }} kg{{ h.notSoldKg > 0 ? ' · not sold ' + (h.notSoldKg | num: 2 : true) + ' kg' : '' }}
                                                     @if (h.unaccountedKg > 0) {
-                                                        <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg not accounted for</div>
+                                                        <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg unsold, awaiting outcome@if (h.followUpDue) { · follow-up due }</div>
                                                     }
                                                 </div>
                                             </td>
@@ -210,13 +210,13 @@ export class HarvestsComponent extends FpmsPage implements OnInit {
         { value: 3, label: 'Sold' },
     ];
 
-    /** Sale status chips; "Not accounted for" (count 9 from the server) cuts across them: kilos neither sold nor recorded as not sold. */
+    /** Sale status chips; "Unsold, awaiting outcome" (count 9 from the server) cuts across them: kilos neither sold nor recorded as not sold. */
     chips = computed<ToolbarChip[]>(() => {
         const c = this.statusCounts();
         return [
             { value: null, label: 'All', count: this.statuses.reduce((n, s) => n + (c[s.value] ?? 0), 0) },
             ...this.statuses.map((s) => ({ value: s.value, label: s.label, count: c[s.value] ?? 0 })),
-            { value: 'open', label: 'Not accounted for', count: c[9] ?? 0 },
+            { value: 'open', label: 'Unsold, awaiting outcome', count: c[9] ?? 0 },
         ];
     });
 
@@ -274,7 +274,7 @@ export class HarvestsComponent extends FpmsPage implements OnInit {
         const tags: { label: string; clear: () => void }[] = [];
         const add = (label: string, clear: () => void) => tags.push({ label, clear: () => { clear(); this.apply(); } });
         if (f.search) { add(`"${f.search}"`, () => (f.search = '')); }
-        if (f.unaccountedOnly) { add('Not accounted for', () => (f.unaccountedOnly = false)); }
+        if (f.unaccountedOnly) { add('Unsold, awaiting outcome', () => (f.unaccountedOnly = false)); }
         if (f.saleStatus != null) { add(this.statuses.find((s) => s.value === f.saleStatus)?.label ?? 'Status', () => (f.saleStatus = null)); }
         if (f.type != null) { add(this.Options.harvestType.find((o: any) => o.value === f.type)?.label ?? 'Type', () => (f.type = null)); }
         if (f.buyerId) { add(this.buyers().find((b) => b.id === f.buyerId)?.name ?? 'Buyer', () => (f.buyerId = null)); }

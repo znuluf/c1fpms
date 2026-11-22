@@ -475,6 +475,7 @@ Table "dbo"."FpmsFarmSettings" {
   "TenantId" int(10) [unique, not null]
   "TimeZone" nvarchar(64) [not null]
   "DocumentExpiryAlertDays" int(10) [not null]
+  "UnsoldFollowUpDays" int(10) [not null, check: `[UnsoldFollowUpDays] BETWEEN 1 AND 60`, default: 7]
   "FarmingSystem" int(10) [not null]
   "DateOrder" int(10) [not null]
   "Use24HourTime" bit [not null]
@@ -1373,6 +1374,7 @@ Table "dbo"."FpmsHarvests" {
   "ShrimpLeft" bit
   "EmergencyReason" int(10)
   "EmergencyNote" nvarchar(300)
+  "FollowUpOn" date
   "TotalKg" decimal(14,3) [not null, check: `[TotalKg]>(0)`]
   "Boxes" int(10)
   "AbwG" decimal(8,2) [check: `[AbwG] IS NULL OR [AbwG]>(0) AND [AbwG]<=(60)`]

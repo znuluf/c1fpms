@@ -1,6 +1,7 @@
 using Abp.Authorization;
 using Abp.UI;
 using Capstone.Domain;
+using Capstone.Farms;
 using Capstone.Harvests;
 using Capstone.Logbooks;
 using Capstone.Logbooks.Dto;
@@ -165,6 +166,49 @@ public class HarvestSales_Tests : FpmsTestBase
         corrected.ShrimpLeft.ShouldBeNull();
         corrected.EmergencyReason.ShouldBeNull();
         corrected.EmergencyNote.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task Unsold_kilos_get_a_follow_up_day_from_the_farm_setting_that_the_farmer_can_move()
+    {
+        // DEC-140: the farm's follow-up period is a setting; a new request reads the saved value.
+        var settings = Resolve<FarmSettingsAppService>();
+        var farmSettings = await settings.Get();
+        farmSettings.UnsoldFollowUpDays.ShouldBe(7); // the starting value, until the farm confirms its own
+        farmSettings.UnsoldFollowUpDays = 3;
+        await settings.Update(farmSettings);
+        var tooLong = await settings.Get();
+        tooLong.UnsoldFollowUpDays = 61;
+        await Should.ThrowAsync<Exception>(() => settings.Update(tooLong)); // 1 to 60 days only
+
+        var harvests = Resolve<HarvestAppService>();
+        var zone = FarmClock.Resolve(FarmClock.DefaultTimeZone);
+        var saved = await harvests.Create(Harvest(HarvestType.Partial, 100));
+        var harvestDay = FarmClock.LocalDate(saved.HarvestedAtUtc, zone);
+        saved.UnaccountedKg.ShouldBe(100m);
+        saved.FollowUpOn.ShouldBe(harvestDay.AddDays(3));
+        saved.FollowUpDue.ShouldBe(harvestDay.AddDays(3) <= Today);
+
+        // The farmer moves it; a day before the harvest is refused.
+        var edit = Harvest(HarvestType.Partial, 100);
+        edit.Id = saved.Id;
+        edit.FollowUpOn = harvestDay;
+        var due = await harvests.Update(edit);
+        due.FollowUpOn.ShouldBe(harvestDay);
+        due.FollowUpDue.ShouldBeTrue();
+        (await Resolve<Dashboard.DashboardAppService>().Get()).UnsoldFollowUps.ShouldContain(f => f.HarvestId == saved.Id && f.UnaccountedKg == 100m);
+
+        edit.FollowUpOn = harvestDay.AddDays(-1);
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Update(edit));
+
+        // Once every kilo is recorded as not sold there is nothing to follow up, and the system never does that by itself.
+        edit.FollowUpOn = null;
+        edit.Disposals = new List<DisposalInput> { new() { Kg = 100, Reason = DisposalReason.StaffOrHomeUse } };
+        var settled = await harvests.Update(edit);
+        settled.UnaccountedKg.ShouldBe(0m);
+        settled.FollowUpOn.ShouldBeNull();
+        settled.FollowUpDue.ShouldBeFalse();
+        (await Resolve<Dashboard.DashboardAppService>().Get()).UnsoldFollowUps.ShouldNotContain(f => f.HarvestId == saved.Id);
     }
 
     [Fact]

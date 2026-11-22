@@ -65,6 +65,14 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                                 <small class="form-text text-muted">Permits expiring within this period are marked as expiring soon.</small>
                                             </div>
                                             <div class="form-group col-md-6">
+                                                <label for="ufu">Follow up unsold shrimp</label>
+                                                <div class="input-group">
+                                                    <input id="ufu" type="number" min="1" max="60" step="1" class="form-control" name="unsoldFollowUpDays" [(ngModel)]="p.unsoldFollowUpDays" required />
+                                                    <div class="input-group-append"><span class="input-group-text">days after harvest</span></div>
+                                                </div>
+                                                <small class="form-text text-muted">Shrimp not yet sold or accounted for are listed on the dashboard after this many days. Each harvest can use its own day.</small>
+                                            </div>
+                                            <div class="form-group col-md-6">
                                                 <label for="tz">Farm time zone</label>
                                                 <input id="tz" type="text" class="form-control" name="timeZone" [(ngModel)]="p.timeZone" required maxlength="64" placeholder="Asia/Manila" />
                                                 <small class="form-text text-muted">IANA time zone used for farm dates and reports, for example Asia/Manila.</small>
@@ -115,6 +123,7 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                             <div class="card-body">
                                 <dl class="row mb-0 fpms-dl">
                                     <dt class="col-sm-4">Permit reminder</dt><dd class="col-sm-8">{{ p.documentExpiryAlertDays }} days before expiry</dd>
+                                    <dt class="col-sm-4">Unsold shrimp follow-up</dt><dd class="col-sm-8">{{ p.unsoldFollowUpDays }} days after harvest</dd>
                                     <dt class="col-sm-4">Time zone</dt><dd class="col-sm-8">{{ p.timeZone }}</dd>
                                     <dt class="col-sm-4">Date display</dt><dd class="col-sm-8">{{ p.dateOrder === 2 ? 'Day first' : 'Month first' }}</dd>
                                     <dt class="col-sm-4">Time display</dt><dd class="col-sm-8">{{ p.use24HourTime ? '24-hour (14:30)' : '12-hour (2:30 PM)' }}</dd>

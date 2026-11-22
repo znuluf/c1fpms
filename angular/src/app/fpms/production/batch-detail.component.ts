@@ -212,7 +212,7 @@ interface CalMonth {
                                 }
                                 @if (closeCheck?.unaccountedKg > 0.0005) {
                                     <div class="alert alert-warning small">
-                                        <strong>{{ closeCheck.unaccountedKg | num: 3 }} kg harvested but not accounted for:</strong>
+                                        <strong>{{ closeCheck.unaccountedKg | num: 3 }} kg harvested but still unsold, awaiting an outcome:</strong>
                                         harvested {{ closeCheck.harvestedKg | num: 3 }} kg, sold {{ closeCheck.soldKg | num: 3 }} kg, not sold (home use, given away, spoiled) {{ closeCheck.notSoldKg | num: 3 }} kg.
                                         Record the remaining sales or not-sold kg first, or close anyway.
                                     </div>
@@ -590,7 +590,7 @@ interface CalMonth {
                                                         <div class="small text-muted mt-1">
                                                             Sold {{ h.soldKg | num: 2 : true }} kg{{ h.notSoldKg > 0 ? ' · not sold ' + (h.notSoldKg | num: 2 : true) + ' kg' : '' }}
                                                             @if (h.unaccountedKg > 0) {
-                                                                <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg to account for</div>
+                                                                <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg unsold, awaiting outcome@if (h.followUpDue) { · follow-up due }</div>
                                                             } @else {
                                                                 <div class="text-success"><i class="fas fa-check mr-1" aria-hidden="true"></i>All accounted for</div>
                                                             }

@@ -16,6 +16,7 @@ public class FarmSettingsDto
     public string RowVersion { get; set; }
     [Required, StringLength(64)] public string TimeZone { get; set; }
     [Range(1, 365)] public int DocumentExpiryAlertDays { get; set; }
+    [Range(1, 60, ErrorMessage = "The unsold shrimp follow-up must be 1 to 60 days.")] public int UnsoldFollowUpDays { get; set; } = 7;
     public FarmingSystem FarmingSystem { get; set; } = FarmingSystem.SemiIntensive;
     public FarmDateOrder DateOrder { get; set; } = FarmDateOrder.MonthFirst;
     public bool Use24HourTime { get; set; }
@@ -55,7 +56,7 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
             s = new FarmSettings
             {
                 Id = tenantId, TenantId = tenantId, TimeZone = previous.TimeZone,
-                DocumentExpiryAlertDays = previous.DocumentExpiryAlertDays, FarmingSystem = previous.FarmingSystem,
+                DocumentExpiryAlertDays = previous.DocumentExpiryAlertDays, UnsoldFollowUpDays = previous.UnsoldFollowUpDays, FarmingSystem = previous.FarmingSystem,
                 DateOrder = previous.DateOrder, Use24HourTime = previous.Use24HourTime,
                 FeedingTimes = previous.FeedingTimes, WaterQualityDaily = previous.WaterQualityDaily,
             };
@@ -68,6 +69,7 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
 
         s.TimeZone = input.TimeZone;
         s.DocumentExpiryAlertDays = input.DocumentExpiryAlertDays;
+        s.UnsoldFollowUpDays = input.UnsoldFollowUpDays;
         s.FarmingSystem = input.FarmingSystem;
         s.DateOrder = input.DateOrder;
         s.Use24HourTime = input.Use24HourTime;
@@ -80,6 +82,7 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
         RowVersion = Production.Concurrency.Encode(s.RowVersion),
         TimeZone = s.TimeZone,
         DocumentExpiryAlertDays = s.DocumentExpiryAlertDays,
+        UnsoldFollowUpDays = s.UnsoldFollowUpDays,
         FarmingSystem = s.FarmingSystem,
         DateOrder = s.DateOrder,
         Use24HourTime = s.Use24HourTime,

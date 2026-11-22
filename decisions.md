@@ -3493,7 +3493,7 @@ Negative:
 
 Date: 2026-11-22
 Owners: Capstone development team
-Status: Proposed. Part 1 (Emergency harvests) and the form changes in part 2 are built on `feature/harvest-types-and-indicators`, not compiled or run. The biomass change in part 3, held stock and the follow-up setting (4), and Base 10 pricing (5) are not built. Items marked † need the partner farm or the adviser.
+Status: Proposed. Part 1 (Emergency harvests) and the form changes in part 2 are built on `feature/harvest-types-and-indicators`, not compiled or run. Part 4 (unsold shrimp and the follow-up setting) is built on the same branch. The biomass change in part 3 and Base 10 pricing (5) are not built. Items marked † need the partner farm or the adviser.
 Builds on: DEC-53, DEC-67, DEC-80, DEC-82, DEC-139
 Supersedes in part: DEC-82 (count and price-table pricing are not restored; Base ABW is), the Partial/Total-only harvest types
 
@@ -3524,10 +3524,10 @@ Code facts checked on this branch: `BatchIndicators` takes the current ABW from 
 - Recorded mortality, estimated survival and estimated remaining stay three separate figures. Unexplained loss is not turned into mortality. Cumulative mortality = recorded deaths ÷ stocked × 100. No generic mortality target is added.
 
 **4. Unsold kilograms.**
-- A new not-sold reason, "Held for later sale", has a follow-up date. It stays on the harvest as unsold stock with the status "Unsold, awaiting outcome" and is never counted as sold or as "All accounted for".
-- When the date passes the system reminds the user to record the outcome (a later sale, staff use, given away, spoiled, other). It never marks the kilograms consumed on its own.
-- Outcomes are added as new rows; the first entry is not overwritten.
-- The follow-up period is a farm setting, `UnsoldFollowUpDays`, 1 to 60. It starts at 7 as a placeholder †, and the date on a held entry can be changed.
+- **Unsold shrimp is the balance the harvest already has**: the kilograms neither sold nor recorded as not sold. A separate "Held for later sale" reason would double count with the sale that later sells them, so there is none. The balance is called "Unsold, awaiting outcome" on every screen (it was "not accounted for") and is never counted as sold or as "All accounted for".
+- Each harvest with such a balance has a follow-up day: the one the farmer chose (`Harvest.FollowUpOn`), else the harvest date plus the farm's follow-up days. When it is today or past, the harvest shows "follow-up due" and the dashboard lists it under Admin and supply. The system only reminds; it never marks the kilograms sold or consumed.
+- Outcomes are the records that already exist: a later sale, or a not-sold entry (staff use, given away, spoiled, other). Each is its own record, so the first harvest record is never overwritten, and the balance falls as they are added. The follow-up goes away when it reaches zero.
+- The follow-up period is a farm setting, `UnsoldFollowUpDays`, 1 to 60 days, edited in Farm settings. It starts at 7 as a placeholder †. Changing it moves the follow-up day of harvests that have no chosen day; it never changes a sale or a record.
 
 **5. Base 10 pricing, per gram.**
 - Base ABW pricing (DEC-80) is restored for new sales: price = base price + (ABW − base ABW) × step per gram. ABW is rounded to 0.01 g and the price to centavos. The agreed price is still what is saved; a different one warns and is never blocked.
@@ -3547,7 +3547,7 @@ Code facts checked on this branch: `BatchIndicators` takes the current ABW from 
 **6. Smaller items.** The Ponds page opens as a table with a tile option, and the choice is remembered per user. Feed supplier is already stored on the inventory lot; the feeding form shows supplier beside the feed name and lot, and feed history and the batch feed report include it. A feeding with two lots keeps one entry per lot.
 
 ### Order of work
-1. Harvest types, form and arithmetic. 2. Batch indicators (the biomass and dead-at-harvest fixes first). 3. Held stock and the follow-up setting. 4. Base ABW pricing and its settings. 5. Mortality indicators, the Ponds table and feed supplier.
+1. Harvest types, form and arithmetic. 2. Batch indicators (the biomass and dead-at-harvest fixes first). 3. Unsold shrimp follow-up and its setting. 4. Base ABW pricing and its settings. 5. Mortality indicators, the Ponds table and feed supplier.
 
 ### Tests
 Emergency on an active batch does not fail it; Emergency with shrimp left keeps the batch active; Emergency with none left, or Final, closes it as Harvested; a harvest ABW changes biomass; a partial harvest subtracts the right pieces; dead at harvest is not counted twice; held stock can be sold or given an outcome and keeps its history; 12.08 g gives ₱220.40 from ₱210; the below-base setting is respected; changing settings leaves saved sales alone; supplier shows from receipt to batch usage; old harvests and sales survive the migration.

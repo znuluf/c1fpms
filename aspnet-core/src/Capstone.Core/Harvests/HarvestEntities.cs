@@ -51,6 +51,12 @@ public class Harvest : FarmEntity
     /// <summary>A short explanation of an Emergency harvest; required when the reason is Other.</summary>
     public string EmergencyNote { get; set; }
 
+    /// <summary>
+    /// The day the farmer chose to follow up shrimp still unsold (DEC-140). Null: the farm's follow-up period after the harvest
+    /// date. Only meaningful while kilos are neither sold nor recorded as not sold; it is never used to mark them consumed.
+    /// </summary>
+    public DateOnly? FollowUpOn { get; set; }
+
     /// <summary>True when the harvest ends the batch's production: a Final harvest, or an Emergency one with no shrimp left (DEC-140).</summary>
     public bool EmptiesPond => HarvestType == HarvestType.Total || (HarvestType == HarvestType.Emergency && ShrimpLeft == false);
 
