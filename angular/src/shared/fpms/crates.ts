@@ -68,7 +68,7 @@ export interface WhereRow {
 }
 
 /**
- * Where a harvest went (DEC-86): each sale of it, each not-sold entry and what is not yet accounted for, so the rows add
+ * Where a harvest went (DEC-86): each sale of it, each not-sold entry and the remaining kilograms available to sell, so the rows add
  * up to the harvest's total. `sales` are the tally sheet's sales (empty for a user who cannot see sales: the sold kilos
  * then show as one row without buyers or amounts).
  */
@@ -87,7 +87,7 @@ export function whereItWent(h: any, sales: any[], reasonLabels: Record<number, s
         rows.push({ to: `Not sold: ${reasonLabels[d.reason] ?? 'Other'}${d.note ? ' (' + d.note + ')' : ''}`, kg: d.kg });
     }
     if (h.unaccountedKg > 0) {
-        rows.push({ to: 'Unsold, awaiting outcome', kg: h.unaccountedKg });
+        rows.push({ to: 'Available to sell', kg: h.unaccountedKg });
     }
     return rows;
 }
