@@ -321,7 +321,6 @@ public class BatchDetailDto : BatchListDto
     public bool HasFinalHarvest { get; set; }
     public bool HasRecords { get; set; }
     public List<string> AllowedLogTypes { get; set; } = new();
-    public bool CanDeclareFailure { get; set; }
     public bool CanClose { get; set; }
     public bool CanAddHarvest { get; set; }
     public bool IsReadOnly { get; set; }
