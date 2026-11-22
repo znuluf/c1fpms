@@ -363,7 +363,7 @@ public class PondAppService : CapstoneAppServiceBase
 
     public virtual async Task<PondDetailDto> Get(Guid id)
     {
-        var farmSystem = (await Farm.GetProfileAsync()).FarmingSystem;
+        var farmSystem = (await Farm.GetSettingsAsync()).FarmingSystem;
         var p = await _ponds.GetAll().AsNoTracking().Include(x => x.Prefix).FirstOrDefaultAsync(x => x.Id == id) ?? throw new UserFriendlyException("Pond not found.");
         var history = await _history.GetAll().AsNoTracking().Where(h => h.PondId == id).OrderByDescending(h => h.ChangeDateUtc).ToListAsync();
         var batches = await _batches.GetAll().AsNoTracking().Include(b => b.Cycle).Where(b => b.PondId == id)
