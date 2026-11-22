@@ -135,12 +135,13 @@ public class DailyLogStatusService : ITransientDependency
         }
 
         var final = await _harvests.GetAll().AsNoTracking()
-            .Where(h => h.BatchId == batch.Id && h.HarvestType == HarvestType.Total)
+            .Where(h => h.BatchId == batch.Id)
+            .Where(Harvest.EmptiesPondExpression)
             .OrderByDescending(h => h.HarvestedAtUtc).Select(h => (DateTime?)h.HarvestedAtUtc).FirstOrDefaultAsync();
         return final.HasValue ? FarmClock.LocalDate(final.Value, zone) : null;
     }
 
-    /// <summary>The last day a batch's daily records are expected: its Total harvest date, its failure date, or today.</summary>
+    /// <summary>The last day a batch's daily records are expected: its final harvest date, its failure date, or today.</summary>
     public async Task<DateOnly> ExpectedUntilAsync(PondBatch batch, DateOnly today, TimeZoneInfo zone)
     {
         var failure = await _failures.GetAll().AsNoTracking().Where(f => f.BatchId == batch.Id).Select(f => (DateOnly?)f.FailedOn).FirstOrDefaultAsync();
@@ -150,7 +151,8 @@ public class DailyLogStatusService : ITransientDependency
         }
 
         var final = await _harvests.GetAll().AsNoTracking()
-            .Where(h => h.BatchId == batch.Id && h.HarvestType == HarvestType.Total)
+            .Where(h => h.BatchId == batch.Id)
+            .Where(Harvest.EmptiesPondExpression)
             .OrderByDescending(h => h.HarvestedAtUtc).Select(h => (DateTime?)h.HarvestedAtUtc).FirstOrDefaultAsync();
         var finalDay = final.HasValue ? FarmClock.LocalDate(final.Value, zone) : (DateOnly?)null;
         return finalDay.HasValue && finalDay.Value < today ? finalDay.Value : today;

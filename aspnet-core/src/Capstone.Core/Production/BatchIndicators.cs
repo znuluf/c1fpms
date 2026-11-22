@@ -93,7 +93,7 @@ public class HarvestFact
         Id = h.Id,
         HarvestedAtUtc = h.HarvestedAtUtc,
         Date = date,
-        IsFinal = h.HarvestType == Harvests.HarvestType.Total,
+        IsFinal = h.EmptiesPond,
         TotalKg = h.TotalKg,
         AbwG = h.AbwG,
         FinalCount = h.FinalCount,

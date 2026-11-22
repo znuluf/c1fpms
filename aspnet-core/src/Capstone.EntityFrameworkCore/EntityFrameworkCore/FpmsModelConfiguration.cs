@@ -558,6 +558,7 @@ public static class FpmsModelConfiguration
             e.Property(x => x.AbwG).HasPrecision(8, 2);
             e.Property(x => x.AbwSampleWeightG).HasPrecision(12, 2);
             e.Property(x => x.QualityNotes).HasMaxLength(Harvest.MaxNotesLength);
+            e.Property(x => x.EmergencyNote).HasMaxLength(Harvest.MaxEmergencyNoteLength);
             e.Property(x => x.LotCode).HasMaxLength(HarvestLotCoder.MaxLength);
             e.HasIndex(x => new { x.TenantId, x.LotCode }).IsUnique().HasFilter("[LotCode] IS NOT NULL"); // DEC-83, never reused
             e.HasOne(x => x.Batch).WithMany().HasForeignKey(x => x.BatchId).OnDelete(DeleteBehavior.Restrict);
@@ -574,7 +575,9 @@ public static class FpmsModelConfiguration
             e.ToTable(t =>
             {
                 t.HasCheckConstraint("CK_FpmsHarvests_Kg", "[TotalKg] > 0");
-                t.HasCheckConstraint("CK_FpmsHarvests_Type", "[HarvestType] IN (1, 2)");
+                t.HasCheckConstraint("CK_FpmsHarvests_Type", "[HarvestType] IN (1, 2, 3)");
+                t.HasCheckConstraint("CK_FpmsHarvests_Emergency",
+                    "([HarvestType] = 3 AND [ShrimpLeft] IS NOT NULL AND [EmergencyReason] IN (1, 2, 3, 4, 5)) OR ([HarvestType] <> 3 AND [ShrimpLeft] IS NULL AND [EmergencyReason] IS NULL AND [EmergencyNote] IS NULL)");
                 t.HasCheckConstraint("CK_FpmsHarvests_FinalCount", "[FinalCount] IS NULL OR [FinalCount] >= 0");
                 t.HasCheckConstraint("CK_FpmsHarvests_DeadAtHarvest", "[DeadAtHarvest] IS NULL OR [DeadAtHarvest] >= 0");
                 t.HasCheckConstraint("CK_FpmsHarvests_Abw", "[AbwG] IS NULL OR ([AbwG] > 0 AND [AbwG] <= 60)");

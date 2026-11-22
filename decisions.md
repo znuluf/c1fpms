@@ -3493,7 +3493,7 @@ Negative:
 
 Date: 2026-11-22
 Owners: Capstone development team
-Status: Proposed. Items marked † need the partner farm or the adviser.
+Status: Proposed. Part 1 (Emergency harvests) and the form changes in part 2 are built on `feature/harvest-types-and-indicators`, not compiled or run. The biomass change in part 3, held stock and the follow-up setting (4), and Base 10 pricing (5) are not built. Items marked † need the partner farm or the adviser.
 Builds on: DEC-53, DEC-67, DEC-80, DEC-82, DEC-139
 Supersedes in part: DEC-82 (count and price-table pricing are not restored; Base ABW is), the Partial/Total-only harvest types
 
@@ -3513,12 +3513,12 @@ Code facts checked on this branch: `BatchIndicators` takes the current ABW from 
 - Emergency is always its own type, even when it empties the pond. It is a classification, never a batch failure; failing a batch stays a separate action.
 - An Emergency harvest records "Shrimp left in the pond: Yes or No". Partial implies Yes and Final implies No. The batch is marked Harvested when the harvest is Final, or Emergency with No shrimp left, not by the type alone.
 - An Emergency harvest records a reason (disease concern, poor water, weather, market opportunity, other) and a short note.
-- Weighed On and the quality checks and notes leave the normal form. Their saved data is kept (as in DEC-139).
+- Weighed on, the quality checks and notes, and Dead at harvest leave the harvest form. Their saved data is kept, still sent back unchanged on an edit, and still shown in the trace report and exports (as in DEC-139). Dead at harvest is not on the partner farm's paper tally sheet, no calculation uses it, and it is returned to the form only if the adviser says the standard (135:2025, 8.4.2.6) requires it †.
 
-**2. Harvest arithmetic, on the server.** Crate net kg = scale reading − crate weight; total kg = sum of crates; crates counted; ABW = sample weight ÷ sample pieces (not editable when a full sample exists); count per kg = 1,000 ÷ ABW; estimated pieces = kg × 1,000 ÷ ABW. Example: 5,002 g ÷ 414 = 12.08 g, 82.78 pieces per kg, and 500 kg is about 41,391 pieces. The screen calls this "Estimated pieces"; an actual count is typed only when someone really counted. Dead at harvest stays an optional count, shown separately and treated as part of the harvested pieces, not subtracted again †.
+**2. Harvest arithmetic, on the server.** Crate net kg = scale reading − crate weight; total kg = sum of crates; crates counted; ABW = sample weight ÷ sample pieces (not editable when a full sample exists); count per kg = 1,000 ÷ ABW; estimated pieces = kg × 1,000 ÷ ABW. Example: 5,002 g ÷ 414 = 12.08 g, 82.78 pieces per kg, and 500 kg is about 41,391 pieces. The screen calls this "Estimated pieces"; an actual count is typed only when someone really counted. Dead at harvest is off the form; if it returns it is treated as part of the harvested pieces, not subtracted again †.
 
 **3. Batch indicators.**
-- Estimated biomass = estimated population × the current ABW, whichever of growth sample or harvest it came from. This fixes the `LatestAbwG` use.
+- Estimated biomass = estimated population × the current ABW, whichever of growth sample or harvest it came from. **Not built, to decide first:** the reference batch (docs/reference-batch.md, Indicator_Tests) is worked out with the latest growth sample's ABW (950 kg; FCR to date 0.870); the current ABW gives 831.25 kg and 0.901. A partial harvest also tends to take the larger shrimp, so its ABW may overstate the shrimp left in the pond †.
 - A harvest sample is its own observation with its date and source and never replaces a growth sample in the history.
 - The batch page shows estimated shrimp remaining, biomass, current ABW and where it came from, estimated survival, and the basis, each labelled as an estimate.
 - Recorded mortality, estimated survival and estimated remaining stay three separate figures. Unexplained loss is not turned into mortality. Cumulative mortality = recorded deaths ÷ stocked × 100. No generic mortality target is added.

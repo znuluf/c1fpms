@@ -608,7 +608,7 @@ interface CalMonth {
                                                     <td colspan="7" class="text-center text-muted py-3">
                                                         No harvests yet.
                                                         @if (b.canAddHarvest && can('Farm.Harvests.Create')) {
-                                                            <div class="small mt-1">Use <strong>Record harvest</strong>: a <em>Partial</em> harvest leaves shrimp in the pond; the <em>Final</em> harvest is the last one and marks the batch Harvested.</div>
+                                                            <div class="small mt-1">Use <strong>Record harvest</strong>: a <em>Partial</em> harvest leaves shrimp in the pond; the <em>Final</em> harvest is the last one and marks the batch Harvested. An <em>Emergency</em> harvest is for an urgent situation; it is not a batch failure.</div>
                                                         }
                                                     </td>
                                                 </tr>

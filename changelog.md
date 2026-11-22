@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added and changed (harvests, DEC-140)
+- **Emergency harvests.** A harvest can be Partial, Final or **Emergency**. An Emergency harvest asks for a reason (disease concern, poor water conditions, weather, market opportunity, other), a short explanation (required for Other) and whether shrimp are still in the pond. It is never a batch failure: the batch becomes Harvested only when no shrimp are left, and correcting the answer reopens it. A batch has one harvest that empties the pond, and none can be dated after it.
+- **A simpler harvest form.** "Weighed on", the quality checks and "Dead at harvest" are no longer on the form. Values already saved are kept and still shown in the trace report and exports.
+- **Clearer labels and units** on the harvest form: "Total weight (kg)", "Number of crates", "Sample weight (g)", "Shrimp counted in the sample (pieces)", "Average body weight, ABW (g per shrimp)" and "Counted shrimp (pieces)", each with a line saying what it is for.
+- A database made before this change must be recreated (new columns and a new type value on harvests).
+
 ### Changed (capstone consultation, 21 Nov 2026)
 - **Plainer for farm owners and technicians.** The tagline is now "Farm Production Information System" (the name stays Farm.Shrimp.io, and "Farm code" stays). The farm profile shows the **Farm ID** in the format of docs/farm-id-proposal.md, `A-LL-FF` (area, place, farm number, e.g. 0-24-03), which is the farm part of the harvest lot code. The sidebar lists Farm management above Production management. Registration steps read "1. Farm", "2. Owner account", "3. Review".
 - **Fewer fields.** Removed time zone (farm profile), "Time packed at the hatchery", the transport permits (fry delivery, sales, trace report) and the hatchery Active/Inactive switch.

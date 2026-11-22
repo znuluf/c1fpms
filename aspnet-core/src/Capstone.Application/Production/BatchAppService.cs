@@ -183,7 +183,7 @@ public class BatchAppService : CapstoneAppServiceBase
         var sampleIsRecent = latestGrowthSample != null && latestGrowthSample.Date <= today && latestGrowthSample.Date >= today.AddDays(-7);
         var harvestReadinessReached = b.Status == BatchStatus.Stocked && ind.Doc.HasValue && ind.Doc.Value >= harvestDocTarget && sampleIsRecent && latestGrowthSample.AbwG >= harvestAbwTarget;
         var counts = await _logs.GetAll().Where(l => l.BatchId == id).GroupBy(l => l.LogType).Select(g => new { g.Key, N = g.Count() }).ToListAsync();
-        var hasFinal = await _harvests.GetAll().AnyAsync(h => h.BatchId == id && h.HarvestType == HarvestType.Total);
+        var hasFinal = await _harvests.GetAll().Where(h => h.BatchId == id).AnyAsync(Harvest.EmptiesPondExpression);
         var hasHarvest = await _harvests.GetAll().AnyAsync(h => h.BatchId == id);
         var failure = await _failures.GetAll().AsNoTracking().FirstOrDefaultAsync(f => f.BatchId == id);
         var names = await GetUserNamesAsync(new[] { b.ClosedByUserId });

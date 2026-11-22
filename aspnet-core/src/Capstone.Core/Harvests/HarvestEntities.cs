@@ -3,14 +3,19 @@ using Capstone.Production;
 using Capstone.Resources;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Capstone.Harvests;
 
 /// <summary>
-/// Partial or Total harvest (spec Section 5). Value 3 (Emergency) was removed in step E: emergency harvests became
-/// Total on a Failed batch, otherwise Partial (conversion 7). The Total harvest marks a Stocked batch Harvested.
+/// Partial, Final (stored as Total) or Emergency harvest (DEC-140). Emergency was removed in step E and became Total on a
+/// Failed batch, otherwise Partial (conversion 7); it is its own type again, and it is never a batch failure. What marks a
+/// Stocked batch Harvested is whether the harvest empties the pond (<see cref="Harvest.EmptiesPond"/>), not the type alone.
 /// </summary>
-public enum HarvestType { Partial = 1, Total = 2 }
+public enum HarvestType { Partial = 1, Total = 2, Emergency = 3 }
+
+/// <summary>Why an Emergency harvest was made (DEC-140).</summary>
+public enum EmergencyReason { DiseaseConcern = 1, PoorWaterConditions = 2, Weather = 3, MarketOpportunity = 4, Other = 5 }
 
 /// <summary>Whose scale weighed the harvest (DEC-81). Buyer: the farm kg already are the buyer's weight.</summary>
 public enum WeighedBy { Farm = 1, Buyer = 2 }
@@ -34,6 +39,24 @@ public class Harvest : FarmEntity
     public PondBatch Batch { get; set; }
     public DateTime HarvestedAtUtc { get; set; }
     public HarvestType HarvestType { get; set; }
+
+    public const int MaxEmergencyNoteLength = 300;
+
+    /// <summary>Emergency harvests only (DEC-140): are there still shrimp in the pond afterwards? Null for Partial and Final.</summary>
+    public bool? ShrimpLeft { get; set; }
+
+    /// <summary>Emergency harvests only (DEC-140): why the harvest was made.</summary>
+    public EmergencyReason? EmergencyReason { get; set; }
+
+    /// <summary>A short explanation of an Emergency harvest; required when the reason is Other.</summary>
+    public string EmergencyNote { get; set; }
+
+    /// <summary>True when the harvest ends the batch's production: a Final harvest, or an Emergency one with no shrimp left (DEC-140).</summary>
+    public bool EmptiesPond => HarvestType == HarvestType.Total || (HarvestType == HarvestType.Emergency && ShrimpLeft == false);
+
+    /// <summary>The same rule as <see cref="EmptiesPond"/>, for queries the database runs.</summary>
+    public static readonly Expression<Func<Harvest, bool>> EmptiesPondExpression =
+        h => h.HarvestType == HarvestType.Total || (h.HarvestType == HarvestType.Emergency && h.ShrimpLeft == false);
 
     /// <summary>
     /// Lot code (DEC-83), e.g. 26-0-24-03-07-02: issued when the harvest is saved and never changed or reused, so it matches

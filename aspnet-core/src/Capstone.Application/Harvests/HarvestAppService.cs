@@ -99,6 +99,15 @@ public class SaveHarvestInput
     /// <summary>Optional: whose scale was used (DEC-81).</summary>
     public WeighedBy? WeighedBy { get; set; }
 
+    /// <summary>Emergency harvests only (DEC-140): are there still shrimp in the pond afterwards?</summary>
+    public bool? ShrimpLeft { get; set; }
+
+    /// <summary>Emergency harvests only (DEC-140): why the harvest was made.</summary>
+    public EmergencyReason? EmergencyReason { get; set; }
+
+    [StringLength(Harvest.MaxEmergencyNoteLength)]
+    public string EmergencyNote { get; set; }
+
     [Range(0.001, 100000000, ErrorMessage = "Total kg must be greater than zero.")]
     public decimal TotalKg { get; set; }
 
@@ -205,6 +214,9 @@ public class HarvestDto
     public Guid? BuyerId { get; set; }
     public string BuyerName { get; set; }
     public WeighedBy? WeighedBy { get; set; }
+    public bool? ShrimpLeft { get; set; }
+    public EmergencyReason? EmergencyReason { get; set; }
+    public string EmergencyNote { get; set; }
     public decimal TotalKg { get; set; }
     public int? Boxes { get; set; }
     public decimal? AbwG { get; set; }
@@ -523,8 +535,29 @@ public class HarvestAppService : CapstoneAppServiceBase
         var warnings = new List<WarningDto>();
         if (!Enum.IsDefined(input.HarvestType))
         {
-            throw new UserFriendlyException("Choose Partial or Final harvest.");
+            throw new UserFriendlyException("Choose Partial, Final or Emergency harvest.");
         }
+
+        // DEC-140: an Emergency harvest says whether shrimp are left and why. Only that answer decides whether the pond is emptied.
+        if (input.HarvestType == HarvestType.Emergency)
+        {
+            if (!input.ShrimpLeft.HasValue)
+            {
+                throw new UserFriendlyException("Say whether there are still shrimp in the pond after the emergency harvest.");
+            }
+
+            if (!input.EmergencyReason.HasValue || !Enum.IsDefined(input.EmergencyReason.Value))
+            {
+                throw new UserFriendlyException("Choose why the emergency harvest was made.");
+            }
+
+            if (input.EmergencyReason == EmergencyReason.Other && string.IsNullOrWhiteSpace(input.EmergencyNote))
+            {
+                throw new UserFriendlyException("Describe the reason for the emergency harvest.");
+            }
+        }
+
+        var emptiesPond = input.HarvestType == HarvestType.Total || (input.HarvestType == HarvestType.Emergency && input.ShrimpLeft == false);
 
         var zone = await Farm.GetTimeZoneAsync();
         var at = FarmClock.ToUtc(input.HarvestedAt);
@@ -539,23 +572,24 @@ public class HarvestAppService : CapstoneAppServiceBase
             throw new UserFriendlyException($"The harvest date cannot be before the stocking date ({batch.StockingDate:yyyy-MM-dd}).");
         }
 
-        // One Total harvest per batch, and it is the batch's last harvest (DEC-51).
+        // One harvest that empties the pond per batch (a Final harvest, or an Emergency one with no shrimp left), and it is the
+        // batch's last harvest (DEC-51, DEC-140).
         var others = await _harvests.GetAll().AsNoTracking().Where(h => h.BatchId == batch.Id && h.Id != harvest.Id)
-            .Select(h => new { h.HarvestType, h.HarvestedAtUtc }).ToListAsync();
-        var otherTotal = others.FirstOrDefault(o => o.HarvestType == HarvestType.Total);
-        if (input.HarvestType == HarvestType.Total && otherTotal != null)
+            .Select(h => new { h.HarvestType, h.ShrimpLeft, h.HarvestedAtUtc }).ToListAsync();
+        var otherFinal = others.FirstOrDefault(o => o.HarvestType == HarvestType.Total || (o.HarvestType == HarvestType.Emergency && o.ShrimpLeft == false));
+        if (emptiesPond && otherFinal != null)
         {
-            throw new UserFriendlyException("This batch already has its Final harvest. Record this one as Partial or correct the Final harvest.");
+            throw new UserFriendlyException("This batch already has its Final harvest (a Final harvest, or an Emergency harvest with no shrimp left). Record this one as Partial, or correct that harvest.");
         }
 
-        if (otherTotal != null && day > FarmClock.LocalDate(otherTotal.HarvestedAtUtc, zone))
+        if (otherFinal != null && day > FarmClock.LocalDate(otherFinal.HarvestedAtUtc, zone))
         {
-            throw new UserFriendlyException($"The batch had its Final harvest on {FarmClock.LocalDate(otherTotal.HarvestedAtUtc, zone):yyyy-MM-dd}; a harvest cannot be dated after it.");
+            throw new UserFriendlyException($"The batch had its Final harvest on {FarmClock.LocalDate(otherFinal.HarvestedAtUtc, zone):yyyy-MM-dd}; a harvest cannot be dated after it.");
         }
 
-        if (input.HarvestType == HarvestType.Total && others.Any(o => FarmClock.LocalDate(o.HarvestedAtUtc, zone) > day))
+        if (emptiesPond && others.Any(o => FarmClock.LocalDate(o.HarvestedAtUtc, zone) > day))
         {
-            throw new UserFriendlyException("The Final harvest must be the batch's last harvest; a partial harvest is dated after it.");
+            throw new UserFriendlyException("The Final harvest must be the batch's last harvest; another harvest is dated after it.");
         }
 
         // Buyer the harvest was for (DEC-81): this farm's; a new choice must be active.
@@ -736,9 +770,13 @@ public class HarvestAppService : CapstoneAppServiceBase
             throw new UserFriendlyException($"Sold {soldTotal:0.###} kg + not sold {notSold:0.###} kg is more than the harvest total of {input.TotalKg:0.###} kg.");
         }
 
-        var wasTotal = !isNew && harvest.HarvestType == HarvestType.Total;
+        var wasFinal = !isNew && harvest.EmptiesPond;
         harvest.HarvestedAtUtc = at;
         harvest.HarvestType = input.HarvestType;
+        var emergency = input.HarvestType == HarvestType.Emergency;
+        harvest.ShrimpLeft = emergency ? input.ShrimpLeft : null;
+        harvest.EmergencyReason = emergency ? input.EmergencyReason : null;
+        harvest.EmergencyNote = emergency && !string.IsNullOrWhiteSpace(input.EmergencyNote) ? input.EmergencyNote.Trim() : null;
         harvest.BuyerId = input.BuyerId;
         harvest.WeighedBy = input.WeighedBy;
         harvest.TotalKg = input.TotalKg;
@@ -810,12 +848,13 @@ public class HarvestAppService : CapstoneAppServiceBase
             harvest.Crates.Add(c);
         }
 
-        // The Total harvest marks a Stocked batch Harvested; a Failed batch stays Failed (salvage).
-        if (input.HarvestType == HarvestType.Total && batch.Status == BatchStatus.Stocked)
+        // A harvest that empties the pond marks a Stocked batch Harvested; a Failed batch stays Failed (salvage). An Emergency
+        // harvest is never a failure (DEC-140): it ends the batch only when no shrimp are left.
+        if (emptiesPond && batch.Status == BatchStatus.Stocked)
         {
             batch.Status = BatchStatus.Harvested;
         }
-        else if (wasTotal && input.HarvestType != HarvestType.Total && batch.Status == BatchStatus.Harvested)
+        else if (wasFinal && !emptiesPond && batch.Status == BatchStatus.Harvested)
         {
             batch.Status = BatchStatus.Stocked;
         }
@@ -921,7 +960,7 @@ public class HarvestAppService : CapstoneAppServiceBase
             {
                 RowVersion = Production.Concurrency.Encode(h.RowVersion),
                 Id = h.Id, BatchId = h.BatchId, BatchCode = h.Batch?.BatchCode, PondCode = h.Batch?.Pond?.PondCode, CycleCode = h.Batch?.Cycle?.CycleCode,
-                BatchStatus = h.Batch?.Status ?? BatchStatus.Stocked, HarvestedAtUtc = h.HarvestedAtUtc, HarvestType = h.HarvestType, TotalKg = h.TotalKg, LotCode = h.LotCode,
+                BatchStatus = h.Batch?.Status ?? BatchStatus.Stocked, HarvestedAtUtc = h.HarvestedAtUtc, HarvestType = h.HarvestType, ShrimpLeft = h.ShrimpLeft, EmergencyReason = h.EmergencyReason, EmergencyNote = h.EmergencyNote, TotalKg = h.TotalKg, LotCode = h.LotCode,
                 BuyerId = h.BuyerId, BuyerName = h.Buyer?.Name, WeighedBy = h.WeighedBy,
                 Boxes = h.Boxes, AbwG = h.AbwG, AbwSampleWeightG = h.AbwSampleWeightG, AbwSamplePieces = h.AbwSamplePieces, FinalCount = h.FinalCount, DeadAtHarvest = h.DeadAtHarvest,
                 SmoothShell = h.SmoothShell, IntactAppendages = h.IntactAppendages, NoNecrosis = h.NoNecrosis, QualityNotes = h.QualityNotes,

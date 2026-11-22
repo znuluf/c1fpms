@@ -67,7 +67,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         </div>
                         <div class="fpms-doc-fields fpms-blank-checks">
                             <span>Harvest</span>
-                            <div>☐ Partial &nbsp; ☐ Total</div>
+                            <div>☐ Partial &nbsp; ☐ Final &nbsp; ☐ Emergency</div>
                             <span>Weighed on</span>
                             <div>☐ Farm's scale &nbsp; ☐ Buyer's scale</div>
                             <span>ABW sample</span>

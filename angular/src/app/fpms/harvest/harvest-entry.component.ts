@@ -10,7 +10,8 @@ import { DisposalReasons } from '@shared/fpms/labels';
 
 /**
  * Harvest entry and detail (Ref 7.1, AC-14, step E): Partial or Total, grade lines on the farm's size grades, optional
- * final count and dead-at-harvest count, not-sold entries (DEC-67) and optional quality checks. Optional crate tally and
+ * counted shrimp, not-sold entries (DEC-67). DEC-140: Emergency harvests, and Weighed on, the quality checks and dead at harvest
+ * are no longer on the form (saved values are kept and sent back unchanged). Optional crate tally and
  * ABW sample (DEC-80): with crates, the total kg and boxes come from them. Optional buyer and scale (DEC-81); for a new
  * harvest with a buyer, the sale can be recorded on the same form, like the paper tally sheet, and both save together;
  * its price terms and payment fields are the blocks the Sales form uses, with the same review step (DEC-85).
@@ -115,10 +116,47 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                 </div>
                                             }
                                             <small class="form-text text-muted">
-                                                {{ m.harvestType === 2 ? (batch?.status === 4 ? 'Salvage of a Failed batch; the batch stays Failed.' : 'The last harvest: the batch becomes Harvested. No harvest or log can be dated after it.') : 'Some shrimp stay in the pond.' }}
+                                                @if (m.harvestType === 2) {
+                                                    {{ batch?.status === 4 ? 'Salvage of a Failed batch; the batch stays Failed.' : 'The last harvest: the batch becomes Harvested. No harvest or log can be dated after it.' }}
+                                                } @else if (m.harvestType === 3) {
+                                                    An urgent harvest. It is not a batch failure.
+                                                } @else {
+                                                    Some shrimp stay in the pond.
+                                                }
                                             </small>
                                         </div>
                                     </div>
+                                    @if (m.harvestType === 3) {
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="er">Reason <span class="text-danger">*</span></label>
+                                                <select id="er" class="form-control" name="emergencyReason" [(ngModel)]="m.emergencyReason" (ngModelChange)="keepDraft()" required>
+                                                    <option [ngValue]="null">Choose a reason</option>
+                                                    @for (o of Options.emergencyReason; track o.value) {
+                                                        <option [ngValue]="o.value">{{ o.label }}</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label class="d-block">Shrimp still in the pond afterwards? <span class="text-danger">*</span></label>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" id="sl1" name="shrimpLeft" [value]="true" [(ngModel)]="m.shrimpLeft" (ngModelChange)="keepDraft()" required />
+                                                    <label class="custom-control-label" for="sl1">Yes</label>
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" id="sl0" name="shrimpLeft" [value]="false" [(ngModel)]="m.shrimpLeft" (ngModelChange)="keepDraft()" required />
+                                                    <label class="custom-control-label" for="sl0">No</label>
+                                                </div>
+                                                <small class="form-text text-muted">
+                                                    {{ m.shrimpLeft === false ? 'No shrimp left: the batch becomes Harvested and no harvest or log can be dated after it.' : 'The batch stays active.' }}
+                                                </small>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="en">Short explanation @if (m.emergencyReason === 5) { <span class="text-danger">*</span> }</label>
+                                                <input id="en" type="text" class="form-control" name="emergencyNote" [(ngModel)]="m.emergencyNote" (ngModelChange)="keepDraft()" maxlength="300" [required]="m.emergencyReason === 5" />
+                                            </div>
+                                        </div>
+                                    }
                                     <div class="form-row">
                                         <div class="form-group col-md-8">
                                             <label for="buyer">Buyer</label>
@@ -130,15 +168,6 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             </select>
                                             <small class="form-text text-muted">When one buyer harvests or orders it. Their usual crate and price terms are filled in.</small>
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="wb">Weighed on</label>
-                                            <select id="wb" class="form-control" name="weighedBy" [(ngModel)]="m.weighedBy" (ngModelChange)="keepDraft()">
-                                                <option [ngValue]="null">Not recorded</option>
-                                                <option [ngValue]="1">The farm's scale</option>
-                                                <option [ngValue]="2">The buyer's scale</option>
-                                            </select>
-                                            @if (m.weighedBy === 2) { <small class="form-text text-muted">The kg are the buyer's weight; the sale needs no separate buyer kg.</small> }
-                                        </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
@@ -146,44 +175,40 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             <input id="at" type="datetime-local" class="form-control" name="harvestedAt" [(ngModel)]="m.harvestedAt" (ngModelChange)="keepDraft()" required [max]="nowInput" />
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <label for="kg">Total kg <span class="text-danger">*</span></label>
+                                            <label for="kg">Total weight (kg) <span class="text-danger">*</span></label>
                                             <input id="kg" type="number" min="0.001" step="0.001" class="form-control" name="totalKg" [(ngModel)]="m.totalKg" (ngModelChange)="keepDraft()" required [readonly]="hasCrates()" />
-                                            <small class="form-text text-muted">{{ hasCrates() ? 'Sum of the crate tally.' : 'Farm weight.' }}</small>
+                                            <small class="form-text text-muted">{{ hasCrates() ? 'Added up from the crate tally.' : 'Weight of all the shrimp harvested.' }}</small>
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <label for="bx">Boxes / crates</label>
+                                            <label for="bx">Number of crates</label>
                                             <input id="bx" type="number" min="0" step="1" class="form-control" name="boxes" [(ngModel)]="m.boxes" (ngModelChange)="keepDraft()" [readonly]="hasCrates()" />
                                         </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
-                                            <label for="sw">ABW sample weight (g)</label>
-                                            <input id="sw" type="number" min="0.01" step="0.01" class="form-control" name="abwSampleWeightG" [(ngModel)]="m.abwSampleWeightG" (ngModelChange)="onSample()" placeholder="optional, e.g. 5002" />
+                                            <label for="sw">Sample weight (g)</label>
+                                            <input id="sw" type="number" min="0.01" step="0.01" class="form-control" name="abwSampleWeightG" [(ngModel)]="m.abwSampleWeightG" (ngModelChange)="onSample()" placeholder="e.g. 5002 (optional)" />
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <label for="sp">Pieces in the sample</label>
-                                            <input id="sp" type="number" min="1" step="1" class="form-control" name="abwSamplePieces" [(ngModel)]="m.abwSamplePieces" (ngModelChange)="onSample()" placeholder="optional, e.g. 414" />
+                                            <label for="sp">Shrimp counted in the sample (pieces)</label>
+                                            <input id="sp" type="number" min="1" step="1" class="form-control" name="abwSamplePieces" [(ngModel)]="m.abwSamplePieces" (ngModelChange)="onSample()" placeholder="e.g. 414 (optional)" />
                                             @if (sampleHalf()) { <small class="form-text text-danger">Enter both the weight and the pieces, or neither.</small> }
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <label for="abw">Sampled ABW (g)</label>
+                                            <label for="abw">Average body weight, ABW (g per shrimp)</label>
                                             <input id="abw" type="number" min="0.01" max="60" step="0.01" class="form-control" name="abwG" [(ngModel)]="m.abwG" (ngModelChange)="keepDraft()" [readonly]="sampleComplete()" />
                                             @if (sampleComplete()) {
-                                                <small class="form-text text-muted">{{ m.abwSampleWeightG | num: 2 }} g ÷ {{ m.abwSamplePieces | num: 0 }} pcs</small>
+                                                <small class="form-text text-muted">Worked out: {{ m.abwSampleWeightG | num: 2 }} g ÷ {{ m.abwSamplePieces | num: 0 }} pieces</small>
                                             } @else if (m.abwG > 0) {
-                                                <small class="form-text text-muted">≈ {{ 1000 / m.abwG | num: 0 }} pcs/kg; used for ungraded kg</small>
+                                                <small class="form-text text-muted">About {{ 1000 / m.abwG | num: 0 }} pieces per kg; used to estimate the pieces harvested.</small>
                                             }
                                         </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
-                                            <label for="fc">Final count (pieces)</label>
-                                            <input id="fc" type="number" min="0" step="1" class="form-control" name="finalCount" [(ngModel)]="m.finalCount" (ngModelChange)="keepDraft()" placeholder="optional" />
-                                            <small class="form-text text-muted">When counted, replaces the estimate.</small>
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="dh">Dead at harvest</label>
-                                            <input id="dh" type="number" min="0" step="1" class="form-control" name="deadAtHarvest" [(ngModel)]="m.deadAtHarvest" (ngModelChange)="keepDraft()" placeholder="optional" />
+                                            <label for="fc">Counted shrimp (pieces)</label>
+                                            <input id="fc" type="number" min="0" step="1" class="form-control" name="finalCount" [(ngModel)]="m.finalCount" (ngModelChange)="keepDraft()" placeholder="only if you counted them all" />
+                                            <small class="form-text text-muted">Leave empty to use the estimate from the ABW. A real count replaces the estimate.</small>
                                         </div>
                                     </div>
                                 </div>
@@ -391,34 +416,6 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     <button type="button" class="btn btn-sm btn-outline-secondary" (click)="m.disposals.push({ kg: null, reason: 1, note: '' }); keepDraft()"><i class="fas fa-plus mr-1"></i>Add not-sold entry</button>
                                 </div>
                             </div>
-                            <div class="card">
-                                <div class="card-header">
-                                    <a href="javascript:;" class="card-title text-reset" role="button" (click)="showQuality = !showQuality" [attr.aria-expanded]="showQuality">
-                                        <i class="fas mr-1" [class.fa-chevron-right]="!showQuality" [class.fa-chevron-down]="showQuality" aria-hidden="true"></i>Quality check (optional)
-                                    </a>
-                                </div>
-                                @if (showQuality) {
-                                    <div class="card-body">
-                                        <p class="small text-muted">Leave a check as "Not assessed" when it was not inspected.</p>
-                                        @for (q of qualityFields; track q.key) {
-                                            <div class="form-group form-row align-items-center mb-2">
-                                                <label class="col-md-4 mb-0" [for]="'q' + q.key">{{ q.label }}</label>
-                                                <div class="col-md-4">
-                                                    <select class="form-control form-control-sm" [id]="'q' + q.key" [name]="'q' + q.key" [(ngModel)]="m[q.key]" (ngModelChange)="keepDraft()">
-                                                        <option [ngValue]="null">Not assessed</option>
-                                                        <option [ngValue]="true">Yes</option>
-                                                        <option [ngValue]="false">No</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        }
-                                        <div class="form-group mb-0">
-                                            <label for="qn">Notes</label>
-                                            <textarea id="qn" rows="2" class="form-control" name="qualityNotes" [(ngModel)]="m.qualityNotes" (ngModelChange)="keepDraft()" maxlength="1000"></textarea>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
                             @if (isNew && m.buyerId && canSell) {
                                 <div class="card card-outline card-primary">
                                     <div class="card-header">
@@ -536,7 +533,6 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     loading = true;
     isNew = true;
     readOnly = false;
-    showQuality = false;
     showCrates = false;
     readonly maxCrates = 1000;
     bulk: any = { count: null, containerTypeId: '', kg: null };
@@ -550,11 +546,6 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     m: any = {};
     restoredAt: string | null = null;
     readonly nowInput = FarmTime.nowInput();
-    readonly qualityFields = [
-        { key: 'smoothShell', label: 'Smooth shell' },
-        { key: 'intactAppendages', label: 'Intact appendages' },
-        { key: 'noNecrosis', label: 'No necrosis' },
-    ];
 
     ngOnInit(): void {
         // Detail routes reuse this component when only the :id changes, so reload on every change.
@@ -613,7 +604,6 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
                     this.grades = [...this.grades, { id: g.sizeGradeId, label: g.sizeLabel, isUngraded: g.isUngraded }];
                 }
             }
-            this.showQuality = h.smoothShell != null || h.intactAppendages != null || h.noNecrosis != null || !!h.qualityNotes;
         }
         this.loading = false;
     }
@@ -621,7 +611,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     private blank(batchId: string): any {
         return {
             batchId, harvestType: 1, harvestedAt: FarmTime.nowInput(), totalKg: null, boxes: null, abwG: null, abwSampleWeightG: null, abwSamplePieces: null,
-            finalCount: null, deadAtHarvest: null, smoothShell: null, intactAppendages: null, noNecrosis: null, qualityNotes: '', gradeLines: [], disposals: [], crates: [],
+            finalCount: null, deadAtHarvest: null, shrimpLeft: null, emergencyReason: null, emergencyNote: '', smoothShell: null, intactAppendages: null, noNecrosis: null, qualityNotes: '', gradeLines: [], disposals: [], crates: [],
             buyerId: '', weighedBy: null, sell: false, sale: this.blankSale(), gradeCrates: false,
             // DEC-133: one id per new harvest, kept in the draft, so a retried save returns the harvest already saved.
             clientRequestId: newGuid(),
@@ -1053,6 +1043,9 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             batchId: this.m.batchId,
             harvestedAt: FarmTime.fromLocalInput(this.m.harvestedAt),
             harvestType: this.m.harvestType,
+            shrimpLeft: this.m.harvestType === 3 ? this.m.shrimpLeft : null,
+            emergencyReason: this.m.harvestType === 3 ? this.m.emergencyReason : null,
+            emergencyNote: this.m.harvestType === 3 ? this.m.emergencyNote || null : null,
             buyerId: this.m.buyerId || null,
             weighedBy: this.m.weighedBy ?? null,
             totalKg: this.m.totalKg,
@@ -1090,7 +1083,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             if (this.isNew) {
                 FormDrafts.clear(this.draftKey);
             }
-            this.notifySaved(body.harvestType === 2 ? 'Final harvest saved.' : 'Harvest saved.');
+            this.notifySaved(body.harvestType === 2 ? 'Final harvest saved.' : body.harvestType === 3 ? 'Emergency harvest saved.' : 'Harvest saved.');
             if (saved?.warnings?.length) {
                 this.showWarnings(saved.warnings);
             }

@@ -80,6 +80,7 @@ erDiagram
 | | `BuyerId`, `WeighedBy` | | The buyer on the harvest and whose scale was used (DEC-81). |
 | | `LotCode` | | The harvest lot code for tracing (DEC-83). |
 | | `ClientRequestId`, `RowVersion` | | Retry-safe saves and version checks (DEC-133). |
+| | `ShrimpLeft`, `EmergencyReason`, `EmergencyNote` | | Emergency harvests (type 3): whether shrimp are left in the pond, why, and a short note. Null for other types (DEC-140). |
 | `FpmsSales` | `ClientRequestId`, `RowVersion` | | Retry-safe saves and version checks (DEC-133). |
 | `FpmsSaleLines` | `PriceMethod`, `BaseAbwG`, `BasePricePerKg`, `StepPerG`, `BaseCountPerKg`, `StepPerCount`, `PriceAbwG`, `PriceCountPerKg`, `ReferencePricePerKg`, `PriceTableId`, `PriceTableName`, `PriceTableRowLabel` | | How a line's price per kg was worked out, with its inputs kept (DEC-80, DEC-82). Names are copied so a later edit of the price table never changes a saved sale. |
 | `FpmsProductionLogs` | `RowVersion` | | Version check on log entry corrections (DEC-133). |

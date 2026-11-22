@@ -65,7 +65,9 @@ export const ReadingSides = { 1: 'Low', 2: 'High' };
 export const PostProductionActivities = { 1: 'Black soil removal', 2: 'Sun drying', 3: 'Equipment maintenance', 4: 'Other' };
 /** Work on the pond during culture (DEC-91), stored with the same activity numbers as post-production. */
 export const PondActivities: Record<number, string> = { 5: 'Water exchange', 6: 'Aeration', 7: 'Pond cleaning', 4: 'Other' };
-export const HarvestTypes = { 1: 'Partial', 2: 'Final' };
+export const HarvestTypes = { 1: 'Partial', 2: 'Final', 3: 'Emergency' };
+/** Why an Emergency harvest was made (DEC-140). */
+export const EmergencyReasons = { 1: 'Disease concern', 2: 'Poor water conditions', 3: 'Weather', 4: 'Market opportunity', 5: 'Other' };
 export const DisposalReasons = { 1: 'Staff or home use', 2: 'Given away', 3: 'Spoiled or lost', 4: 'Other' };
 export const PaymentStatuses = { 1: 'Unpaid', 2: 'Partial', 3: 'Paid' };
 export const ExpiryStatuses = { 0: 'No expiry', 1: 'Active', 2: 'Expiring soon', 3: 'Expired' };
@@ -92,6 +94,7 @@ export const Options = {
     feedingSession: opts(FeedingSessions),
     mortalityCause: opts(MortalityCauses),
     harvestType: opts(HarvestTypes),
+    emergencyReason: opts(EmergencyReasons),
     disposalReason: opts(DisposalReasons),
     shortfallReason: opts(ShortfallReasons),
     cycleOutcome: opts(CycleOutcomes),

@@ -1369,7 +1369,10 @@ Table "dbo"."FpmsHarvests" {
   "Id" uniqueidentifier(16) [pk, not null]
   "BatchId" uniqueidentifier(16) [not null]
   "HarvestedAtUtc" datetime2 [not null]
-  "HarvestType" int(10) [not null, check: `[HarvestType]=(2) OR [HarvestType]=(1)`]
+  "HarvestType" int(10) [not null, check: `[HarvestType] IN (1, 2, 3)`]
+  "ShrimpLeft" bit
+  "EmergencyReason" int(10)
+  "EmergencyNote" nvarchar(300)
   "TotalKg" decimal(14,3) [not null, check: `[TotalKg]>(0)`]
   "Boxes" int(10)
   "AbwG" decimal(8,2) [check: `[AbwG] IS NULL OR [AbwG]>(0) AND [AbwG]<=(60)`]

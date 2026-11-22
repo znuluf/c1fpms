@@ -107,6 +107,66 @@ public class HarvestSales_Tests : FpmsTestBase
         (await Resolve<BatchAppService>().Get(BatchId(CurrentBatch))).Status.ShouldBe(BatchStatus.Stocked);
     }
 
+    private SaveHarvestInput Emergency(decimal kg, bool? shrimpLeft, EmergencyReason? reason, string note = null, params (string Label, decimal Kg)[] grades)
+    {
+        var input = Harvest(HarvestType.Emergency, kg, grades);
+        input.ShrimpLeft = shrimpLeft;
+        input.EmergencyReason = reason;
+        input.EmergencyNote = note;
+        return input;
+    }
+
+    [Fact]
+    public async Task Emergency_harvest_needs_an_answer_and_a_reason_and_is_never_a_batch_failure()
+    {
+        var harvests = Resolve<HarvestAppService>();
+
+        // DEC-140: the pond's state and the reason must be said; "Other" needs a few words.
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Create(Emergency(200, null, EmergencyReason.Weather)));
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Create(Emergency(200, true, null)));
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Create(Emergency(200, true, EmergencyReason.Other)));
+
+        var saved = await harvests.Create(Emergency(200, true, EmergencyReason.PoorWaterConditions, "  Dissolved oxygen crashed before dawn  "));
+        saved.HarvestType.ShouldBe(HarvestType.Emergency);
+        saved.ShrimpLeft.ShouldBe(true);
+        saved.EmergencyReason.ShouldBe(EmergencyReason.PoorWaterConditions);
+        saved.EmergencyNote.ShouldBe("Dissolved oxygen crashed before dawn");
+
+        // Shrimp are left, so the batch stays active: not Harvested, not Failed, and no final harvest yet.
+        var batch = await Resolve<BatchAppService>().Get(BatchId(CurrentBatch));
+        batch.Status.ShouldBe(BatchStatus.Stocked);
+        batch.HasFinalHarvest.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task Emergency_harvest_with_no_shrimp_left_ends_the_batch_and_correcting_it_reopens_it()
+    {
+        var harvests = Resolve<HarvestAppService>();
+        var saved = await harvests.Create(Emergency(1500, false, EmergencyReason.DiseaseConcern, null, ("50/60", 1500)));
+        var batch = await Resolve<BatchAppService>().Get(BatchId(CurrentBatch));
+        batch.Status.ShouldBe(BatchStatus.Harvested);
+        batch.HasFinalHarvest.ShouldBeTrue();
+
+        // Nothing can be harvested after it.
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Create(Harvest(HarvestType.Partial, 10)));
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Create(Harvest(HarvestType.Total, 10)));
+
+        // Correcting the answer to "shrimp left" returns the batch to Stocked; correcting it to Partial clears the emergency fields.
+        var edit = Emergency(1500, true, EmergencyReason.DiseaseConcern, null, ("50/60", 1500));
+        edit.Id = saved.Id;
+        await harvests.Update(edit);
+        (await Resolve<BatchAppService>().Get(BatchId(CurrentBatch))).Status.ShouldBe(BatchStatus.Stocked);
+
+        var partial = Harvest(HarvestType.Partial, 1500, ("50/60", 1500));
+        partial.Id = saved.Id;
+        partial.ShrimpLeft = true;
+        partial.EmergencyReason = EmergencyReason.Weather;
+        var corrected = await harvests.Update(partial);
+        corrected.ShrimpLeft.ShouldBeNull();
+        corrected.EmergencyReason.ShouldBeNull();
+        corrected.EmergencyNote.ShouldBeNull();
+    }
+
     [Fact]
     public async Task Harvest_rules_reject_bad_grades_counts_and_dates()
     {
