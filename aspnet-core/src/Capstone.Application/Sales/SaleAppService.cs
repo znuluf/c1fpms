@@ -319,6 +319,9 @@ public class SellableLineDto
     public decimal SoldKg { get; set; }
     public decimal UnsoldKg { get; set; }
 
+    /// <summary>Harvest-wide kilograms still available to sell after all sales and not-sold dispositions.</summary>
+    public decimal HarvestAvailableKg { get; set; }
+
     /// <summary>The harvest's sampled ABW, the default ABW for base-ABW pricing (DEC-80).</summary>
     public decimal? HarvestAbwG { get; set; }
 
@@ -493,6 +496,7 @@ public class SaleAppService : CapstoneAppServiceBase
                 {
                     HarvestGradeLineId = l.Id, HarvestId = h.Id, HarvestedAtUtc = h.HarvestedAtUtc, HarvestDate = FarmClock.LocalDate(h.HarvestedAtUtc, zone),
                     BatchId = h.BatchId, BatchCode = h.Batch?.BatchCode, PondCode = h.Batch?.Pond?.PondCode, SizeLabel = l.SizeGrade?.Label, Kg = l.Kg, SoldKg = s, UnsoldKg = l.Kg - s,
+                    HarvestAvailableKg = availableByHarvest[h.Id],
                     HarvestAbwG = h.AbwG, HarvestBuyerId = h.BuyerId, LotCode = h.LotCode, DefaultCountPerKg = DefaultCount(l, h),
                 };
             })
