@@ -70,7 +70,7 @@ Technology: SQL Server (Development: Docker inside GitHub Codespaces; Production
 
 Stores:
 - **ABP tables:** tenants, users, roles, permissions, audit logs, entity changes, notifications.
-- **Farm and permits:** FarmProfile, PermitCategory, PermitPreset, PermitRecord.
+- **Farm and permits:** FarmProfile (farm identity and contact details), FarmSettings (operational defaults and display preferences), PermitCategory, PermitPreset, PermitRecord.
 - **Ponds:** PondNamePrefix, Pond, PondModification, PondPreparationRound, PondPreparationEntry.
 - **Hatchery and stock:** Hatchery, HatcheryCertificate, FryDelivery, FryDeliveryStatusChange, InventoryItem, InventoryLot, StockMovement.
 - **Production:** ProductionCycle, ShrimpBatch, BatchFailure, ProductionLog with WaterQualityMeasurement, GrowthSamplingDetail, ChemicalApplication and MortalityDetail; FeedingSession.
@@ -142,7 +142,7 @@ Example: Create Batch (Stocking) starts a cycle.
 - **Never exposed to the client:** password hashes, the JWT signing key, connection strings, server paths, stack traces (users see an error reference instead), other farms' data, and any farm data to the System Administrator.
 - **Time:**
   - Stored in UTC (`datetime2`); farm-local dates use `date` / `DateOnly`.
-  - The server clock is the only clock; farm time comes only from FarmProfile.TimeZone (Asia/Manila).
+  - The server clock is the only clock; farm-local time and display preferences come from FarmSettings (default timezone Asia/Manila). FarmContext can fall back to legacy FarmProfile values until a settings row exists.
 - **Performance and security:**
   - p95 < 500 ms for ordinary API calls and < 3 s for reports, with two years of data and 5 users.
   - Lists are paginated on the server (25 rows by default, 100 at most); reports cover at most 24 months.
