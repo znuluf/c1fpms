@@ -435,7 +435,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                     <tbody>
                                                         @for (d of h.disposals; track d.id) {
                                                             <tr>
-                                                                <td>{{ d.reason | label: L.DisposalReasons }}</td>
+                                                                <td>{{ DisposalReasons[d.reason] || 'Other' }}</td>
                                                                 <td>{{ d.note || '—' }}</td>
                                                                 <td class="text-right">{{ d.kg | num: 3 }}</td>
                                                                 <td>{{ d.creationTime | farmDateTime }}</td>

@@ -96,7 +96,7 @@ public class HarvestSales_Tests : FpmsTestBase
             .Select(d => new { d.Kg, d.IsDeleted, d.CreatorUserId, d.DeleterUserId, d.DeletionTime })
             .ToList());
         history.Count.ShouldBe(2);
-        history.ShouldAllBe(d => !d.IsDeleted);
+        history.All(d => !d.IsDeleted).ShouldBeTrue();
         history[0].Kg.ShouldBe(10m);
         history[0].CreatorUserId.ShouldNotBeNull();
         history[1].Kg.ShouldBe(25m);
