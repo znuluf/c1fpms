@@ -1,6 +1,7 @@
 using Abp.UI;
 using Capstone.Domain;
 using Capstone.Harvests;
+using Capstone.Production;
 using Capstone.Sales;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
