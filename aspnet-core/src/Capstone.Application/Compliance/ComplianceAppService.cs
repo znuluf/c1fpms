@@ -269,11 +269,11 @@ public class ComplianceAppService : CapstoneAppServiceBase
 
     public virtual async Task<ComplianceDocumentDto> GetDocument(Guid id)
     {
-        var profile = await Farm.GetProfileAsync();
+        var settings = await Farm.GetSettingsAsync();
         var d = await _documents.GetAll().AsNoTracking().Include(x => x.Category).FirstOrDefaultAsync(x => x.Id == id)
                 ?? throw new UserFriendlyException("Compliance record not found.");
         var names = await GetUserNamesAsync(new[] { d.CreatorUserId, d.LastModifierUserId });
-        return Map(d, await Farm.GetTodayAsync(), profile.DocumentExpiryAlertDays, names);
+        return Map(d, await Farm.GetTodayAsync(), settings.DocumentExpiryAlertDays, names);
     }
 
     public virtual async Task<Guid> CreateDocument(SaveDocumentInput input)
