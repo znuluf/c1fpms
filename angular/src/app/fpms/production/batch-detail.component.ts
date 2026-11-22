@@ -31,7 +31,7 @@ interface CalMonth {
         <fpms-page-header [title]="b ? b.pondCode + ' · ' + (b.letter ? 'Batch ' + b.letter : b.batchCode) : 'Batch'" [subtitle]="b ? 'Cycle ' + b.cycleCode + ' · ' + (b.pondAreaM2AtStocking | num: 0) + ' m²' + (b.stockingDate ? ' · stocked ' + (b.stockingDate | farmDate) : '') + '.' : ''" backLink="/app/production/batches" backLabel="Batches">
             @if (b) {
                 <fpms-badge [text]="b.status | label: L.BatchStatuses"></fpms-badge>
-                @if (can('Farm.Reports') || (canManage && (b.canDeclareFailure || b.canClose || b.canReopen))) {
+                @if (can('Farm.Reports') || (canManage && (b.canClose || b.canReopen))) {
                     <fpms-more>
                         @if (can('Farm.Reports')) {
                             <a class="dropdown-item" role="menuitem" [routerLink]="['/app/reports/trace', b.id]"><i class="fas fa-project-diagram mr-2" aria-hidden="true"></i>Trace report</a>
@@ -41,9 +41,6 @@ interface CalMonth {
                         }
                         @if (canManage && b.canReopen) {
                             <button type="button" class="dropdown-item" role="menuitem" (click)="reopening = { reason: '' }"><i class="fas fa-undo mr-2" aria-hidden="true"></i>Reopen batch</button>
-                        }
-                        @if (canManage && b.canDeclareFailure) {
-                            <button type="button" class="dropdown-item text-danger" role="menuitem" (click)="startFailure()"><i class="fas fa-ban mr-2" aria-hidden="true"></i>Declare failure</button>
                         }
                     </fpms-more>
                 }
@@ -128,7 +125,7 @@ interface CalMonth {
                             <div class="card-header"><h3 class="card-title"><i class="fas fa-undo" aria-hidden="true"></i>Reopen batch {{ b.batchCode }}</h3></div>
                             <div class="card-body">
                                 <p class="small">
-                                    The batch returns to {{ b.failureReason ? 'Failed' : 'Harvested' }} so its records can be corrected. Its final indicators are worked out again when you close it.
+                                    The batch returns to Harvested so its records can be corrected. Its final indicators are worked out again when you close it.
                                     The reason is kept in the batch's history and the activity log.
                                 </p>
                                 <label for="br">Reason <span class="text-danger">*</span></label>
@@ -138,36 +135,6 @@ interface CalMonth {
                                 <button class="btn btn-warning mr-2" [disabled]="busy() || reopening.reason.trim().length < 3" (click)="reopen()">Reopen batch</button>
                                 <button class="btn btn-default" (click)="reopening = null">Cancel</button>
                             </div>
-                        </div></div></div></div>
-                    }
-
-                    @if (failure) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-danger mb-0 border-0">
-                            <div class="card-header"><h3 class="card-title"><i class="fas fa-ban" aria-hidden="true"></i>Declare batch failed</h3></div>
-                            <form #ff="ngForm" (ngSubmit)="saveFailure()" fpmsReview="failure record" [fpmsReviewNew]="true" novalidate>
-                                <div class="card-body">
-                                    <div class="form-row">
-                                        <div class="form-group col-md-3">
-                                            <label for="fd">Failure date <span class="text-danger">*</span></label>
-                                            <input id="fd" type="date" class="form-control" name="fd" [(ngModel)]="failure.failureDate" required [min]="b.stockingDate" [max]="today" />
-                                        </div>
-                                        <div class="form-group col-md-3">
-                                            <label for="fl">Estimated loss (₱)</label>
-                                            <input id="fl" type="number" min="0" step="0.01" class="form-control" name="fl" [(ngModel)]="failure.estimatedLossPhp" />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="fr">Reason <span class="text-danger">*</span></label>
-                                            <input id="fr" class="form-control" name="fr" [(ngModel)]="failure.reason" required maxlength="1000" />
-                                        </div>
-                                    </div>
-                                    <p class="small text-muted mb-0">The pond becomes Post-harvest. A salvage harvest, notes and sales can still be recorded until the batch is closed.</p>
-                                </div>
-                                <div class="card-footer">
-                                    <button class="btn btn-danger mr-2" type="submit" [disabled]="busy() || !ff.form.valid">Declare failed</button>
-                                    <button class="btn btn-default" type="button" (click)="failure = null">Cancel</button>
-                                    <fpms-form-hint [form]="ff"></fpms-form-hint>
-                                </div>
-                            </form>
                         </div></div></div></div>
                     }
 
@@ -249,7 +216,7 @@ interface CalMonth {
                                 @if (i.cultureDays != null) { <div><dt>Days of culture</dt><dd>{{ i.cultureDays }}</dd></div> }
                             </dl>
                         }
-                        @if (b.failureReason || b.isReadOnly || (b.earliestSafeHarvestDate && !b.isReadOnly) || b.technicianName || (canManage && !b.isReadOnly)) {
+                        @if (b.isReadOnly || (b.earliestSafeHarvestDate && !b.isReadOnly) || b.technicianName || (canManage && !b.isReadOnly)) {
                             <ul class="fpms-notices">
                                 <!-- DEC-127: who looks after this batch day to day, and a cover for days off. A name, not a lock. -->
                                 @if (b.technicianName || (canManage && !b.isReadOnly)) {
@@ -268,18 +235,6 @@ interface CalMonth {
                                             }
                                             @if (canManage && !b.isReadOnly) {
                                                 · <button type="button" class="btn btn-link p-0 align-baseline" (click)="startAssign()">{{ b.technicianName ? 'Change' : 'Name who looks after it' }}</button>
-                                            }
-                                        </span>
-                                    </li>
-                                }
-                                @if (b.failureReason) {
-                                    <li class="error">
-                                        <i class="fas fa-ban" aria-hidden="true"></i>
-                                        <span>
-                                            <strong>Failed</strong> on {{ b.failureDate | farmDate }}: {{ b.failureReason }}
-                                            @if (b.estimatedLossPhp) { · estimated loss {{ b.estimatedLossPhp | php }} }
-                                            @if (can('Farm.Reports')) {
-                                                · <a [routerLink]="['/app/reports']" [queryParams]="{ report: 'failure', batchId: b.id }">Failure report</a>
                                             }
                                         </span>
                                     </li>
@@ -720,7 +675,6 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
     feedPager = new PagerState('feedDate desc');
     logPager = new PagerState('observedAt desc');
     logType: number | null = null;
-    failure: any = null;
     closing: any = null;
     closeCheck: any = null;
     reopening: { reason: string } | null = null;
@@ -873,7 +827,7 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
         const id = this.param('id');
         this.b = await this.api.get<any>('Batch', 'Get', { id });
         this.setPageTitle(this.b ? `Batch ${this.b.batchCode}` : null);
-        this.failure = this.closing = null;
+        this.closing = null;
         this.reopening = null;
         this.loadLogs();
         this.loadFeeding();
@@ -995,17 +949,6 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
 
     feedKg(sessions: any[]): number {
         return sessions.reduce((sum, x) => sum + (x.kg ?? 0), 0);
-    }
-
-    startFailure(): void {
-        this.failure = { id: this.b.id, reason: '', failureDate: this.today, estimatedLossPhp: null, rowVersion: this.b.rowVersion };
-    }
-
-    async saveFailure(): Promise<void> {
-        if (await this.act(() => this.api.post('Batch', 'DeclareFailure', this.failure))) {
-            this.notifySaved('Batch declared failed.');
-            this.load();
-        }
     }
 
     async startClose(): Promise<void> {
