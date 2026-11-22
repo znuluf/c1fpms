@@ -64,6 +64,38 @@ public class HarvestTally_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task Disposition_history_shows_its_recorder_and_cannot_be_edited_or_deleted()
+    {
+        var input = TallySheet();
+        input.Crates = new List<CrateInput>();
+        input.TotalKg = 100;
+        input.Boxes = 1;
+        input.AbwSampleWeightG = null;
+        input.AbwSamplePieces = null;
+        input.GradeLines = new() { new() { SizeGradeId = Grade(SizeGrade.UngradedLabel), Kg = 100 } };
+        var harvest = await Resolve<HarvestAppService>().Create(input);
+        var saved = await Resolve<HarvestAppService>().RecordDisposal(new RecordDisposalInput
+        {
+            HarvestId = harvest.Id, Kg = 10, Reason = DisposalReason.StaffOrHomeUse,
+        });
+        var disposal = saved.Disposals.Single();
+        disposal.RecordedBy.ShouldNotBeNullOrWhiteSpace();
+        disposal.CreationTime.ShouldBeGreaterThan(DateTime.MinValue);
+
+        await Should.ThrowAsync<InvalidOperationException>(() => UsingDbContextAsync(async context =>
+        {
+            var existing = await context.HarvestDisposals.SingleAsync(d => d.Id == disposal.Id);
+            existing.Note = "Attempted correction";
+        }));
+
+        await Should.ThrowAsync<InvalidOperationException>(() => UsingDbContextAsync(async context =>
+        {
+            var existing = await context.HarvestDisposals.SingleAsync(d => d.Id == disposal.Id);
+            existing.IsDeleted = true;
+        }));
+    }
+
+    [Fact]
     public async Task Final_harvest_requires_explicit_confirmation_that_the_pond_is_empty()
     {
         var harvests = Resolve<HarvestAppService>();
