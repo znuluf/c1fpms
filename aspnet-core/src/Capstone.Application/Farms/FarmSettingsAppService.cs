@@ -1,9 +1,7 @@
 using Abp.Authorization;
 using Abp.Domain.Repositories;
-using Abp.Runtime.Session;
 using Abp.UI;
 using Capstone.Authorization;
-using Capstone.Domain;
 using Capstone.Production;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -28,8 +26,13 @@ public class FarmSettingsDto
 public class FarmSettingsAppService : CapstoneAppServiceBase
 {
     private readonly IRepository<FarmSettings, int> _settings;
+    private readonly IRepository<FarmProfile, int> _profiles;
 
-    public FarmSettingsAppService(IRepository<FarmSettings, int> settings) => _settings = settings;
+    public FarmSettingsAppService(IRepository<FarmSettings, int> settings, IRepository<FarmProfile, int> profiles)
+    {
+        _settings = settings;
+        _profiles = profiles;
+    }
 
     public virtual async Task<FarmSettingsDto> Get()
     {
@@ -47,7 +50,7 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
         if (!Enum.IsDefined(input.DateOrder)) throw new UserFriendlyException("Choose a valid date display order.");
         var feedingTimes = FeedingSchedule.Format(FeedingSchedule.Parse(input.FeedingTimes));
 
-        var tenantId = AbpSession.GetTenantId();
+        var tenantId = Farm.TenantId;
         var s = await _settings.FirstOrDefaultAsync(x => x.Id == tenantId);
         if (s == null)
         {
