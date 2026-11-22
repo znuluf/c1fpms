@@ -82,6 +82,7 @@ export function pricingBody(_t: any): any {
         priceCountPerKg: null,
         priceTableId: null,
     };
+}
 
 /** Copies a buyer's last terms (from Sale/GetBuyerPriceTerms) onto a line when the method matches and nothing is typed yet. */
 export function applyTerms(target: any, terms: any): boolean {
