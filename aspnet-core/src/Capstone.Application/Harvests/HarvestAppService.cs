@@ -37,6 +37,11 @@ public class DisposalInput
     public string Note { get; set; }
 }
 
+public class RecordDisposalInput : DisposalInput
+{
+    public Guid HarvestId { get; set; }
+}
+
 /// <summary>One weighed crate on the tally sheet (DEC-80); crate numbers follow the list order.</summary>
 public class CrateInput
 {
@@ -536,11 +541,11 @@ public class HarvestAppService : CapstoneAppServiceBase
 
     /// <summary>Records an additional not-sold outcome without rewriting earlier disposition entries.</summary>
     [AbpAuthorize(PermissionNames.Harvests_Create)]
-    public virtual async Task<HarvestDto> RecordDisposal(Guid harvestId, DisposalInput input)
+    public virtual async Task<HarvestDto> RecordDisposal(RecordDisposalInput input)
     {
-        if (input == null || input.Kg <= 0)
+        if (input == null || input.HarvestId == Guid.Empty || input.Kg <= 0)
         {
-            throw new UserFriendlyException("Not-sold kg must be greater than zero.");
+            throw new UserFriendlyException("Choose a harvest and enter not-sold kg greater than zero.");
         }
 
         if (!Enum.IsDefined(input.Reason))
@@ -550,13 +555,13 @@ public class HarvestAppService : CapstoneAppServiceBase
 
         if (RowLocker != null)
         {
-            await RowLocker.LockAsync(RowLockTarget.Harvest, harvestId);
+            await RowLocker.LockAsync(RowLockTarget.Harvest, input.HarvestId);
         }
 
         var harvest = await _harvests.GetAll()
             .Include(h => h.Disposals)
             .Include(h => h.GradeLines)
-            .FirstOrDefaultAsync(h => h.Id == harvestId)
+            .FirstOrDefaultAsync(h => h.Id == input.HarvestId)
             ?? throw new UserFriendlyException("Harvest not found.");
 
         var batch = await _batches.GetAsync(harvest.BatchId);
@@ -920,7 +925,7 @@ public class HarvestAppService : CapstoneAppServiceBase
         {
             foreach (var d in disposals)
             {
-                harvest.Disposals.Add(new HarvestDisposal { HarvestId = harvest.Id, TenantId = AbpSession.TenantId ?? 0, Kg = d.Kg, Reason = d.Reason, Note = string.IsNullOrWhiteSpace(d.Note) ? null : d.Note.Trim() });
+                harvest.Disposals.Add(new HarvestDisposal { HarvestId = harvest.Id, TenantId = AbpSession.TenantId ?? throw new AbpAuthorizationException("A farm tenant is required."), Kg = d.Kg, Reason = d.Reason, Note = string.IsNullOrWhiteSpace(d.Note) ? null : d.Note.Trim() });
             }
         }
 

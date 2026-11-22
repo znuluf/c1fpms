@@ -1103,7 +1103,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
         let saved: any;
         const ok = await this.act(async () => (saved = await this.api.post<any>('Harvest', 'RecordDisposal', {
             harvestId: this.h.id,
-            input: { kg: Number(this.disposalKg), reason: this.disposalReason, note: this.disposalNote || null },
+            kg: Number(this.disposalKg), reason: this.disposalReason, note: this.disposalNote || null,
         })));
         if (ok) {
             this.h = saved;

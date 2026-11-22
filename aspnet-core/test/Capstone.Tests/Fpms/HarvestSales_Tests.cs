@@ -86,8 +86,7 @@ public class HarvestSales_Tests : FpmsTestBase
         corrected.NotSoldKg.ShouldBe(10m);
         corrected.GradeLines.Single().Kg.ShouldBe(90m);
 
-        var added = await harvests.RecordDisposal(harvest.Id,
-            new DisposalInput { Kg = 25, Reason = DisposalReason.SpoiledOrLost });
+        var added = await harvests.RecordDisposal(new RecordDisposalInput { HarvestId = harvest.Id, Kg = 25, Reason = DisposalReason.SpoiledOrLost });
         added.NotSoldKg.ShouldBe(35m);
         added.GradeLines.Single().Kg.ShouldBe(90m);
 
@@ -114,20 +113,17 @@ public class HarvestSales_Tests : FpmsTestBase
         var harvests = Resolve<HarvestAppService>();
         var harvest = await harvests.Create(Harvest(HarvestType.Partial, 100));
 
-        var first = await harvests.RecordDisposal(harvest.Id,
-            new DisposalInput { Kg = 10, Reason = DisposalReason.StaffOrHomeUse });
+        var first = await harvests.RecordDisposal(new RecordDisposalInput { HarvestId = harvest.Id, Kg = 10, Reason = DisposalReason.StaffOrHomeUse });
         first.NotSoldKg.ShouldBe(10m);
         first.UnaccountedKg.ShouldBe(90m);
 
-        var second = await harvests.RecordDisposal(harvest.Id,
-            new DisposalInput { Kg = 25, Reason = DisposalReason.SpoiledOrLost, Note = "Damaged during handling" });
+        var second = await harvests.RecordDisposal(new RecordDisposalInput { HarvestId = harvest.Id, Kg = 25, Reason = DisposalReason.SpoiledOrLost, Note = "Damaged during handling" });
         second.NotSoldKg.ShouldBe(35m);
         second.UnaccountedKg.ShouldBe(65m);
         second.Disposals.Count.ShouldBe(2);
         second.Disposals.Sum(d => d.Kg).ShouldBe(35m);
 
-        await Should.ThrowAsync<UserFriendlyException>(() => harvests.RecordDisposal(harvest.Id,
-            new DisposalInput { Kg = 66, Reason = DisposalReason.GivenAway }));
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.RecordDisposal(new RecordDisposalInput { HarvestId = harvest.Id, Kg = 66, Reason = DisposalReason.GivenAway }));
     }
 
     [Fact]
