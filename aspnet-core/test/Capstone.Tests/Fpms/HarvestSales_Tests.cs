@@ -336,6 +336,40 @@ public class HarvestSales_Tests : FpmsTestBase
 
     // ---------------------------------------------------------------- sales
     [Fact]
+    public async Task Sale_form_gets_harvest_wide_available_kg_when_dispositions_are_not_grade_specific()
+    {
+        var harvest = await Resolve<HarvestAppService>().Create(Harvest(HarvestType.Partial, 100,
+            ("90/100", 60), ("100/120", 40)));
+        await Resolve<HarvestAppService>().RecordDisposal(new RecordDisposalInput
+        {
+            HarvestId = harvest.Id, Kg = 25, Reason = DisposalReason.StaffOrHomeUse,
+        });
+
+        var sales = Resolve<SaleAppService>();
+        var sellable = (await sales.GetSellableLines(null)).Where(x => x.HarvestId == harvest.Id).ToList();
+        sellable.Count.ShouldBe(2);
+        sellable.Sum(x => x.UnsoldKg).ShouldBe(100m);
+        sellable.Select(x => x.HarvestAvailableKg).Distinct().Single().ShouldBe(75m);
+
+        await Should.ThrowAsync<UserFriendlyException>(() => sales.Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = sellable.Select(x => new SaleLineInput { HarvestGradeLineId = x.HarvestGradeLineId, Kg = x.UnsoldKg, PricePerKg = 200 }).ToList(),
+        }));
+
+        var accepted = await sales.Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = new()
+            {
+                new() { HarvestGradeLineId = sellable.Single(x => x.SizeLabel == "90/100").HarvestGradeLineId, Kg = 60, PricePerKg = 200 },
+                new() { HarvestGradeLineId = sellable.Single(x => x.SizeLabel == "100/120").HarvestGradeLineId, Kg = 15, PricePerKg = 200 },
+            },
+        });
+        accepted.TotalKg.ShouldBe(75m);
+    }
+
+    [Fact]
     public async Task Sale_cannot_exceed_a_grade_lines_unsold_kg()
     {
         var sales = Resolve<SaleAppService>();
