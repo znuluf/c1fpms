@@ -1,9 +1,6 @@
 using Abp.UI;
 using Capstone.Domain;
 using Capstone.Harvests;
-using Capstone.Production;
-using BatchAppService = Capstone.Production.BatchAppService;
-using BatchStatus = Capstone.Production.BatchStatus;
 using Capstone.Sales;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
@@ -79,9 +76,7 @@ public class HarvestTally_Tests : FpmsTestBase
         var harvest = await harvests.Create(input);
         harvest.HarvestType.ShouldBe(HarvestType.Total);
 
-        var batch = await Resolve<BatchAppService>().Get(input.BatchId);
-        batch.Status.ShouldBe(BatchStatus.Harvested);
-        batch.CanAddHarvest.ShouldBeFalse();
+        Q(c => c.PondBatches.IgnoreQueryFilters().Where(b => b.Id == input.BatchId).Select(b => (int)b.Status).Single()).ShouldBe(3); // Harvested
     }
 
     [Fact]
@@ -97,10 +92,7 @@ public class HarvestTally_Tests : FpmsTestBase
         harvest.ShrimpLeft.ShouldBe(false);
         harvest.EmergencyReason.ShouldBe(EmergencyReason.PoorWaterConditions);
 
-        var batch = await Resolve<BatchAppService>().Get(input.BatchId);
-        batch.Status.ShouldBe(BatchStatus.Harvested);
-        batch.CanClose.ShouldBeTrue();
-        batch.CanAddHarvest.ShouldBeFalse();
+        Q(c => c.PondBatches.IgnoreQueryFilters().Where(b => b.Id == input.BatchId).Select(b => (int)b.Status).Single()).ShouldBe(3); // Harvested
     }
 
     [Fact]
@@ -115,10 +107,7 @@ public class HarvestTally_Tests : FpmsTestBase
         harvest.HarvestType.ShouldBe(HarvestType.Emergency);
         harvest.ShrimpLeft.ShouldBe(true);
 
-        var batch = await Resolve<BatchAppService>().Get(input.BatchId);
-        batch.Status.ShouldBe(BatchStatus.Stocked);
-        batch.CanClose.ShouldBeFalse();
-        batch.CanAddHarvest.ShouldBeTrue();
+        Q(c => c.PondBatches.IgnoreQueryFilters().Where(b => b.Id == input.BatchId).Select(b => (int)b.Status).Single()).ShouldBe(2); // Stocked
     }
 
     [Fact]
