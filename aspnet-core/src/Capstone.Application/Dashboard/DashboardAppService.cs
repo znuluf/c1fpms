@@ -147,6 +147,17 @@ public class KpiDto
     public int BlankDailyRecordsYesterday { get; set; }
 }
 
+public class HarvestReadinessAlertDto
+{
+    public Guid BatchId { get; set; }
+    public string BatchCode { get; set; }
+    public string PondCode { get; set; }
+    public int Doc { get; set; }
+    public decimal AbwG { get; set; }
+    public DateOnly SampleDate { get; set; }
+    public DateOnly? EarliestSafeHarvestDate { get; set; }
+}
+
 public class HighMortalityDto
 {
     public Guid LogId { get; set; }
@@ -167,6 +178,7 @@ public class DashboardDto
     public List<CycleTileDto> ActiveCycles { get; set; } = new();
     public List<WaterQualityAlertDto> WaterQualityAlerts { get; set; } = new();
     public List<HighMortalityDto> HighMortality { get; set; } = new();
+    public List<HarvestReadinessAlertDto> HarvestReadinessAlerts { get; set; } = new();
     public List<StockAlertDto> StockAlerts { get; set; } = new();
     public List<DocumentAlertDto> DocumentAlerts { get; set; } = new();
     public List<string> MissingRequiredDocuments { get; set; } = new();
