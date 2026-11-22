@@ -2,6 +2,8 @@ using Abp.UI;
 using Capstone.Domain;
 using Capstone.Harvests;
 using Capstone.Sales;
+using Capstone.Production;
+using Capstone.Production.Dto;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using System;
@@ -93,6 +95,39 @@ public class HarvestTally_Tests : FpmsTestBase
             var existing = await context.HarvestDisposals.SingleAsync(d => d.Id == disposal.Id);
             existing.IsDeleted = true;
         }));
+    }
+
+    [Fact]
+    public async Task Batch_cannot_close_until_every_harvested_kilogram_is_sold_or_disposed()
+    {
+        var input = TallySheet();
+        input.HarvestType = HarvestType.Total;
+        input.PondEmptiedConfirmed = true;
+        var harvest = await Resolve<HarvestAppService>().Create(input);
+        var batches = Resolve<BatchAppService>();
+
+        var check = await batches.GetCloseCheck(input.BatchId);
+        check.HarvestedKg.ShouldBe(503m);
+        check.UnaccountedKg.ShouldBe(503m);
+
+        var blocked = await Should.ThrowAsync<UserFriendlyException>(() => batches.Close(new CloseBatchInput
+        {
+            Id = input.BatchId, ConfirmReadOnly = true,
+        }));
+        blocked.Message.ShouldContain("503");
+        Q(c => c.PondBatches.IgnoreQueryFilters().Where(b => b.Id == input.BatchId).Select(b => (int)b.Status).Single()).ShouldBe(3); // Still Harvested
+
+        await Resolve<HarvestAppService>().RecordDisposal(new RecordDisposalInput
+        {
+            HarvestId = harvest.Id, Kg = 503, Reason = DisposalReason.StaffOrHomeUse,
+        });
+
+        check = await batches.GetCloseCheck(input.BatchId);
+        check.NotSoldKg.ShouldBe(503m);
+        check.UnaccountedKg.ShouldBe(0m);
+
+        await batches.Close(new CloseBatchInput { Id = input.BatchId, ConfirmReadOnly = true });
+        Q(c => c.PondBatches.IgnoreQueryFilters().Where(b => b.Id == input.BatchId).Select(b => (int)b.Status).Single()).ShouldBe(5); // Closed
     }
 
     [Fact]
