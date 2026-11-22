@@ -531,6 +531,12 @@ public class HarvestAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("A harvest cannot move to another batch.");
         }
 
+        // Existing dispositions are historical facts, not editable harvest-form fields. Ignore any stale or
+        // modified client copy and use the persisted entries for all balance and ungraded-line calculations.
+        input.Disposals = harvest.Disposals
+            .Select(d => new DisposalInput { Kg = d.Kg, Reason = d.Reason, Note = d.Note })
+            .ToList();
+
         var warnings = await ApplyAsync(harvest, batch, input, isNew: false);
         if (harvest.LotCode == null)
         {
