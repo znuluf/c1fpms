@@ -261,8 +261,8 @@ public class HarvestSales_Tests : FpmsTestBase
 
         // Once every kilo is recorded as not sold there is nothing to follow up, and the system never does that by itself.
         edit.FollowUpOn = null;
-        edit.Disposals = new List<DisposalInput> { new() { Kg = 100, Reason = DisposalReason.StaffOrHomeUse } };
-        var settled = await harvests.Update(edit);
+        await harvests.RecordDisposal(new RecordDisposalInput { HarvestId = saved.Id, Kg = 100, Reason = DisposalReason.StaffOrHomeUse });
+        var settled = await harvests.Get(saved.Id);
         settled.UnaccountedKg.ShouldBe(0m);
         settled.FollowUpOn.ShouldBeNull();
         settled.FollowUpDue.ShouldBeFalse();
@@ -306,10 +306,9 @@ public class HarvestSales_Tests : FpmsTestBase
         check.NotSoldKg.ShouldBe(20m);
         check.UnaccountedKg.ShouldBe(10m);
 
-        // Sold + not sold may not exceed the harvest: 170 + 35 > 200.
-        input.Id = harvest.Id;
-        input.Disposals = new() { new() { Kg = 35, Reason = DisposalReason.GivenAway } };
-        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Update(input));
+        // Dispositions are append-only. A further 35 kg entry would exceed the remaining balance.
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.RecordDisposal(
+            new RecordDisposalInput { HarvestId = harvest.Id, Kg = 35, Reason = DisposalReason.GivenAway }));
     }
 
     [Fact]
