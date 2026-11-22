@@ -57,7 +57,7 @@ import { batchShort } from '@shared/fpms/labels';
                                         </div>
                                     }
                                     <small class="form-text text-muted">
-                                        Pre-selected as {{ c.suggestedOutcome | label: L.CycleOutcomes }}{{ c.suggestedOutcome === 2 ? ' because every batch failed' : '' }}. Change it if that is not right.
+                                        Pre-selected as {{ c.suggestedOutcome | label: L.CycleOutcomes }}{{ c.suggestedOutcome === 2 ? ' because every batch has a historical incident record' : '' }}. Change it if that is not right.
                                     </small>
                                 </div>
                                 <div class="custom-control custom-checkbox">
@@ -84,7 +84,7 @@ import { batchShort } from '@shared/fpms/labels';
                                 @if (c.status === 4) {
                                     <li><i class="fas fa-lock" aria-hidden="true"></i><span>Closed {{ c.closedAtUtc | farmDateTime }} by {{ c.closedBy }} as <strong>{{ c.outcome | label: L.CycleOutcomes }}</strong>. Its records are read-only; sales and payments can still be updated.</span></li>
                                 } @else {
-                                    <li><i class="fas fa-info-circle" aria-hidden="true"></i><span>To close the cycle, close every batch first (each batch must be Harvested or Failed).</span></li>
+                                    <li><i class="fas fa-info-circle" aria-hidden="true"></i><span>To close the cycle, close every batch first.</span></li>
                                 }
                             </ul>
                         }
