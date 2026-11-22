@@ -3,6 +3,8 @@ using Abp.Domain.Repositories;
 using Abp.UI;
 using Capstone.Authorization;
 using Capstone.Production;
+using Capstone.Domain;
+using Capstone.Ponds;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
