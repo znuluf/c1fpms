@@ -51,7 +51,7 @@ public static class FpmsModelConfiguration
             e.Property(x => x.FarmName).IsRequired().HasMaxLength(FarmProfile.MaxFarmNameLength);
             e.Property(x => x.AddressLine1).HasMaxLength(FarmProfile.MaxAddressLineLength);
             e.Property(x => x.AddressLine2).HasMaxLength(FarmProfile.MaxAddressLineLength);
-            e.Property(x => x.FeedingTimes).HasMaxLength(Capstone.Capstone.Production.FeedingSchedule.MaxTimesLength);
+            e.Property(x => x.FeedingTimes).HasMaxLength(FeedingSchedule.MaxTimesLength);
             // DEC-83: one farm number per place across all farms.
             e.HasIndex(x => new { x.LotAreaCode, x.LotPlaceCode, x.LotFarmNumber }).IsUnique().HasFilter("[LotFarmNumber] IS NOT NULL");
             e.Property(x => x.CityMunicipality).HasMaxLength(FarmProfile.MaxCityLength);
@@ -80,7 +80,7 @@ public static class FpmsModelConfiguration
             e.ToTable("FpmsFarmSettings");
             e.Property(x => x.Id).ValueGeneratedNever();
             e.Property(x => x.TimeZone).IsRequired().HasMaxLength(64);
-            e.Property(x => x.FeedingTimes).IsRequired().HasMaxLength(Production.FeedingSchedule.MaxTimesLength);
+            e.Property(x => x.FeedingTimes).IsRequired().HasMaxLength(FeedingSchedule.MaxTimesLength);
             e.ToTable(t => t.HasCheckConstraint("CK_FpmsFarmSettings_DocumentAlertDays", "[DocumentExpiryAlertDays] BETWEEN 1 AND 365"));
             e.HasIndex(x => x.TenantId).IsUnique();
         });
