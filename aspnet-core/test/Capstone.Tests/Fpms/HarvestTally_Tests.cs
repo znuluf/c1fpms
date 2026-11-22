@@ -2,6 +2,8 @@ using Abp.UI;
 using Capstone.Domain;
 using Capstone.Harvests;
 using Capstone.Production;
+using BatchAppService = Capstone.Production.BatchAppService;
+using BatchStatus = Capstone.Production.BatchStatus;
 using Capstone.Sales;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
