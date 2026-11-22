@@ -57,6 +57,7 @@ public class FarmProvisioningManager : DomainService
     private readonly UserManager _userManager;
     private readonly IPermissionManager _permissionManager;
     private readonly IRepository<FarmProfile, int> _profiles;
+    private readonly IRepository<FarmSettings, int> _settings;
     private readonly IRepository<DocumentCategory, Guid> _documentCategories;
     private readonly IRepository<DocumentPreset, Guid> _documentPresets;
     private readonly IRepository<PondNamePrefix, Guid> _pondPrefixes;
@@ -69,6 +70,7 @@ public class FarmProvisioningManager : DomainService
         UserManager userManager,
         IPermissionManager permissionManager,
         IRepository<FarmProfile, int> profiles,
+        IRepository<FarmSettings, int> settings,
         IRepository<DocumentCategory, Guid> documentCategories,
         IRepository<DocumentPreset, Guid> documentPresets,
         IRepository<PondNamePrefix, Guid> pondPrefixes,
@@ -80,6 +82,7 @@ public class FarmProvisioningManager : DomainService
         _userManager = userManager;
         _permissionManager = permissionManager;
         _profiles = profiles;
+        _settings = settings;
         _documentCategories = documentCategories;
         _documentPresets = documentPresets;
         _pondPrefixes = pondPrefixes;
@@ -144,6 +147,8 @@ public class FarmProvisioningManager : DomainService
                 TimeZone = FarmClock.DefaultTimeZone,
                 DocumentExpiryAlertDays = 30,
             });
+
+            await _settings.InsertAsync(new FarmSettings { Id = tenant.Id, TenantId = tenant.Id });
 
             foreach (var c in FarmDefaults.DocumentCategories)
             {
