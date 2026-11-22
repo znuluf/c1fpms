@@ -69,20 +69,19 @@ export function referencePrice(t: any, abwG: number | null, countPerKg: number |
 }
 
 /** The fields to send for a method; the others are sent empty. */
-export function pricingBody(t: any): any {
-    const m = 1;
+export function pricingBody(_t: any): any {
+    // New sales use one fixed price per kilogram. Legacy ABW/count/table terms are not sent.
     return {
         priceMethod: 1,
-        basePricePerKg: m === 2 || m === 3 ? num(t.basePricePerKg) : null,
-        baseAbwG: m === 2 ? num(t.baseAbwG) : null,
-        stepPerG: m === 2 ? num(t.stepPerG) : null,
-        priceAbwG: m === 2 ? num(t.priceAbwG) : null,
-        baseCountPerKg: m === 3 ? num(t.baseCountPerKg) : null,
-        stepPerCount: m === 3 ? num(t.stepPerCount) : null,
-        priceCountPerKg: m === 3 || m === 4 ? num(t.priceCountPerKg) : null,
-        priceTableId: m === 4 ? t.priceTableId || null : null,
+        basePricePerKg: null,
+        baseAbwG: null,
+        stepPerG: null,
+        priceAbwG: null,
+        baseCountPerKg: null,
+        stepPerCount: null,
+        priceCountPerKg: null,
+        priceTableId: null,
     };
-}
 
 /** Copies a buyer's last terms (from Sale/GetBuyerPriceTerms) onto a line when the method matches and nothing is typed yet. */
 export function applyTerms(target: any, terms: any): boolean {
