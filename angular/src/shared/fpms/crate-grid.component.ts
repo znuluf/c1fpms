@@ -8,6 +8,8 @@ export interface GridCrate {
     crateNo: number;
     kg: number;
     tareKg?: number | null;
+    /** Legacy grade label retained for historical crate data; grading is no longer shown in the grid. */
+    sizeLabel?: string | null;
     
     /** A one- or two-character key explained in the legend, e.g. "A" for the first dispatch receipt. */
     mark?: string | null;
