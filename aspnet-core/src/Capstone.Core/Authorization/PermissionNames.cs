@@ -17,6 +17,8 @@ public static class PermissionNames
 
     public const string FarmProfile = "Farm.Profile";
     public const string FarmProfile_Edit = "Farm.Profile.Edit";
+    public const string FarmSettings = "Farm.Settings";
+    public const string FarmSettings_Edit = "Farm.Settings.Edit";
     public const string FarmUsers = "Farm.Users";
     public const string ActivityLog = "Farm.ActivityLog";
 
