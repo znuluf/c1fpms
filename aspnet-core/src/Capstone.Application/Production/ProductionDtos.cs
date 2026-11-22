@@ -123,7 +123,7 @@ public class ReopenInput
 
 public class CycleDetailDto : CycleListDto
 {
-    /// <summary>Pre-selected outcome at closing: Failed when every batch failed, else Completed (DEC-64).</summary>
+    /// <summary>Pre-selected outcome at closing: Discontinued for cycles whose batches all have legacy incident records, otherwise Completed (DEC-64).</summary>
     public CycleOutcome SuggestedOutcome { get; set; }
 
     public bool CanReopen { get; set; }
@@ -166,7 +166,7 @@ public class CloseCycleInput
 {
     public Guid Id { get; set; }
 
-    /// <summary>Completed or Failed, confirmed by the Owner (DEC-64).</summary>
+    /// <summary>Completed or Discontinued, confirmed by the Owner (DEC-64).</summary>
     public CycleOutcome? Outcome { get; set; }
 
     public string RowVersion { get; set; }
