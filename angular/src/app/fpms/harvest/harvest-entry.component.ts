@@ -404,28 +404,72 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             </div>
                                         </div>
                                     }
-                                    @for (d of m.disposals; track $index) {
-                                        <div class="form-row align-items-end">
-                                            <div class="form-group col-4">
-                                                <label class="small" [for]="'dk' + $index">Kg</label>
-                                                <input [id]="'dk' + $index" type="number" min="0.001" step="0.001" class="form-control form-control-sm" [name]="'dk' + $index" [(ngModel)]="d.kg" (ngModelChange)="keepDraft()" required />
+                                    @if (isNew) {
+                                        @for (d of m.disposals; track $index) {
+                                            <div class="form-row align-items-end">
+                                                <div class="form-group col-4">
+                                                    <label class="small" [for]="'dk' + $index">Kg</label>
+                                                    <input [id]="'dk' + $index" type="number" min="0.001" step="0.001" class="form-control form-control-sm" [name]="'dk' + $index" [(ngModel)]="d.kg" (ngModelChange)="keepDraft()" required />
+                                                </div>
+                                                <div class="form-group col-4">
+                                                    <label class="small" [for]="'dr' + $index">Reason</label>
+                                                    <select [id]="'dr' + $index" class="form-control form-control-sm" [name]="'dr' + $index" [(ngModel)]="d.reason" (ngModelChange)="keepDraft()">
+                                                        @for (o of Options.disposalReason; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-3">
+                                                    <label class="small" [for]="'dn' + $index">Note</label>
+                                                    <input [id]="'dn' + $index" class="form-control form-control-sm" [name]="'dn' + $index" [(ngModel)]="d.note" (ngModelChange)="keepDraft()" maxlength="300" />
+                                                </div>
+                                                <div class="form-group col-1">
+                                                    <button type="button" class="btn btn-sm btn-link text-danger px-0" (click)="m.disposals.splice($index, 1); keepDraft()" aria-label="Remove"><i class="fas fa-times"></i></button>
+                                                </div>
                                             </div>
-                                            <div class="form-group col-4">
-                                                <label class="small" [for]="'dr' + $index">Reason</label>
-                                                <select [id]="'dr' + $index" class="form-control form-control-sm" [name]="'dr' + $index" [(ngModel)]="d.reason" (ngModelChange)="keepDraft()">
-                                                    @for (o of Options.disposalReason; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
-                                                </select>
+                                        }
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="m.disposals.push({ kg: null, reason: 1, note: '' }); keepDraft()"><i class="fas fa-plus mr-1"></i>Add not-sold entry</button>
+                                    } @else {
+                                        @if (h.disposals?.length) {
+                                            <div class="table-responsive mb-3">
+                                                <table class="table table-sm mb-0">
+                                                    <thead><tr><th>Recorded outcome</th><th>Note</th><th class="text-right">Kg</th><th>Recorded</th></tr></thead>
+                                                    <tbody>
+                                                        @for (d of h.disposals; track d.id) {
+                                                            <tr>
+                                                                <td>{{ d.reason | label: L.DisposalReasons }}</td>
+                                                                <td>{{ d.note || '—' }}</td>
+                                                                <td class="text-right">{{ d.kg | num: 3 }}</td>
+                                                                <td>{{ d.creationTime | farmDateTime }}</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
                                             </div>
-                                            <div class="form-group col-3">
-                                                <label class="small" [for]="'dn' + $index">Note</label>
-                                                <input [id]="'dn' + $index" class="form-control form-control-sm" [name]="'dn' + $index" [(ngModel)]="d.note" (ngModelChange)="keepDraft()" maxlength="300" />
+                                        } @else {
+                                            <p class="small text-muted">No not-sold outcomes have been recorded.</p>
+                                        }
+                                        @if (h.unaccountedKg > 0 && !readOnly) {
+                                            <div class="form-row align-items-end">
+                                                <div class="form-group col-md-3">
+                                                    <label for="newDisposalKg">Kg to record</label>
+                                                    <input id="newDisposalKg" name="newDisposalKg" type="number" min="0.001" [max]="h.unaccountedKg" step="0.001" class="form-control" [(ngModel)]="disposalKg" />
+                                                    <small class="form-text text-muted">Up to {{ h.unaccountedKg | num: 3 }} kg remains unaccounted for.</small>
+                                                </div>
+                                                <div class="form-group col-md-3">
+                                                    <label for="newDisposalReason">Outcome</label>
+                                                    <select id="newDisposalReason" name="newDisposalReason" class="form-control" [(ngModel)]="disposalReason">
+                                                        @for (o of Options.disposalReason; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="newDisposalNote">Note (optional)</label>
+                                                    <input id="newDisposalNote" name="newDisposalNote" class="form-control" [(ngModel)]="disposalNote" maxlength="300" />
+                                                </div>
+                                                <div class="form-group col-md-2">
+                                                    <button type="button" class="btn btn-primary btn-block" (click)="recordDisposal()" [disabled]="!disposalKg || disposalKg <= 0 || disposalKg > h.unaccountedKg">Record outcome</button>
+                                                </div>
                                             </div>
-                                            <div class="form-group col-1">
-                                                <button type="button" class="btn btn-sm btn-link text-danger px-0" (click)="m.disposals.splice($index, 1); keepDraft()" aria-label="Remove"><i class="fas fa-times"></i></button>
-                                            </div>
-                                        </div>
+                                        }
                                     }
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="m.disposals.push({ kg: null, reason: 1, note: '' }); keepDraft()"><i class="fas fa-plus mr-1"></i>Add not-sold entry</button>
                                 </div>
                             </div>
                             @if (isNew && m.buyerId && canSell) {
@@ -557,6 +601,9 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     grades: any[] = [];
     m: any = {};
     restoredAt: string | null = null;
+    disposalKg: number | null = null;
+    disposalReason = 1;
+    disposalNote = '';
     readonly nowInput = FarmTime.nowInput();
 
     ngOnInit(): void {
@@ -1046,6 +1093,25 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
 
     sellableKg(): number {
         return (this.h?.gradeLines ?? []).reduce((s: number, g: any) => s + (g.unsoldKg || 0), 0);
+    }
+
+    async recordDisposal(): Promise<void> {
+        if (!this.h || !this.disposalKg || this.disposalKg <= 0 || this.disposalKg > this.h.unaccountedKg) {
+            return;
+        }
+
+        let saved: any;
+        const ok = await this.act(async () => (saved = await this.api.post<any>('Harvest', 'RecordDisposal', {
+            harvestId: this.h.id,
+            input: { kg: Number(this.disposalKg), reason: this.disposalReason, note: this.disposalNote || null },
+        })));
+        if (ok) {
+            this.h = saved;
+            this.disposalKg = null;
+            this.disposalReason = 1;
+            this.disposalNote = '';
+            this.notifySaved('Not-sold outcome recorded.');
+        }
     }
 
     /** `confirmed` is true only from the review card's button, so Enter in a field never saves a sale unchecked. */

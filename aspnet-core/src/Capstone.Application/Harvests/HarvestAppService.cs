@@ -858,7 +858,8 @@ public class HarvestAppService : CapstoneAppServiceBase
         }
 
         // Not-sold entries: Σ sold + Σ not sold ≤ total (DEC-67).
-        var disposals = input.Disposals ?? new List<DisposalInput>();
+        var disposals = isNew ? input.Disposals ?? new List<DisposalInput>() : harvest.Disposals
+            .Select(d => new DisposalInput { Kg = d.Kg, Reason = d.Reason, Note = d.Note }).ToList();
         if (disposals.Any(d => !Enum.IsDefined(d.Reason)))
         {
             throw new UserFriendlyException("Choose a reason for each not-sold entry.");
@@ -913,15 +914,14 @@ public class HarvestAppService : CapstoneAppServiceBase
             harvest.GradeLines.Add(new HarvestGradeLine { HarvestId = harvest.Id, SizeGradeId = l.SizeGradeId, Kg = l.Kg });
         }
 
-        foreach (var d in harvest.Disposals.ToList())
+        // Dispositions are append-only after harvest creation. Corrections use RecordDisposal rather than
+        // replacing the audit history whenever the harvest's weighing details are edited.
+        if (isNew)
         {
-            harvest.Disposals.Remove(d);
-            await _disposals.DeleteAsync(d);
-        }
-
-        foreach (var d in disposals)
-        {
-            harvest.Disposals.Add(new HarvestDisposal { HarvestId = harvest.Id, Kg = d.Kg, Reason = d.Reason, Note = string.IsNullOrWhiteSpace(d.Note) ? null : d.Note.Trim() });
+            foreach (var d in disposals)
+            {
+                harvest.Disposals.Add(new HarvestDisposal { HarvestId = harvest.Id, TenantId = AbpSession.TenantId ?? 0, Kg = d.Kg, Reason = d.Reason, Note = string.IsNullOrWhiteSpace(d.Note) ? null : d.Note.Trim() });
+            }
         }
 
         // A crate on a dispatch receipt (DEC-86) keeps its number, weight and grade, because the buyer's receipt lists it.
