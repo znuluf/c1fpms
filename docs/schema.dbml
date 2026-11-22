@@ -470,6 +470,23 @@ Table "dbo"."FpmsFarmCodeChanges" {
   "ChangedAt" datetime2 [not null]
 }
 
+Table "dbo"."FpmsFarmSettings" {
+  "Id" int(10) [pk, not null]
+  "TenantId" int(10) [unique, not null]
+  "TimeZone" nvarchar(64) [not null]
+  "DocumentExpiryAlertDays" int(10) [not null]
+  "FarmingSystem" int(10) [not null]
+  "DateOrder" int(10) [not null]
+  "Use24HourTime" bit [not null]
+  "FeedingTimes" nvarchar(100) [not null]
+  "WaterQualityDaily" bit [not null]
+  "RowVersion" rowversion [not null]
+  "CreationTime" datetime2 [not null]
+  "CreatorUserId" bigint(19)
+  "LastModificationTime" datetime2
+  "LastModifierUserId" bigint(19)
+}
+
 Table "dbo"."FpmsFarmProfiles" {
   "Id" int(10) [pk, not null]
   "TenantId" int(10) [unique, not null]
