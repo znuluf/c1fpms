@@ -117,9 +117,9 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             }
                                             <small class="form-text text-muted">
                                                 @if (m.harvestType === 2) {
-                                                    {{ batch?.status === 4 ? 'Salvage of a Failed batch; the batch stays Failed.' : 'The last harvest: the batch becomes Harvested. No harvest or log can be dated after it.' }}
+                                                    The last harvest: the batch becomes Harvested. No harvest or log can be dated after it.
                                                 } @else if (m.harvestType === 3) {
-                                                    An urgent harvest. It is not a batch failure.
+                                                    Emergency Harvest: record why it is urgent and whether shrimp remain. The batch becomes Harvested only when no shrimp remain.
                                                 } @else {
                                                     Some shrimp stay in the pond.
                                                 }
