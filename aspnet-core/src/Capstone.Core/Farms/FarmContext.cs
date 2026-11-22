@@ -53,7 +53,7 @@ public class FarmContext : ITransientDependency
     public async Task<bool> GetWaterQualityDailyAsync() => (await GetProfileAsync()).WaterQualityDaily;
 
     /// <summary>Whether the farm grades harvests by size (DEC-100).</summary>
-    public async Task<bool> GetUsesSizeGradingAsync() => (await GetProfileAsync()).UsesSizeGrading;
+    public Task<bool> GetUsesSizeGradingAsync() => Task.FromResult(false);
 
     public async Task<DateOnly> GetTodayAsync() => FarmClock.Today(await GetTimeZoneAsync());
 
