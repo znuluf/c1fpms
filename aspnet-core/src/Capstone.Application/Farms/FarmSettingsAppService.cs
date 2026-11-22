@@ -33,10 +33,7 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
 
     public virtual async Task<FarmSettingsDto> Get()
     {
-        var tenantId = AbpSession.GetTenantId();
-        var s = await _settings.FirstOrDefaultAsync(x => x.Id == tenantId)
-            ?? new FarmSettings { Id = tenantId, TenantId = tenantId };
-        return Map(s);
+        return Map(await Farm.GetSettingsAsync());
     }
 
     [AbpAuthorize(PermissionNames.FarmSettings_Edit)]
@@ -54,7 +51,14 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
         var s = await _settings.FirstOrDefaultAsync(x => x.Id == tenantId);
         if (s == null)
         {
-            s = new FarmSettings { Id = tenantId, TenantId = tenantId };
+            var previous = await Farm.GetSettingsAsync();
+            s = new FarmSettings
+            {
+                Id = tenantId, TenantId = tenantId, TimeZone = previous.TimeZone,
+                DocumentExpiryAlertDays = previous.DocumentExpiryAlertDays, FarmingSystem = previous.FarmingSystem,
+                DateOrder = previous.DateOrder, Use24HourTime = previous.Use24HourTime,
+                FeedingTimes = previous.FeedingTimes, WaterQualityDaily = previous.WaterQualityDaily,
+            };
             await _settings.InsertAsync(s);
         }
         else
