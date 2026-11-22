@@ -147,6 +147,7 @@ public class CycleDetailDto : CycleListDto
     public bool CanClose { get; set; }
 }
 
+/// <summary>Legacy request shape retained for compatibility; new incident declarations are rejected.</summary>
 public class FailureInput
 {
     public Guid Id { get; set; }
