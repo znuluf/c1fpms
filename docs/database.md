@@ -83,9 +83,9 @@ erDiagram
 | `FpmsSales` | `ClientRequestId`, `RowVersion` | | Retry-safe saves and version checks (DEC-133). |
 | `FpmsSaleLines` | `PriceMethod`, `BaseAbwG`, `BasePricePerKg`, `StepPerG`, `BaseCountPerKg`, `StepPerCount`, `PriceAbwG`, `PriceCountPerKg`, `ReferencePricePerKg`, `PriceTableId`, `PriceTableName`, `PriceTableRowLabel` | | How a line's price per kg was worked out, with its inputs kept (DEC-80, DEC-82). Names are copied so a later edit of the price table never changes a saved sale. |
 | `FpmsProductionLogs` | `RowVersion` | | Version check on log entry corrections (DEC-133). |
-| `FpmsFarmProfiles` | `FeedingTimes` | | The farm's usual feeding times (DEC-61, DEC-123). |
-| | `WaterQualityDaily` | | Whether water quality is a daily record (DEC-94). |
-| | `UsesSizeGrading` | | Whether harvests are graded by size (DEC-100). |
+| `FpmsFarmSettings` | `TimeZone`, `DocumentExpiryAlertDays`, `FarmingSystem`, `DateOrder`, `Use24HourTime`, `FeedingTimes`, `WaterQualityDaily` | | One-to-one operational and display preferences for each farm. The settings row uses the tenant ID as both its primary key and TenantId. |
+| `FpmsFarmProfiles` | `TimeZone`, `DocumentExpiryAlertDays`, `FarmingSystem`, `DateOrder`, `Use24HourTime`, `FeedingTimes`, `WaterQualityDaily` | | Legacy copies retained for compatibility with existing farm profile data; new settings reads and writes use `FpmsFarmSettings`. |
+| | `UsesSizeGrading` | | Legacy field only; size grading is no longer exposed as a farm preference. |
 | | `LotAreaCode`, `LotPlaceCode`, `LotFarmNumber` | | Parts of the harvest lot code (DEC-83). |
 | | `RowVersion` | | Version check on farm profile changes (DEC-133). |
 | `FpmsPonds` | `IsArchived`, `LengthM`, `WidthM` | | Ponds are archived, never deleted (DEC-77). Length and width are optional (ponds made before they were asked for have only an area); when both are set the area is their product. |
@@ -102,7 +102,7 @@ These appear on several tables and mean the same thing on each:
   feedings and pond preparation.
 - **`RowVersion`** (`rowversion`). SQL Server changes it on every update. A correction sends the version its page
   loaded; if it no longer matches, someone else saved first and the change is refused. Mapped with `[Timestamp]` on
-  the entity. On cycles, batches, deliveries, and since DEC-133 harvests, sales, log entries and the farm profile.
+  the entity. On cycles, batches, deliveries, and since DEC-133 harvests, sales, log entries and the farm profile or settings record.
 
 ## 3. How to add or change a column
 
