@@ -7,6 +7,7 @@ using Abp.UI;
 using Capstone.Authorization;
 using Capstone.Domain;
 using Capstone.Harvests;
+using Capstone.ReferenceData;
 using Capstone.Production.Dto;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -33,13 +34,15 @@ public class BatchAppService : CapstoneAppServiceBase
     private readonly IRepository<Sales.Sale, Guid> _sales;
     private readonly IRepository<Inventory.StockMovement, Guid> _movements;
     private readonly Authorization.Roles.RoleManager _roleManager;
+    private readonly FarmStandardsProvider _standards;
 
     public BatchAppService(IRepository<PondBatch, Guid> batches, IRepository<BatchFailure, Guid> failures, IRepository<ProductionLog, Guid> logs,
         IRepository<Harvest, Guid> harvests, BatchDataLoader loader, DailyLogStatusService daily, IRepository<ReopenEvent, Guid> reopenings,
         IRepository<ProductionCycle, Guid> cycles, TreatmentWithdrawal withdrawal, IRepository<Sales.SaleLine, Guid> saleLines, IRepository<Sales.Sale, Guid> sales,
-        IRepository<Inventory.StockMovement, Guid> movements, Authorization.Roles.RoleManager roleManager)
+        IRepository<Inventory.StockMovement, Guid> movements, Authorization.Roles.RoleManager roleManager, FarmStandardsProvider standards)
     {
         _roleManager = roleManager;
+        _standards = standards;
         _movements = movements;
         _saleLines = saleLines;
         _sales = sales;
@@ -172,7 +175,13 @@ public class BatchAppService : CapstoneAppServiceBase
                     .FirstOrDefaultAsync(x => x.Id == id) ?? throw new UserFriendlyException("Batch not found.");
         var zone = await Farm.GetTimeZoneAsync();
         var facts = await _loader.LoadAsync(b.Id, zone);
-        var ind = IndicatorCalculator.Compute(facts, await Farm.GetTodayAsync());
+        var today = await Farm.GetTodayAsync();
+        var ind = IndicatorCalculator.Compute(facts, today);
+        var harvestDocTarget = (int)await _standards.GetAsync(FarmThresholds.HarvestReadyFromDoc);
+        var harvestAbwTarget = await _standards.GetAsync(FarmThresholds.HarvestReadyAtAbw);
+        var latestGrowthSample = facts.GrowthSamples.OrderByDescending(g => g.ObservedAtUtc).FirstOrDefault();
+        var sampleIsRecent = latestGrowthSample != null && latestGrowthSample.Date <= today && latestGrowthSample.Date >= today.AddDays(-7);
+        var harvestReadinessReached = b.Status == BatchStatus.Stocked && ind.Doc >= harvestDocTarget && sampleIsRecent && latestGrowthSample.AbwG >= harvestAbwTarget;
         var counts = await _logs.GetAll().Where(l => l.BatchId == id).GroupBy(l => l.LogType).Select(g => new { g.Key, N = g.Count() }).ToListAsync();
         var hasFinal = await _harvests.GetAll().AnyAsync(h => h.BatchId == id && h.HarvestType == HarvestType.Total);
         var hasHarvest = await _harvests.GetAll().AnyAsync(h => h.BatchId == id);
@@ -195,6 +204,11 @@ public class BatchAppService : CapstoneAppServiceBase
             HatcheryCertificationStatusAtStocking = b.HatcheryCertificationStatusAtStocking, StockingDensityPerM2 = b.StockingDensityPerM2,
             DeadAtStocking = b.DeadAtStocking, PlHealthCertificateNo = delivery?.PlHealthCertificateNo, SfscNo = delivery?.SfscNo,
             EarliestSafeHarvestDate = await _withdrawal.EarliestSafeHarvestDateAsync(b.Id, zone),
+            HarvestReadinessReached = harvestReadinessReached,
+            HarvestReadinessSampleIsRecent = sampleIsRecent,
+            HarvestReadinessDocTarget = harvestDocTarget,
+            HarvestReadinessAbwTargetG = harvestAbwTarget,
+            HarvestReadinessSampleDate = latestGrowthSample?.Date,
             Reopenings = await ReopeningsAsync(b.Id),
             FarmingSystemAtStocking = b.FarmingSystemAtStocking, ConstructionTypeAtStocking = b.ConstructionTypeAtStocking, DensityFlag = b.DensityFlag,
             FailureReason = failure?.Reason, FailureDate = failure?.FailedOn, EstimatedLossPhp = failure?.EstimatedLossPhp,
