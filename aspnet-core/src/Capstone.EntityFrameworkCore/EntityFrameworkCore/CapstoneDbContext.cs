@@ -1,3 +1,4 @@
+using System;
 using Abp.Zero.EntityFrameworkCore;
 using Capstone.Alerts;
 using Capstone.Authorization.Roles;
