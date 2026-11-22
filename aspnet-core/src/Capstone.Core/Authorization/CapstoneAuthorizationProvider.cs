@@ -21,6 +21,8 @@ public class CapstoneAuthorizationProvider : AuthorizationProvider
 
         var profile = context.CreatePermission(PermissionNames.FarmProfile, F("Farm profile"), multiTenancySides: farm);
         profile.CreateChildPermission(PermissionNames.FarmProfile_Edit, F("Edit farm profile"), multiTenancySides: farm);
+        var settings = context.CreatePermission(PermissionNames.FarmSettings, F("Farm settings"), multiTenancySides: farm);
+        settings.CreateChildPermission(PermissionNames.FarmSettings_Edit, F("Edit farm settings"), multiTenancySides: farm);
         context.CreatePermission(PermissionNames.FarmUsers, F("Farm user accounts"), multiTenancySides: farm);
         context.CreatePermission(PermissionNames.ActivityLog, F("Activity log"), multiTenancySides: farm);
         context.CreatePermission(PermissionNames.Compliance, F("Permits and licenses"), multiTenancySides: farm);
