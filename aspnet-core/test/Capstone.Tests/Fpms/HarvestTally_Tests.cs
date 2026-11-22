@@ -64,6 +64,43 @@ public class HarvestTally_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task Emergency_harvest_with_no_shrimp_left_completes_the_batch_without_a_failure_status()
+    {
+        var input = TallySheet();
+        input.HarvestType = HarvestType.Emergency;
+        input.ShrimpLeft = false;
+        input.EmergencyReason = EmergencyReason.PoorWaterConditions;
+
+        var harvest = await Resolve<HarvestAppService>().Create(input);
+        harvest.HarvestType.ShouldBe(HarvestType.Emergency);
+        harvest.ShrimpLeft.ShouldBe(false);
+        harvest.EmergencyReason.ShouldBe(EmergencyReason.PoorWaterConditions);
+
+        var batch = await Resolve<BatchAppService>().Get(input.BatchId);
+        batch.Status.ShouldBe(BatchStatus.Harvested);
+        batch.CanClose.ShouldBeTrue();
+        batch.CanAddHarvest.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task Emergency_harvest_with_shrimp_left_keeps_the_batch_stocked()
+    {
+        var input = TallySheet();
+        input.HarvestType = HarvestType.Emergency;
+        input.ShrimpLeft = true;
+        input.EmergencyReason = EmergencyReason.Weather;
+
+        var harvest = await Resolve<HarvestAppService>().Create(input);
+        harvest.HarvestType.ShouldBe(HarvestType.Emergency);
+        harvest.ShrimpLeft.ShouldBe(true);
+
+        var batch = await Resolve<BatchAppService>().Get(input.BatchId);
+        batch.Status.ShouldBe(BatchStatus.Stocked);
+        batch.CanClose.ShouldBeFalse();
+        batch.CanAddHarvest.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task Editing_the_crates_replaces_the_tally_and_removing_them_keeps_the_typed_total()
     {
         var harvests = Resolve<HarvestAppService>();
