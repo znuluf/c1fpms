@@ -571,7 +571,8 @@ public static class FpmsModelConfiguration
             // them; with Restrict, EF Core tried to null their required HarvestId and threw. Harvests are soft-deleted, so the
             // database cascade never removes rows that are still in use; sale lines still restrict a sold grade line.
             e.HasMany(x => x.GradeLines).WithOne().HasForeignKey(g => g.HarvestId).OnDelete(DeleteBehavior.Cascade);
-            e.HasMany(x => x.Disposals).WithOne().HasForeignKey(d => d.HarvestId).OnDelete(DeleteBehavior.Cascade);
+            // Dispositions are append-only history: unlike replaceable grade lines and crates, they must survive a harvest deletion attempt.
+            e.HasMany(x => x.Disposals).WithOne().HasForeignKey(d => d.HarvestId).OnDelete(DeleteBehavior.Restrict);
             e.HasMany(x => x.Crates).WithOne().HasForeignKey(c => c.HarvestId).OnDelete(DeleteBehavior.Cascade);
             e.HasIndex(x => new { x.TenantId, x.HarvestedAtUtc });
             e.HasIndex(x => new { x.TenantId, x.BatchId });
