@@ -215,6 +215,14 @@ interface CalMonth {
                                 <div><dt>Harvested</dt><dd>{{ i.totalHarvestKg | num: 1 }} kg · {{ i.harvestedPieces | num: 0 }} pcs</dd></div>
                                 @if (i.cultureDays != null) { <div><dt>Days of culture</dt><dd>{{ i.cultureDays }}</dd></div> }
                             </dl>
+                            @if (b.status === 2 && i.estimatedPopulation === 0) {
+                                <div class="alert alert-warning mt-2 mb-0" role="status">
+                                    <strong>Estimated remaining population is zero.</strong>
+                                    This is an estimate from recorded survival, mortality and harvest data, not confirmation that the pond is empty.
+                                    Review the records and check the pond. The batch stays Stocked until a Final harvest is recorded or, for an Emergency harvest,
+                                    staff explicitly confirm that no shrimp remain.
+                                </div>
+                            }
                         }
                         @if (b.isReadOnly || (b.earliestSafeHarvestDate && !b.isReadOnly) || b.technicianName || (canManage && !b.isReadOnly)) {
                             <ul class="fpms-notices">
