@@ -126,6 +126,15 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             </small>
                                         </div>
                                     </div>
+                                    @if (m.harvestType === 2) {
+                                        <div class="form-group mt-2 mb-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="pc" name="pondEmptiedConfirmed" [(ngModel)]="m.pondEmptiedConfirmed" (ngModelChange)="keepDraft()" required />
+                                                <label class="custom-control-label" for="pc">I confirm that no shrimp remain in the pond after this Final harvest. <span class="text-danger">*</span></label>
+                                            </div>
+                                            <small class="form-text text-muted">The batch will be marked Harvested only after this confirmation and the Final harvest are saved. Do not rely on the estimated remaining population alone.</small>
+                                        </div>
+                                    }
                                     @if (m.harvestType === 3) {
                                         <div class="form-row">
                                             <div class="form-group col-md-4">
@@ -672,7 +681,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     private blank(batchId: string): any {
         return {
             batchId, harvestType: 1, harvestedAt: FarmTime.nowInput(), totalKg: null, boxes: null, abwG: null, abwSampleWeightG: null, abwSamplePieces: null,
-            finalCount: null, deadAtHarvest: null, shrimpLeft: null, emergencyReason: null, emergencyNote: '', followUpOn: '', smoothShell: null, intactAppendages: null, noNecrosis: null, qualityNotes: '', gradeLines: [], disposals: [], crates: [],
+            finalCount: null, deadAtHarvest: null, shrimpLeft: null, pondEmptiedConfirmed: false, emergencyReason: null, emergencyNote: '', followUpOn: '', smoothShell: null, intactAppendages: null, noNecrosis: null, qualityNotes: '', gradeLines: [], disposals: [], crates: [],
             buyerId: '', weighedBy: null, sell: false, sale: this.blankSale(), gradeCrates: false,
             // DEC-133: one id per new harvest, kept in the draft, so a retried save returns the harvest already saved.
             clientRequestId: newGuid(),
@@ -1125,6 +1134,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             harvestType: this.m.harvestType,
             followUpOn: this.m.followUpOn || null,
             shrimpLeft: this.m.harvestType === 3 ? this.m.shrimpLeft : null,
+            pondEmptiedConfirmed: this.m.harvestType === 2 && this.m.pondEmptiedConfirmed === true,
             emergencyReason: this.m.harvestType === 3 ? this.m.emergencyReason : null,
             emergencyNote: this.m.harvestType === 3 ? this.m.emergencyNote || null : null,
             buyerId: this.m.buyerId || null,
