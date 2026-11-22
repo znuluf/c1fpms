@@ -142,10 +142,14 @@ export class FarmSettingsComponent extends FpmsPage implements OnInit {
     }
 
     async save(): Promise<void> {
-        if (await this.act(() => this.api.put('FarmProfile', 'Update', this.p))) {
+        let warnings: any[] = [];
+        if (await this.act(async () => (warnings = (await this.api.put<any[]>('FarmProfile', 'Update', this.p)) ?? []))) {
             FarmTime.setZone(this.p.timeZone);
             FarmTime.setDisplay(this.p.dateOrder, this.p.use24HourTime);
             this.notifySaved('Farm settings saved.');
+            if (warnings.length) {
+                this.showWarnings(warnings);
+            }
             await this.load();
         }
     }
