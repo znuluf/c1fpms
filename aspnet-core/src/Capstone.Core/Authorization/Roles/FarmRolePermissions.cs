@@ -11,6 +11,7 @@ public static class FarmRolePermissions
     {
         PermissionNames.Dashboard, PermissionNames.Dashboard_Full,
         PermissionNames.FarmProfile, PermissionNames.FarmProfile_Edit,
+        PermissionNames.FarmSettings, PermissionNames.FarmSettings_Edit,
         PermissionNames.FarmUsers, PermissionNames.ActivityLog, PermissionNames.Compliance,
         PermissionNames.Ponds, PermissionNames.Ponds_Manage, PermissionNames.Ponds_Prepare,
         PermissionNames.Hatcheries, PermissionNames.Hatcheries_Manage,
