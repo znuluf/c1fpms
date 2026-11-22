@@ -32,7 +32,7 @@ public class HarvestSales_Tests : FpmsTestBase
 
     private SaveHarvestInput Harvest(HarvestType type, decimal kg, params (string Label, decimal Kg)[] grades) => new()
     {
-        BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = type, TotalKg = kg, AbwG = 9,
+        BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = type, PondEmptiedConfirmed = type == HarvestType.Total, TotalKg = kg, AbwG = 9,
         GradeLines = grades.Select(g => new GradeLineInput { SizeGradeId = Grade(g.Label), Kg = g.Kg }).ToList(),
     };
 
