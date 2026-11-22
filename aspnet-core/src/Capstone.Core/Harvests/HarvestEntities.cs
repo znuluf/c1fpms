@@ -159,9 +159,12 @@ public class HarvestGradeLine : FarmChildEntity
 }
 
 /// <summary>Harvested kg kept, given away or lost instead of sold (DEC-67).</summary>
-public class HarvestDisposal : FarmChildEntity
+public class HarvestDisposal : Abp.Domain.Entities.Auditing.FullAuditedEntity<Guid>, Abp.Domain.Entities.IMustHaveTenant
 {
     public const int MaxNoteLength = 300;
+
+    /// <summary>Farm scope. Full audit fields retain who recorded, corrected or removed this disposition.</summary>
+    public int TenantId { get; set; }
 
     public Guid HarvestId { get; set; }
     public decimal Kg { get; set; }
