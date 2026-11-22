@@ -222,18 +222,6 @@ public class FarmProfileAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.FarmProfile_Edit)]
     public virtual async Task<List<WarningDto>> Update(FarmProfileDto input)
     {
-        try
-        {
-            TimeZoneInfo.FindSystemTimeZoneById(input.TimeZone);
-        }
-        catch (Exception)
-        {
-            if (input.TimeZone != FarmClock.DefaultTimeZone)
-            {
-                throw new UserFriendlyException($"Unknown time zone '{input.TimeZone}'. Use an IANA name such as Asia/Manila.");
-            }
-        }
-
         FarmAddress.Validate(input.PostalCode, input.Country);
 
         var tenantId = Farm.TenantId;
