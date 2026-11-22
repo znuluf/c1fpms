@@ -44,7 +44,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                         <div class="card">
                             <div class="card-header"><h3 class="card-title">Where it went</h3></div>
                             <div class="card-body">
-                                <div class="fpms-balance" role="img" [attr.aria-label]="'Sold ' + (h.soldKg | num: 2) + ' kg, not sold ' + (h.notSoldKg | num: 2) + ' kg, not yet accounted for ' + (h.unaccountedKg | num: 2) + ' kg, of ' + (h.totalKg | num: 2) + ' kg harvested'">
+                                <div class="fpms-balance" role="img" [attr.aria-label]="'Sold ' + (h.soldKg | num: 2) + ' kg, not sold ' + (h.notSoldKg | num: 2) + ' kg, available to sell ' + (h.unaccountedKg | num: 2) + ' kg, of ' + (h.totalKg | num: 2) + ' kg harvested'">
                                     @if (h.soldKg > 0) { <div class="sold" [style.flex-grow]="h.soldKg"></div> }
                                     @if (h.notSoldKg > 0) { <div class="notsold" [style.flex-grow]="h.notSoldKg"></div> }
                                     @if (h.unaccountedKg > 0) { <div class="open" [style.flex-grow]="h.unaccountedKg"></div> }
@@ -52,7 +52,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                 <div class="fpms-balance-key small">
                                     <span><i class="sold" aria-hidden="true"></i>Sold {{ h.soldKg | num: 2 }} kg</span>
                                     <span><i class="notsold" aria-hidden="true"></i>Not sold {{ h.notSoldKg | num: 2 }} kg</span>
-                                    <span><i class="open" aria-hidden="true"></i>Unsold, awaiting outcome {{ h.unaccountedKg | num: 2 }} kg</span>
+                                    <span><i class="open" aria-hidden="true"></i>Available to sell {{ h.unaccountedKg | num: 2 }} kg</span>
                                     <span class="ml-auto">of <strong>{{ h.totalKg | num: 2 }} kg</strong> harvested</span>
                                 </div>
                             </div>
@@ -473,7 +473,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                             <p class="small text-muted">
                                 Recorded by {{ h.recordedBy }}, {{ h.creationTime | farmDateTime }} · {{ h.harvestedPieces | num: 0 }} pieces ·
                                 sold {{ h.soldKg | num: 2 }} kg · not sold {{ h.notSoldKg | num: 2 }} kg
-                                @if (h.unaccountedKg > 0) { · <span class="text-warning-dark">{{ h.unaccountedKg | num: 2 }} kg unsold, awaiting outcome · follow up {{ h.followUpDue ? 'was due' : 'by' }} {{ h.followUpOn | farmDate }}</span> }
+                                @if (h.unaccountedKg > 0) { · <span class="text-warning-dark">{{ h.unaccountedKg | num: 2 }} kg available to sell · follow up {{ h.followUpDue ? 'was due' : 'by' }} {{ h.followUpOn | farmDate }}</span> }
                             </p>
                         }
                         @if (!readOnly) {
