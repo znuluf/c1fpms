@@ -95,11 +95,12 @@ public class ReportAppService : CapstoneAppServiceBase
     private async Task<ReportHeaderDto> HeaderAsync(string scope)
     {
         var profile = await Farm.GetProfileAsync();
+        var settings = await Farm.GetSettingsAsync();
         var tenant = await GetCurrentTenantAsync();
         var user = await GetCurrentUserAsync();
         return new ReportHeaderDto
         {
-            FarmName = profile.FarmName, FarmCode = tenant.TenancyName, FarmAddress = profile.FormatAddress(), TimeZone = profile.TimeZone,
+            FarmName = profile.FarmName, FarmCode = tenant.TenancyName, FarmAddress = profile.FormatAddress(), TimeZone = settings.TimeZone,
             GeneratedAtUtc = DateTime.UtcNow, GeneratedBy = $"{user.Name} {user.Surname}".Trim(), Scope = scope,
         };
     }
