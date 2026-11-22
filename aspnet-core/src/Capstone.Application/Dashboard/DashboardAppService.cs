@@ -267,6 +267,7 @@ public class DashboardAppService : CapstoneAppServiceBase
         var zone = await Farm.GetTimeZoneAsync();
         var today = FarmClock.Today(zone);
         var profile = await Farm.GetProfileAsync();
+        var settings = await Farm.GetSettingsAsync();
         var isOwner = await IsGrantedAsync(PermissionNames.Dashboard_Full);
         var parameters = await _waterQuality.GetParametersAsync();
         var dto = new DashboardDto { FarmName = profile.FarmName, Today = today, IsOwner = isOwner };
@@ -460,7 +461,7 @@ public class DashboardAppService : CapstoneAppServiceBase
         if (isOwner)
         {
             await _notifications.RefreshDocumentAlertsAsync();
-            var horizon = today.AddDays(profile.DocumentExpiryAlertDays);
+            var horizon = today.AddDays(settings.DocumentExpiryAlertDays);
             var docs = await _documents.GetAll().AsNoTracking().Include(d => d.Category)
                 .Where(d => !d.IsArchived && d.ExpiryDate != null && d.ExpiryDate <= horizon).OrderBy(d => d.ExpiryDate).ToListAsync();
             dto.DocumentAlerts = docs.Select(d => new DocumentAlertDto
