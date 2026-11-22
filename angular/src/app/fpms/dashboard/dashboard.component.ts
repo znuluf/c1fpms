@@ -636,6 +636,18 @@ export class DashboardComponent extends FpmsPage implements OnInit {
                 actionLink: ['/app/logbook', a.logId],
             });
         }
+        for (const h of (dash.harvestReadinessAlerts as any[]) ?? []) {
+            act.push({
+                title: `Ready for harvest: ${h.pondCode}`,
+                detail: `DOC ${h.doc} and ABW ${Number(h.abwG).toFixed(2)} g meet this farm's targets.${h.earliestSafeHarvestDate && String(h.earliestSafeHarvestDate).substring(0, 10) > this.today ? ` Withdrawal period ends ${this.shortDate(String(h.earliestSafeHarvestDate).substring(0, 10))}.` : ''}`,
+                where: h.pondCode,
+                whereSub: h.batchCode,
+                whereLink: ['/app/production/batches', h.batchId],
+                since: `ABW sampled ${this.shortDate(String(h.sampleDate).substring(0, 10))}`,
+                action: 'Open batch',
+                actionLink: ['/app/production/batches', h.batchId],
+            });
+        }
         for (const h of dash.highMortality as any[]) {
             act.push({
                 title: `High mortality: ${h.count} dead`,
