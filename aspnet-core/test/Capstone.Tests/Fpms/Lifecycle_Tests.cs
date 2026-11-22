@@ -351,7 +351,7 @@ public class Lifecycle_Tests : FpmsTestBase
 
     // ---------------------------------------------------------------- AC-15, AC-16, AC-17
     [Fact]
-    public async Task AC15_declare_failure_makes_the_batch_failed_and_the_pond_post_harvest()
+    public async Task Legacy_early_ending_records_are_presented_as_harvested_and_keep_their_history()
     {
         var batches = Resolve<BatchAppService>();
         var id = BatchId(CurrentBatch);
@@ -360,7 +360,7 @@ public class Lifecycle_Tests : FpmsTestBase
         await batches.DeclareFailure(new FailureInput { Id = id, Reason = "WSSV outbreak", FailureDate = today, EstimatedLossPhp = 250000 });
 
         var detail = await batches.Get(id);
-        detail.Status.ShouldBe(BatchStatus.Failed);
+        detail.Status.ShouldBe(BatchStatus.Harvested);
         detail.FailureReason.ShouldBe("WSSV outbreak");
         detail.CanAddHarvest.ShouldBeTrue(); // salvage harvest
         (await Resolve<PondAppService>().Get(PondId("GP-02"))).Status.ShouldBe(PondDisplayStatus.PostHarvest);
