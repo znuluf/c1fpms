@@ -65,6 +65,24 @@ public class HarvestTally_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task Final_harvest_requires_explicit_confirmation_that_the_pond_is_empty()
+    {
+        var harvests = Resolve<HarvestAppService>();
+        var input = TallySheet();
+        input.HarvestType = HarvestType.Total;
+
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Create(input));
+
+        input.PondEmptiedConfirmed = true;
+        var harvest = await harvests.Create(input);
+        harvest.HarvestType.ShouldBe(HarvestType.Total);
+
+        var batch = await Resolve<BatchAppService>().Get(input.BatchId);
+        batch.Status.ShouldBe(BatchStatus.Harvested);
+        batch.CanAddHarvest.ShouldBeFalse();
+    }
+
+    [Fact]
     public async Task Emergency_harvest_with_no_shrimp_left_completes_the_batch_without_a_failure_status()
     {
         var input = TallySheet();
