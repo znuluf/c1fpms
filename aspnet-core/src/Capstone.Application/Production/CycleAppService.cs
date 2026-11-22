@@ -228,7 +228,7 @@ public class CycleAppService : CapstoneAppServiceBase
             }
         }
 
-        var farmSystem = (await Farm.GetProfileAsync()).FarmingSystem;
+        var farmSystem = (await Farm.GetSettingsAsync()).FarmingSystem;
         var prepared = await _rounds.GetAll().AsNoTracking().Where(r => r.UsedAtUtc == null && r.PreparedAtUtc != null).ToListAsync();
         var pondIds = prepared.Select(r => r.PondId).ToList();
         var ponds = await _ponds.GetAll().AsNoTracking().Include(p => p.Prefix).Where(p => pondIds.Contains(p.Id)).OrderBy(p => p.PondCode).ToListAsync();
