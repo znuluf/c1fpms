@@ -430,9 +430,13 @@ public class HarvestTally_Tests : FpmsTestBase
         input.Id = harvest.Id;
         var crates = input.Crates;
         input.Crates = crates.Select((c, i) => new CrateInput { Kg = i == 16 ? 24 : c.Kg }).ToList(); // crate 17 re-weighed
+        input.TotalKg = 504; // 16 × 30 kg + the re-weighed 24 kg crate
+        input.GradeLines = new() { new() { SizeGradeId = Grade(SizeGrade.UngradedLabel), Kg = 504 } };
         await Should.ThrowAsync<UserFriendlyException>(() => harvests.Update(input));
 
         input.Crates = crates.Skip(1).ToList(); // crate 1 removed: crate 16 would become the 23 kg one and crate 17 would be gone
+        input.TotalKg = 503;
+        input.GradeLines = new() { new() { SizeGradeId = Grade(SizeGrade.UngradedLabel), Kg = 503 } };
         await Should.ThrowAsync<UserFriendlyException>(() => harvests.Update(input));
 
         // Saving the harvest with its tally unchanged keeps the crates on the sale.
