@@ -448,7 +448,7 @@ public class ReportAppService : CapstoneAppServiceBase
         string Local(DateTime utc) => FarmClock.ToLocal(utc, zone).ToString("yyyy-MM-dd HH:mm");
         var dto = new FailureReportDto
         {
-            Header = await HeaderAsync(input.BatchId.HasValue ? $"Batch failure report" : $"Cycle failure report, {cycle.CycleCode}"),
+            Header = await HeaderAsync(input.BatchId.HasValue ? "Historical batch incident report" : $"Historical cycle incidents, {cycle.CycleCode}"),
             CycleCode = cycle.CycleCode,
             HatcheryName = cycle.FryDelivery?.Hatchery?.Name,
             HatcheryShortCode = cycle.FryDelivery?.Hatchery?.ShortCode,
