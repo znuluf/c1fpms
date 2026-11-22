@@ -9,6 +9,7 @@ using Capstone.Ponds;
 using Capstone.Production;
 using Capstone.ReferenceData;
 using Capstone.Resources;
+using Capstone.ReferenceData;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -203,6 +204,8 @@ public class DashboardAppService : CapstoneAppServiceBase
     private readonly ComplianceChecker _compliance;
     private readonly NotificationAppService _notifications;
     private readonly Resources.FryDeliveryAppService _deliveries;
+    private readonly FarmStandardsProvider _standards;
+    private readonly TreatmentWithdrawal _withdrawal;
 
     public DashboardAppService(
         IRepository<Pond, Guid> ponds,
@@ -223,9 +226,11 @@ public class DashboardAppService : CapstoneAppServiceBase
         WaterQualityEvaluator waterQuality,
         ComplianceChecker compliance,
         NotificationAppService notifications,
-        Resources.FryDeliveryAppService deliveries)
+        Resources.FryDeliveryAppService deliveries, FarmStandardsProvider standards, TreatmentWithdrawal withdrawal)
     {
         _deliveries = deliveries;
+        _standards = standards;
+        _withdrawal = withdrawal;
         _ponds = ponds;
         _batches = batches;
         _cycles = cycles;
@@ -259,6 +264,8 @@ public class DashboardAppService : CapstoneAppServiceBase
         var ponds = await _ponds.GetAll().AsNoTracking().Include(p => p.Prefix).Where(p => p.ManualStatus != PondManualStatus.Inactive && !p.IsArchived).OrderBy(p => p.PondCode).ToListAsync();
         var open = await _batches.GetAll().AsNoTracking().Include(b => b.Technicians).Where(b => b.Status != BatchStatus.Closed).ToListAsync();
         var facts = await _loader.LoadAsync(open.Select(b => b.Id).ToList(), zone);
+        var harvestDocTarget = (int)await _standards.GetAsync(FarmThresholds.HarvestReadyFromDoc);
+        var harvestAbwTarget = await _standards.GetAsync(FarmThresholds.HarvestReadyAtAbw);
 
         // Water-quality alerts in the last 7 farm days
         var since = FarmClock.StartOfDayUtc(today.AddDays(-6), zone);
@@ -343,7 +350,13 @@ public class DashboardAppService : CapstoneAppServiceBase
             };
             if (batch != null && batch.StockingDate.HasValue)
             {
-                var ind = IndicatorCalculator.Compute(facts.TryGetValue(batch.Id, out var f) ? f : new BatchFacts(), today);
+                var batchFacts = facts.TryGetValue(batch.Id, out var f) ? f : new BatchFacts();
+                var ind = IndicatorCalculator.Compute(batchFacts, today);
+                var latestGrowthSample = batchFacts.GrowthSamples.OrderByDescending(g => g.ObservedAtUtc).FirstOrDefault();
+                if (batch.Status == BatchStatus.Stocked && ind.Doc.HasValue && ind.Doc.Value >= harvestDocTarget && latestGrowthSample != null && latestGrowthSample.Date <= today && latestGrowthSample.Date >= today.AddDays(-7) && latestGrowthSample.AbwG >= harvestAbwTarget)
+                {
+                    dto.HarvestReadinessAlerts.Add(new HarvestReadinessAlertDto { BatchId = batch.Id, BatchCode = batch.BatchCode, PondCode = tile.PondCode, Doc = ind.Doc.Value, AbwG = latestGrowthSample.AbwG, SampleDate = latestGrowthSample.Date, EarliestSafeHarvestDate = await _withdrawal.EarliestSafeHarvestDateAsync(batch.Id, zone) });
+                }
                 tile.Doc = batch.Status == BatchStatus.Stocked ? ind.Doc : null;
                 tile.AbwG = ind.CurrentAbwG;
                 tile.FcrToDate = ind.FcrToDate;
