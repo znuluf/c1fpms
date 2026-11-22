@@ -357,6 +357,8 @@ public class Lifecycle_Tests : FpmsTestBase
         var id = BatchId(CurrentBatch);
         var today = Domain.FarmClock.Today(Domain.FarmClock.Resolve(Domain.FarmClock.DefaultTimeZone));
         await Should.ThrowAsync<UserFriendlyException>(() => batches.DeclareFailure(new FailureInput { Id = id, Reason = "WSSV outbreak", FailureDate = today, EstimatedLossPhp = 250000 }));
+        Q(c => c.BatchFailures.IgnoreQueryFilters().Any(f => f.BatchId == id)).ShouldBeFalse();
+        Q(c => c.PondBatches.IgnoreQueryFilters().Single(b => b.Id == id).Status).ShouldBe(BatchStatus.Stocked);
         await SeedLegacyFailureAsync(id, today, "WSSV outbreak", 250000m);
 
         var detail = await batches.Get(id);
