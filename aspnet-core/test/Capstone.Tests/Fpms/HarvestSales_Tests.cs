@@ -338,8 +338,11 @@ public class HarvestSales_Tests : FpmsTestBase
     [Fact]
     public async Task Sale_form_gets_harvest_wide_available_kg_when_dispositions_are_not_grade_specific()
     {
+        SetSizeGrading(true);
         var harvest = await Resolve<HarvestAppService>().Create(Harvest(HarvestType.Partial, 100,
             ("90/100", 60), ("100/120", 40)));
+        harvest.GradeLines.Count.ShouldBe(2); // Verify farm grading configuration was applied before testing sellable lines.
+        harvest.GradeLines.Select(x => x.SizeLabel).OrderBy(x => x).ShouldBe(new[] { "100/120", "90/100" });
         await Resolve<HarvestAppService>().RecordDisposal(new RecordDisposalInput
         {
             HarvestId = harvest.Id, Kg = 25, Reason = DisposalReason.StaffOrHomeUse,
