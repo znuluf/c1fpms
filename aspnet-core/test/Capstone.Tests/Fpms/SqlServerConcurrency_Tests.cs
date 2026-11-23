@@ -2,6 +2,7 @@ using Abp.UI;
 using Capstone.Domain;
 using Capstone.Harvests;
 using Capstone.Production;
+using Capstone.Production.Dto;
 using Capstone.Resources;
 using Capstone.Sales;
 using Microsoft.Data.SqlClient;
