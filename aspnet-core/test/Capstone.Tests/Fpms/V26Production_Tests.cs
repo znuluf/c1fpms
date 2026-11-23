@@ -262,6 +262,21 @@ public class V26Production_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task Harvested_page_filter_includes_legacy_failed_batches_and_displays_them_as_harvested()
+    {
+        var batches = Resolve<BatchAppService>();
+        var id = BatchId(CurrentBatch);
+        await batches.DeclareFailure(new FailureInput { Id = id, Reason = "Legacy historical record", FailureDate = Today });
+
+        var page = await batches.GetPage(new GetBatchPageInput { Status = BatchStatus.Harvested, MaxResultCount = 100 });
+        var item = page.Items.Single(x => x.Id == id);
+        item.Status.ShouldBe(BatchStatus.Harvested);
+
+        var all = await batches.GetAll(new GetBatchesInput { Status = BatchStatus.Harvested });
+        all.Single(x => x.Id == id).Status.ShouldBe(BatchStatus.Harvested);
+    }
+
+    [Fact]
     public async Task A_batch_in_a_closed_cycle_is_reopened_only_after_the_cycle()
     {
         var cycles = Resolve<CycleAppService>();
