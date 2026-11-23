@@ -312,6 +312,47 @@ public class HarvestSales_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task Sales_and_dispositions_cannot_change_the_accounting_of_a_closed_batch()
+    {
+        var harvests = Resolve<HarvestAppService>();
+        var harvest = await harvests.Create(Harvest(HarvestType.Partial, 100, ("100/120", 100)));
+        var sales = Resolve<SaleAppService>();
+        var sale = await sales.Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 40, PricePerKg = 200 } },
+        });
+
+        // Simulate a batch that has passed its close checks. The API paths under test must all observe that state.
+        UsingDbContext(c =>
+        {
+            var batch = c.PondBatches.IgnoreQueryFilters().Single(b => b.Id == BatchId(CurrentBatch));
+            batch.Status = BatchStatus.Closed;
+        });
+
+        await Should.ThrowAsync<UserFriendlyException>(() => sales.Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 60, PricePerKg = 205 } },
+        }));
+
+        var current = await sales.Get(sale.Id);
+        await Should.ThrowAsync<UserFriendlyException>(() => sales.Update(new SaveSaleInput
+        {
+            Id = sale.Id, RowVersion = current.RowVersion, BuyerId = Buyer, SaleDate = Today,
+            Lines = current.Lines.Select(l => new SaleLineInput { HarvestGradeLineId = l.HarvestGradeLineId, Kg = l.Kg, PricePerKg = l.PricePerKg }).ToList(),
+        }));
+        await Should.ThrowAsync<UserFriendlyException>(() => sales.Void(new VoidSaleInput { Id = sale.Id, Reason = "Correction after close" }));
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.RecordDisposal(new RecordDisposalInput
+        {
+            HarvestId = harvest.Id, Kg = 60, Reason = DisposalReason.GivenAway,
+        }));
+
+        // Financial settlement remains allowed after closure; it does not change the kg accounting.
+        (await sales.AddPayment(new AddPaymentInput { SaleId = sale.Id, PaidOn = Today, Amount = 1, Method = "Cash" })).Paid.ShouldBe(1m);
+    }
+
+    [Fact]
     public async Task A_sold_grade_line_cannot_drop_below_what_was_sold()
     {
         var harvests = Resolve<HarvestAppService>();
