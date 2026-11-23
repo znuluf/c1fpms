@@ -109,6 +109,27 @@ public class PondBatch : FarmEntity
         }
     }
 
+    /// <summary>Only a stocked batch, or a batch backed by a historical incident record, can accept another harvest.</summary>
+    public bool CanRecordHarvest(bool hasLegacyIncident) =>
+        Status == BatchStatus.Stocked || (Status == BatchStatus.Failed && hasLegacyIncident);
+
+    /// <summary>Only a harvested batch, or a batch backed by a historical incident record, can be closed.</summary>
+    public bool CanClose(bool hasLegacyIncident) =>
+        Status == BatchStatus.Harvested || (Status == BatchStatus.Failed && hasLegacyIncident);
+
+    /// <summary>Apply the production-state effect of creating or correcting a harvest; legacy incident state is preserved.</summary>
+    public void ApplyHarvestOutcome(bool emptiesPond, bool wasFinal)
+    {
+        if (emptiesPond && Status == BatchStatus.Stocked)
+        {
+            Status = BatchStatus.Harvested;
+        }
+        else if (wasFinal && !emptiesPond && Status == BatchStatus.Harvested)
+        {
+            Status = BatchStatus.Stocked;
+        }
+    }
+
     /// <summary>
     /// Which new log types the batch status allows (spec Section 5 lifecycle guards): Stocked takes every operational log;
     /// Harvested and Failed take corrections and notes until Close Batch. Feeding is recorded as feeding sessions,
