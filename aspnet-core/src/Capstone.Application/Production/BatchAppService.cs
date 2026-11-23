@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Capstone.Production;
 
-/// <summary>Batches: details and indicators, Declare Batch Failure (Ref 7.4, AC-15) and Close Batch (Ref 5.5, AC-16).</summary>
+/// <summary>Batches: details, indicators, reopening and closure. Legacy failure records remain readable for historical compatibility.</summary>
 [AbpAuthorize(PermissionNames.Production)]
 public class BatchAppService : CapstoneAppServiceBase
 {
@@ -125,7 +125,7 @@ public class BatchAppService : CapstoneAppServiceBase
         var query = Matching(_batches.GetAll().AsNoTracking().Include(b => b.Pond).Include(b => b.Cycle).Include(b => b.Technicians), input.Search)
             .Where(b => !input.CycleId.HasValue || b.CycleId == input.CycleId)
             .Where(b => !input.PondId.HasValue || b.PondId == input.PondId)
-            .Where(b => !input.Status.HasValue || b.Status == input.Status)
+            .Where(b => !input.Status.HasValue || (input.Status == BatchStatus.Harvested ? b.Status == BatchStatus.Harvested || b.Status == BatchStatus.Failed : b.Status == input.Status))
             .Where(b => !input.OpenOnly || b.Status != BatchStatus.Closed);
         var total = await query.CountAsync();
         var sort = SortSpec.Parse(input.Sorting, BatchSortKeys, "default", false);
@@ -328,8 +328,8 @@ public class BatchAppService : CapstoneAppServiceBase
     }
 
     /// <summary>
-    /// Owner reopens a Closed batch with a reason (DEC-64). It returns to Failed when it has a failure record, otherwise to
-    /// Harvested; its stored final indicators are cleared and recomputed when it is closed again. The cycle must be open.
+    /// Owner reopens a Closed batch with a reason (DEC-64). Legacy failure state remains stored for historical reporting;
+    /// the batch is presented in the current lifecycle as Harvested. Final indicators are recomputed when it is closed again.
     /// </summary>
     [AbpAuthorize(PermissionNames.Production_Manage)]
     public virtual async Task Reopen(ReopenInput input)
@@ -393,8 +393,8 @@ public class BatchAppService : CapstoneAppServiceBase
     }
 
     /// <summary>
-    /// What Close Batch lists before the confirmation (DEC-50): feeding slots (each feeding in the farm's schedule, DEC-61) and water days left blank between
-    /// stocking and the end of culture (Total harvest, failure, or today).
+    /// What Close Batch lists before confirmation (DEC-50): scheduled feeding slots (DEC-61) and water days left blank between
+    /// stocking and the end of culture (Final harvest, a legacy recorded ending, or today).
     /// </summary>
     public virtual async Task<CloseCheckDto> GetCloseCheck(Guid id)
     {
@@ -431,7 +431,7 @@ public class BatchAppService : CapstoneAppServiceBase
     }
 
     /// <summary>
-    /// Log calendar for one batch: each farm-local day from stocking to the end of culture (Total harvest, failure, or today)
+    /// Log calendar for one batch: each farm-local day from stocking to the end of culture (Final harvest, a legacy recorded ending, or today)
     /// with AM, PM and water cells, and markers for mortality, growth sampling and chemical entries. Works for Closed batches.
     /// </summary>
     public virtual async Task<BatchLogCalendarDto> GetLogCalendar(Guid id)
