@@ -211,7 +211,7 @@ interface CalMonth {
                                 </div>
                                 <div [title]="i.biomassAbwSource === 'Harvest' ? 'Uses the partial-harvest ABW selected by staff' : 'Uses the latest growth-sampling ABW'"><dt>Est. biomass</dt><dd>{{ i.estimatedBiomassKg | num: 1 }} kg</dd><dd class="font-weight-normal text-muted">{{ i.biomassAbwG | num: 2 }} g ABW · {{ i.biomassAbwSource === 'Harvest' ? 'harvest sample' : i.biomassAbwSource === 'Sample' ? 'growth sample' : 'no ABW basis' }}{{ i.biomassAbwSourceDate ? ' · ' + (i.biomassAbwSourceDate | farmDate) : '' }}</dd></div>
                                 <div><dt>Feed to date</dt><dd>{{ i.cumulativeFeedKg | num: 1 }} kg</dd></div>
-                                <div><dt>Mortality to date</dt><dd>{{ i.cumulativeMortality | num: 0 }}</dd></div>
+                                <div><dt>Mortality to date</dt><dd>{{ i.cumulativeMortality | num: 0 }}{{ i.cumulativeMortalityPct == null ? '' : ' · ' + (i.cumulativeMortalityPct | num: 2) + '%' }}</dd></div>
                                 <div><dt>Harvested</dt><dd>{{ i.totalHarvestKg | num: 1 }} kg · {{ i.harvestedPieces | num: 0 }} pcs</dd></div>
                                 @if (i.cultureDays != null) { <div><dt>Days of culture</dt><dd>{{ i.cultureDays }}</dd></div> }
                             </dl>
