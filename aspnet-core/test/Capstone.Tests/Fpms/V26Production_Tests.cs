@@ -266,7 +266,7 @@ public class V26Production_Tests : FpmsTestBase
     {
         var batches = Resolve<BatchAppService>();
         var id = BatchId(CurrentBatch);
-        await batches.DeclareFailure(new FailureInput { Id = id, Reason = "Legacy historical record", FailureDate = Today });
+        AddLegacyFailure(id, Today, "Legacy historical record");
 
         var page = await batches.GetPage(new GetBatchPageInput { Status = BatchStatus.Harvested, MaxResultCount = 100 });
         var item = page.Items.Single(x => x.Id == id);
@@ -283,7 +283,7 @@ public class V26Production_Tests : FpmsTestBase
         var batches = Resolve<BatchAppService>();
         var cycleId = CycleId("C-2026-01");
         await batches.Close(new CloseBatchInput { Id = BatchId(ReferenceBatch), ConfirmReadOnly = true });
-        await batches.DeclareFailure(new FailureInput { Id = BatchId(CurrentBatch), Reason = "Crop lost", FailureDate = Today });
+        AddLegacyFailure(BatchId(CurrentBatch), Today, "Crop lost");
         await batches.Close(new CloseBatchInput { Id = BatchId(CurrentBatch), ConfirmReadOnly = true });
         await cycles.Close(new CloseCycleInput { Id = cycleId, Outcome = CycleOutcome.Completed });
 
@@ -313,7 +313,7 @@ public class V26Production_Tests : FpmsTestBase
         var batches = Resolve<BatchAppService>();
         var created = await cycles.CreateBatches(new CreateBatchesInput { FryDeliveryId = DeliveryId(NewDelivery), Batches = new() { Stocking("GP-03", 100000) } });
         var batchId = created.Batches.Single().Id;
-        await batches.DeclareFailure(new FailureInput { Id = batchId, Reason = "WSSV outbreak", FailureDate = Today });
+        AddLegacyFailure(batchId, Today, "WSSV outbreak");
         await batches.Close(new CloseBatchInput { Id = batchId, ConfirmReadOnly = true });
         var cycle = await cycles.Get(created.CycleId);
         cycle.SuggestedOutcome.ShouldBe(CycleOutcome.Failed);
