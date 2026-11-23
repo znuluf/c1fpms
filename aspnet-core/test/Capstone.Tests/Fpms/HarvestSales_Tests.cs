@@ -270,6 +270,65 @@ public class HarvestSales_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task Farm_Base_abw_schemes_are_saved_validated_and_available_to_sales()
+    {
+        var settings = Resolve<FarmSettingsAppService>();
+        var dto = await settings.Get();
+        dto.BaseAbwPricingSchemes = new List<BaseAbwPricingSchemeDto>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Base 10g", BasePricePerKg = 210, BaseAbwG = 10, StepPerG = 5, IsActive = true },
+            new() { Id = Guid.NewGuid(), Name = "Base 15g", BasePricePerKg = 250, BaseAbwG = 15, StepPerG = 5, IsActive = false },
+        };
+        await settings.Update(dto);
+
+        var saved = await settings.Get();
+        saved.BaseAbwPricingSchemes.Count.ShouldBe(2);
+        saved.BaseAbwPricingSchemes.Single(x => x.Name == "Base 10g").BasePricePerKg.ShouldBe(210m);
+        saved.BaseAbwPricingSchemes.Single(x => x.Name == "Base 15g").IsActive.ShouldBeFalse();
+
+        var available = await Resolve<SaleAppService>().GetBaseAbwPricingSchemes();
+        available.Count.ShouldBe(1);
+        available.Single().Name.ShouldBe("Base 10g");
+
+        var invalid = await settings.Get();
+        invalid.BaseAbwPricingSchemes[0].BaseAbwG = 0;
+        await Should.ThrowAsync<UserFriendlyException>(() => settings.Update(invalid));
+
+        var duplicate = await settings.Get();
+        duplicate.BaseAbwPricingSchemes[1].Name = duplicate.BaseAbwPricingSchemes[0].Name;
+        await Should.ThrowAsync<UserFriendlyException>(() => settings.Update(duplicate));
+    }
+
+    [Fact]
+    public async Task Base_abw_sale_calculates_symmetrically_below_and_above_its_configured_base()
+    {
+        var input = Harvest(HarvestType.Partial, 100, ("100/120", 100));
+        input.AbwG = 8;
+        var harvest = await Resolve<HarvestAppService>().Create(input);
+        var line = harvest.GradeLines.Single();
+
+        var sale = await Resolve<SaleAppService>().Create(new SaveSaleInput
+        {
+            BuyerId = Buyer,
+            SaleDate = Today,
+            Lines = new()
+            {
+                new()
+                {
+                    HarvestGradeLineId = line.Id, Kg = 100, PricePerKg = 200,
+                    PriceMethod = PriceMethod.BaseAbw, BasePricePerKg = 210, BaseAbwG = 10, StepPerG = 5,
+                },
+            },
+        });
+
+        var saved = sale.Lines.Single();
+        saved.PriceMethod.ShouldBe(PriceMethod.BaseAbw);
+        saved.PriceAbwG.ShouldBe(8m);
+        saved.ReferencePricePerKg.ShouldBe(200m);
+        saved.PricePerKg.ShouldBe(200m);
+    }
+
+    [Fact]
     public async Task Harvest_rules_reject_bad_grades_counts_and_dates()
     {
         var harvests = Resolve<HarvestAppService>();
