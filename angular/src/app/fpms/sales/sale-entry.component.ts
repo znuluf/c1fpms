@@ -217,7 +217,9 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         return PRICE_METHODS.filter((o) => o.value !== 3 || l.priceMethod === 3);
     }
     /** Active price tables with their rows (DEC-82). */
-    tables: any[] = [];\n    /** Active farm-level Base ABW presets; selected terms are copied onto each sale line. */\n    abwSchemes: any[] = [];
+    tables: any[] = [];
+    /** Active farm-level Base ABW presets; selected terms are copied onto each sale line. */
+    abwSchemes: any[] = [];
     /** Harvests with a crate tally, loaded as the sale's lines name them (DEC-86): id → the harvest, or null while unknown. */
     private crateSource: Record<string, any> = {};
     /** The crate numbers typed for each harvest, e.g. "1-10, 15". */
@@ -238,7 +240,8 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
             this.api.get<any[]>('Sale', 'GetSellableLines', { saleId: this.original?.id }),
             this.api.get<any>('FarmSettings', 'Get'),
         ]);
-        this.buyers = buyers.filter((b) => b.isActive || b.id === this.original?.buyerId);\n        this.abwSchemes = (settings.baseAbwPricingSchemes ?? []).filter((s: any) => s.isActive);
+        this.buyers = buyers.filter((b) => b.isActive || b.id === this.original?.buyerId);
+        this.abwSchemes = (settings.baseAbwPricingSchemes ?? []).filter((s: any) => s.isActive);
         const keep = new Set((this.original?.lines ?? []).map((l: any) => l.priceTableId).filter((x: any) => x));
         this.tables = (await this.api.get<any[]>('PriceTable', 'GetAll')).filter((t) => t.isActive || keep.has(t.id));
         this.sellable = sellable;
