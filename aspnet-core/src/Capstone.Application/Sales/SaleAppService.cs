@@ -747,13 +747,15 @@ public class SaleAppService : CapstoneAppServiceBase
 
         var zone = await Farm.GetTimeZoneAsync();
         var gradeIds = lines.Select(l => l.HarvestGradeLineId).ToList();
-        var gradeLines = await _gradeLines.GetAll().Include(g => g.SizeGrade).Where(g => gradeIds.Contains(g.Id)).ToListAsync();
-        if (gradeLines.Count != gradeIds.Count)
+        // Read only the parent ids first so we can lock before reading the kilograms or grade details used by the checks.
+        var gradeHarvests = await _gradeLines.GetAll().Where(g => gradeIds.Contains(g.Id))
+            .Select(g => new { g.Id, g.HarvestId }).ToListAsync();
+        if (gradeHarvests.Count != gradeIds.Count)
         {
             throw new UserFriendlyException("Choose harvest grades of this farm for every line.");
         }
 
-        var harvestIds = gradeLines.Select(g => g.HarvestId).Distinct().ToList();
+        var harvestIds = gradeHarvests.Select(g => g.HarvestId).Distinct().ToList();
 
         // A correction also releases the old harvests it no longer sells from. Lock both sides, then their batches,
         // in a stable order so closure cannot race a sale being added, changed or removed.
@@ -763,6 +765,14 @@ public class SaleAppService : CapstoneAppServiceBase
             : await _gradeLines.GetAll().Where(g => previousGradeIds.Contains(g.Id)).Select(g => g.HarvestId).Distinct().ToListAsync();
         var allHarvestIds = harvestIds.Concat(previousHarvestIds).Distinct().ToList();
         await LockAccountingBatchesAsync(allHarvestIds);
+
+        // Re-read grade quantities only after the harvest locks have been acquired. Otherwise a sale that waited for a
+        // concurrent harvest correction could validate against the correction's stale, pre-lock grade quantities.
+        var gradeLines = await _gradeLines.GetAll().Include(g => g.SizeGrade).Where(g => gradeIds.Contains(g.Id)).ToListAsync();
+        if (gradeLines.Count != gradeIds.Count)
+        {
+            throw new UserFriendlyException("A harvest grade changed while this sale was being saved. Reload the sale and try again.");
+        }
 
         var harvests = await _harvests.GetAll().Include(h => h.Disposals).Include(h => h.GradeLines)
             .Where(h => allHarvestIds.Contains(h.Id)).ToDictionaryAsync(h => h.Id);
