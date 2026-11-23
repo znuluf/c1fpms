@@ -23,6 +23,7 @@ public class Indicator_Tests : FpmsTestBase
         i.StockingDensityPerM2.ShouldBe(100m);
         i.CumulativeFeedKg.ShouldBe(3000m);
         i.CumulativeMortality.ShouldBe(10000);
+        i.CumulativeMortalityPct.ShouldBe(5m); // 10,000 recorded deaths ÷ 200,000 PL stocked
         i.HarvestedPieces.ShouldBe(142500m);
         i.TotalHarvestKg.ShouldBe(2500m);
         i.EstimatedPopulation.ShouldBe(47500m);       // 200,000 − 10,000 − 142,500
