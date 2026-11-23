@@ -206,7 +206,13 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
             (await hold.ExecuteScalarAsync()).ShouldNotBeNull();
         }
 
-        var voidTask = Task.Run(() => Resolve<SaleAppService>().Void(new VoidSaleInput { Id = sale.Id, Reason = "Concurrent close test" }));
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var voidTask = Task.Run(async () =>
+        {
+            started.SetResult();
+            await Resolve<SaleAppService>().Void(new VoidSaleInput { Id = sale.Id, Reason = "Concurrent close test" });
+        });
+        await started.Task;
         await Task.Delay(250);
         voidTask.IsCompleted.ShouldBeFalse();
 
