@@ -18,6 +18,10 @@ public class IndicatorsDto
     public decimal TotalHarvestKg { get; set; }
     public decimal? EstimatedPopulation { get; set; }
     public decimal? EstimatedBiomassKg { get; set; }
+    public decimal? BiomassAbwG { get; set; }
+    public string BiomassAbwSource { get; set; }
+    public DateOnly? BiomassAbwSourceDate { get; set; }
+    public Guid? BiomassAbwSourceId { get; set; }
     public decimal? FcrToDate { get; set; }
     public decimal? FinalFcr { get; set; }
     public decimal? SurvivalRatePct { get; set; }
@@ -70,6 +74,10 @@ public class IndicatorsDto
         TotalHarvestKg = i.TotalHarvestKg,
         EstimatedPopulation = i.EstimatedPopulation,
         EstimatedBiomassKg = i.EstimatedBiomassKg,
+        BiomassAbwG = i.BiomassAbwG,
+        BiomassAbwSource = i.BiomassAbwSource,
+        BiomassAbwSourceDate = i.BiomassAbwSourceDate,
+        BiomassAbwSourceId = i.BiomassAbwSourceId,
         FcrToDate = i.FcrToDate,
         FinalFcr = i.FinalFcr,
         SurvivalRatePct = i.SurvivalRatePct,
