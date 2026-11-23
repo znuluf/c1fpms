@@ -437,8 +437,18 @@ public class FeedingAppService : CapstoneAppServiceBase
     public virtual async Task Void(VoidInput input)
     {
         var session = await _sessions.FirstOrDefaultAsync(s => s.Id == input.Id) ?? throw new UserFriendlyException("Feeding not found.");
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, session.BatchId);
+        }
+
         var batch = await _batches.GetAsync(session.BatchId);
         batch.EnsureNotClosed();
+        if (batch.Status == BatchStatus.Failed && !await _failures.GetAll().AnyAsync(f => f.BatchId == batch.Id))
+        {
+            throw new UserFriendlyException("This batch has a legacy incident status but no historical incident record. Contact an administrator before changing feeding.");
+        }
+
         await _inventory.ReverseUsageForSessionAsync(session.Id, DateTime.UtcNow, $"Void of {FeedingSchedule.Label(session.Session).ToLowerInvariant()} of {session.FeedDate:yyyy-MM-dd}: {input.Reason.Trim()}");
         // Save the reason first: ABP reloads the entity when it turns a delete into a soft delete.
         session.VoidReason = input.Reason.Trim();
