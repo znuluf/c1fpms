@@ -483,7 +483,7 @@ public class BatchAppService : CapstoneAppServiceBase
         Concurrency.Check(batch.RowVersion, input.RowVersion);
         if (batch.Status is not (BatchStatus.Harvested or BatchStatus.Failed))
         {
-            throw new UserFriendlyException("Only a Harvested batch can be closed.");
+            throw new UserFriendlyException("Only a Harvested batch or a batch with a legacy incident record can be closed.");
         }
 
         if (!input.ConfirmReadOnly)
