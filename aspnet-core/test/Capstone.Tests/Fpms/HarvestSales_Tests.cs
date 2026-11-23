@@ -324,8 +324,9 @@ public class HarvestSales_Tests : FpmsTestBase
         var saved = sale.Lines.Single();
         saved.PriceMethod.ShouldBe(PriceMethod.BaseAbw);
         saved.PriceAbwG.ShouldBe(8m);
-        saved.ReferencePricePerKg.ShouldBe(200m);
+        saved.FormulaPricePerKg.ShouldBe(200m);
         saved.PricePerKg.ShouldBe(200m);
+        SaleLine.BaseAbwPrice(210m, 10m, 5m, 12.08m).ShouldBe(220.40m);
     }
 
     [Fact]
