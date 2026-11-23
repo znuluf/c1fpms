@@ -187,6 +187,43 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
     }
 
     [SqlServerFact]
+    public async Task Voiding_a_sale_waits_for_batch_closure_then_refuses_the_closed_batch()
+    {
+        var harvest = await Resolve<HarvestAppService>().Create(NewHarvest(null, 100));
+        var sale = await Resolve<SaleAppService>().Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 100, PricePerKg = 250 } },
+        });
+        var batchId = BatchId(CurrentBatch);
+
+        // Hold the batch row as Close Batch does. Void must acquire Sale, then Harvest, then Batch before changing kg.
+        await using var connection = Open();
+        await using var transaction = (SqlTransaction)await connection.BeginTransactionAsync();
+        await using (var hold = new SqlCommand("SELECT Id FROM FpmsPondBatches WITH (UPDLOCK, ROWLOCK) WHERE Id = @id", connection, transaction))
+        {
+            hold.Parameters.AddWithValue("@id", batchId);
+            (await hold.ExecuteScalarAsync()).ShouldNotBeNull();
+        }
+
+        var voidTask = Task.Run(() => Resolve<SaleAppService>().Void(new VoidSaleInput { Id = sale.Id, Reason = "Concurrent close test" }));
+        await Task.Delay(250);
+        voidTask.IsCompleted.ShouldBeFalse();
+
+        await using (var close = new SqlCommand("UPDATE FpmsPondBatches SET Status = @status WHERE Id = @id", connection, transaction))
+        {
+            close.Parameters.AddWithValue("@status", (int)BatchStatus.Closed);
+            close.Parameters.AddWithValue("@id", batchId);
+            (await close.ExecuteNonQueryAsync()).ShouldBe(1);
+        }
+        await transaction.CommitAsync();
+
+        await Should.ThrowAsync<UserFriendlyException>(async () => await voidTask);
+        Q(c => c.Sales.IgnoreQueryFilters().Single(s => s.Id == sale.Id).VoidReason).ShouldBeNull();
+        Q(c => c.PondBatches.IgnoreQueryFilters().Single(b => b.Id == batchId).Status).ShouldBe(BatchStatus.Closed);
+    }
+
+    [SqlServerFact]
     public async Task A_delivery_step_waits_for_a_step_already_in_progress_then_sees_it()
     {
         var deliveries = Resolve<FryDeliveryAppService>();
