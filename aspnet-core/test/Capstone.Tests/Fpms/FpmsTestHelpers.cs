@@ -40,6 +40,9 @@ public abstract class FpmsTestBase : CapstoneTestBase
         var tenantId = GetTenantId(PilotFarm);
         UsingDbContext(null, c =>
         {
+            var batch = c.PondBatches.IgnoreQueryFilters().Single(b => b.Id == batchId && b.TenantId == tenantId);
+            batch.Status = BatchStatus.Failed;
+
             var failure = new BatchFailure
             {
                 Id = Guid.NewGuid(), TenantId = tenantId, BatchId = batchId, FailedOn = failedOn,
