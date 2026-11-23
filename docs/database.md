@@ -196,3 +196,8 @@ There are two ways to draw the diagram. Both read the real model, so nothing is 
 | How is the database created on the farm PC? | `docs/runbook.md` (install, release and rollback) and `Capstone.Migrator/` |
 | What sample data is seeded? | `Capstone.EntityFrameworkCore/EntityFrameworkCore/Seed/Development/SimpleSampleDataBuilder.cs` |
 | How are simultaneous saves handled? | `docs/reliability.md` |
+
+
+### Farm-configured Base ABW pricing
+
+`FpmsFarmSettings.BaseAbwPricingSchemesJson` stores up to 20 farm-wide Base ABW presets as JSON (name, base price per kg, base ABW, peso adjustment per gram, active flag). This is configuration, not a buyer profile. A sale selects a preset and copies its terms to each applicable sale line. The sale line retains the base price, base ABW, step, actual pricing ABW, formula reference and agreed price; later changes to farm settings do not rewrite historical sales (DEC-141).
