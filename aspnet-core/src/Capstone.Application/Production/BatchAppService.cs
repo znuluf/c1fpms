@@ -487,7 +487,7 @@ public class BatchAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("This batch has a legacy incident status but no historical incident record. Contact an administrator before closing it.");
         }
 
-        if (batch.Status is not (BatchStatus.Harvested or BatchStatus.Failed))
+        if (!batch.CanClose(failure != null))
         {
             throw new UserFriendlyException("Only a Harvested batch or a batch with a legacy incident record can be closed.");
         }
