@@ -334,6 +334,18 @@ public class BatchAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.Production_Manage)]
     public virtual async Task Reopen(ReopenInput input)
     {
+        // A cycle close checks every child batch. Take the parent cycle lock first, then the pond and batch locks,
+        // matching stocking's cycle/pond order and preventing a reopen from slipping into a closing cycle.
+        var parent = await _batches.GetAll().Where(b => b.Id == input.Id)
+            .Select(b => new { b.CycleId, b.PondId }).FirstOrDefaultAsync()
+            ?? throw new UserFriendlyException("Batch not found.");
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Cycle, parent.CycleId);
+            await RowLocker.LockAsync(RowLockTarget.Pond, parent.PondId);
+            await RowLocker.LockAsync(RowLockTarget.Batch, input.Id);
+        }
+
         var batch = await _batches.GetAll().Include(b => b.Pond).Include(b => b.Cycle).FirstOrDefaultAsync(b => b.Id == input.Id)
                     ?? throw new UserFriendlyException("Batch not found.");
         Concurrency.Check(batch.RowVersion, input.RowVersion);
