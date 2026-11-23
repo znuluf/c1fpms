@@ -3,7 +3,7 @@ import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { FPMS_IMPORTS } from '../shared-imports';
-import { PRICE_METHODS, countFromAbw, pricingBody, referencePrice, termsEmpty, usedAbw, usedCount } from '@shared/fpms/pricing';
+import { PRICE_METHODS, countFromAbw, pricingBody, referencePrice, usedAbw, usedCount } from '@shared/fpms/pricing';
 import { PriceTermsComponent, SalePaymentComponent, initialPaymentOf } from '@shared/fpms/pricing-ui';
 import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
 
@@ -116,7 +116,7 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                             <div class="form-group mb-1">
                                                 <label [for]="'abs' + $index">Farm pricing scheme</label>
                                                 <select [id]="'abs' + $index" class="custom-select" [name]="'abs' + $index" [(ngModel)]="l.abwSchemeId" (ngModelChange)="applyAbwScheme(l, $event)">
-                                                    <option value="">Custom terms</option>
+                                                    <option value="">Choose a scheme or enter custom terms</option>
                                                     @for (s of abwSchemes; track s.id) { <option [value]="s.id">{{ s.name }} · base {{ s.baseAbwG }}g</option> }
                                                 </select>
                                             </div>
@@ -503,11 +503,8 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         };
     }
 
-    /** Choosing Base ABW pricing starts with the farm's first active preset, never the buyer's previous terms. */
+    /** Pricing terms are chosen for this sale; no buyer's previous pricing is copied. */
     async onMethod(l: any): Promise<void> {
-        if (l.priceMethod === 2 && termsEmpty(l) && this.abwSchemes.length) {
-            this.applyAbwScheme(l, this.abwSchemes[0].id);
-        }
         this.applyFormula(l);
     }
 
