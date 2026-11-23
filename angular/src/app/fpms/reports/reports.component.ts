@@ -109,7 +109,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                             </p>
                         }
                         @if (key === 'failure' && !f.cycleId && !f.batchId) {
-                            <p class="small text-muted">Choose a failed cycle or a failed batch.</p>
+                            <p class="small text-muted">Choose a cycle or batch with a historical incident.</p>
                         }
                     </div>
                 </div>
@@ -157,7 +157,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                                                 <div class="small">Planned {{ r.plannedStartDate | farmDate }} → {{ r.plannedEndDate | farmDate }} · Hatchery <span [title]="r.hatcheryName">{{ r.hatcheryShortCode || r.hatcheryName }}</span> · lot {{ r.hatcheryLotNumber || '—' }}</div>
                                                 @if (r.objectives) { <div class="small">Objectives: {{ r.objectives }}</div> }
 
-                                                @if (r.failureReason) { <div class="small text-danger">Failure: {{ r.failureReason }}</div> }
+                                                @if (r.failureReason) { <div class="small text-danger">Historical incident: {{ r.failureReason }}</div> }
                                             </div>
                                         </div>
                                         <section class="fpms-summary" aria-label="Summary"><dl class="fpms-figures fpms-figures-sm">
@@ -183,7 +183,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                                             <p>
                                                 {{ b.stockingDate ? (b.stockingDate | farmDate) : 'Not stocked' }} · {{ b.plCountStocked | num: 0 }} PL · PL age {{ b.plAgeDays ?? '—' }} · lot {{ b.hatcheryLotNumber || '—' }} ·
                                                 density {{ b.indicators?.stockingDensityPerM2 | num: 2 }} PL/m² · {{ b.hatcheryCertificationStatusAtStocking }}
-                                                @if (b.failureReason) { <br /><span class="text-danger">Failure: {{ b.failureReason }}</span> }
+                                                @if (b.failureReason) { <br /><span class="text-danger">Historical incident: {{ b.failureReason }}</span> }
                                             </p>
                                             <h4 class="fpms-section-h">Indicators <span class="fpms-section-aside">({{ b.isFinal ? 'final, stored at closure' : 'live' }})</span></h4>
                                             <dl class="fpms-facts mb-3">
@@ -337,7 +337,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                                             <p class="mb-1"><strong>Cycle {{ r.cycleCode }}</strong> · Hatchery <span [title]="r.hatcheryName">{{ r.hatcheryShortCode || r.hatcheryName }}</span> ({{ r.hatcheryAccreditation }})</p>
                                         }
                                         @if (r.cycleFailureReason) {
-                                            <p class="mb-1">Cycle failure on {{ r.cycleFailureDate | farmDate }}: {{ r.cycleFailureReason }} · estimated loss {{ r.cycleEstimatedLossPhp | php }}</p>
+                                            <p class="mb-1">Historical cycle incident on {{ r.cycleFailureDate | farmDate }}: {{ r.cycleFailureReason }} · estimated loss {{ r.cycleEstimatedLossPhp | php }}</p>
                                         }
 
                                     </div>
@@ -349,9 +349,9 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                                             <dl class="row mb-2 fpms-dl">
                                                 <dt class="col-md-3">Stocked</dt><dd class="col-md-3">{{ b.stockingDate | farmDate }} · {{ b.plCountStocked | num: 0 }} PL · lot {{ b.hatcheryLotNumber || '—' }}</dd>
                                                 <dt class="col-md-3">Hatchery certification</dt><dd class="col-md-3">{{ b.hatcheryCertificationStatusAtStocking }}</dd>
-                                                <dt class="col-md-3">Failure date</dt><dd class="col-md-3">{{ b.failureDate | farmDate }} (DOC {{ b.docAtFailure ?? '—' }})</dd>
+                                                <dt class="col-md-3">Incident date</dt><dd class="col-md-3">{{ b.failureDate | farmDate }} (DOC {{ b.docAtFailure ?? '—' }})</dd>
                                                 <dt class="col-md-3">Estimated loss</dt><dd class="col-md-3">{{ b.estimatedLossPhp | php }}</dd>
-                                                <dt class="col-md-3">Reason</dt><dd class="col-md-9">{{ b.failureReason }}</dd>
+                                                <dt class="col-md-3">Recorded reason</dt><dd class="col-md-9">{{ b.failureReason }}</dd>
                                                 <dt class="col-md-3">Est. population / biomass</dt><dd class="col-md-3">{{ b.indicators?.estimatedPopulation | num: 0 }} / {{ b.indicators?.estimatedBiomassKg | num: 1 }} kg</dd>
                                                 <dt class="col-md-3">Inventory used (cost)</dt><dd class="col-md-3">{{ b.inventoryUsageCost | php }}</dd>
                                             </dl>
@@ -363,7 +363,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                                         </div>
                                     </div>
                                 } @empty {
-                                    <fpms-empty text="No failed batches for this selection."></fpms-empty>
+                                    <fpms-empty text="No historical incidents for this selection."></fpms-empty>
                                 }
                                 <p class="small text-center"><strong>{{ r.notice }}</strong></p>
                                 <div class="row mt-4 small">
@@ -626,7 +626,7 @@ export class ReportsComponent extends FpmsPage implements OnInit {
         { key: 'sales', label: 'Sales by buyer and period' },
         { key: 'wq', label: 'Water quality exceptions' },
         { key: 'inventory', label: 'Feed and supplement use' },
-        { key: 'failure', label: 'Batch failures' },
+        { key: 'failure', label: 'Historical batch incidents' },
     ];
     key: ReportKey = 'cycle';
     shown: ReportKey = 'cycle';
