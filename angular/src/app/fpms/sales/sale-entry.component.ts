@@ -3,7 +3,7 @@ import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { FPMS_IMPORTS } from '../shared-imports';
-import { PRICE_METHODS, applyTerms, countFromAbw, pricingBody, referencePrice, termsEmpty, usedAbw, usedCount } from '@shared/fpms/pricing';
+import { PRICE_METHODS, countFromAbw, pricingBody, referencePrice, termsEmpty, usedAbw, usedCount } from '@shared/fpms/pricing';
 import { PriceTermsComponent, SalePaymentComponent, initialPaymentOf } from '@shared/fpms/pricing-ui';
 import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
 
@@ -208,8 +208,6 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
     sellable: any[] = [];
     original: any = null;
     m: any = { lines: [] };
-    /** Pricing terms from the buyer's last priced sale or their price table, fetched once per buyer (DEC-80, DEC-82). */
-    terms: Record<string, any> = {};
     readonly methods = PRICE_METHODS;
 
     /** Price by count is offered only on a line that already uses it: the partner farm always sells by kg (DEC-90). */
@@ -493,14 +491,8 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         this.m.lines = own.map((o) => ({ ...this.blankLine(o.harvestGradeLineId), kg: canPrefillAll ? o.unsoldKg : null }));
         const buyerId = own[0].harvestBuyerId;
         if (buyerId && this.buyers.some((b) => b.id === buyerId && b.isActive)) {
+            // The harvest's buyer is a useful starting point, but pricing is selected independently for each sale.
             this.m.buyerId = buyerId;
-            const t = await this.buyerTerms();
-            for (const l of this.m.lines) {
-                if (t) {
-                    l.priceMethod = t.priceMethod;
-                    await this.onMethod(l);
-                }
-            }
         }
     }
 
@@ -511,36 +503,10 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         };
     }
 
-    private async buyerTerms(): Promise<any> {
-        if (!this.m.buyerId) {
-            return null;
-        }
-        if (!(this.m.buyerId in this.terms)) {
-            this.terms[this.m.buyerId] = await this.api.get<any>('Sale', 'GetBuyerPriceTerms', { buyerId: this.m.buyerId });
-        }
-        return this.terms[this.m.buyerId];
-    }
-
-    /**
-     * Choosing a priced method fills its empty terms: from another line on this sale with the same method, else the buyer's
-     * last terms (or their price table); for a table with neither, the buyer's own table, else the only active one.
-     */
+    /** Choosing Base ABW pricing starts with the farm's first active preset, never the buyer's previous terms. */
     async onMethod(l: any): Promise<void> {
-        if (l.priceMethod > 1 && termsEmpty(l)) {
-            const sibling = this.m.lines.find((x: any) => x !== l && x.priceMethod === l.priceMethod && !termsEmpty(x));
-            if (sibling) {
-                applyTerms(l, { ...sibling });
-                l.termsFrom = null;
-            } else {
-                const t = await this.buyerTerms();
-                if (applyTerms(l, t)) {
-                    l.termsFrom = t.fromDispatchReceiptNo ?? null;
-                } else if (l.priceMethod === 4) {
-                    const own = this.tables.filter((x) => x.isActive && x.buyerId === this.m.buyerId);
-                    const any = this.tables.filter((x) => x.isActive);
-                    l.priceTableId = (own.length ? own[0] : any.length === 1 ? any[0] : null)?.id ?? '';
-                }
-            }
+        if (l.priceMethod === 2 && termsEmpty(l) && this.abwSchemes.length) {
+            this.applyAbwScheme(l, this.abwSchemes[0].id);
         }
         this.applyFormula(l);
     }
