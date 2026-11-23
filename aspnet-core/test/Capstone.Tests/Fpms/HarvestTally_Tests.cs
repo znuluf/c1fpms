@@ -59,10 +59,23 @@ public class HarvestTally_Tests : FpmsTestBase
         harvest.TotalKg.ShouldBe(503m);
         harvest.Boxes.ShouldBe(17);
         harvest.AbwG.ShouldBe(12.08m);
+        harvest.UseHarvestAbwForBiomass.ShouldBeTrue(); // Default is Yes for a new Partial harvest.
         harvest.AbwSampleWeightG.ShouldBe(5002m);
         harvest.AbwSamplePieces.ShouldBe(414);
         harvest.Crates.Select(c => c.CrateNo).ShouldBe(Enumerable.Range(1, 17));
         harvest.Crates.Last().Kg.ShouldBe(23m);
+    }
+
+    [Fact]
+    public async Task Partial_harvest_can_opt_out_of_using_its_abw_for_remaining_biomass()
+    {
+        var input = TallySheet();
+        input.UseHarvestAbwForBiomass = false;
+
+        var harvest = await Resolve<HarvestAppService>().Create(input);
+
+        harvest.UseHarvestAbwForBiomass.ShouldBeFalse();
+        (await Resolve<HarvestAppService>().Get(harvest.Id)).UseHarvestAbwForBiomass.ShouldBeFalse();
     }
 
     [Fact]
