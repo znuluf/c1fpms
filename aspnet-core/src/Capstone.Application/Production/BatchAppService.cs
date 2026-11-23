@@ -224,8 +224,8 @@ public class BatchAppService : CapstoneAppServiceBase
         };
         await FillPeopleAsync(new BatchListDto[] { dto });
 
-        dto.CanClose = isOwner && (b.Status == BatchStatus.Harvested || b.Status == BatchStatus.Failed);
-        dto.CanAddHarvest = canHarvest && (b.Status == BatchStatus.Stocked || b.Status == BatchStatus.Failed);
+        dto.CanClose = isOwner && b.CanClose(failure != null);
+        dto.CanAddHarvest = canHarvest && b.CanRecordHarvest(failure != null);
         if (b.Status == BatchStatus.Closed && isOwner)
         {
             dto.ReopenBlockedReason = await ReopenBlockedReasonAsync(b);
@@ -479,6 +479,12 @@ public class BatchAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.Production_Manage)]
     public virtual async Task<IndicatorsDto> Close(CloseBatchInput input)
     {
+        // Serialize closure with harvest creation and correction so no harvest can slip in after the accounting check.
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, input.Id);
+        }
+
         var batch = await _batches.GetAsync(input.Id);
         Concurrency.Check(batch.RowVersion, input.RowVersion);
         var failure = await _failures.FirstOrDefaultAsync(f => f.BatchId == batch.Id);
