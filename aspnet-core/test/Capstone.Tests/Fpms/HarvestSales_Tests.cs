@@ -323,7 +323,8 @@ public class HarvestSales_Tests : FpmsTestBase
             Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 40, PricePerKg = 200 } },
         });
 
-        // Simulate a batch that has passed its close checks. The API paths under test must all observe that state.
+        // The remaining 60 kg are genuinely available before closure; simulate the committed Closed transition.
+        (await Resolve<BatchAppService>().GetCloseCheck(BatchId(CurrentBatch))).UnaccountedKg.ShouldBe(60m);
         UsingDbContext(c =>
         {
             var batch = c.PondBatches.IgnoreQueryFilters().Single(b => b.Id == BatchId(CurrentBatch));
