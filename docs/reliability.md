@@ -5,11 +5,10 @@ when something fails on the farm PC; where each behaviour is in the code; and wh
 
 Release 1.0.0 and later. Decisions: DEC-37, DEC-38, DEC-127, DEC-131, DEC-132, DEC-133, DEC-134, DEC-135 (in [`decisions.md`](../decisions.md)).
 
-> **Development copy.** This document describes release 1.0.0 in `znuluf/try-prod`. This development project has the same
-> behaviour for everything in sections 2 to 5, except that read-committed snapshot is set by `.devcontainer/start-fpms.sh`
-> rather than a migration. The release-only items of DEC-132 are not here: committed migrations and the CI `migrations` job
-> (section 7 and the migration step of section 9; the SQL Server tests run here in the CI job `sqlserver`), the admin-password check (section 7), and INFO logging and the FULL recovery model set by
-> migration (section 6).
+> **Development copy.** In this repository, read-committed snapshot is set by `.devcontainer/start-fpms.sh` rather than a
+> committed migration. The SQL Server concurrency tests run in CI job `sqlserver`. Release-only items of DEC-132 (committed
+> migrations, the migration CI job, the admin-password check, INFO logging and the FULL recovery model set by migration)
+> are not part of this development branch.
 
 ## Contents
 1. [The approach in one page](#1-the-approach-in-one-page)
@@ -35,7 +34,7 @@ never silently loses or duplicates a record. It uses six techniques, each chosen
 | **Uniqueness enforced by the database** | Two records where only one can exist | One feeding per pond, day and feeding number; one open batch per pond; unique codes |
 | **Request ID** (idempotency key) | A save sent twice becoming two records | Feedings, log entries, pond preparation, stocking, harvests, sales, tally sheets |
 | **Row version** (optimistic concurrency) | A correction from an out-of-date page overwriting someone else's | Cycles, batches, fry deliveries, harvests, sales, log entries, farm profile |
-| **Row lock** (pessimistic, only where totals are checked) | Two saves both passing a check on the same total | Stocking from a delivery; delivery steps; sales and corrections of a harvest |
+| **Row lock** (pessimistic, where shared state is checked or transitioned) | Two saves both passing a check on the same total or lifecycle state | Stocking from a delivery; delivery steps; sales and corrections of a harvest; harvests, feeding, logs and closure for one batch |
 | **Request lock** | A save and its retry arriving at the same moment both getting through | Every save with a request ID (DEC-134) |
 | **Atomic database step** | Two saves taking the same number | Cycle codes, dispatch receipt numbers, harvest lot codes |
 
@@ -57,6 +56,7 @@ only impossible or conflicting data is refused, always with a message that says 
 | Two people press the same delivery step (for example Receive fry) at once | The second sees the first step and is refused if it no longer fits ("A delivery that is Received cannot become …") | Each step locks the delivery row before reading its current step | `FryDeliveryAppService.NextStepCheckAsync` and `UndoLastStep` (`_rowLocker.LockAsync`) | Step rules: `Lifecycle_Tests.Delivery_steps_follow_the_flow_and_endings_need_a_reason`; the lock on SQL Server: `SqlServerConcurrency_Tests.A_delivery_step_waits_for_a_step_already_in_progress_then_sees_it` |
 | Two saves need the next cycle code, receipt number or lot code | Each gets its own number; none is repeated | One `MERGE … WITH (HOLDLOCK)` statement reads and increments the counter in a single step | `NumberSequenceGenerator.cs` | `ReferenceSetup_Tests.Number_sequence_counts_up_per_scope`; on SQL Server, the sales test above (five different receipt numbers) |
 | Two sales of the same harvest at the same moment | Each is checked against what the other sold; a sale that would oversell a grade is refused | The harvest row is locked (in id order, so two sales never wait on each other) before kilograms left are checked; a harvest correction takes the same lock | `SaleAppService.ApplyAsync` and `HarvestAppService.Update` (`RowLocker.LockAsync(RowLockTarget.Harvest, …)`) | `SqlServerConcurrency_Tests.Sales_saved_at_the_same_moment_get_different_receipt_numbers_and_never_oversell` (six 20 kg sales from 100 kg: five saved, one refused) |
+| Two people record the final harvest for one batch at the same moment | Only one final harvest is saved; the other sees that the batch is already Harvested | Both submissions lock the batch row before checking its current state or existing final harvest. The same lock is used by corrections, feeding, logs and Close Batch, so an operation cannot slip across the final-harvest or closure transition | `HarvestAppService.Create` and `Update`; `FeedingAppService.Save`; `LogAppService`; `BatchAppService.Close`; `RowLocker.cs` (`RowLockTarget.Batch`) | `SqlServerConcurrency_Tests.Two_final_harvests_saved_at_the_same_moment_can_only_complete_the_batch_once` |
 | Feed drawn below the stock on hand (two feedings use the last bags) | Both feedings are saved; the lot is flagged for checking | Recording at the pond is never blocked; the shortfall is a warning and a flag (AC-12) | `InventoryManager.RecordUsageAsync` | `Logbook_Tests.Stock_shortfall_warns_saves_and_flags_the_lot` |
 | Several water readings for one pond on one day | All are kept | Allowed on purpose: readings are taken several times a day | `LogAppService.Create` | Logbook tests |
 | Reports and lists open while others save | Nobody waits, and nobody sees a save that is not finished | Read-committed snapshot isolation: reading never blocks writing. Every request reads at READ COMMITTED (ABP's default was READ UNCOMMITTED, which could show a save later rolled back; DEC-134). | Migration `DatabaseSettings` (`ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON`); `CapstoneCoreModule.PreInitialize` (`Configuration.UnitOfWork.IsolationLevel`) | `SqlServerConcurrency_Tests.A_report_reads_while_a_save_is_in_progress_without_waiting` |
@@ -84,6 +84,7 @@ is also disabled while a save is running.
 | Harvest | `HarvestAppService.Create` | `harvest-entry.component.ts` | `RetrySafeSaves_Tests.A_retried_harvest_returns_the_harvest_already_saved` |
 | Sale | `SaleAppService.Create` | `sale-entry.component.ts` | `RetrySafeSaves_Tests.A_retried_sale_returns_the_sale_already_saved_with_its_receipt_number` |
 | The same harvest sent four times at once (SQL Server) | `HarvestAppService.Create` (request lock) | `harvest-entry.component.ts` | `SqlServerConcurrency_Tests.The_same_harvest_sent_several_times_at_once_is_saved_once`; `The_database_refuses_a_second_record_with_the_same_request_id` |
+| The same Final harvest request retried after its first save completed | `HarvestAppService.Create` checks the request ID before the batch's now-Harvested status | `harvest-entry.component.ts` | `SqlServerConcurrency_Tests.Retrying_the_same_final_harvest_request_returns_the_saved_harvest_after_batch_completion` |
 | Harvest and sale together (tally sheet) | `TallySheetAppService.Save` (the sale shares the harvest's ID) | `harvest-entry.component.ts` | `HarvestTally_Tests.A_retried_tally_sheet_returns_the_same_harvest_and_sale` |
 
 The double tap itself is stopped in the browser: every save runs through `FpmsPage.act()`
@@ -189,10 +190,10 @@ Recorded in DEC-133 to DEC-135 and shown to the farm as they are:
 - **Automated tests:** `cd aspnet-core && dotnet test test/Capstone.Tests/Capstone.Tests.csproj` runs every test named
   in this document. Most run on an in-memory database, which has no transactions, row versions or locks, so the version
   tests there set one first.
-- **On real SQL Server (DEC-134):** `SqlServerConcurrency_Tests` (8 tests) run on a real SQL Server when the
+- **On real SQL Server (DEC-134):** `SqlServerConcurrency_Tests` (10 tests) run on a real SQL Server when the
   environment variable `FPMS_TEST_SQLSERVER` holds a connection string, for example
   `Server=localhost,1433;User Id=sa;Password=…;TrustServerCertificate=True`. Each test creates its own database from the
-  migrations and drops it afterwards; without the variable they are skipped. They show the delivery and harvest locks, the
+  migrations and drops it afterwards; without the variable they are skipped. They show the delivery, harvest and batch lifecycle locks, the
   request lock, row versions, the unique request-ID index, receipt numbers and read-committed snapshot working on the
   database the farm uses. Every push runs them in the GitHub Actions workflow `Build` (`.github/workflows/build.yml`, job
   `sqlserver`), against SQL Server 2022.
