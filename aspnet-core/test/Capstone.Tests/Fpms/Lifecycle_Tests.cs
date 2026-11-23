@@ -408,7 +408,8 @@ public class Lifecycle_Tests : FpmsTestBase
 
         (await cycles.Get(cycleId)).CanClose.ShouldBeTrue();
         await Should.ThrowAsync<UserFriendlyException>(() => cycles.Close(new CloseCycleInput { Id = cycleId })); // outcome required (DEC-64)
-        (await cycles.Get(cycleId)).SuggestedOutcome.ShouldBe(CycleOutcome.Completed); // one batch harvested, one failed
+        (await cycles.Get(cycleId)).SuggestedOutcome.ShouldBe(CycleOutcome.Completed); // one batch harvested, one has a legacy incident
+        await Should.ThrowAsync<UserFriendlyException>(() => cycles.Close(new CloseCycleInput { Id = cycleId, Outcome = CycleOutcome.Failed }));
         await cycles.Close(new CloseCycleInput { Id = cycleId, Outcome = CycleOutcome.Completed });
         var closed = await cycles.Get(cycleId);
         closed.Status.ShouldBe(CycleStatus.Closed);
