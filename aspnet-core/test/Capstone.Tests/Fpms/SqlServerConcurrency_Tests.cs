@@ -128,6 +128,45 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
     }
 
     [SqlServerFact]
+    public async Task Two_final_harvests_saved_at_the_same_moment_can_only_complete_the_batch_once()
+    {
+        var harvests = Resolve<HarvestAppService>();
+        var inputs = Enumerable.Range(0, 2).Select(_ =>
+        {
+            var input = NewHarvest(Guid.NewGuid());
+            input.HarvestType = HarvestType.Total;
+            input.PondEmptiedConfirmed = true;
+            return input;
+        }).ToList();
+
+        var results = await AtOnce(2, i => harvests.Create(inputs[i]));
+
+        results.Count(r => r.Error == null).ShouldBe(1);
+        results.Single(r => r.Error != null).Error.ShouldBeOfType<UserFriendlyException>()
+            .Message.ShouldContain("Final harvest is already recorded");
+        Q(c => c.Harvests.IgnoreQueryFilters().Count(h => h.BatchId == BatchId(CurrentBatch)
+            && (h.HarvestType == HarvestType.Total || (h.HarvestType == HarvestType.Emergency && h.ShrimpLeft == false)))).ShouldBe(1);
+        Q(c => c.PondBatches.IgnoreQueryFilters().Where(b => b.Id == BatchId(CurrentBatch)).Select(b => b.Status).Single())
+            .ShouldBe(BatchStatus.Harvested);
+    }
+
+    [SqlServerFact]
+    public async Task Retrying_the_same_final_harvest_request_returns_the_saved_harvest_after_batch_completion()
+    {
+        var harvests = Resolve<HarvestAppService>();
+        var requestId = Guid.NewGuid();
+        var input = NewHarvest(requestId);
+        input.HarvestType = HarvestType.Total;
+        input.PondEmptiedConfirmed = true;
+
+        var results = await AtOnce(3, _ => harvests.Create(input));
+
+        results.ShouldAllBe(r => r.Error == null);
+        results.Select(r => r.Value.Id).Distinct().Count().ShouldBe(1);
+        Q(c => c.Harvests.IgnoreQueryFilters().Count(h => h.BatchId == input.BatchId && h.ClientRequestId == requestId)).ShouldBe(1);
+    }
+
+    [SqlServerFact]
     public async Task Sales_saved_at_the_same_moment_get_different_receipt_numbers_and_never_oversell()
     {
         var harvest = await Resolve<HarvestAppService>().Create(NewHarvest(null, 100));
