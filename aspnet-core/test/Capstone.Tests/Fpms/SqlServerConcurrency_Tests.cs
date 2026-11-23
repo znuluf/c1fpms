@@ -167,6 +167,60 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
     }
 
     [SqlServerFact]
+    public async Task Batch_closure_and_sale_void_are_serialized_so_accounting_cannot_become_stale()
+    {
+        var harvestInput = NewHarvest(null, 100);
+        harvestInput.HarvestType = HarvestType.Total;
+        harvestInput.PondEmptiedConfirmed = true;
+        var harvest = await Resolve<HarvestAppService>().Create(harvestInput);
+        var sales = Resolve<SaleAppService>();
+        var sale = await sales.Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 100, PricePerKg = 200 } },
+        });
+
+        var batches = Resolve<BatchAppService>();
+        var batchId = BatchId(CurrentBatch);
+        var batch = await batches.Get(batchId);
+        var results = await AtOnce(2, async i =>
+        {
+            if (i == 0)
+            {
+                await batches.Close(new CloseBatchInput { Id = batchId, ConfirmReadOnly = true, RowVersion = batch.RowVersion });
+                return "closed";
+            }
+
+            await sales.Void(new VoidSaleInput { Id = sale.Id, Reason = "Buyer cancelled" });
+            return "voided";
+        });
+
+        results.Count(r => r.Error == null).ShouldBe(1);
+        var check = await batches.GetCloseCheck(batchId);
+        var after = await batches.Get(batchId);
+        if (after.Status == BatchStatus.Closed)
+        {
+            results.ShouldContain(r => r.Value == "closed" && r.Error == null);
+            results.ShouldContain(r => r.Value == null && r.Error != null);
+            check.SoldKg.ShouldBe(100m);
+            check.UnaccountedKg.ShouldBe(0m);
+            (await sales.Get(sale.Id)).TotalKg.ShouldBe(100m);
+        }
+        else
+        {
+            after.Status.ShouldBe(BatchStatus.Harvested);
+            results.ShouldContain(r => r.Value == "voided" && r.Error == null);
+            results.ShouldContain(r => r.Value == null && r.Error != null);
+            check.SoldKg.ShouldBe(0m);
+            check.UnaccountedKg.ShouldBe(100m);
+            await Should.ThrowAsync<UserFriendlyException>(() => batches.Close(new CloseBatchInput
+            {
+                Id = batchId, ConfirmReadOnly = true, RowVersion = after.RowVersion,
+            }));
+        }
+    }
+
+    [SqlServerFact]
     public async Task Sales_saved_at_the_same_moment_get_different_receipt_numbers_and_never_oversell()
     {
         var harvest = await Resolve<HarvestAppService>().Create(NewHarvest(null, 100));
