@@ -129,7 +129,8 @@ public class DailyLogStatusService : ITransientDependency
     /// </summary>
     public async Task<DateOnly?> LastLogDateAsync(PondBatch batch, TimeZoneInfo zone)
     {
-        if (batch.Status == BatchStatus.Failed)
+        // The legacy salvage exemption belongs to an actual historical incident record, not the enum value alone.
+        if (batch.Status == BatchStatus.Failed && await _failures.GetAll().AsNoTracking().AnyAsync(f => f.BatchId == batch.Id))
         {
             return null;
         }
