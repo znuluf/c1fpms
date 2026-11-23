@@ -48,7 +48,11 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
 
     public virtual async Task<FarmSettingsDto> Get()
     {
-        return Map(await Farm.GetSettingsAsync());
+        // Read the persisted row directly. FarmContext intentionally caches its fallback settings
+        // for the lifetime of a consumer; after the first settings row is created, that cached
+        // fallback can otherwise hide the newly persisted Base ABW schemes in this request scope.
+        var saved = await _settings.FirstOrDefaultAsync(x => x.Id == Farm.TenantId);
+        return Map(saved ?? await Farm.GetSettingsAsync());
     }
 
     [AbpAuthorize(PermissionNames.FarmSettings_Edit)]
