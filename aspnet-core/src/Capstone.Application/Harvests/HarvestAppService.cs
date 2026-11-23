@@ -134,7 +134,6 @@ public class SaveHarvestInput
     /// <summary>Optional ABW sample weight (g); with the piece count it sets the ABW (DEC-80).</summary>
     [Range(0.01, 1000000, ErrorMessage = "The sample weight must be greater than zero.")]
     public decimal? AbwSampleWeightG { get; set; }
-    public bool UseHarvestAbwForBiomass { get; set; }
 
     [Range(1, 100000, ErrorMessage = "The sample piece count must be at least 1.")]
     public int? AbwSamplePieces { get; set; }
@@ -238,6 +237,7 @@ public class HarvestDto
     public decimal TotalKg { get; set; }
     public int? Boxes { get; set; }
     public decimal? AbwG { get; set; }
+    public bool UseHarvestAbwForBiomass { get; set; }
     public decimal? AbwSampleWeightG { get; set; }
     public int? AbwSamplePieces { get; set; }
     public long? FinalCount { get; set; }
