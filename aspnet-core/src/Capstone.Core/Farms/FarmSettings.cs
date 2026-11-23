@@ -26,4 +26,7 @@ public class FarmSettings : AuditedEntity<int>, Abp.Domain.Entities.IMustHaveTen
     public string FeedingTimes { get; set; } = FeedingSchedule.DefaultTimes;
     public bool WaterQualityDaily { get; set; } = true;
 
+    /// <summary>Farm-wide reusable Base ABW pricing presets. Sale lines snapshot the selected terms.</summary>
+    public string BaseAbwPricingSchemesJson { get; set; } = "[]";
+
 }
