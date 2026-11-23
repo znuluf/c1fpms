@@ -163,6 +163,21 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                             <div class="card-body">{{ p.waterQualityDaily === false ? 'Water is tested on selected days.' : 'Water is tested every day.' }}</div>
                         </div>
                         <div class="card">
+                            <div class="card-header"><h3 class="card-title">Base ABW pricing</h3></div>
+                            <div class="card-body">
+                                @if (p.baseAbwPricingSchemes.length) {
+                                    @for (s of p.baseAbwPricingSchemes; track s.id) {
+                                        <div class="d-flex justify-content-between border-bottom py-2">
+                                            <span>{{ s.name }} · {{ s.baseAbwG }}g</span>
+                                            <span>{{ s.basePricePerKg | php }}/kg + {{ s.stepPerG | php }}/g {{ s.isActive ? '' : '· inactive' }}</span>
+                                        </div>
+                                    }
+                                } @else {
+                                    <span class="text-muted">No Base ABW pricing schemes configured.</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card">
                             <div class="card-header"><h3 class="card-title">System preferences</h3></div>
                             <div class="card-body">
                                 <dl class="row mb-0 fpms-dl">
