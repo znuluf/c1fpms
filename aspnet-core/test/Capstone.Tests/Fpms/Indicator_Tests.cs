@@ -37,6 +37,51 @@ public class Indicator_Tests : FpmsTestBase
     }
 
     [Fact]
+    public void Partial_harvest_abw_is_used_by_default_when_selected_and_a_new_growth_sample_supersedes_it()
+    {
+        var sampleAt = new DateTime(2026, 6, 10, 8, 0, 0, DateTimeKind.Utc);
+        var harvestAt = sampleAt.AddDays(1);
+        var facts = new BatchFacts
+        {
+            PlCountStocked = 100_000,
+            GrowthSamples = new List<GrowthSampleFact>
+            {
+                new() { LogId = Guid.NewGuid(), Date = new DateOnly(2026, 6, 10), ObservedAtUtc = sampleAt, AbwG = 10m },
+            },
+            Harvests = new List<HarvestFact>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(), Date = new DateOnly(2026, 6, 11), HarvestedAtUtc = harvestAt,
+                    IsPartial = true, AbwG = 12m, FinalCount = 1_000, UseHarvestAbwForBiomass = true,
+                },
+            },
+        };
+
+        var afterHarvest = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 11));
+        afterHarvest.EstimatedPopulation.ShouldBe(99_000m);
+        afterHarvest.BiomassAbwG.ShouldBe(12m);
+        afterHarvest.BiomassAbwSource.ShouldBe("Harvest");
+        afterHarvest.EstimatedBiomassKg.ShouldBe(1_188m);
+
+        facts.Harvests[0].UseHarvestAbwForBiomass = false;
+        var optedOut = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 11));
+        optedOut.BiomassAbwG.ShouldBe(10m);
+        optedOut.BiomassAbwSource.ShouldBe("Sample");
+        optedOut.EstimatedBiomassKg.ShouldBe(990m);
+
+        facts.Harvests[0].UseHarvestAbwForBiomass = true;
+        facts.GrowthSamples.Add(new GrowthSampleFact
+        {
+            LogId = Guid.NewGuid(), Date = new DateOnly(2026, 6, 12), ObservedAtUtc = sampleAt.AddDays(2), AbwG = 11m,
+        });
+        var afterNewSample = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 12));
+        afterNewSample.BiomassAbwG.ShouldBe(11m);
+        afterNewSample.BiomassAbwSource.ShouldBe("Sample");
+        afterNewSample.EstimatedBiomassKg.ShouldBe(1_089m);
+    }
+
+    [Fact]
     public void Estimated_population_can_reach_zero_without_being_a_batch_status()
     {
         var sampleAt = new DateTime(2026, 6, 10, 8, 0, 0, DateTimeKind.Utc);
