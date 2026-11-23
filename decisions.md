@@ -3651,3 +3651,25 @@ The Base ABW formula already exists in the sales domain, but the new-sale flow h
 ### Consequences
 
 Farm staff can configure the farm's commonly used pricing agreements once and choose the applicable agreement for each transaction. Different sales to the same buyer can use different agreements without changing buyer records. A future buyer-specific pricing feature can be added separately if the farm needs it.
+
+
+---
+
+## Decision DEC-142: Optional partial-harvest ABW basis for remaining biomass
+
+Date: 2026-11-24
+Status: Accepted
+Builds on: DEC-140
+
+### Decision
+
+- When recording a Partial harvest with an ABW, ask whether that harvest ABW should be used for the pond's estimated remaining biomass.
+- Default the answer to **Yes**. Staff can clear the choice when the harvested shrimp may be larger than those left in the pond.
+- Save the choice on the harvest record and show it again when the harvest is edited. Existing harvests remain opted out so their historical biomass calculation does not change merely because the feature is introduced.
+- The current ABW shown on the batch remains the latest recorded growth-sample or harvest ABW. The ABW used for estimated biomass is a separate basis and its source is shown.
+- A selected Partial-harvest ABW is used only while it is newer than the latest growth sample. A newer growth sample supersedes it. A later Partial harvest can again choose Yes or No.
+- Final and Emergency harvest ABWs remain harvest measurements; this preference applies only to Partial harvests.
+
+### Consequences
+
+The farm can use a partial-harvest measurement when staff consider it representative of the shrimp remaining, while retaining an explicit opt-out for selective harvests. Biomass and FCR-to-date use the same selected ABW basis, and the source is visible to staff.
