@@ -114,6 +114,7 @@ public class BatchIndicators
     public decimal? LatestAbwG { get; set; }
     public decimal? CurrentAbwG { get; set; }
     public long CumulativeMortality { get; set; }
+    public decimal? CumulativeMortalityPct { get; set; }
     public decimal HarvestedPieces { get; set; }
     public decimal TotalHarvestKg { get; set; }
     public decimal? EstimatedPopulation { get; set; }
@@ -202,6 +203,7 @@ public static class IndicatorCalculator
             Doc = Doc(f.StockingDate, today),
             CumulativeFeedKg = f.CumulativeFeedKg,
             CumulativeMortality = f.CumulativeMortality,
+            CumulativeMortalityPct = f.PlCountStocked > 0 ? Round(f.CumulativeMortality / (decimal)f.PlCountStocked * 100m, 2) : null,
         };
 
         var latestSample = f.GrowthSamples.OrderBy(s => s.ObservedAtUtc).LastOrDefault();
