@@ -349,6 +349,7 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
             }
         }
         this.m.lines.push(line);
+        if (line.priceMethod > 1) this.applyFormula(line);
         this.loadCrates();
     }
 
