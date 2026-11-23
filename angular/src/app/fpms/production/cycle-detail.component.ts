@@ -51,10 +51,12 @@ import { batchShort } from '@shared/fpms/labels';
                                 <div class="form-group">
                                     <label class="d-block">Outcome <span class="text-danger">*</span></label>
                                     @for (o of Options.cycleOutcome; track o.value) {
-                                        <div class="custom-control custom-radio custom-control-inline">
-                                            <input type="radio" class="custom-control-input" [id]="'oc' + o.value" name="outcome" [value]="o.value" [(ngModel)]="closing.outcome" />
-                                            <label class="custom-control-label" [for]="'oc' + o.value">{{ o.label }}</label>
-                                        </div>
+                                        @if (o.value !== 2 || c.suggestedOutcome === 2) {
+                                            <div class="custom-control custom-radio custom-control-inline">
+                                                <input type="radio" class="custom-control-input" [id]="'oc' + o.value" name="outcome" [value]="o.value" [(ngModel)]="closing.outcome" />
+                                                <label class="custom-control-label" [for]="'oc' + o.value">{{ o.label }}</label>
+                                            </div>
+                                        }
                                     }
                                     <small class="form-text text-muted">
                                         Pre-selected as {{ c.suggestedOutcome | label: L.CycleOutcomes }}{{ c.suggestedOutcome === 2 ? ' because every batch has a historical incident record' : '' }}. Change it if that is not right.
