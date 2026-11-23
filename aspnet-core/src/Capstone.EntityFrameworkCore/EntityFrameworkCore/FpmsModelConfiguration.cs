@@ -81,13 +81,24 @@ public static class FpmsModelConfiguration
             e.Property(x => x.Id).ValueGeneratedNever();
             e.Property(x => x.TimeZone).IsRequired().HasMaxLength(64);
             e.Property(x => x.FeedingTimes).IsRequired().HasMaxLength(FeedingSchedule.MaxTimesLength);
-            e.Property(x => x.BaseAbwPricingSchemesJson).IsRequired().HasColumnType("nvarchar(max)");
             e.ToTable(t =>
             {
                 t.HasCheckConstraint("CK_FpmsFarmSettings_DocumentAlertDays", "[DocumentExpiryAlertDays] BETWEEN 1 AND 365");
                 t.HasCheckConstraint("CK_FpmsFarmSettings_UnsoldFollowUpDays", "[UnsoldFollowUpDays] BETWEEN 1 AND 60");
             });
             e.HasIndex(x => x.TenantId).IsUnique();
+        });
+
+        b.Entity<BaseAbwPricingScheme>(e =>
+        {
+            e.ToTable("FpmsBaseAbwPricingSchemes");
+            e.Property(x => x.Name).IsRequired().HasMaxLength(BaseAbwPricingScheme.MaxNameLength);
+            e.Property(x => x.BasePricePerKg).HasPrecision(12, 2);
+            e.Property(x => x.BaseAbwG).HasPrecision(8, 2);
+            e.Property(x => x.StepPerG).HasPrecision(12, 2);
+            e.HasIndex(x => new { x.TenantId, x.Name }).IsUnique().HasFilter(NotDeleted);
+            e.ToTable(t => t.HasCheckConstraint("CK_FpmsBaseAbwPricingSchemes_Terms",
+                "[BasePricePerKg] >= 0 AND [BaseAbwG] BETWEEN 0.01 AND 60 AND [StepPerG] >= 0"));
         });
 
         b.Entity<DocumentCategory>(e =>
