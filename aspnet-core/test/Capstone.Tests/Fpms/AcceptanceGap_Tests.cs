@@ -186,7 +186,7 @@ public class AcceptanceGap_Tests : FpmsTestBase
 
         await Should.ThrowAsync<UserFriendlyException>(() => cycles.Close(new CloseCycleInput { Id = created.CycleId }));
 
-        await batches.DeclareFailure(new FailureInput { Id = batchId, Reason = "AHPND suspected; mass mortality", FailureDate = FarmToday(), EstimatedLossPhp = 120000 });
+        AddLegacyFailure(batchId, FarmToday(), "AHPND suspected; mass mortality", 120000);
         var failed = await batches.Get(batchId);
         failed.Status.ShouldBe(BatchStatus.Harvested);
         failed.EstimatedLossPhp.ShouldBe(120000m);

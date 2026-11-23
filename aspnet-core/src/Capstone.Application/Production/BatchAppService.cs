@@ -368,28 +368,11 @@ public class BatchAppService : CapstoneAppServiceBase
         });
     }
 
-    /// <summary>Legacy compatibility only. New production endings are recorded as Emergency Harvests, which retain their event details on the harvest record.</summary>
+    /// <summary>Retained for API compatibility with older clients. New failure declarations are no longer accepted; record an Emergency harvest instead.</summary>
     [AbpAuthorize(PermissionNames.Production_Manage)]
-    public virtual async Task DeclareFailure(FailureInput input)
+    public virtual Task DeclareFailure(FailureInput input)
     {
-        var batch = await _batches.GetAsync(input.Id);
-        Concurrency.Check(batch.RowVersion, input.RowVersion);
-        if (batch.Status != BatchStatus.Stocked)
-        {
-            throw new UserFriendlyException("Only a Stocked batch can be declared failed.");
-        }
-
-        var today = await Farm.GetTodayAsync();
-        if (input.FailureDate > today || (batch.StockingDate.HasValue && input.FailureDate < batch.StockingDate.Value))
-        {
-            throw new UserFriendlyException("The failure date must be between the stocking date and today.");
-        }
-
-        batch.Status = BatchStatus.Failed;
-        await _failures.InsertAsync(new BatchFailure
-        {
-            BatchId = batch.Id, FailedOn = input.FailureDate, Reason = input.Reason.Trim(), EstimatedLossPhp = input.EstimatedLossPhp,
-        });
+        throw new UserFriendlyException("Batch failure declarations are no longer supported. Record an Emergency harvest instead.");
     }
 
     /// <summary>
@@ -500,7 +483,7 @@ public class BatchAppService : CapstoneAppServiceBase
         Concurrency.Check(batch.RowVersion, input.RowVersion);
         if (batch.Status is not (BatchStatus.Harvested or BatchStatus.Failed))
         {
-            throw new UserFriendlyException("Only a Harvested or Failed batch can be closed.");
+            throw new UserFriendlyException("Only a Harvested batch or a batch with a legacy incident record can be closed.");
         }
 
         if (!input.ConfirmReadOnly)

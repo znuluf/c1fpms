@@ -356,8 +356,9 @@ public class Lifecycle_Tests : FpmsTestBase
         var batches = Resolve<BatchAppService>();
         var id = BatchId(CurrentBatch);
         var today = Domain.FarmClock.Today(Domain.FarmClock.Resolve(Domain.FarmClock.DefaultTimeZone));
-        await Should.ThrowAsync<UserFriendlyException>(() => batches.DeclareFailure(new FailureInput { Id = id, Reason = "x", FailureDate = today.AddDays(1) }));
-        await batches.DeclareFailure(new FailureInput { Id = id, Reason = "WSSV outbreak", FailureDate = today, EstimatedLossPhp = 250000 });
+        var rejected = await Should.ThrowAsync<UserFriendlyException>(() => batches.DeclareFailure(new FailureInput { Id = id, Reason = "x", FailureDate = today }));
+        rejected.Message.ShouldContain("Emergency harvest");
+        AddLegacyFailure(id, today, "WSSV outbreak", 250000);
 
         var detail = await batches.Get(id);
         detail.Status.ShouldBe(BatchStatus.Harvested);
@@ -401,13 +402,14 @@ public class Lifecycle_Tests : FpmsTestBase
 
         var today = Domain.FarmClock.Today(Domain.FarmClock.Resolve(Domain.FarmClock.DefaultTimeZone));
         await batches.Close(new CloseBatchInput { Id = BatchId(ReferenceBatch), ConfirmReadOnly = true });
-        await batches.DeclareFailure(new FailureInput { Id = BatchId(CurrentBatch), Reason = "Crop lost", FailureDate = today });
+        AddLegacyFailure(BatchId(CurrentBatch), today, "Crop lost");
         (await cycles.Get(cycleId)).CanClose.ShouldBeFalse();
         await batches.Close(new CloseBatchInput { Id = BatchId(CurrentBatch), ConfirmReadOnly = true });
 
         (await cycles.Get(cycleId)).CanClose.ShouldBeTrue();
         await Should.ThrowAsync<UserFriendlyException>(() => cycles.Close(new CloseCycleInput { Id = cycleId })); // outcome required (DEC-64)
-        (await cycles.Get(cycleId)).SuggestedOutcome.ShouldBe(CycleOutcome.Completed); // one batch harvested, one failed
+        (await cycles.Get(cycleId)).SuggestedOutcome.ShouldBe(CycleOutcome.Completed); // one batch harvested, one has a legacy incident
+        await Should.ThrowAsync<UserFriendlyException>(() => cycles.Close(new CloseCycleInput { Id = cycleId, Outcome = CycleOutcome.Failed }));
         await cycles.Close(new CloseCycleInput { Id = cycleId, Outcome = CycleOutcome.Completed });
         var closed = await cycles.Get(cycleId);
         closed.Status.ShouldBe(CycleStatus.Closed);
