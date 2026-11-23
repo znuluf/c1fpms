@@ -18,9 +18,9 @@ public class BaseAbwPricingSchemeDto
 {
     public Guid Id { get; set; }
     [Required, StringLength(60)] public string Name { get; set; }
-    [Range(typeof(decimal), "0", "100000000")] public decimal BasePricePerKg { get; set; }
-    [Range(typeof(decimal), "0.01", "60")] public decimal BaseAbwG { get; set; }
-    [Range(typeof(decimal), "0", "1000000")] public decimal StepPerG { get; set; }
+    public decimal BasePricePerKg { get; set; }
+    public decimal BaseAbwG { get; set; }
+    public decimal StepPerG { get; set; }
     public bool IsActive { get; set; } = true;
 }
 
