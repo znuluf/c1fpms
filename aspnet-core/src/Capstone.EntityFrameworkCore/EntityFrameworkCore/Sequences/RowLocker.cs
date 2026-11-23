@@ -33,6 +33,7 @@ public class RowLocker : IRowLocker, ITransientDependency
             RowLockTarget.Harvest => "FpmsHarvests",
             RowLockTarget.Pond => "FpmsPonds",
             RowLockTarget.Batch => "FpmsPondBatches",
+            RowLockTarget.Sale => "FpmsSales",
             _ => throw new ArgumentOutOfRangeException(nameof(target)),
         };
 
