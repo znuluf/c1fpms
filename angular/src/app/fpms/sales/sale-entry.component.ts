@@ -238,10 +238,10 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         const [buyers, sellable, settings] = await Promise.all([
             this.api.get<any[]>('Buyer', 'GetLookup'),
             this.api.get<any[]>('Sale', 'GetSellableLines', { saleId: this.original?.id }),
-            this.api.get<any>('FarmSettings', 'Get'),
+            this.api.get<any[]>('Sale', 'GetBaseAbwPricingSchemes'),
         ]);
         this.buyers = buyers.filter((b) => b.isActive || b.id === this.original?.buyerId);
-        this.abwSchemes = (settings.baseAbwPricingSchemes ?? []).filter((s: any) => s.isActive);
+        this.abwSchemes = settings ?? [];
         const keep = new Set((this.original?.lines ?? []).map((l: any) => l.priceTableId).filter((x: any) => x));
         this.tables = (await this.api.get<any[]>('PriceTable', 'GetAll')).filter((t) => t.isActive || keep.has(t.id));
         this.sellable = sellable;
