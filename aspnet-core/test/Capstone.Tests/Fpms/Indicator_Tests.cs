@@ -88,7 +88,8 @@ public class Indicator_Tests : FpmsTestBase
         var afterNewSample = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 12));
         afterNewSample.BiomassAbwG.ShouldBe(11m);
         afterNewSample.BiomassAbwSource.ShouldBe("Sample");
-        afterNewSample.EstimatedBiomassKg.ShouldBe(1_089m);
+        afterNewSample.EstimatedPopulation.ShouldBe(98_500m); // 100,000 − 1,000 − 500 harvested pieces
+        afterNewSample.EstimatedBiomassKg.ShouldBe(1_083.5m); // 98,500 × 11 g ÷ 1000
     }
 
     [Fact]
