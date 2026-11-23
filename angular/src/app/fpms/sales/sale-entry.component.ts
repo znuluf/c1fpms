@@ -133,7 +133,7 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                 <details class="fpms-fold mt-3 mb-0">
                                     <summary>How kg and prices work <span class="fpms-fold-hint">buyer kg, base ABW price</span></summary>
                                     <p class="mb-1">Leave Buyer kg empty when the buyer pays on the farm's weight. When it is filled, the amount uses it; yield and FCR keep the farm weight.</p>
-                                    <p class="mb-0">"Base ABW price" works the price out from the buyer's base price at a base ABW plus a step for each gram above it; the shrimp ABW starts from the harvest's sampled ABW.</p>
+                                    <p class="mb-0">"Base ABW pricing" works the price out from the selected base price and base ABW, adjusting for each gram above or below it; the shrimp ABW starts from the harvest's sampled ABW.</p>
                                 </details>
                             </div>
                         </div>
