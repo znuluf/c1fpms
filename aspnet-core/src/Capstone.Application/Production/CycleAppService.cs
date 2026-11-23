@@ -291,6 +291,8 @@ public class CycleAppService : CapstoneAppServiceBase
         FryDelivery delivery;
         if (input.CycleId.HasValue)
         {
+            // Serialize adding batches with cycle closure and reopening. Re-read the cycle only after taking its row lock.
+            await _rowLocker.LockAsync(RowLockTarget.Cycle, input.CycleId.Value);
             cycle = await _cycles.GetAll().Include(c => c.FryDelivery).ThenInclude(d => d.Hatchery).FirstOrDefaultAsync(c => c.Id == input.CycleId)
                     ?? throw new UserFriendlyException("Production cycle not found.");
             if (cycle.Status != CycleStatus.Active)
@@ -529,6 +531,7 @@ public class CycleAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.Production_Manage)]
     public virtual async Task Close(CloseCycleInput input)
     {
+        await _rowLocker.LockAsync(RowLockTarget.Cycle, input.Id);
         var cycle = await _cycles.GetAsync(input.Id);
         Concurrency.Check(cycle.RowVersion, input.RowVersion);
         if (cycle.Status != CycleStatus.Active)
@@ -561,6 +564,7 @@ public class CycleAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.Production_Manage)]
     public virtual async Task Reopen(ReopenInput input)
     {
+        await _rowLocker.LockAsync(RowLockTarget.Cycle, input.Id);
         var cycle = await _cycles.GetAsync(input.Id);
         Concurrency.Check(cycle.RowVersion, input.RowVersion);
         if (cycle.Status != CycleStatus.Closed)
