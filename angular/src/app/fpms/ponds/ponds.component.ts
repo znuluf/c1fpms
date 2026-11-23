@@ -104,6 +104,7 @@ interface PondCard {
                                                 <th scope="col">Feed used</th>
                                                 <th scope="col">Last sample</th>
                                                 <th scope="col">Latest water</th>
+                                                <th scope="col">Log, last 7 days</th>
                                                 <th scope="col">Attention</th>
                                                 <th scope="col">Actions</th>
                                             </tr>
@@ -133,7 +134,26 @@ interface PondCard {
                                                             @if (p.waterDate) { <div class="small text-muted">Observed {{ p.waterDate }}</div> }
                                                         } @else { <span class="text-muted">—</span> }
                                                     </td>
-                                                    <td>@if (p.alert) { <span class="text-warning-dark">{{ p.alert }}</span> } @else { <span class="text-muted">—</span> }</td>
+                                                    <td>
+                                                        @if (p.strip.length) {
+                                                            <div class="pd-strip">
+                                                                @for (c of p.strip; track c.date) {
+                                                                    <a class="sq" [class.is-today]="c.today" [ngClass]="c.state" [title]="c.title" [attr.aria-label]="c.title" role="button" tabindex="0" (click)="openFeeding(p.batchId!, c.date)" (keydown.enter)="openFeeding(p.batchId!, c.date)">@if (c.water !== 'na') { <span class="wq" [class.in]="c.water === 'in'" aria-hidden="true"></span> }</a>
+                                                                }
+                                                            </div>
+                                                            @if (p.today) {
+                                                                <div class="small text-nowrap mt-1">
+                                                                    @for (t of p.today; track t.label) { <span class="pd-chip" [class.done]="t.done">{{ t.label }} {{ t.done ? '✓' : '–' }}</span> }
+                                                                </div>
+                                                            }
+                                                        } @else { <span class="text-muted">—</span> }
+                                                    </td>
+                                                    <td>
+                                                        @if (p.alert) {
+                                                            <span class="text-warning-dark">{{ p.alert }}</span>
+                                                            @if (p.alertLog) { <div><a [routerLink]="['/app/logbook', p.alertLog]">Open log</a></div> }
+                                                        } @else { <span class="text-muted">—</span> }
+                                                    </td>
                                                     <td class="text-nowrap">
                                                         @if (p.batchId) { <a [routerLink]="['/app/production/batches', p.batchId]">Batch</a><span class="mx-1">·</span> }
                                                         <a [routerLink]="['/app/ponds', p.id]">Pond</a>
