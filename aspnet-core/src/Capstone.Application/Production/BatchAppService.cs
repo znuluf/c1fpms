@@ -218,7 +218,7 @@ public class BatchAppService : CapstoneAppServiceBase
             LogCounts = counts.ToDictionary(c => c.Key.ToString(), c => c.N),
             HasFinalHarvest = hasFinal,
             HasRecords = counts.Count > 0 || hasHarvest,
-            AllowedLogTypes = Enum.GetValues<LogType>().Where(b.AllowsNewLog).Select(t => t.ToString()).ToList(),
+            AllowedLogTypes = Enum.GetValues<LogType>().Where(t => b.AllowsNewLog(t, failure != null)).Select(t => t.ToString()).ToList(),
             IsReadOnly = b.Status == BatchStatus.Closed,
             TechnicianUserIds = b.Technicians.Select(t => t.UserId).ToList(), CoverUserId = b.CoverUserId, CoverUntil = b.CoverUntil,
         };
