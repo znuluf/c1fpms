@@ -213,6 +213,15 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             }
                                         </div>
                                     </div>
+                                    @if (m.harvestType === 1 && m.abwG > 0) {
+                                        <div class="form-group mt-2 mb-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="useHarvestAbwForBiomass" name="useHarvestAbwForBiomass" [(ngModel)]="m.useHarvestAbwForBiomass" (ngModelChange)="keepDraft()" />
+                                                <label class="custom-control-label" for="useHarvestAbwForBiomass">Use this harvest ABW for the pond's remaining-biomass estimate</label>
+                                            </div>
+                                            <small class="form-text text-muted">Yes is selected by default. Clear it if the shrimp harvested may be larger than those left in the pond. A later growth sample will replace this ABW basis.</small>
+                                        </div>
+                                    }
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
                                             <label for="fc">Counted shrimp (pieces)</label>
@@ -667,6 +676,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             this.readOnly = !h.canEdit;
             this.m = {
                 ...h,
+                useHarvestAbwForBiomass: h.useHarvestAbwForBiomass ?? false,
                 harvestedAt: FarmTime.toLocalInput(h.harvestedAtUtc),
                 gradeLines: h.gradeLines.map((g: any) => ({ sizeGradeId: g.sizeGradeId, kg: g.kg, soldKg: g.soldKg })),
                 disposals: h.disposals.map((d: any) => ({ ...d })),
@@ -691,7 +701,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
 
     private blank(batchId: string): any {
         return {
-            batchId, harvestType: 1, harvestedAt: FarmTime.nowInput(), totalKg: null, boxes: null, abwG: null, abwSampleWeightG: null, abwSamplePieces: null,
+            batchId, harvestType: 1, harvestedAt: FarmTime.nowInput(), totalKg: null, boxes: null, abwG: null, useHarvestAbwForBiomass: true, abwSampleWeightG: null, abwSamplePieces: null,
             finalCount: null, deadAtHarvest: null, shrimpLeft: null, pondEmptiedConfirmed: false, emergencyReason: null, emergencyNote: '', followUpOn: '', smoothShell: null, intactAppendages: null, noNecrosis: null, qualityNotes: '', gradeLines: [], disposals: [], crates: [],
             buyerId: '', weighedBy: null, sell: false, sale: this.blankSale(), gradeCrates: false,
             // DEC-133: one id per new harvest, kept in the draft, so a retried save returns the harvest already saved.
@@ -1153,6 +1163,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             totalKg: this.m.totalKg,
             boxes: this.m.boxes,
             abwG: this.m.abwG || null,
+            useHarvestAbwForBiomass: this.m.harvestType === 1 && this.m.useHarvestAbwForBiomass === true,
             abwSampleWeightG: this.sampleComplete() ? Number(this.m.abwSampleWeightG) : null,
             abwSamplePieces: this.sampleComplete() ? Number(this.m.abwSamplePieces) : null,
             // Every crate sends its tare (0 when none), so a later change to the container's empty weight does not alter it.
