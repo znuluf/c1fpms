@@ -495,6 +495,64 @@ public class HarvestSales_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task A_closed_batch_rejects_sale_creation_correction_and_voiding()
+    {
+        var harvest = await Resolve<HarvestAppService>().Create(Harvest(HarvestType.Total, 100, ("90/100", 100)));
+        var sales = Resolve<SaleAppService>();
+        var sale = await sales.Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 100, PricePerKg = 200 } },
+        });
+
+        var batches = Resolve<BatchAppService>();
+        var batchId = BatchId(CurrentBatch);
+        var batch = await batches.Get(batchId);
+        await batches.Close(new CloseBatchInput { Id = batchId, ConfirmReadOnly = true, RowVersion = batch.RowVersion });
+
+        await Should.ThrowAsync<UserFriendlyException>(() => sales.Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 1, PricePerKg = 200 } },
+        }));
+        await Should.ThrowAsync<UserFriendlyException>(() => sales.Update(new SaveSaleInput
+        {
+            Id = sale.Id, RowVersion = sale.RowVersion, BuyerId = Buyer, SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 100, PricePerKg = 205 } },
+        }));
+        await Should.ThrowAsync<UserFriendlyException>(() => sales.Void(new VoidSaleInput { Id = sale.Id, Reason = "Buyer cancelled" }));
+
+        var check = await batches.GetCloseCheck(batchId);
+        check.SoldKg.ShouldBe(100m);
+        check.UnaccountedKg.ShouldBe(0m);
+        (await sales.Get(sale.Id)).TotalKg.ShouldBe(100m);
+    }
+
+    [Fact]
+    public async Task A_closed_batch_rejects_additional_not_sold_dispositions()
+    {
+        var harvest = await Resolve<HarvestAppService>().Create(Harvest(HarvestType.Total, 100, ("90/100", 100)));
+        await Resolve<SaleAppService>().Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 100, PricePerKg = 200 } },
+        });
+
+        var batches = Resolve<BatchAppService>();
+        var batchId = BatchId(CurrentBatch);
+        var batch = await batches.Get(batchId);
+        await batches.Close(new CloseBatchInput { Id = batchId, ConfirmReadOnly = true, RowVersion = batch.RowVersion });
+
+        await Should.ThrowAsync<UserFriendlyException>(() => Resolve<HarvestAppService>().RecordDisposal(
+            new RecordDisposalInput { HarvestId = harvest.Id, Kg = 1, Reason = DisposalReason.SpoiledOrLost }));
+
+        var check = await batches.GetCloseCheck(batchId);
+        check.SoldKg.ShouldBe(100m);
+        check.NotSoldKg.ShouldBe(0m);
+        check.UnaccountedKg.ShouldBe(0m);
+    }
+
+    [Fact]
     public async Task Dispatch_receipt_shows_the_bfar_registration_number()
     {
         UsingDbContext(context =>
