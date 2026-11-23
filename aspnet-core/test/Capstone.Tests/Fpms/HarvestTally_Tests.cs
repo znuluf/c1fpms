@@ -131,6 +131,21 @@ public class HarvestTally_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task A_legacy_failed_status_without_its_historical_incident_record_cannot_accept_a_harvest()
+    {
+        var batchId = BatchId(CurrentBatch);
+        await UsingDbContextAsync(async context =>
+        {
+            var batch = await context.PondBatches.SingleAsync(b => b.Id == batchId);
+            batch.Status = BatchStatus.Failed;
+        });
+
+        var error = await Should.ThrowAsync<UserFriendlyException>(() => Resolve<HarvestAppService>().Create(TallySheet()));
+        error.Message.ShouldContain("no historical incident record");
+        Q(c => c.Harvests.IgnoreQueryFilters().Count(h => h.BatchId == batchId)).ShouldBe(0);
+    }
+
+    [Fact]
     public async Task Final_harvest_requires_explicit_confirmation_that_the_pond_is_empty()
     {
         var harvests = Resolve<HarvestAppService>();
