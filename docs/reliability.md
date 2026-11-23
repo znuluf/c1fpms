@@ -105,7 +105,7 @@ again."* Nothing is locked while a person is reading or typing, which suits a sm
 | Record | Where the check is |
 |---|---|
 | Production cycle (close, reopen) | `CycleAppService` |
-| Batch (declare failure, close, reopen) | `BatchAppService` |
+| Batch (close, reopen) | `BatchAppService` |
 | Fry delivery (edit, finish stocking) | `FryDeliveryAppService` |
 | Harvest (correction) | `HarvestAppService.Update` |
 | Sale (correction) | `SaleAppService.Update` |
