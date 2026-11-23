@@ -262,10 +262,10 @@ public static class IndicatorCalculator
             && (latestSample == null || latestOptedInPartialWithAbw.HarvestedAtUtc > latestSample.ObservedAtUtc);
         if (useHarvestAbw)
         {
-            result.BiomassAbwG = latestPartialWithAbw.AbwG;
+            result.BiomassAbwG = latestOptedInPartialWithAbw.AbwG;
             result.BiomassAbwSource = "Harvest";
-            result.BiomassAbwSourceDate = latestPartialWithAbw.Date;
-            result.BiomassAbwSourceId = latestPartialWithAbw.Id;
+            result.BiomassAbwSourceDate = latestOptedInPartialWithAbw.Date;
+            result.BiomassAbwSourceId = latestOptedInPartialWithAbw.Id;
         }
         else if (latestSample != null)
         {
