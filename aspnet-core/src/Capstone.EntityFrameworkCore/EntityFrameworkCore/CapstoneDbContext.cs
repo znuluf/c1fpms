@@ -23,6 +23,7 @@ public class CapstoneDbContext : AbpZeroDbContext<Tenant, Role, User, CapstoneDb
 {
     public DbSet<FarmProfile> FarmProfiles { get; set; }
     public DbSet<FarmSettings> FarmSettings { get; set; }
+    public DbSet<BaseAbwPricingScheme> BaseAbwPricingSchemes { get; set; }
     public DbSet<FarmCodeChange> FarmCodeChanges { get; set; }
     public DbSet<DocumentCategory> DocumentCategories { get; set; }
     public DbSet<DocumentPreset> DocumentPresets { get; set; }
