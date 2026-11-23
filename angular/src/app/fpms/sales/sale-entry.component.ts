@@ -68,6 +68,16 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                 <span>{{ totalKg() | num: 3 : true }} kg · <strong>{{ total() | php }}</strong></span>
                             </div>
                             <div class="card-body pt-0">
+                                @if (abwSchemes.length) {
+                                    <div class="form-group mt-3">
+                                        <label for="saleAbwScheme">Base ABW pricing for this sale</label>
+                                        <select id="saleAbwScheme" class="custom-select" name="saleAbwScheme" [(ngModel)]="m.abwSchemeId" (ngModelChange)="applySaleAbwScheme($event)">
+                                            <option value="">Choose a scheme to apply to all lines</option>
+                                            @for (s of abwSchemes; track s.id) { <option [value]="s.id">{{ s.name }} · base {{ s.baseAbwG }}g</option> }
+                                        </select>
+                                        <small class="form-text text-muted">The selected terms are copied to every sale line and calculated against each harvest's ABW.</small>
+                                    </div>
+                                }
                                 @for (l of m.lines; track $index) {
                                     <div class="fpms-sale-line">
                                         <div class="harvest">
@@ -112,15 +122,6 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                             <span class="l">Amount</span>
                                             <strong>{{ amount(l) | php }}</strong>
                                         </div>
-                                        @if (l.priceMethod === 2 && abwSchemes.length) {
-                                            <div class="form-group mb-1">
-                                                <label [for]="'abs' + $index">Farm pricing scheme</label>
-                                                <select [id]="'abs' + $index" class="custom-select" [name]="'abs' + $index" [(ngModel)]="l.abwSchemeId" (ngModelChange)="applyAbwScheme(l, $event)">
-                                                    <option value="">Choose a scheme or enter custom terms</option>
-                                                    @for (s of abwSchemes; track s.id) { <option [value]="s.id">{{ s.name }} · base {{ s.baseAbwG }}g</option> }
-                                                </select>
-                                            </div>
-                                        }
                                         @if (l.priceMethod > 1) {
                                             <div class="terms">
                                                 <fpms-price-terms [t]="l" [key]="'l' + $index" [tables]="tablesFor(l)" [abw]="option(l)?.harvestAbwG ?? null" [count]="defaultCount(l)" [termsFrom]="l.termsFrom" (changed)="applyFormula(l)"></fpms-price-terms>
@@ -284,14 +285,21 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         this.loading = false;
     }
 
-    applyAbwScheme(line: any, schemeId: string): void {
+    applySaleAbwScheme(schemeId: string): void {
         const scheme = this.abwSchemes.find((s) => s.id === schemeId);
         if (!scheme) return;
+        for (const line of this.m.lines ?? []) {
+            line.priceMethod = 2;
+            this.copyAbwScheme(line, scheme);
+            this.applyFormula(line);
+        }
+    }
+
+    private copyAbwScheme(line: any, scheme: any): void {
         line.basePricePerKg = scheme.basePricePerKg;
         line.baseAbwG = scheme.baseAbwG;
         line.stepPerG = scheme.stepPerG;
         line.priceAbwG = null;
-        this.applyFormula(line);
     }
 
     option(l: any): any {
@@ -332,7 +340,15 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
 
     addLine(): void {
         const free = this.sellable.find((o) => !this.m.lines.some((l: any) => l.harvestGradeLineId === o.harvestGradeLineId));
-        this.m.lines.push(this.blankLine(free?.harvestGradeLineId ?? ''));
+        const line = this.blankLine(free?.harvestGradeLineId ?? '');
+        if (this.m.abwSchemeId) {
+            const scheme = this.abwSchemes.find((s) => s.id === this.m.abwSchemeId);
+            if (scheme) {
+                line.priceMethod = 2;
+                this.copyAbwScheme(line, scheme);
+            }
+        }
+        this.m.lines.push(line);
         this.loadCrates();
     }
 
@@ -505,6 +521,10 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
 
     /** Pricing terms are chosen for this sale; no buyer's previous pricing is copied. */
     async onMethod(l: any): Promise<void> {
+        if (l.priceMethod === 2 && this.m.abwSchemeId) {
+            const scheme = this.abwSchemes.find((s) => s.id === this.m.abwSchemeId);
+            if (scheme) this.copyAbwScheme(l, scheme);
+        }
         this.applyFormula(l);
     }
 
