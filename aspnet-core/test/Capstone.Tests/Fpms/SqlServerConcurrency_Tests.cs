@@ -222,6 +222,62 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
     }
 
     [SqlServerFact]
+    public async Task Cycle_close_and_batch_reopen_are_serialized()
+    {
+        var harvestInput = NewHarvest(null, 100);
+        harvestInput.HarvestType = HarvestType.Total;
+        harvestInput.PondEmptiedConfirmed = true;
+        var harvest = await Resolve<HarvestAppService>().Create(harvestInput);
+        await Resolve<SaleAppService>().Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today,
+            Lines = new() { new() { HarvestGradeLineId = harvest.GradeLines.Single().Id, Kg = 100, PricePerKg = 200 } },
+        });
+
+        var batches = Resolve<BatchAppService>();
+        var batchId = BatchId(CurrentBatch);
+        await batches.Close(new CloseBatchInput { Id = BatchId(ReferenceBatch), ConfirmReadOnly = true });
+        await batches.Close(new CloseBatchInput { Id = batchId, ConfirmReadOnly = true });
+
+        var cycles = Resolve<CycleAppService>();
+        var cycleId = CycleId("C-2026-01");
+        var cycle = await cycles.Get(cycleId);
+        var batch = await batches.Get(batchId);
+        var results = await AtOnce(2, async i =>
+        {
+            if (i == 0)
+            {
+                await cycles.Close(new CloseCycleInput { Id = cycleId, Outcome = CycleOutcome.Completed, RowVersion = cycle.RowVersion });
+                return "cycle-closed";
+            }
+
+            await batches.Reopen(new ReopenInput { Id = batchId, RowVersion = batch.RowVersion, Reason = "Correcting the batch closure" });
+            return "batch-reopened";
+        });
+
+        results.Count(r => r.Error == null).ShouldBe(1);
+        var afterCycle = await cycles.Get(cycleId);
+        var afterBatch = await batches.Get(batchId);
+        if (afterCycle.Status == CycleStatus.Closed)
+        {
+            results.ShouldContain(r => r.Value == "cycle-closed" && r.Error == null);
+            results.ShouldContain(r => r.Value == null && r.Error != null);
+            afterBatch.Status.ShouldBe(BatchStatus.Closed);
+        }
+        else
+        {
+            afterCycle.Status.ShouldBe(CycleStatus.Active);
+            afterBatch.Status.ShouldBe(BatchStatus.Harvested);
+            results.ShouldContain(r => r.Value == "batch-reopened" && r.Error == null);
+            results.ShouldContain(r => r.Value == null && r.Error != null);
+            await Should.ThrowAsync<UserFriendlyException>(() => cycles.Close(new CloseCycleInput
+            {
+                Id = cycleId, Outcome = CycleOutcome.Completed, RowVersion = afterCycle.RowVersion,
+            }));
+        }
+    }
+
+    [SqlServerFact]
     public async Task Sales_saved_at_the_same_moment_get_different_receipt_numbers_and_never_oversell()
     {
         var harvest = await Resolve<HarvestAppService>().Create(NewHarvest(null, 100));
