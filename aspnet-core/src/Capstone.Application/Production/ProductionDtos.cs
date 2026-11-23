@@ -14,6 +14,7 @@ public class IndicatorsDto
     public decimal? CurrentAbwG { get; set; }
     public decimal? LatestSampleAbwG { get; set; }
     public long CumulativeMortality { get; set; }
+    public decimal? CumulativeMortalityPct { get; set; }
     public decimal HarvestedPieces { get; set; }
     public decimal TotalHarvestKg { get; set; }
     public decimal? EstimatedPopulation { get; set; }
@@ -70,6 +71,7 @@ public class IndicatorsDto
         CurrentAbwG = i.CurrentAbwG,
         LatestSampleAbwG = i.LatestAbwG,
         CumulativeMortality = i.CumulativeMortality,
+        CumulativeMortalityPct = i.CumulativeMortalityPct,
         HarvestedPieces = i.HarvestedPieces,
         TotalHarvestKg = i.TotalHarvestKg,
         EstimatedPopulation = i.EstimatedPopulation,
