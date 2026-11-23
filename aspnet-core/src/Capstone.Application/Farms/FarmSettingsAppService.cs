@@ -63,8 +63,10 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
         var schemes = input.BaseAbwPricingSchemes ?? new List<BaseAbwPricingSchemeDto>();
         if (schemes.Count > 20) throw new UserFriendlyException("A farm can configure up to 20 Base ABW pricing schemes.");
         if (schemes.Any(x => x.Id == Guid.Empty || string.IsNullOrWhiteSpace(x.Name) || x.Name.Trim().Length > 60
-            || x.BasePricePerKg < 0 || x.BaseAbwG < 0.01m || x.BaseAbwG > 60 || x.StepPerG < 0))
-            throw new UserFriendlyException("Check each Base ABW scheme: enter a name, a non-negative base price and adjustment, and a base ABW from 0.01 to 60 g.");
+            || x.BasePricePerKg < 0 || x.BasePricePerKg > 100000000m || x.BasePricePerKg != Math.Round(x.BasePricePerKg, 2)
+            || x.BaseAbwG < 0.01m || x.BaseAbwG > 60 || x.BaseAbwG != Math.Round(x.BaseAbwG, 2)
+            || x.StepPerG < 0 || x.StepPerG > 1000000m || x.StepPerG != Math.Round(x.StepPerG, 2)))
+            throw new UserFriendlyException("Check each Base ABW scheme: prices and adjustments must be 0 to 2 decimal places, and the base ABW must be 0.01 to 60 g with 2 decimal places at most.");
         if (schemes.Select(x => x.Id).Distinct().Count() != schemes.Count
             || schemes.Select(x => x.Name.Trim()).Distinct(StringComparer.OrdinalIgnoreCase).Count() != schemes.Count)
             throw new UserFriendlyException("Base ABW scheme IDs and names must be unique.");
