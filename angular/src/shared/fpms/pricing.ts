@@ -5,7 +5,10 @@
  * 1 Fixed · 2 Base ABW (base price at a base ABW + step per gram) · 3 Base count (base price at a base count + step per
  * piece fewer) · 4 Price table (the row covering the count).
  */
-export const PRICE_METHODS = [\n    { value: 1, label: 'Fixed price' },\n    { value: 2, label: 'Base ABW pricing' },\n];
+export const PRICE_METHODS = [
+    { value: 1, label: 'Fixed price' },
+    { value: 2, label: 'Base ABW pricing' },
+];
 
 const money = (v: number) => Math.round(v * 100) / 100;
 
