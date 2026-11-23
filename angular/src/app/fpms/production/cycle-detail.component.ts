@@ -12,7 +12,7 @@ import { batchShort } from '@shared/fpms/labels';
         <fpms-page-header [title]="'Cycle ' + (c?.cycleCode ?? '')" [subtitle]="c ? (c.startDate ? 'Started ' + (c.startDate | farmDate) + '. ' : '') + 'Holds the batches stocked from fry delivery ' + c.hatcheryBatchNumber + '.' : ''" backLink="/app/production/cycles" backLabel="Production cycles">
             @if (c) {
                 <fpms-badge [text]="c.status | label: L.CycleStatuses"></fpms-badge>
-                @if (c.outcome) { <span class="badge ml-1" [class.badge-success]="c.outcome === 1" [class.badge-danger]="c.outcome === 2">{{ c.outcome | label: L.CycleOutcomes }}</span> }
+                @if (c.outcome) { <span class="badge ml-1" [class.badge-success]="c.outcome === 1" [class.badge-warning]="c.outcome === 2">{{ c.outcome | label: L.CycleOutcomes }}</span> }
                 @if (c.canCreateBatch) {
                     <a class="btn btn-primary" routerLink="/app/production/create-batch" [queryParams]="{ cycleId: c.id }"><i class="fas fa-shrimp mr-1"></i>Add batch to this cycle</a>
                 }
@@ -57,7 +57,7 @@ import { batchShort } from '@shared/fpms/labels';
                                         </div>
                                     }
                                     <small class="form-text text-muted">
-                                        Pre-selected as {{ c.suggestedOutcome | label: L.CycleOutcomes }}{{ c.suggestedOutcome === 2 ? ' because every batch failed' : '' }}. Change it if that is not right.
+                                        Pre-selected as {{ c.suggestedOutcome | label: L.CycleOutcomes }}{{ c.suggestedOutcome === 2 ? ' because every batch has a historical incident record' : '' }}. Change it if that is not right.
                                     </small>
                                 </div>
                                 <div class="custom-control custom-checkbox">
@@ -84,7 +84,7 @@ import { batchShort } from '@shared/fpms/labels';
                                 @if (c.status === 4) {
                                     <li><i class="fas fa-lock" aria-hidden="true"></i><span>Closed {{ c.closedAtUtc | farmDateTime }} by {{ c.closedBy }} as <strong>{{ c.outcome | label: L.CycleOutcomes }}</strong>. Its records are read-only; sales and payments can still be updated.</span></li>
                                 } @else {
-                                    <li><i class="fas fa-info-circle" aria-hidden="true"></i><span>To close the cycle, close every batch first (each batch must be Harvested or Failed).</span></li>
+                                    <li><i class="fas fa-info-circle" aria-hidden="true"></i><span>To close the cycle, close every batch first (each batch must be Harvested).</span></li>
                                 }
                             </ul>
                         }
