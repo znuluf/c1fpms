@@ -3,7 +3,7 @@ import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { FPMS_IMPORTS } from '../shared-imports';
-import { PRICE_METHODS, countFromAbw, num, pricingBody, referencePrice, termsEmpty } from '@shared/fpms/pricing';
+import { PRICE_METHODS, countFromAbw, num, pricingBody, referencePrice } from '@shared/fpms/pricing';
 import { PriceTermsComponent, SalePaymentComponent, initialPaymentOf } from '@shared/fpms/pricing-ui';
 import { whereItWent, WhereRow } from '@shared/fpms/crates';
 import { DisposalReasons } from '@shared/fpms/labels';
@@ -497,7 +497,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                 <div class="form-group">
                                                     <label for="absale">Farm pricing scheme</label>
                                                     <select id="absale" class="form-control" name="saleAbwScheme" [(ngModel)]="m.sale.abwSchemeId" (ngModelChange)="applyAbwScheme($event)">
-                                                        <option value="">Custom terms</option>
+                                                        <option value="">Choose a scheme or enter custom terms</option>
                                                         @for (s of abwSchemes; track s.id) { <option [value]="s.id">{{ s.name }} · base {{ s.baseAbwG }}g</option> }
                                                     </select>
                                                 </div>
@@ -1056,10 +1056,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     }
 
     onSaleMethod(): void {
-        const s = this.m.sale;
-        if (s.priceMethod === 2 && termsEmpty(s) && this.abwSchemes.length) {
-            this.applyAbwScheme(this.abwSchemes[0].id);
-        }
+        // Pricing is selected for this sale, not inherited from the buyer or another transaction.
         this.applySaleFormula();
     }
 
