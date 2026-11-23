@@ -70,7 +70,17 @@ public class Indicator_Tests : FpmsTestBase
         optedOut.BiomassAbwSource.ShouldBe("Sample");
         optedOut.EstimatedBiomassKg.ShouldBe(990m);
 
+        // A later partial harvest where staff opt out must not erase the earlier opted-in biomass basis.
         facts.Harvests[0].UseHarvestAbwForBiomass = true;
+        facts.Harvests.Add(new HarvestFact
+        {
+            Id = Guid.NewGuid(), Date = new DateOnly(2026, 6, 12), HarvestedAtUtc = sampleAt.AddDays(2),
+            IsPartial = true, AbwG = 13m, FinalCount = 500, UseHarvestAbwForBiomass = false,
+        });
+        var laterOptOut = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 12));
+        laterOptOut.BiomassAbwG.ShouldBe(12m);
+        laterOptOut.BiomassAbwSource.ShouldBe("Harvest");
+
         facts.GrowthSamples.Add(new GrowthSampleFact
         {
             LogId = Guid.NewGuid(), Date = new DateOnly(2026, 6, 12), ObservedAtUtc = sampleAt.AddDays(2), AbwG = 11m,
