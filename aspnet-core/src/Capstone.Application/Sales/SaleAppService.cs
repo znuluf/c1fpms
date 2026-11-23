@@ -360,6 +360,7 @@ public class SaleAppService : CapstoneAppServiceBase
     private readonly IRepository<SalePayment, Guid> _payments;
     private readonly IRepository<HarvestGradeLine, Guid> _gradeLines;
     private readonly IRepository<Harvest, Guid> _harvests;
+    private readonly IRepository<PondBatch, Guid> _batches;
     private readonly IRepository<Buyer, Guid> _buyers;
     private readonly IRepository<ComplianceDocument, Guid> _documents;
     private readonly INumberSequenceGenerator _sequences;
@@ -368,7 +369,7 @@ public class SaleAppService : CapstoneAppServiceBase
     private readonly IRepository<HarvestCrate, Guid> _crates;
 
     public SaleAppService(IRepository<Sale, Guid> sales, IRepository<SaleLine, Guid> lines, IRepository<SalePayment, Guid> payments,
-        IRepository<HarvestGradeLine, Guid> gradeLines, IRepository<Harvest, Guid> harvests, IRepository<Buyer, Guid> buyers,
+        IRepository<HarvestGradeLine, Guid> gradeLines, IRepository<Harvest, Guid> harvests, IRepository<PondBatch, Guid> batches, IRepository<Buyer, Guid> buyers,
         IRepository<ComplianceDocument, Guid> documents, INumberSequenceGenerator sequences, FarmStandardsProvider standards, IRepository<PriceTable, Guid> priceTables,
         IRepository<HarvestCrate, Guid> crates)
     {
@@ -377,6 +378,7 @@ public class SaleAppService : CapstoneAppServiceBase
         _payments = payments;
         _gradeLines = gradeLines;
         _harvests = harvests;
+        _batches = batches;
         _crates = crates;
         _buyers = buyers;
         _documents = documents;
@@ -586,6 +588,12 @@ public class SaleAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("Sale id is required.");
         }
 
+        // Serialize corrections and voids of this sale before reading its current line set.
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Sale, input.Id.Value);
+        }
+
         var sale = await _sales.GetAll().Include(s => s.Lines).Include(s => s.Payments).FirstOrDefaultAsync(s => s.Id == input.Id.Value)
                    ?? throw new UserFriendlyException("Sale not found.");
         Production.Concurrency.Check(sale.RowVersion, input.RowVersion);
@@ -626,7 +634,17 @@ public class SaleAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.Production_Manage)]
     public virtual async Task Void(VoidSaleInput input)
     {
-        var sale = await _sales.GetAsync(input.Id);
+        // Lock order is Sale -> Harvest (ascending id) -> Batch (ascending id), matching corrections.
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Sale, input.Id);
+        }
+
+        var sale = await _sales.GetAll().Include(s => s.Lines).FirstOrDefaultAsync(s => s.Id == input.Id)
+                   ?? throw new UserFriendlyException("Sale not found.");
+        var gradeLineIds = sale.Lines.Select(l => l.HarvestGradeLineId).Distinct().ToList();
+        var harvestIds = await _gradeLines.GetAll().Where(g => gradeLineIds.Contains(g.Id)).Select(g => g.HarvestId).Distinct().ToListAsync();
+        await LockHarvestsAndEnsureBatchesOpenAsync(harvestIds);
         sale.VoidReason = input.Reason.Trim();
         // Its crates are free for another sale again (DEC-86).
         foreach (var crate in await _crates.GetAll().Where(c => c.SaleId == sale.Id).ToListAsync())
@@ -655,6 +673,56 @@ public class SaleAppService : CapstoneAppServiceBase
         {
             throw new UserFriendlyException("A payment cannot be dated before the sale date.");
         }
+    }
+
+    /// <summary>
+    /// Serializes sale accounting with harvest corrections and batch closure. Every path takes harvest locks first
+    /// (ascending id), then batch locks (ascending id), matching HarvestAppService and RecordDisposal.
+    /// </summary>
+    private async Task<Dictionary<Guid, Harvest>> LockHarvestsAndEnsureBatchesOpenAsync(IEnumerable<Guid> sourceIds)
+    {
+        var harvestIds = sourceIds.Distinct().OrderBy(id => id).ToList();
+        if (harvestIds.Count == 0)
+        {
+            throw new UserFriendlyException("A sale must contain at least one harvest grade.");
+        }
+
+        if (RowLocker != null)
+        {
+            foreach (var id in harvestIds)
+            {
+                await RowLocker.LockAsync(RowLockTarget.Harvest, id);
+            }
+        }
+
+        var harvests = await _harvests.GetAll().Include(h => h.Disposals).Include(h => h.GradeLines)
+            .Where(h => harvestIds.Contains(h.Id)).ToDictionaryAsync(h => h.Id);
+        if (harvests.Count != harvestIds.Count)
+        {
+            throw new UserFriendlyException("Choose harvest grades of this farm for every line.");
+        }
+
+        var batchIds = harvests.Values.Select(h => h.BatchId).Distinct().OrderBy(id => id).ToList();
+        if (RowLocker != null)
+        {
+            foreach (var id in batchIds)
+            {
+                await RowLocker.LockAsync(RowLockTarget.Batch, id);
+            }
+        }
+
+        var batches = await _batches.GetAll().Where(b => batchIds.Contains(b.Id)).ToDictionaryAsync(b => b.Id);
+        foreach (var id in batchIds)
+        {
+            if (!batches.TryGetValue(id, out var batch))
+            {
+                throw new UserFriendlyException("A batch for this harvest could not be found.");
+            }
+
+            batch.EnsureNotClosed();
+        }
+
+        return harvests;
     }
 
     private async Task<List<WarningDto>> ApplyAsync(Sale sale, SaveSaleInput input, bool isNew)
@@ -697,17 +765,8 @@ public class SaleAppService : CapstoneAppServiceBase
 
         var harvestIds = gradeLines.Select(g => g.HarvestId).Distinct().ToList();
 
-        // DEC-134: sales and corrections of the same harvest run one at a time, so two sales at once cannot both pass the
-        // kilograms-left check below. Locked in id order, so two sales of the same harvests never wait on each other.
-        if (RowLocker != null)
-        {
-            foreach (var id in harvestIds.OrderBy(x => x))
-            {
-                await RowLocker.LockAsync(RowLockTarget.Harvest, id);
-            }
-        }
-
-        var harvests = await _harvests.GetAll().Include(h => h.Disposals).Include(h => h.GradeLines).Where(h => harvestIds.Contains(h.Id)).ToDictionaryAsync(h => h.Id);
+        // Serialize against other sales, harvest corrections, dispositions and batch closure.
+        var harvests = await LockHarvestsAndEnsureBatchesOpenAsync(harvestIds);
         var exceptSale = isNew ? (Guid?)null : sale.Id;
         var soldElsewhere = await SoldByGradeLineAsync(harvests.Values.SelectMany(h => h.GradeLines).Select(g => g.Id).ToList(), exceptSale);
         var diffPct = await _standards.GetAsync(FarmThresholds.BuyerWeightDiffPct);
