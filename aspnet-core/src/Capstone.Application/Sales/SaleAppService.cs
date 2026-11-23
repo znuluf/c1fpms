@@ -767,6 +767,15 @@ public class SaleAppService : CapstoneAppServiceBase
 
         // Serialize against other sales, harvest corrections, dispositions and batch closure.
         var harvests = await LockHarvestsAndEnsureBatchesOpenAsync(harvestIds);
+
+        // A harvest correction may have replaced its grade rows while this request was waiting for the harvest lock.
+        // Re-read them under that lock; never save a sale against a grade line that has since been replaced.
+        gradeLines = await _gradeLines.GetAll().Include(g => g.SizeGrade).Where(g => gradeIds.Contains(g.Id)).ToListAsync();
+        if (gradeLines.Count != gradeIds.Count)
+        {
+            throw new UserFriendlyException("One or more selected harvest grades changed while this sale was being saved. Reload the sale form and try again.");
+        }
+
         var exceptSale = isNew ? (Guid?)null : sale.Id;
         var soldElsewhere = await SoldByGradeLineAsync(harvests.Values.SelectMany(h => h.GradeLines).Select(g => g.Id).ToList(), exceptSale);
         var diffPct = await _standards.GetAsync(FarmThresholds.BuyerWeightDiffPct);
