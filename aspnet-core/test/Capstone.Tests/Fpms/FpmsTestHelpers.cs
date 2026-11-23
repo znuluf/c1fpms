@@ -1,4 +1,5 @@
 using Capstone.EntityFrameworkCore;
+using Capstone.Production;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -32,6 +33,22 @@ public abstract class FpmsTestBase : CapstoneTestBase
     protected Guid DeliveryId(string batchNumber) => Q(c => c.FryDeliveries.IgnoreQueryFilters().Single(d => d.HatcheryBatchNumber == batchNumber).Id);
 
     protected Guid BatchId(string code) => Q(c => c.PondBatches.IgnoreQueryFilters().Single(b => b.BatchCode == code).Id);
+
+    /// <summary>Seeds a pre-existing legacy failure row for compatibility tests; the public API no longer creates these.</summary>
+    protected void AddLegacyFailure(Guid batchId, DateOnly failedOn, string reason, decimal? estimatedLossPhp = null)
+    {
+        var tenantId = GetTenantId(PilotFarm);
+        UsingDbContext(null, c =>
+        {
+            var failure = new BatchFailure
+            {
+                Id = Guid.NewGuid(), TenantId = tenantId, BatchId = batchId, FailedOn = failedOn,
+                Reason = reason, EstimatedLossPhp = estimatedLossPhp,
+            };
+            c.BatchFailures.Add(failure);
+            return failure.Id;
+        });
+    }
 
     protected Guid CycleId(string code) => Q(c => c.ProductionCycles.IgnoreQueryFilters().Single(b => b.CycleCode == code).Id);
 
