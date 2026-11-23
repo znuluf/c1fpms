@@ -179,6 +179,26 @@ public class HarvestTally_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task Correcting_a_final_harvest_to_partial_returns_the_batch_to_stocked()
+    {
+        var harvests = Resolve<HarvestAppService>();
+        var input = TallySheet();
+        input.HarvestType = HarvestType.Total;
+        input.PondEmptiedConfirmed = true;
+        var saved = await harvests.Create(input);
+
+        input.Id = saved.Id;
+        input.RowVersion = saved.RowVersion;
+        input.HarvestType = HarvestType.Partial;
+        input.PondEmptiedConfirmed = false;
+        var corrected = await harvests.Update(input);
+
+        corrected.HarvestType.ShouldBe(HarvestType.Partial);
+        Q(c => c.PondBatches.IgnoreQueryFilters().Where(b => b.Id == input.BatchId).Select(b => b.Status).Single())
+            .ShouldBe(BatchStatus.Stocked);
+    }
+
+    [Fact]
     public async Task Emergency_harvest_with_no_shrimp_left_completes_the_batch_without_a_failure_status()
     {
         var input = TallySheet();
