@@ -132,8 +132,8 @@ public class PondBatch : FarmEntity
 
     /// <summary>
     /// Which new log types the batch status allows (spec Section 5 lifecycle guards): Stocked takes every operational log;
-    /// Harvested and Failed take corrections and notes until Close Batch. Feeding is recorded as feeding sessions,
-    /// preparation on the pond, and post-production logging was removed.
+    /// Harvested takes corrections and notes until Close Batch; Failed does so only when backed by a historical incident record.
+    /// Feeding is recorded as feeding sessions, preparation on the pond, and post-production logging was removed.
     /// </summary>
     public bool AllowsNewLog(LogType type, bool hasLegacyIncident = false) =>
         type is not (LogType.PondPreparation or LogType.Feeding or LogType.PostProduction)
