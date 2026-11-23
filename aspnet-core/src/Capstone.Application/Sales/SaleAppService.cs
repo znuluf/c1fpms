@@ -509,10 +509,6 @@ public class SaleAppService : CapstoneAppServiceBase
             .ToList();
     }
 
-    /// <summary>
-    /// The buyer's pricing from their latest priced (non-fixed) sale line; when there is none, their active price table;
-    /// else null. Prefills a new sale; every value stays editable (DEC-80, DEC-82).
-    /// </summary>
     /// <summary>Active farm-configured Base ABW presets available to staff recording a sale.</summary>
     public virtual async Task<List<BaseAbwPricingSchemeDto>> GetBaseAbwPricingSchemes()
     {
@@ -528,6 +524,10 @@ public class SaleAppService : CapstoneAppServiceBase
         }
     }
 
+    /// <summary>
+    /// The buyer's pricing from their latest priced (non-fixed) sale line; when there is none, their active price table;
+    /// else null. Prefills a new sale; every value stays editable (DEC-80, DEC-82).
+    /// </summary>
     public virtual async Task<BuyerPriceTermsDto> GetBuyerPriceTerms(Guid buyerId)
     {
         var last = await (from l in _lines.GetAll().AsNoTracking()
