@@ -5,7 +5,7 @@
  * 1 Fixed · 2 Base ABW (base price at a base ABW + step per gram) · 3 Base count (base price at a base count + step per
  * piece fewer) · 4 Price table (the row covering the count).
  */
-export const PRICE_METHODS = [{ value: 1, label: 'Fixed price' }];
+export const PRICE_METHODS = [\n    { value: 1, label: 'Fixed price' },\n    { value: 2, label: 'Base ABW pricing' },\n];
 
 const money = (v: number) => Math.round(v * 100) / 100;
 
@@ -69,14 +69,15 @@ export function referencePrice(t: any, abwG: number | null, countPerKg: number |
 }
 
 /** The fields to send for a method; the others are sent empty. */
-export function pricingBody(_t: any): any {
-    // New sales use one fixed price per kilogram. Legacy ABW/count/table terms are not sent.
+export function pricingBody(t: any): any {
+    const method = Number(t.priceMethod ?? 1);
+    const isBaseAbw = method === 2;
     return {
-        priceMethod: 1,
-        basePricePerKg: null,
-        baseAbwG: null,
-        stepPerG: null,
-        priceAbwG: null,
+        priceMethod: isBaseAbw ? 2 : 1,
+        basePricePerKg: isBaseAbw ? num(t.basePricePerKg) : null,
+        baseAbwG: isBaseAbw ? num(t.baseAbwG) : null,
+        stepPerG: isBaseAbw ? num(t.stepPerG) : null,
+        priceAbwG: isBaseAbw ? num(t.priceAbwG) : null,
         baseCountPerKg: null,
         stepPerCount: null,
         priceCountPerKg: null,
