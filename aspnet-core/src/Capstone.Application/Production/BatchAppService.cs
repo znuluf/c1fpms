@@ -481,6 +481,12 @@ public class BatchAppService : CapstoneAppServiceBase
     {
         var batch = await _batches.GetAsync(input.Id);
         Concurrency.Check(batch.RowVersion, input.RowVersion);
+        var failure = await _failures.FirstOrDefaultAsync(f => f.BatchId == batch.Id);
+        if (batch.Status == BatchStatus.Failed && failure == null)
+        {
+            throw new UserFriendlyException("This batch has a legacy incident status but no historical incident record. Contact an administrator before closing it.");
+        }
+
         if (batch.Status is not (BatchStatus.Harvested or BatchStatus.Failed))
         {
             throw new UserFriendlyException("Only a Harvested batch or a batch with a legacy incident record can be closed.");
@@ -502,7 +508,6 @@ public class BatchAppService : CapstoneAppServiceBase
 
         var facts = await _loader.LoadAsync(batch.Id, await Farm.GetTimeZoneAsync());
         var ind = IndicatorCalculator.Compute(facts, await Farm.GetTodayAsync());
-        var failure = await _failures.FirstOrDefaultAsync(f => f.BatchId == batch.Id);
         batch.FinalAbwG = ind.FinalAbwG;
         batch.FinalFcr = ind.FinalFcr;
         batch.SurvivalRatePct = ind.SurvivalRatePct ?? (facts.PlCountStocked > 0 ? 0m : null);
