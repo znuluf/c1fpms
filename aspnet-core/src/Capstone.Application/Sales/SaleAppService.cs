@@ -7,6 +7,8 @@ using Capstone.Common;
 using Capstone.Production.Dto;
 using Capstone.Compliance;
 using Capstone.Domain;
+using Capstone.Farms;
+using System.Text.Json;
 using Capstone.Harvests;
 using Capstone.Production;
 using Capstone.ReferenceData;
@@ -511,6 +513,21 @@ public class SaleAppService : CapstoneAppServiceBase
     /// The buyer's pricing from their latest priced (non-fixed) sale line; when there is none, their active price table;
     /// else null. Prefills a new sale; every value stays editable (DEC-80, DEC-82).
     /// </summary>
+    /// <summary>Active farm-configured Base ABW presets available to staff recording a sale.</summary>
+    public virtual async Task<List<BaseAbwPricingSchemeDto>> GetBaseAbwPricingSchemes()
+    {
+        var settings = await Farm.GetSettingsAsync();
+        try
+        {
+            return (JsonSerializer.Deserialize<List<BaseAbwPricingSchemeDto>>(settings.BaseAbwPricingSchemesJson ?? "[]") ?? new())
+                .Where(x => x.IsActive).ToList();
+        }
+        catch (JsonException)
+        {
+            return new List<BaseAbwPricingSchemeDto>();
+        }
+    }
+
     public virtual async Task<BuyerPriceTermsDto> GetBuyerPriceTerms(Guid buyerId)
     {
         var last = await (from l in _lines.GetAll().AsNoTracking()
