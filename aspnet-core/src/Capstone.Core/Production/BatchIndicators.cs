@@ -257,10 +257,9 @@ public static class IndicatorCalculator
 
         // Biomass ABW is a separate choice from the latest-event ABW shown in the headline.
         // A partial-harvest ABW is used only when staff opted in, and only until a newer growth sample.
-        var latestPartialWithAbw = harvests.LastOrDefault(h => h.IsPartial && h.AbwG.HasValue);
-        var useHarvestAbw = latestPartialWithAbw != null
-            && latestPartialWithAbw.UseHarvestAbwForBiomass
-            && (latestSample == null || latestPartialWithAbw.HarvestedAtUtc > latestSample.ObservedAtUtc);
+        var latestOptedInPartialWithAbw = harvests.LastOrDefault(h => h.IsPartial && h.AbwG.HasValue && h.UseHarvestAbwForBiomass);
+        var useHarvestAbw = latestOptedInPartialWithAbw != null
+            && (latestSample == null || latestOptedInPartialWithAbw.HarvestedAtUtc > latestSample.ObservedAtUtc);
         if (useHarvestAbw)
         {
             result.BiomassAbwG = latestPartialWithAbw.AbwG;
