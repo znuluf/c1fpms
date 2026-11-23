@@ -596,6 +596,13 @@ public class HarvestAppService : CapstoneAppServiceBase
             .FirstOrDefaultAsync(h => h.Id == input.HarvestId)
             ?? throw new UserFriendlyException("Harvest not found.");
 
+        // Match harvest corrections and sales: hold the harvest lock before the batch lock so Close cannot
+        // pass its accounting check while a disposition is being recorded.
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, harvest.BatchId);
+        }
+
         var batch = await _batches.GetAsync(harvest.BatchId);
         batch.EnsureNotClosed();
         if (harvest.CreatorUserId != AbpSession.UserId && !await IsGrantedAsync(PermissionNames.Harvests_EditAny))
