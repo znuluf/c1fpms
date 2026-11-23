@@ -3,7 +3,7 @@ import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { FPMS_IMPORTS } from '../shared-imports';
-import { PRICE_METHODS, applyTerms, countFromAbw, num, pricingBody, referencePrice, termsEmpty } from '@shared/fpms/pricing';
+import { PRICE_METHODS, countFromAbw, num, pricingBody, referencePrice, termsEmpty } from '@shared/fpms/pricing';
 import { PriceTermsComponent, SalePaymentComponent, initialPaymentOf } from '@shared/fpms/pricing-ui';
 import { whereItWent, WhereRow } from '@shared/fpms/crates';
 import { DisposalReasons } from '@shared/fpms/labels';
@@ -493,6 +493,15 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     @if (m.sell) {
                                         <div class="card-body">
                                             <p class="small text-muted">@if (showGrades()) { All {{ sellKg() | num: 3 }} kg are sold to this buyer at one price{{ gradeKg() > 0 ? ', on every grade line' : ' as "Ungraded / mixed"' }}. Splitting between buyers or grades at different prices: save the harvest alone, then record each sale. } @else { All {{ sellKg() | num: 3 }} kg are sold to this buyer at one price. Splitting between buyers at different prices: save the harvest alone, then record each sale. }</p>
+                                            @if (m.sale.priceMethod === 2 && abwSchemes.length) {
+                                                <div class="form-group">
+                                                    <label for="absale">Farm pricing scheme</label>
+                                                    <select id="absale" class="form-control" name="saleAbwScheme" [(ngModel)]="m.sale.abwSchemeId" (ngModelChange)="applyAbwScheme($event)">
+                                                        <option value="">Custom terms</option>
+                                                        @for (s of abwSchemes; track s.id) { <option [value]="s.id">{{ s.name }} · base {{ s.baseAbwG }}g</option> }
+                                                    </select>
+                                                </div>
+                                            }
                                             <div class="form-row">
                                                 <div class="form-group col-md-4">
                                                     <label for="spm">Price</label>
@@ -634,6 +643,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
         this.containers = (await this.api.get<any[]>('ContainerType', 'GetAll')).filter((t) => t.isActive);
         this.buyers = await this.api.get<any[]>('TallySheet', 'GetBuyerOptions');
         this.tables = this.can('Farm.Sales') ? (await this.api.get<any[]>('PriceTable', 'GetAll')).filter((t) => t.isActive) : [];
+        this.abwSchemes = this.can('Farm.Sales') ? await this.api.get<any[]>('Sale', 'GetBaseAbwPricingSchemes') : [];
         this.resetBulk();
         if (this.isNew) {
             const all = await this.api.get<any[]>('Batch', 'GetAll', { openOnly: true });
@@ -972,16 +982,15 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     }
     /** Active price tables (DEC-82), loaded only for users who can sell. */
     tables: any[] = [];
+    /** Active farm-level Base ABW presets, selected for this sale rather than inherited from a buyer. */
+    abwSchemes: any[] = [];
 
     blankSale(): any {
         return {
-            priceMethod: 1, pricePerKg: null, basePricePerKg: null, baseAbwG: null, stepPerG: null, baseCountPerKg: null, stepPerCount: null, priceTableId: '',
+            priceMethod: 1, pricePerKg: null, basePricePerKg: null, baseAbwG: null, stepPerG: null, priceAbwG: null, baseCountPerKg: null, stepPerCount: null, priceTableId: '',
             paymentTerms: '', dueDate: '', paidNow: null, paidMethod: '', paidInFull: true,
         };
     }
-
-    /** Last terms of the buyer chosen on this form (from GetBuyerDefaults). */
-    private buyerPriceTerms: any = null;
 
     buyerName(): string {
         return this.buyers.find((b) => b.id === this.m.buyerId)?.name ?? 'the buyer';
@@ -1008,12 +1017,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
         if (!sale.paymentTerms && d?.paymentTerms) {
             sale.paymentTerms = d.paymentTerms;
         }
-        this.buyerPriceTerms = d?.priceTerms ?? null;
-        if (this.buyerPriceTerms && (sale.priceMethod === 1 || termsEmpty(sale)) && !(num(sale.pricePerKg) > 0)) {
-            sale.priceMethod = this.buyerPriceTerms.priceMethod;
-            applyTerms(sale, this.buyerPriceTerms);
-            this.applySaleFormula();
-        }
+        // Pricing is selected per sale from the farm's configured schemes, never inherited from buyer defaults.
         this.keepDraft();
     }
 
@@ -1053,12 +1057,21 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
 
     onSaleMethod(): void {
         const s = this.m.sale;
-        if (s.priceMethod > 1 && termsEmpty(s)) {
-            if (!applyTerms(s, this.buyerPriceTerms) && s.priceMethod === 4) {
-                const list = this.saleTables();
-                s.priceTableId = list.length && (list[0].buyerId === this.m.buyerId || list.length === 1) ? list[0].id : '';
-            }
+        if (s.priceMethod === 2 && termsEmpty(s) && this.abwSchemes.length) {
+            this.applyAbwScheme(this.abwSchemes[0].id);
         }
+        this.applySaleFormula();
+    }
+
+    applyAbwScheme(schemeId: string): void {
+        const scheme = this.abwSchemes.find((x) => x.id === schemeId);
+        if (!scheme) return;
+        Object.assign(this.m.sale, {
+            basePricePerKg: scheme.basePricePerKg,
+            baseAbwG: scheme.baseAbwG,
+            stepPerG: scheme.stepPerG,
+            priceAbwG: null,
+        });
         this.applySaleFormula();
     }
 
