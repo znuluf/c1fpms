@@ -28,6 +28,7 @@ public class FeedingAppService : CapstoneAppServiceBase
 {
     private readonly IRepository<FeedingSession, Guid> _sessions;
     private readonly IRepository<PondBatch, Guid> _batches;
+    private readonly IRepository<BatchFailure, Guid> _failures;
     private readonly IRepository<ProductionCycle, Guid> _cycles;
     private readonly IRepository<StockMovement, Guid> _movements;
     private readonly InventoryManager _inventory;
@@ -37,7 +38,7 @@ public class FeedingAppService : CapstoneAppServiceBase
     private readonly ReferenceData.FarmStandardsProvider _standards;
     private readonly IRepository<WaterQualityMeasurement, Guid> _measurements;
 
-    public FeedingAppService(IRepository<FeedingSession, Guid> sessions, IRepository<PondBatch, Guid> batches, IRepository<ProductionCycle, Guid> cycles,
+    public FeedingAppService(IRepository<FeedingSession, Guid> sessions, IRepository<PondBatch, Guid> batches, IRepository<BatchFailure, Guid> failures, IRepository<ProductionCycle, Guid> cycles,
         IRepository<StockMovement, Guid> movements, InventoryManager inventory, BatchDataLoader loader, DailyLogStatusService daily,
         IRepository<ProductionLog, Guid> logs, ReferenceData.FarmStandardsProvider standards, IRepository<WaterQualityMeasurement, Guid> measurements)
     {
@@ -47,6 +48,7 @@ public class FeedingAppService : CapstoneAppServiceBase
         _logs = logs;
         _sessions = sessions;
         _batches = batches;
+        _failures = failures;
         _cycles = cycles;
         _movements = movements;
         _inventory = inventory;
@@ -156,9 +158,20 @@ public class FeedingAppService : CapstoneAppServiceBase
             return new SaveFeedingResultDto { Session = (await MapAsync(new List<Guid> { duplicate.Id })).Single(), WasDuplicate = true };
         }
 
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, input.BatchId);
+        }
+
         var batch = await _batches.GetAll().Include(b => b.Pond).FirstOrDefaultAsync(b => b.Id == input.BatchId) ?? throw new UserFriendlyException("Batch not found.");
         batch.EnsureNotClosed();
-        if (!batch.AllowsFeeding)
+        var hasLegacyIncident = batch.Status == BatchStatus.Failed && await _failures.GetAll().AnyAsync(f => f.BatchId == batch.Id);
+        if (batch.Status == BatchStatus.Failed && !hasLegacyIncident)
+        {
+            throw new UserFriendlyException("This batch has a legacy incident status but no historical incident record. Contact an administrator before recording feeding.");
+        }
+
+        if (!batch.AllowsFeeding(hasLegacyIncident))
         {
             throw new UserFriendlyException($"Feeding cannot be recorded while the batch is {batch.Status}.");
         }
@@ -424,8 +437,18 @@ public class FeedingAppService : CapstoneAppServiceBase
     public virtual async Task Void(VoidInput input)
     {
         var session = await _sessions.FirstOrDefaultAsync(s => s.Id == input.Id) ?? throw new UserFriendlyException("Feeding not found.");
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, session.BatchId);
+        }
+
         var batch = await _batches.GetAsync(session.BatchId);
         batch.EnsureNotClosed();
+        if (batch.Status == BatchStatus.Failed && !await _failures.GetAll().AnyAsync(f => f.BatchId == batch.Id))
+        {
+            throw new UserFriendlyException("This batch has a legacy incident status but no historical incident record. Contact an administrator before changing feeding.");
+        }
+
         await _inventory.ReverseUsageForSessionAsync(session.Id, DateTime.UtcNow, $"Void of {FeedingSchedule.Label(session.Session).ToLowerInvariant()} of {session.FeedDate:yyyy-MM-dd}: {input.Reason.Trim()}");
         // Save the reason first: ABP reloads the entity when it turns a delete into a soft delete.
         session.VoidReason = input.Reason.Trim();

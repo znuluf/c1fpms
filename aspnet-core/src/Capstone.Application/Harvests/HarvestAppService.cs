@@ -320,6 +320,7 @@ public class HarvestAppService : CapstoneAppServiceBase
     private readonly HarvestLotCoder _lotCoder;
     private readonly IRepository<SizeGrade, Guid> _grades;
     private readonly IRepository<PondBatch, Guid> _batches;
+    private readonly IRepository<BatchFailure, Guid> _failures;
     private readonly IRepository<SaleLine, Guid> _saleLines;
     private readonly IRepository<Sale, Guid> _sales;
     private readonly TreatmentWithdrawal _withdrawal;
@@ -327,7 +328,7 @@ public class HarvestAppService : CapstoneAppServiceBase
     public HarvestAppService(IRepository<Harvest, Guid> harvests, IRepository<HarvestGradeLine, Guid> gradeLines, IRepository<HarvestDisposal, Guid> disposals,
         IRepository<SizeGrade, Guid> grades, IRepository<PondBatch, Guid> batches, IRepository<SaleLine, Guid> saleLines, IRepository<Sale, Guid> sales,
         TreatmentWithdrawal withdrawal, IRepository<HarvestCrate, Guid> crates, IRepository<ContainerType, Guid> containerTypes,
-        IRepository<Resources.Buyer, Guid> buyers, HarvestLotCoder lotCoder)
+        IRepository<Resources.Buyer, Guid> buyers, HarvestLotCoder lotCoder, IRepository<BatchFailure, Guid> failures)
     {
         _buyers = buyers;
         _lotCoder = lotCoder;
@@ -338,6 +339,7 @@ public class HarvestAppService : CapstoneAppServiceBase
         _disposals = disposals;
         _grades = grades;
         _batches = batches;
+        _failures = failures;
         _saleLines = saleLines;
         _sales = sales;
         _withdrawal = withdrawal;
@@ -481,20 +483,27 @@ public class HarvestAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.Harvests_Create)]
     public virtual async Task<HarvestDto> Create(SaveHarvestInput input)
     {
-        var batch = await _batches.FirstOrDefaultAsync(b => b.Id == input.BatchId) ?? throw new UserFriendlyException("Batch not found.");
-        batch.EnsureNotClosed();
-        if (batch.Status is not (BatchStatus.Stocked or BatchStatus.Failed))
-        {
-            throw new UserFriendlyException($"This batch is {batch.Status}; its Final harvest is already recorded.");
-        }
-
-        // A retried save (lost connection after the server saved) returns the harvest already saved (DEC-133), also when
-        // the first attempt is still saving (DEC-134).
+        // Idempotent retries return their saved harvest before checking the batch's current lifecycle state.
         await OneRequestAtATimeAsync("harvest", input.ClientRequestId);
         if (input.ClientRequestId.HasValue && await _harvests.GetAll().AnyAsync(x => x.ClientRequestId == input.ClientRequestId))
         {
             var existing = await _harvests.GetAll().Where(x => x.ClientRequestId == input.ClientRequestId).Select(x => x.Id).FirstAsync();
             return await Get(existing);
+        }
+
+        // Serialize all harvests for this batch. This makes the final-harvest check and status transition one atomic
+        // decision even when two staff members submit different requests at the same time.
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, input.BatchId);
+        }
+
+        var batch = await _batches.FirstOrDefaultAsync(b => b.Id == input.BatchId) ?? throw new UserFriendlyException("Batch not found.");
+        batch.EnsureNotClosed();
+        var hasLegacyIncident = await HasLegacyIncidentAsync(batch);
+        if (!batch.CanRecordHarvest(hasLegacyIncident))
+        {
+            throw new UserFriendlyException($"This batch is {batch.Status}; its Final harvest is already recorded.");
         }
 
         var harvest = new Harvest { Id = Guid.NewGuid(), BatchId = batch.Id, ClientRequestId = input.ClientRequestId };
@@ -523,8 +532,19 @@ public class HarvestAppService : CapstoneAppServiceBase
         var harvest = await _harvests.GetAll().Include(h => h.GradeLines).Include(h => h.Disposals).Include(h => h.Crates).FirstOrDefaultAsync(h => h.Id == input.Id.Value)
                       ?? throw new UserFriendlyException("Harvest not found.");
         Production.Concurrency.Check(harvest.RowVersion, input.RowVersion);
+        // Match Create's batch lock so a correction cannot race a new Final harvest.
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, harvest.BatchId);
+        }
+
         var batch = await _batches.GetAsync(harvest.BatchId);
         batch.EnsureNotClosed();
+        var hasLegacyIncident = await HasLegacyIncidentAsync(batch);
+        if (!batch.CanRecordHarvest(hasLegacyIncident) && batch.Status != BatchStatus.Harvested)
+        {
+            throw new UserFriendlyException($"This batch is {batch.Status} and cannot be corrected with another harvest.");
+        }
         if (harvest.CreatorUserId != AbpSession.UserId && !await IsGrantedAsync(PermissionNames.Harvests_EditAny))
         {
             throw new AbpAuthorizationException("You can only edit harvests you recorded.");
@@ -633,6 +653,21 @@ public class HarvestAppService : CapstoneAppServiceBase
                 HarvestId = h.Id, LotCode = h.LotCode, PondCode = h.PondCode, BatchCode = h.BatchCode,
                 UnaccountedKg = h.UnaccountedKg, FollowUpOn = h.FollowUpOn!.Value, HarvestedAtUtc = h.HarvestedAtUtc,
             }).ToList();
+    }
+
+    private async Task<bool> HasLegacyIncidentAsync(PondBatch batch)
+    {
+        if (batch.Status != BatchStatus.Failed)
+        {
+            return false;
+        }
+
+        if (!await _failures.GetAll().AnyAsync(f => f.BatchId == batch.Id))
+        {
+            throw new UserFriendlyException("This batch has a legacy incident status but no historical incident record. Contact an administrator before recording or correcting harvests.");
+        }
+
+        return true;
     }
 
     private IQueryable<Harvest> Query() => _harvests.GetAll().AsNoTracking()
@@ -974,16 +1009,9 @@ public class HarvestAppService : CapstoneAppServiceBase
             harvest.Crates.Add(c);
         }
 
-        // A harvest that empties the pond marks a Stocked batch Harvested; a Failed batch stays Failed (salvage). An Emergency
-        // harvest is never a failure (DEC-140): it ends the batch only when no shrimp are left.
-        if (emptiesPond && batch.Status == BatchStatus.Stocked)
-        {
-            batch.Status = BatchStatus.Harvested;
-        }
-        else if (wasFinal && !emptiesPond && batch.Status == BatchStatus.Harvested)
-        {
-            batch.Status = BatchStatus.Stocked;
-        }
+        // Emergency harvest is an event type, never a failure. Only whether shrimp remain determines whether
+        // the harvest ends a normal Stocked batch; the domain method also preserves legacy incident status.
+        batch.ApplyHarvestOutcome(emptiesPond, wasFinal);
 
         if (gradedKg > 0 && gradedKg < input.TotalKg && await Farm.GetUsesSizeGradingAsync())
         {

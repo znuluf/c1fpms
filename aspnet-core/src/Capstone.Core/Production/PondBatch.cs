@@ -109,17 +109,39 @@ public class PondBatch : FarmEntity
         }
     }
 
+    /// <summary>Only a stocked batch, or a batch backed by a historical incident record, can accept another harvest.</summary>
+    public bool CanRecordHarvest(bool hasLegacyIncident) =>
+        Status == BatchStatus.Stocked || (Status == BatchStatus.Failed && hasLegacyIncident);
+
+    /// <summary>Only a harvested batch, or a batch backed by a historical incident record, can be closed.</summary>
+    public bool CanClose(bool hasLegacyIncident) =>
+        Status == BatchStatus.Harvested || (Status == BatchStatus.Failed && hasLegacyIncident);
+
+    /// <summary>Apply the production-state effect of creating or correcting a harvest; legacy incident state is preserved.</summary>
+    public void ApplyHarvestOutcome(bool emptiesPond, bool wasFinal)
+    {
+        if (emptiesPond && Status == BatchStatus.Stocked)
+        {
+            Status = BatchStatus.Harvested;
+        }
+        else if (wasFinal && !emptiesPond && Status == BatchStatus.Harvested)
+        {
+            Status = BatchStatus.Stocked;
+        }
+    }
+
     /// <summary>
     /// Which new log types the batch status allows (spec Section 5 lifecycle guards): Stocked takes every operational log;
-    /// Harvested and Failed take corrections and notes until Close Batch. Feeding is recorded as feeding sessions,
-    /// preparation on the pond, and post-production logging was removed.
+    /// Harvested takes corrections and notes until Close Batch; Failed does so only when backed by a historical incident record.
+    /// Feeding is recorded as feeding sessions, preparation on the pond, and post-production logging was removed.
     /// </summary>
-    public bool AllowsNewLog(LogType type) =>
+    public bool AllowsNewLog(LogType type, bool hasLegacyIncident = false) =>
         type is not (LogType.PondPreparation or LogType.Feeding or LogType.PostProduction)
-        && Status is BatchStatus.Stocked or BatchStatus.Harvested or BatchStatus.Failed;
+        && (Status is BatchStatus.Stocked or BatchStatus.Harvested || (Status == BatchStatus.Failed && hasLegacyIncident));
 
     /// <summary>Feeding sessions follow the same rule as logs.</summary>
-    public bool AllowsFeeding => Status is BatchStatus.Stocked or BatchStatus.Harvested or BatchStatus.Failed;
+    public bool AllowsFeeding(bool hasLegacyIncident = false) =>
+        Status is BatchStatus.Stocked or BatchStatus.Harvested || (Status == BatchStatus.Failed && hasLegacyIncident);
 }
 
 /// <summary>Declare Batch Failure (Ref 7.4): one row per failed batch.</summary>

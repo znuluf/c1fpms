@@ -31,6 +31,7 @@ public class LogAppService : CapstoneAppServiceBase
 {
     private readonly IRepository<ProductionLog, Guid> _logs;
     private readonly IRepository<PondBatch, Guid> _batches;
+    private readonly IRepository<BatchFailure, Guid> _failures;
     private readonly IRepository<PondPreparationDetail, Guid> _prep;
     private readonly IRepository<GrowthSamplingDetail, Guid> _growth;
     private readonly IRepository<ChemicalApplicationDetail, Guid> _chemical;
@@ -48,6 +49,7 @@ public class LogAppService : CapstoneAppServiceBase
     public LogAppService(
         IRepository<ProductionLog, Guid> logs,
         IRepository<PondBatch, Guid> batches,
+        IRepository<BatchFailure, Guid> failures,
         IRepository<PondPreparationDetail, Guid> prep,
         IRepository<GrowthSamplingDetail, Guid> growth,
         IRepository<ChemicalApplicationDetail, Guid> chemical,
@@ -65,6 +67,7 @@ public class LogAppService : CapstoneAppServiceBase
         _standards = standards;
         _logs = logs;
         _batches = batches;
+        _failures = failures;
         _prep = prep;
         _growth = growth;
         _chemical = chemical;
@@ -237,8 +240,14 @@ public class LogAppService : CapstoneAppServiceBase
             return new SaveLogResultDto { Log = await Get(existing.Id), WasDuplicate = true };
         }
 
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, input.BatchId);
+        }
+
         var batch = await LoadBatchAsync(input.BatchId);
-        if (!batch.AllowsNewLog(input.LogType))
+        var hasLegacyIncident = await HasLegacyIncidentAsync(batch);
+        if (!batch.AllowsNewLog(input.LogType, hasLegacyIncident))
         {
             throw new UserFriendlyException(batch.Status == BatchStatus.Closed
                 ? FpmsErrors.ReadOnlyClosed
@@ -284,8 +293,14 @@ public class LogAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("The log type cannot be changed.");
         }
 
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, log.BatchId);
+        }
+
         var batch = await LoadBatchAsync(log.BatchId);
         batch.EnsureNotClosed();
+        await HasLegacyIncidentAsync(batch);
         if (log.CreatorUserId != AbpSession.UserId && !await CanEditAnyLogAsync())
         {
             throw new AbpAuthorizationException("You can only edit log entries you recorded.");
@@ -314,8 +329,14 @@ public class LogAppService : CapstoneAppServiceBase
     public virtual async Task Void(VoidInput input)
     {
         var log = await _logs.FirstOrDefaultAsync(l => l.Id == input.Id) ?? throw new UserFriendlyException("Log entry not found.");
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, log.BatchId);
+        }
+
         var batch = await LoadBatchAsync(log.BatchId);
         batch.EnsureNotClosed();
+        await HasLegacyIncidentAsync(batch);
         await _inventory.ReverseUsageForLogAsync(log.Id, DateTime.UtcNow, $"Void of {Describe(log.LogType)} log: {input.Reason.Trim()}");
         // Save the reason first: ABP reloads the entity when it turns a delete into a soft delete.
         log.VoidReason = input.Reason.Trim();
@@ -326,6 +347,21 @@ public class LogAppService : CapstoneAppServiceBase
     // ------------------------------------------------------------------ internals
 
     private static string Clean(string value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private async Task<bool> HasLegacyIncidentAsync(PondBatch batch)
+    {
+        if (batch.Status != BatchStatus.Failed)
+        {
+            return false;
+        }
+
+        if (!await _failures.GetAll().AnyAsync(f => f.BatchId == batch.Id))
+        {
+            throw new UserFriendlyException("This batch has a legacy incident status but no historical incident record. Contact an administrator before changing its logs.");
+        }
+
+        return true;
+    }
 
     private async Task<PondBatch> LoadBatchAsync(Guid batchId)
     {

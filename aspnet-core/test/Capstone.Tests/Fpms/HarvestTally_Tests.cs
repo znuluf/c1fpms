@@ -131,6 +131,38 @@ public class HarvestTally_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task A_legacy_failed_status_without_its_historical_incident_record_cannot_accept_a_harvest()
+    {
+        var batchId = BatchId(CurrentBatch);
+        await UsingDbContextAsync(async context =>
+        {
+            var batch = await context.PondBatches.SingleAsync(b => b.Id == batchId);
+            batch.Status = BatchStatus.Failed;
+        });
+
+        var error = await Should.ThrowAsync<UserFriendlyException>(() => Resolve<HarvestAppService>().Create(TallySheet()));
+        error.Message.ShouldContain("no historical incident record");
+        Q(c => c.Harvests.IgnoreQueryFilters().Count(h => h.BatchId == batchId)).ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task A_legacy_failed_status_without_its_historical_incident_record_cannot_be_closed()
+    {
+        var batchId = BatchId(CurrentBatch);
+        await UsingDbContextAsync(async context =>
+        {
+            var batch = await context.PondBatches.SingleAsync(b => b.Id == batchId);
+            batch.Status = BatchStatus.Failed;
+        });
+
+        var error = await Should.ThrowAsync<UserFriendlyException>(() => Resolve<BatchAppService>().Close(new CloseBatchInput
+        {
+            Id = batchId, ConfirmReadOnly = true,
+        }));
+        error.Message.ShouldContain("no historical incident record");
+    }
+
+    [Fact]
     public async Task Final_harvest_requires_explicit_confirmation_that_the_pond_is_empty()
     {
         var harvests = Resolve<HarvestAppService>();
@@ -144,6 +176,26 @@ public class HarvestTally_Tests : FpmsTestBase
         harvest.HarvestType.ShouldBe(HarvestType.Total);
 
         Q(c => c.PondBatches.IgnoreQueryFilters().Where(b => b.Id == input.BatchId).Select(b => (int)b.Status).Single()).ShouldBe(3); // Harvested
+    }
+
+    [Fact]
+    public async Task Correcting_a_final_harvest_to_partial_returns_the_batch_to_stocked()
+    {
+        var harvests = Resolve<HarvestAppService>();
+        var input = TallySheet();
+        input.HarvestType = HarvestType.Total;
+        input.PondEmptiedConfirmed = true;
+        var saved = await harvests.Create(input);
+
+        input.Id = saved.Id;
+        input.RowVersion = saved.RowVersion;
+        input.HarvestType = HarvestType.Partial;
+        input.PondEmptiedConfirmed = false;
+        var corrected = await harvests.Update(input);
+
+        corrected.HarvestType.ShouldBe(HarvestType.Partial);
+        Q(c => c.PondBatches.IgnoreQueryFilters().Where(b => b.Id == input.BatchId).Select(b => b.Status).Single())
+            .ShouldBe(BatchStatus.Stocked);
     }
 
     [Fact]

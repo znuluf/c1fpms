@@ -218,14 +218,14 @@ public class BatchAppService : CapstoneAppServiceBase
             LogCounts = counts.ToDictionary(c => c.Key.ToString(), c => c.N),
             HasFinalHarvest = hasFinal,
             HasRecords = counts.Count > 0 || hasHarvest,
-            AllowedLogTypes = Enum.GetValues<LogType>().Where(b.AllowsNewLog).Select(t => t.ToString()).ToList(),
+            AllowedLogTypes = Enum.GetValues<LogType>().Where(t => b.AllowsNewLog(t, failure != null)).Select(t => t.ToString()).ToList(),
             IsReadOnly = b.Status == BatchStatus.Closed,
             TechnicianUserIds = b.Technicians.Select(t => t.UserId).ToList(), CoverUserId = b.CoverUserId, CoverUntil = b.CoverUntil,
         };
         await FillPeopleAsync(new BatchListDto[] { dto });
 
-        dto.CanClose = isOwner && (b.Status == BatchStatus.Harvested || b.Status == BatchStatus.Failed);
-        dto.CanAddHarvest = canHarvest && (b.Status == BatchStatus.Stocked || b.Status == BatchStatus.Failed);
+        dto.CanClose = isOwner && b.CanClose(failure != null);
+        dto.CanAddHarvest = canHarvest && b.CanRecordHarvest(failure != null);
         if (b.Status == BatchStatus.Closed && isOwner)
         {
             dto.ReopenBlockedReason = await ReopenBlockedReasonAsync(b);
@@ -479,9 +479,21 @@ public class BatchAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.Production_Manage)]
     public virtual async Task<IndicatorsDto> Close(CloseBatchInput input)
     {
+        // Serialize closure with harvest creation and correction so no harvest can slip in after the accounting check.
+        if (RowLocker != null)
+        {
+            await RowLocker.LockAsync(RowLockTarget.Batch, input.Id);
+        }
+
         var batch = await _batches.GetAsync(input.Id);
         Concurrency.Check(batch.RowVersion, input.RowVersion);
-        if (batch.Status is not (BatchStatus.Harvested or BatchStatus.Failed))
+        var failure = await _failures.FirstOrDefaultAsync(f => f.BatchId == batch.Id);
+        if (batch.Status == BatchStatus.Failed && failure == null)
+        {
+            throw new UserFriendlyException("This batch has a legacy incident status but no historical incident record. Contact an administrator before closing it.");
+        }
+
+        if (!batch.CanClose(failure != null))
         {
             throw new UserFriendlyException("Only a Harvested batch or a batch with a legacy incident record can be closed.");
         }
@@ -502,7 +514,6 @@ public class BatchAppService : CapstoneAppServiceBase
 
         var facts = await _loader.LoadAsync(batch.Id, await Farm.GetTimeZoneAsync());
         var ind = IndicatorCalculator.Compute(facts, await Farm.GetTodayAsync());
-        var failure = await _failures.FirstOrDefaultAsync(f => f.BatchId == batch.Id);
         batch.FinalAbwG = ind.FinalAbwG;
         batch.FinalFcr = ind.FinalFcr;
         batch.SurvivalRatePct = ind.SurvivalRatePct ?? (facts.PlCountStocked > 0 ? 0m : null);
