@@ -79,10 +79,12 @@ public class HarvestFact
 
     /// <summary>The Total harvest.</summary>
     public bool IsFinal { get; set; }
+    public bool IsPartial { get; set; }
 
     public decimal TotalKg { get; set; }
     public decimal? AbwG { get; set; }
     public long? FinalCount { get; set; }
+    public bool UseHarvestAbwForBiomass { get; set; }
 
     /// <summary>Grade lines with the grade's mid count per kg; null for the "Ungraded / mixed" grade.</summary>
     public List<(decimal Kg, decimal? MidCountPerKg)> GradeLines { get; set; } = new();
@@ -94,9 +96,11 @@ public class HarvestFact
         HarvestedAtUtc = h.HarvestedAtUtc,
         Date = date,
         IsFinal = h.EmptiesPond,
+        IsPartial = h.HarvestType == Harvests.HarvestType.Partial,
         TotalKg = h.TotalKg,
         AbwG = h.AbwG,
         FinalCount = h.FinalCount,
+        UseHarvestAbwForBiomass = h.UseHarvestAbwForBiomass,
         GradeLines = h.GradeLines.Select(g => (g.Kg, g.SizeGrade?.MidCountPerKg)).ToList(),
     };
 }
@@ -114,6 +118,10 @@ public class BatchIndicators
     public decimal TotalHarvestKg { get; set; }
     public decimal? EstimatedPopulation { get; set; }
     public decimal? EstimatedBiomassKg { get; set; }
+    public decimal? BiomassAbwG { get; set; }
+    public string BiomassAbwSource { get; set; }
+    public DateOnly? BiomassAbwSourceDate { get; set; }
+    public Guid? BiomassAbwSourceId { get; set; }
     public decimal? FcrToDate { get; set; }
     public decimal? FinalFcr { get; set; }
     public decimal? SurvivalRatePct { get; set; }
@@ -247,9 +255,30 @@ public static class IndicatorCalculator
             result.SurvivalRatePct = result.HarvestedPieces > 0 ? Round(result.HarvestedPieces / f.PlCountStocked * 100m, 2) : null;
         }
 
-        if (result.EstimatedPopulation.HasValue && result.LatestAbwG.HasValue)
+        // Biomass ABW is a separate choice from the latest-event ABW shown in the headline.
+        // A partial-harvest ABW is used only when staff opted in, and only until a newer growth sample.
+        var latestPartialWithAbw = harvests.LastOrDefault(h => h.IsPartial && h.AbwG.HasValue);
+        var useHarvestAbw = latestPartialWithAbw != null
+            && latestPartialWithAbw.UseHarvestAbwForBiomass
+            && (latestSample == null || latestPartialWithAbw.HarvestedAtUtc > latestSample.ObservedAtUtc);
+        if (useHarvestAbw)
         {
-            result.EstimatedBiomassKg = Round(result.EstimatedPopulation.Value * result.LatestAbwG.Value / 1000m, 3);
+            result.BiomassAbwG = latestPartialWithAbw.AbwG;
+            result.BiomassAbwSource = "Harvest";
+            result.BiomassAbwSourceDate = latestPartialWithAbw.Date;
+            result.BiomassAbwSourceId = latestPartialWithAbw.Id;
+        }
+        else if (latestSample != null)
+        {
+            result.BiomassAbwG = latestSample.AbwG;
+            result.BiomassAbwSource = "Sample";
+            result.BiomassAbwSourceDate = latestSample.Date;
+            result.BiomassAbwSourceId = latestSample.LogId;
+        }
+
+        if (result.EstimatedPopulation.HasValue && result.BiomassAbwG.HasValue)
+        {
+            result.EstimatedBiomassKg = Round(result.EstimatedPopulation.Value * result.BiomassAbwG.Value / 1000m, 3);
         }
 
         var denominator = (result.EstimatedBiomassKg ?? 0m) + result.TotalHarvestKg;
