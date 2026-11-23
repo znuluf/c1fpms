@@ -7,9 +7,22 @@ using Capstone.Domain;
 using Capstone.Ponds;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Capstone.Farms;
+
+public class BaseAbwPricingSchemeDto
+{
+    public Guid Id { get; set; }
+    [Required, StringLength(60)] public string Name { get; set; }
+    [Range(typeof(decimal), "0", "100000000")] public decimal BasePricePerKg { get; set; }
+    [Range(typeof(decimal), "0.01", "60")] public decimal BaseAbwG { get; set; }
+    [Range(typeof(decimal), "0", "1000000")] public decimal StepPerG { get; set; }
+    public bool IsActive { get; set; } = true;
+}
 
 public class FarmSettingsDto
 {
@@ -22,6 +35,7 @@ public class FarmSettingsDto
     public bool Use24HourTime { get; set; }
     [StringLength(FeedingSchedule.MaxTimesLength)] public string FeedingTimes { get; set; }
     public bool WaterQualityDaily { get; set; } = true;
+    public List<BaseAbwPricingSchemeDto> BaseAbwPricingSchemes { get; set; } = new();
 }
 
 /// <summary>Operational defaults and display preferences, separate from farm identity and contact details.</summary>
@@ -46,6 +60,16 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
 
         if (!Enum.IsDefined(input.FarmingSystem)) throw new UserFriendlyException("Choose a valid farming system.");
         if (!Enum.IsDefined(input.DateOrder)) throw new UserFriendlyException("Choose a valid date display order.");
+        var schemes = input.BaseAbwPricingSchemes ?? new List<BaseAbwPricingSchemeDto>();
+        if (schemes.Count > 20) throw new UserFriendlyException("A farm can configure up to 20 Base ABW pricing schemes.");
+        if (schemes.Any(x => x.Id == Guid.Empty || string.IsNullOrWhiteSpace(x.Name) || x.Name.Trim().Length > 60
+            || x.BasePricePerKg < 0 || x.BaseAbwG < 0.01m || x.BaseAbwG > 60 || x.StepPerG < 0))
+            throw new UserFriendlyException("Check each Base ABW scheme: enter a name, a non-negative base price and adjustment, and a base ABW from 0.01 to 60 g.");
+        if (schemes.Select(x => x.Id).Distinct().Count() != schemes.Count
+            || schemes.Select(x => x.Name.Trim()).Distinct(StringComparer.OrdinalIgnoreCase).Count() != schemes.Count)
+            throw new UserFriendlyException("Base ABW scheme IDs and names must be unique.");
+        foreach (var scheme in schemes) scheme.Name = scheme.Name.Trim();
+
         var feedingTimes = FeedingSchedule.Format(FeedingSchedule.Parse(input.FeedingTimes));
 
         var tenantId = Farm.TenantId;
@@ -59,6 +83,7 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
                 DocumentExpiryAlertDays = previous.DocumentExpiryAlertDays, UnsoldFollowUpDays = previous.UnsoldFollowUpDays, FarmingSystem = previous.FarmingSystem,
                 DateOrder = previous.DateOrder, Use24HourTime = previous.Use24HourTime,
                 FeedingTimes = previous.FeedingTimes, WaterQualityDaily = previous.WaterQualityDaily,
+                BaseAbwPricingSchemesJson = previous.BaseAbwPricingSchemesJson,
             };
             await _settings.InsertAsync(s);
         }
@@ -75,6 +100,7 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
         s.Use24HourTime = input.Use24HourTime;
         s.FeedingTimes = feedingTimes;
         s.WaterQualityDaily = input.WaterQualityDaily;
+        s.BaseAbwPricingSchemesJson = JsonSerializer.Serialize(schemes);
     }
 
     private static FarmSettingsDto Map(FarmSettings s) => new()
@@ -88,5 +114,12 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
         Use24HourTime = s.Use24HourTime,
         FeedingTimes = FeedingSchedule.Format(FeedingSchedule.Times(s.FeedingTimes)),
         WaterQualityDaily = s.WaterQualityDaily,
+        BaseAbwPricingSchemes = ReadSchemes(s.BaseAbwPricingSchemesJson),
     };
+
+    private static List<BaseAbwPricingSchemeDto> ReadSchemes(string json)
+    {
+        try { return JsonSerializer.Deserialize<List<BaseAbwPricingSchemeDto>>(json ?? "[]") ?? new(); }
+        catch (JsonException) { return new(); }
+    }
 }
