@@ -135,12 +135,13 @@ public class PondBatch : FarmEntity
     /// Harvested and Failed take corrections and notes until Close Batch. Feeding is recorded as feeding sessions,
     /// preparation on the pond, and post-production logging was removed.
     /// </summary>
-    public bool AllowsNewLog(LogType type) =>
+    public bool AllowsNewLog(LogType type, bool hasLegacyIncident = false) =>
         type is not (LogType.PondPreparation or LogType.Feeding or LogType.PostProduction)
-        && Status is BatchStatus.Stocked or BatchStatus.Harvested or BatchStatus.Failed;
+        && (Status is BatchStatus.Stocked or BatchStatus.Harvested || (Status == BatchStatus.Failed && hasLegacyIncident));
 
     /// <summary>Feeding sessions follow the same rule as logs.</summary>
-    public bool AllowsFeeding => Status is BatchStatus.Stocked or BatchStatus.Harvested or BatchStatus.Failed;
+    public bool AllowsFeeding(bool hasLegacyIncident = false) =>
+        Status is BatchStatus.Stocked or BatchStatus.Harvested || (Status == BatchStatus.Failed && hasLegacyIncident);
 }
 
 /// <summary>Declare Batch Failure (Ref 7.4): one row per failed batch.</summary>
