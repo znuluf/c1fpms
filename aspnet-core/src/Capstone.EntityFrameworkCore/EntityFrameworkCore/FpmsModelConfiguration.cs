@@ -81,6 +81,7 @@ public static class FpmsModelConfiguration
             e.Property(x => x.Id).ValueGeneratedNever();
             e.Property(x => x.TimeZone).IsRequired().HasMaxLength(64);
             e.Property(x => x.FeedingTimes).IsRequired().HasMaxLength(FeedingSchedule.MaxTimesLength);
+            e.Property(x => x.BaseAbwPricingSchemesJson).IsRequired().HasColumnType("nvarchar(max)");
             e.ToTable(t =>
             {
                 t.HasCheckConstraint("CK_FpmsFarmSettings_DocumentAlertDays", "[DocumentExpiryAlertDays] BETWEEN 1 AND 365");
