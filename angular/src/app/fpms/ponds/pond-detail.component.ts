@@ -678,9 +678,9 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
         this.isNew = !id;
         this.tabChosen = false;
         if (this.isNew) {
-            const [prefixes, settings] = await Promise.all([this.api.get<any[]>('Pond', 'GetPrefixes'), this.api.get<any>('FarmSettings', 'Get')]);
+            const [prefixes, farmSystem] = await Promise.all([this.api.get<any[]>('Pond', 'GetPrefixes'), this.api.get<number>('Pond', 'GetFarmFarmingSystem')]);
             this.prefixes = prefixes;
-            this.farmSystem = settings.farmingSystem;
+            this.farmSystem = farmSystem;
             this.pond = {
                 id: '00000000-0000-0000-0000-000000000000',
                 number: null,
