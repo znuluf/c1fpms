@@ -287,6 +287,7 @@ public class DashboardAppService : CapstoneAppServiceBase
 
         // Water-quality alerts in the last 7 farm days
         var since = FarmClock.StartOfDayUtc(today.AddDays(-6), zone);
+        // Keep the complete seven-day window: truncating before grouping silently understates alert counts on busy farms.
         var wq = await (from l in _logs.GetAll().AsNoTracking()
                         join m in _measurements.GetAll().AsNoTracking() on l.Id equals m.LogId
                         join b in _batches.GetAll().AsNoTracking() on l.BatchId equals b.Id
@@ -315,6 +316,7 @@ public class DashboardAppService : CapstoneAppServiceBase
         dto.Kpis.WaterQualityAlerts7Days = grouped.Count;
 
         // High-mortality entries in the last 7 farm days (judged when saved; DEC-49)
+        // As above, count every qualifying entry in the window before deriving distinct high-mortality days.
         var highMortality = await (from l in _logs.GetAll().AsNoTracking()
                                    join d in _mortality.GetAll().AsNoTracking() on l.Id equals d.Id
                                    join b in _batches.GetAll().AsNoTracking() on l.BatchId equals b.Id
