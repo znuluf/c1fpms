@@ -2260,3 +2260,68 @@ body,
         padding-left: 0.75rem;
     }
 }
+
+.fpms-summary {
+    box-shadow: var(--fpms-shadow-1);
+}
+
+.fpms-overview-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: 0;
+    padding: 1rem 1.1rem;
+    background: var(--fpms-surface);
+    border: 1px solid var(--fpms-line);
+    border-radius: var(--fpms-r-card);
+    box-shadow: var(--fpms-shadow-1);
+}
+
+.fpms-overview-icon {
+    display: inline-flex;
+    flex: 0 0 2.85rem;
+    align-items: center;
+    justify-content: center;
+    width: 2.85rem;
+    height: 2.85rem;
+    border-radius: 0.85rem;
+    font-size: 1.15rem;
+}
+
+.fpms-overview-icon-blue {
+    background: #e7f0fb;
+    color: #356b9b;
+}
+
+.fpms-overview-icon-teal {
+    background: #e3f4f2;
+    color: #267a78;
+}
+
+.fpms-overview-icon-green {
+    background: #e5f4e9;
+    color: #287a4b;
+}
+
+.fpms-overview-icon-amber {
+    background: #fff3dc;
+    color: #9b6b16;
+}
+
+.fpms-overview-copy {
+    min-width: 0;
+}
+
+.fpms-overview-copy .v {
+    color: var(--fpms-text);
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+}
+
+.fpms-overview-copy .l {
+    margin-top: 0.2rem;
+    color: var(--fpms-muted);
+    font-size: 0.875rem;
+}
