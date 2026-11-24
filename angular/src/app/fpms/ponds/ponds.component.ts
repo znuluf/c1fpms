@@ -505,7 +505,11 @@ export class PondsComponent extends FpmsPage implements OnInit {
     });
     /** Facility totals exclude archived ponds; production figures remain tied to the active batch. */
     pondSummary = computed(() => {
-        const active = (this.cards() ?? []).filter((p) => !p.archived);
+        const cards = this.cards();
+        if (!cards) {
+            return null;
+        }
+        const active = cards.filter((p) => !p.archived);
         return {
             total: active.length,
             growOut: active.filter((p) => p.purpose === 1).length,
