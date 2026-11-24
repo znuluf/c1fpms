@@ -1,12 +1,12 @@
 import { PHONE_MESSAGE, tidyPhone } from '@shared/fpms/phone';
-import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { LAST_FARM_CODE_KEY } from '@shared/auth/app-auth.service';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { applyCoverageBarangay, applyCoverageCity, applyCoverageProvince, coverageBarangays, coverageCities, coverageProvinces } from '@shared/fpms/coverage-area';
 
-/** Farm Profile Management (Ref 2.1, D-31). Owners edit; Technicians read. The Ponds tab summarizes pond specifications (D-32). */
+/** Farm Profile Management (Ref 2.1, D-31). Owners edit; Technicians read. Pond specifications are managed on the Ponds page. */
 const PROFILE_DRAFT = 'farm-profile';
 
 @Component({
@@ -19,22 +19,6 @@ const PROFILE_DRAFT = 'farm-profile';
                 @if (!p) {
                     <fpms-loading></fpms-loading>
                 } @else {
-                    <ul class="nav nav-tabs mb-3" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:;" role="tab" [class.active]="tab() === 'details'" [attr.aria-selected]="tab() === 'details'" (click)="tab.set('details')">
-                                Farm details
-                            </a>
-                        </li>
-                        @if (canSeePonds) {
-                            <li class="nav-item">
-                                <a class="nav-link" href="javascript:;" role="tab" [class.active]="tab() === 'ponds'" [attr.aria-selected]="tab() === 'ponds'" (click)="openPonds()">
-                                    Ponds
-                                    @if (ponds()?.length) { <span class="badge badge-secondary ml-1">{{ ponds()!.length }}</span> }
-                                </a>
-                            </li>
-                        }
-                    </ul>
-
                     @if (tab() === 'details' && !canEdit) {
                         <div class="card">
                             <div class="card-header"><h3 class="card-title">Farm details</h3></div>
@@ -256,101 +240,7 @@ const PROFILE_DRAFT = 'farm-profile';
                         </form>
                     }
 
-                    @if (tab() === 'ponds') {
-                        <div class="card">
-                            <div class="card-header d-flex align-items-center">
-                                <h3 class="card-title mr-auto">Pond specifications</h3>
-                                <a routerLink="/app/ponds" class="btn btn-sm btn-outline-primary">Manage ponds</a>
-                            </div>
-                            @if (ponds()?.length) {
-                                <div class="card-body pb-0">
-                                    <div class="row">
-                                        <div class="col-6 col-md-3"><div class="fpms-kpi"><div class="v">{{ ponds()!.length | num: 0 }}</div><div class="l">Ponds</div></div></div>
-                                        <div class="col-6 col-md-3"><div class="fpms-kpi"><div class="v">{{ p.pondAreaHectares | num: 2 }} ha</div><div class="l">Total pond area</div></div></div>
-                                        <div class="col-6 col-md-3"><div class="fpms-kpi"><div class="v">{{ inProduction | num: 0 }}</div><div class="l">In production now</div></div></div>
-                                        <div class="col-6 col-md-3">
-                                            <div class="fpms-kpi" [class.fpms-kpi-warn]="areaExceeded">
-                                                @if (p.totalAreaHectares) {
-                                                    <div class="v">{{ areaShare | num: 0 }}%</div>
-                                                    <div class="l">of {{ p.totalAreaHectares | num: 2 }} ha farm area</div>
-                                                } @else {
-                                                    <div class="v fpms-none">—</div>
-                                                    <div class="l">Farm area not set</div>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @if (p.totalAreaHectares) {
-                                        <div class="progress mb-2" style="height: 0.5rem" role="progressbar" aria-label="Share of the farm area used by ponds" [attr.aria-valuenow]="areaShare" aria-valuemin="0" aria-valuemax="100">
-                                            <div class="progress-bar" [class.bg-warning]="areaExceeded" [style.width.%]="areaShare > 100 ? 100 : areaShare"></div>
-                                        </div>
-                                        @if (areaExceeded) {
-                                            <div class="small text-warning-dark mb-2"><i class="fas fa-exclamation-triangle mr-1"></i>The ponds add up to more than the total farm area. Check the total area or the pond areas.</div>
-                                        }
-                                    } @else {
-                                        <div class="small text-muted mb-2">Add the total farm area on the Farm details tab to compare it with the ponds.</div>
-                                    }
-                                </div>
-                            }
-                            <div class="card-body p-0 table-responsive">
-                                @if (!ponds()) {
-                                    <fpms-loading></fpms-loading>
-                                } @else if (!ponds()!.length) {
-                                    <fpms-empty text="No ponds yet." icon="fas fa-water">
-                                        <a routerLink="/app/ponds" class="btn btn-sm btn-primary">Add ponds</a>
-                                    </fpms-empty>
-                                } @else {
-                                    <table class="table table-sm table-hover mb-0">
-                                        <caption class="sr-only">Pond specifications</caption>
-                                        <thead>
-                                            <tr>
-                                                <th>Pond</th>
-                                                <th>Purpose</th>
-                                                <th>Construction</th>
-                                                <th class="text-right">Area (m²)</th>
-                                                <th class="text-right">Avg depth (m)</th>
-                                                <th class="text-right">Max depth (m)</th>
-                                                <th>Farming system</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @for (x of ponds(); track x.id) {
-                                                <tr>
-                                                    <td class="text-nowrap">
-                                                        <a [routerLink]="['/app/ponds', x.id]">{{ x.pondCode }}</a>
-                                                        <div class="small text-muted">{{ x.name }}</div>
-                                                    </td>
-                                                    <td>{{ x.purpose | label: L.PondPurposes }}</td>
-                                                    <td>{{ x.constructionType | label: L.ConstructionTypes }}</td>
-                                                    <td class="text-right">{{ x.areaM2 | num: 0 }}</td>
-                                                    <td class="text-right">{{ x.averageDepthM | num: 2 }}</td>
-                                                    <td class="text-right">{{ x.maxDepthM | num: 2 }}</td>
-                                                    <td>
-                                                        {{ x.farmingSystem | label: L.FarmingSystems }}
-                                                        @if (x.farmingSystemOverride == null) {
-                                                            <span class="small text-muted">(farm setting)</span>
-                                                        }
-                                                        @if (x.systemWarning) {
-                                                            <div class="small text-warning-dark"><i class="fas fa-exclamation-triangle mr-1"></i>{{ x.systemWarning }}</div>
-                                                        }
-                                                    </td>
-                                                    <td><fpms-badge [text]="x.status | label: L.PondDisplayStatuses"></fpms-badge></td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="3">{{ ponds()!.length === 1 ? '1 pond' : ponds()!.length + ' ponds' }}</td>
-                                                <td class="text-right">{{ totalAreaM2 | num: 0 }}</td>
-                                                <td colspan="4"></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                }
-                            </div>
-                        </div>
-                    }
+
                 }
             </div>
         </section>
@@ -468,24 +358,9 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
         done: { oldCode: string; farmCode: string } | null;
     } | null = null;
     private codeTimer: any;
-    tab = signal<'details' | 'ponds'>('details');
-    ponds = signal<any[] | null>(null);
 
     get canEdit(): boolean {
         return this.can('Farm.Profile.Edit');
-    }
-
-    get canSeePonds(): boolean {
-        return this.can('Farm.Ponds');
-    }
-
-    get totalAreaM2(): number {
-        return (this.ponds() ?? []).reduce((n, x) => n + Number(x.areaM2 || 0), 0);
-    }
-
-    /** Ponds with a batch growing in them (display status 3, In production). */
-    get inProduction(): number {
-        return (this.ponds() ?? []).filter((x) => x.status === 3).length;
     }
 
     /** The ponds' share of the total farm area, in percent (not capped). */
@@ -651,12 +526,6 @@ export class FarmProfileComponent extends FpmsPage implements OnInit, OnDestroy 
         }
     }
 
-    async openPonds(): Promise<void> {
-        this.tab.set('ponds');
-        if (!this.ponds()) {
-            this.ponds.set(await this.api.get<any[]>('Pond', 'GetAll'));
-        }
-    }
 
     async save(): Promise<void> {
         let warnings: any[] = [];
