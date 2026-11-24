@@ -19,7 +19,7 @@ const PROFILE_DRAFT = 'farm-profile';
                 @if (!p) {
                     <fpms-loading></fpms-loading>
                 } @else {
-                    @if (tab() === 'details' && !canEdit) {
+                    @if (!canEdit) {
                         <div class="card">
                             <div class="card-header"><h3 class="card-title">Farm details</h3></div>
                             <div class="card-body">
@@ -61,7 +61,7 @@ const PROFILE_DRAFT = 'farm-profile';
                         <p class="text-muted small"><i class="fas fa-lock mr-1"></i>Only a Farm Owner can change the farm profile.</p>
                     }
 
-                    @if (tab() === 'details' && canEdit) {
+                    @if (canEdit) {
                         @if (restoredAt) {
                             <div class="alert alert-info d-flex align-items-center" role="status">
                                 <i class="fas fa-history mr-2" aria-hidden="true"></i>
