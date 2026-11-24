@@ -1,28 +1,18 @@
-// Reference-app visual layer: a restrained navy navigation rail, green primary actions,
-// white working surfaces, compact summaries and calm table chrome. All existing FPMS
-// routes, components, permissions and business rules remain unchanged.
+// Reference-inspired visual layer for FPMS.
+// Adopts the reference application's light workspace, clear dark active navigation,
+// segmented section tabs, summary tiles and calm data tables while retaining FPMS branding,
+// labels, routes, permissions, workflows and semantic status colors.
 
 :root {
-    --fpms-ref-nav: #18364b;
-    --fpms-ref-nav-hover: #244b61;
-    --fpms-ref-green: #18845b;
-    --fpms-ref-green-dark: #126b49;
-    --fpms-ref-green-soft: #e9f4ee;
-    --fpms-ref-ground: #f3f6f5;
-    --fpms-ref-border: #e1e8e5;
-    --fpms-ref-heading: #203b4d;
-    --fpms-nav-active: #18845b;
+    --fpms-ref-nav-active: #17283d;
+    --fpms-ref-ground: #f7f8fa;
+    --fpms-ref-border: #e3e8ee;
+    --fpms-ref-heading: var(--fpms-text);
 }
 html[data-theme='neutral'] {
-    --fpms-ref-nav: #202b35;
-    --fpms-ref-nav-hover: #344653;
-    --fpms-ref-green: #176b52;
-    --fpms-ref-green-dark: #10543f;
-    --fpms-ref-green-soft: #e9f1ed;
     --fpms-ref-ground: #f2f4f5;
     --fpms-ref-border: #d9dfe2;
     --fpms-ref-heading: #202b35;
-    --fpms-nav-active: #176b52;
 }
 
 body,
@@ -45,64 +35,65 @@ body,
     }
 }
 
-// Deep navy navigation rail and green active state.
+// The reference uses a white navigation rail with one unmistakable dark active item.
 .main-sidebar.fpms-sidebar,
 .fpms-nav-card,
 .main-sidebar.fpms-sidebar .sidebar,
 .main-sidebar.fpms-sidebar .fpms-nav-foot {
-    background: var(--fpms-ref-nav);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: #fff;
+    border-color: var(--fpms-ref-border);
 }
 .main-sidebar.fpms-sidebar .fpms-brand {
     background: #fff;
     border-bottom-color: var(--fpms-ref-border);
 }
 .main-sidebar.fpms-sidebar .fpms-user-panel {
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    border-top: 1px solid var(--fpms-ref-border);
 }
-.main-sidebar.fpms-sidebar .fpms-user-name { color: #fff; }
-.main-sidebar.fpms-sidebar .fpms-user-role { color: #c2d0d8; }
+.main-sidebar.fpms-sidebar .fpms-user-name { color: var(--fpms-text); }
+.main-sidebar.fpms-sidebar .fpms-user-role { color: var(--fpms-muted); }
 .main-sidebar.fpms-sidebar .fpms-avatar {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.16);
+    color: var(--fpms-primary-dark);
+    background: var(--fpms-tide-50);
 }
 .main-sidebar.fpms-sidebar .nav-sidebar > .fpms-nav-label {
-    color: #a9beca;
-    letter-spacing: 0.055em;
+    color: var(--fpms-muted);
+    letter-spacing: 0.045em;
     text-transform: uppercase;
     font-size: 0.75rem;
 }
-.main-sidebar.fpms-sidebar .nav-sidebar .nav-link { color: #e5edf1; }
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-link { color: var(--fpms-text); }
 .main-sidebar.fpms-sidebar .nav-sidebar .nav-link .nav-icon,
-.main-sidebar.fpms-sidebar .fpms-chevron { color: #b4c6d0; }
+.main-sidebar.fpms-sidebar .fpms-chevron { color: var(--fpms-muted); }
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item:hover > .nav-link,
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link:focus,
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item.has-treeview.menu-open > .nav-link {
-    background: var(--fpms-ref-nav-hover);
-    color: #fff;
+    background: var(--fpms-ground-muted);
+    color: var(--fpms-primary-dark);
 }
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link.active {
-    background: var(--fpms-ref-green);
+    background: var(--fpms-ref-nav-active);
     color: #fff;
-    box-shadow: inset 3px 0 0 #b9e2cc;
+    font-weight: 600;
+    box-shadow: none;
 }
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link.active .nav-icon { color: #fff; }
-.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview::before { background: rgba(255, 255, 255, 0.2); }
-.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item::before { border-color: rgba(255, 255, 255, 0.2); }
-.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link { color: #c7d5dc; }
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview::before { background: var(--fpms-ref-border); }
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item::before { border-color: var(--fpms-ref-border); }
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link { color: var(--fpms-muted); }
 .main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link.active {
-    color: #fff;
-    background: var(--fpms-ref-nav-hover);
+    color: var(--fpms-primary-dark);
+    background: var(--fpms-accent-50);
 }
-.main-sidebar.fpms-sidebar .fpms-nav-foot { border-top: 1px solid rgba(255, 255, 255, 0.14); }
-.main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link { color: #d7e2e8; }
+.main-sidebar.fpms-sidebar .fpms-nav-foot { border-top: 1px solid var(--fpms-ref-border); }
+.main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link { color: var(--fpms-muted); }
 .main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link:hover,
 .main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link:focus {
-    color: #fff;
-    background: var(--fpms-ref-nav-hover);
+    color: var(--fpms-text);
+    background: var(--fpms-ground-muted);
 }
 
-// White top bar, clean section navigation and clearer page headings.
+// White top bar and clear page titles.
 .main-header.navbar {
     background: #fff;
     border-bottom: 1px solid var(--fpms-ref-border);
@@ -110,24 +101,64 @@ body,
 .fpms-crumbs li:last-child,
 .fpms-page-header h1,
 .fpms-report-header h4 { color: var(--fpms-ref-heading); }
+.fpms-page-header h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
 .fpms-page-header { margin-bottom: 1rem; }
+
+// Segmented section tabs mirror the reference's Ponds / Cycle / Harvest workspace tabs.
 .fpms-section-bar {
-    background: #fff;
-    border-bottom: 1px solid var(--fpms-ref-border);
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 1rem 0.75rem;
+    background: transparent;
+    border-bottom: 0;
 }
 .fpms-section-tabs {
+    flex: 0 1 auto;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--fpms-ref-border);
+    border-radius: 12px;
     background: #fff;
-    border-color: var(--fpms-ref-border);
-    box-shadow: none;
+    box-shadow: 0 1px 3px rgba(18, 35, 54, 0.045);
+}
+.fpms-section-tab {
+    min-height: 2.5rem;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: 9px;
+    color: var(--fpms-muted);
+    font-weight: 600;
+}
+.fpms-section-tab:hover,
+.fpms-section-tab:focus {
+    background: var(--fpms-ground-muted);
+    color: var(--fpms-primary-dark);
 }
 .fpms-section-tab.active {
-    background: var(--fpms-ref-green);
+    background: var(--fpms-ref-nav-active);
+    border: 0;
     color: #fff;
 }
-.fpms-section-tab.active:hover,
-.fpms-section-tab.active:focus { color: #fff; }
+.fpms-section-tab.active .fpms-tab-count {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+.fpms-section-subtabs {
+    padding: 0.35rem 1rem;
+    background: transparent;
+    border-bottom: 1px solid var(--fpms-ref-border);
+}
+.fpms-section-subtabs .fpms-section-tab {
+    min-height: 2.2rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
 
-// Consistent white cards and summary surfaces. Avoid clipping menus/popovers inside cards.
 .card,
 .fpms-kpi,
 .fpms-status-tile,
@@ -135,69 +166,105 @@ body,
 .fpms-att-box,
 .fpms-pcal-panel {
     border: 1px solid var(--fpms-ref-border);
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(24, 54, 75, 0.045);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(18, 35, 54, 0.045), 0 7px 20px rgba(18, 35, 54, 0.035);
+}
+.card {
+    overflow: hidden;
 }
 .card-header {
     background: #fff;
     border-bottom: 1px solid var(--fpms-ref-border);
 }
-.card-title { color: var(--fpms-ref-heading); font-weight: 600; }
+.card-title {
+    color: var(--fpms-ref-heading);
+    font-weight: 700;
+}
 .fpms-kpi {
-    border-left: 3px solid var(--fpms-ref-green);
-    box-shadow: 0 2px 8px rgba(24, 54, 75, 0.045);
+    border-radius: 12px;
 }
-.fpms-kpi .v { color: var(--fpms-ref-heading); }
-.fpms-stats { gap: 0.75rem; }
+.fpms-summary {
+    box-shadow: 0 1px 3px rgba(18, 35, 54, 0.045), 0 7px 20px rgba(18, 35, 54, 0.035);
+}
+.fpms-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
 .fpms-stat {
+    min-width: 0;
     border: 1px solid var(--fpms-ref-border);
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(24, 54, 75, 0.045);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(18, 35, 54, 0.045), 0 7px 20px rgba(18, 35, 54, 0.035);
+    padding: 1rem 1.15rem;
+}
+.fpms-stat.warn { border-color: var(--fpms-warn-line); }
+@media (min-width: 768px) {
+    .fpms-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-// Green primary actions and links; semantic status colors remain untouched.
-.btn-primary {
-    background: var(--fpms-ref-green);
-    border-color: var(--fpms-ref-green);
+// Pond overview metric tiles: icon, key number and plain-language label.
+.fpms-overview-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: 0;
+    padding: 1rem 1.1rem;
+    background: #fff;
+    border: 1px solid var(--fpms-ref-border);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(18, 35, 54, 0.045), 0 7px 20px rgba(18, 35, 54, 0.035);
 }
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary:not(:disabled):not(.disabled):active {
-    background: var(--fpms-ref-green-dark);
-    border-color: var(--fpms-ref-green-dark);
+.fpms-overview-icon {
+    display: inline-flex;
+    flex: 0 0 2.85rem;
+    align-items: center;
+    justify-content: center;
+    width: 2.85rem;
+    height: 2.85rem;
+    border-radius: 0.85rem;
+    font-size: 1.15rem;
 }
-.btn-outline-primary {
-    color: var(--fpms-ref-green-dark);
-    border-color: var(--fpms-ref-green);
+.fpms-overview-icon-blue { background: #e7f0fb; color: #356b9b; }
+.fpms-overview-icon-teal { background: #e3f4f2; color: #267a78; }
+.fpms-overview-icon-green { background: #e5f4e9; color: #287a4b; }
+.fpms-overview-icon-amber { background: #fff3dc; color: #9b6b16; }
+.fpms-overview-copy { min-width: 0; }
+.fpms-overview-copy .v {
+    color: var(--fpms-text);
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
 }
-.btn-outline-primary:hover {
-    color: #fff;
-    background: var(--fpms-ref-green);
-    border-color: var(--fpms-ref-green);
+.fpms-overview-copy .l {
+    margin-top: 0.2rem;
+    color: var(--fpms-muted);
+    font-size: 0.875rem;
 }
-a { color: var(--fpms-ref-green-dark); }
-a:hover { color: var(--fpms-ref-green); }
 
-// Table chrome and form controls.
+// Calm table chrome, keeping status colors and row semantics unchanged.
 .table thead th {
-    background: #f4f7f6;
-    color: #52636c;
+    background: #f7f9fb;
+    color: #596775;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
     border-bottom: 1px solid var(--fpms-ref-border);
-    font-weight: 600;
 }
-.table tbody tr:hover { background: #f7faf8; }
+.table tbody tr:hover { background: #f7fafc; }
 .table td,
 .table th { border-color: var(--fpms-ref-border); }
 .table-responsive { border-radius: 8px; }
-.form-control,
-.custom-select,
-select.form-control {
-    border-color: #cbd6d2;
-    border-radius: 7px;
-}
-.form-control:focus,
-.custom-select:focus,
-select.form-control:focus {
-    border-color: var(--fpms-ref-green);
-    box-shadow: 0 0 0 0.16rem rgba(24, 132, 91, 0.14);
+
+@media (max-width: 575.98px) {
+    .fpms-page-header h1 { font-size: 1.55rem; }
+    .fpms-section-bar { padding-right: 0.5rem; padding-left: 0.5rem; }
+    .fpms-section-tabs { flex: 1 1 auto; min-width: 0; }
+    .fpms-section-tab { padding-right: 0.75rem; padding-left: 0.75rem; }
 }
