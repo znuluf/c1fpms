@@ -441,6 +441,11 @@ public class PondAppService : CapstoneAppServiceBase
     [AbpAuthorize(PermissionNames.Ponds_Manage)]
     public virtual async Task<Guid> Create(PondEditDto input)
     {
+        if (input.Purpose != PondPurpose.GrowOut)
+        {
+            throw new UserFriendlyException("New ponds must be created for grow-out production. Existing ponds keep their recorded purpose.");
+        }
+
         // Without a prefix the name comes from the construction type ("Earthen Pond 3", code EP-03).
         var prefix = input.PrefixId.HasValue
             ? await _prefixes.FirstOrDefaultAsync(x => x.Id == input.PrefixId.Value) ?? throw new UserFriendlyException("Pond name prefix not found.")
