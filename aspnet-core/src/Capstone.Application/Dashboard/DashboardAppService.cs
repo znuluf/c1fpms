@@ -292,7 +292,7 @@ public class DashboardAppService : CapstoneAppServiceBase
                         join b in _batches.GetAll().AsNoTracking() on l.BatchId equals b.Id
                         where m.IsOutOfRange && l.ObservedAtUtc >= since
                         orderby l.ObservedAtUtc descending
-                        select new { l.Id, l.BatchId, l.PondId, l.ObservedAtUtc, b.BatchCode, m.ParameterCode, m.Value, m.UnitCode, m.Side }).Take(500).ToListAsync();
+                        select new { l.Id, l.BatchId, l.PondId, l.ObservedAtUtc, b.BatchCode, m.ParameterCode, m.Value, m.UnitCode, m.Side }).ToListAsync();
         var pondCodes = ponds.ToDictionary(p => p.Id, p => p.PondCode);
         var grouped = wq.GroupBy(w => new { w.PondId, Day = FarmClock.LocalDate(w.ObservedAtUtc, zone) })
             .Select(g =>
@@ -320,7 +320,7 @@ public class DashboardAppService : CapstoneAppServiceBase
                                    join b in _batches.GetAll().AsNoTracking() on l.BatchId equals b.Id
                                    where d.IsHighMortality && l.ObservedAtUtc >= since
                                    orderby l.ObservedAtUtc descending
-                                   select new { l.Id, l.BatchId, l.PondId, l.ObservedAtUtc, b.BatchCode, d.Count }).Take(200).ToListAsync();
+                                   select new { l.Id, l.BatchId, l.PondId, l.ObservedAtUtc, b.BatchCode, d.Count }).ToListAsync();
         dto.HighMortality = highMortality.Select(h => new HighMortalityDto
         {
             LogId = h.Id, BatchId = h.BatchId, BatchCode = h.BatchCode, PondCode = pondCodes.TryGetValue(h.PondId, out var pc) ? pc : null,
