@@ -128,6 +128,9 @@ public class SaveHarvestInput
     [Range(0.01, 60, ErrorMessage = "Sampled ABW must be between 0.01 and 60 g.")]
     public decimal? AbwG { get; set; }
 
+    /// <summary>Partial harvest only; defaults to using its ABW for remaining-biomass estimates.</summary>
+    public bool UseHarvestAbwForBiomass { get; set; } = true;
+
     /// <summary>Optional ABW sample weight (g); with the piece count it sets the ABW (DEC-80).</summary>
     [Range(0.01, 1000000, ErrorMessage = "The sample weight must be greater than zero.")]
     public decimal? AbwSampleWeightG { get; set; }
@@ -234,6 +237,7 @@ public class HarvestDto
     public decimal TotalKg { get; set; }
     public int? Boxes { get; set; }
     public decimal? AbwG { get; set; }
+    public bool UseHarvestAbwForBiomass { get; set; }
     public decimal? AbwSampleWeightG { get; set; }
     public int? AbwSamplePieces { get; set; }
     public long? FinalCount { get; set; }
@@ -950,6 +954,7 @@ public class HarvestAppService : CapstoneAppServiceBase
         harvest.TotalKg = input.TotalKg;
         harvest.Boxes = input.Boxes;
         harvest.AbwG = input.AbwG;
+        harvest.UseHarvestAbwForBiomass = input.HarvestType == HarvestType.Partial && input.AbwG.HasValue && input.UseHarvestAbwForBiomass;
         harvest.AbwSampleWeightG = input.AbwSampleWeightG;
         harvest.AbwSamplePieces = input.AbwSamplePieces;
         harvest.FinalCount = input.FinalCount;
@@ -1128,7 +1133,7 @@ public class HarvestAppService : CapstoneAppServiceBase
                 Id = h.Id, BatchId = h.BatchId, BatchCode = h.Batch?.BatchCode, PondCode = h.Batch?.Pond?.PondCode, CycleCode = h.Batch?.Cycle?.CycleCode,
                 BatchStatus = h.Batch?.Status ?? BatchStatus.Stocked, HarvestedAtUtc = h.HarvestedAtUtc, HarvestType = h.HarvestType, ShrimpLeft = h.ShrimpLeft, EmergencyReason = h.EmergencyReason, EmergencyNote = h.EmergencyNote, TotalKg = h.TotalKg, LotCode = h.LotCode,
                 BuyerId = h.BuyerId, BuyerName = h.Buyer?.Name, WeighedBy = h.WeighedBy,
-                Boxes = h.Boxes, AbwG = h.AbwG, AbwSampleWeightG = h.AbwSampleWeightG, AbwSamplePieces = h.AbwSamplePieces, FinalCount = h.FinalCount, DeadAtHarvest = h.DeadAtHarvest,
+                Boxes = h.Boxes, AbwG = h.AbwG, UseHarvestAbwForBiomass = h.UseHarvestAbwForBiomass, AbwSampleWeightG = h.AbwSampleWeightG, AbwSamplePieces = h.AbwSamplePieces, FinalCount = h.FinalCount, DeadAtHarvest = h.DeadAtHarvest,
                 SmoothShell = h.SmoothShell, IntactAppendages = h.IntactAppendages, NoNecrosis = h.NoNecrosis, QualityNotes = h.QualityNotes,
                 GradeLines = lines,
                 Disposals = h.Disposals.OrderBy(d => d.CreationTime).Select(d => new DisposalDto

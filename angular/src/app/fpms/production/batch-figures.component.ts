@@ -178,7 +178,7 @@ export class BatchFiguresComponent {
         return [
             { text: `Feed fed to date: ${num(i.cumulativeFeedKg, 1)} kg.` },
             {
-                text: `Est. biomass: ${num(i.estimatedPopulation, 0)} shrimp × ${num(i.latestSampleAbwG, 2)} g ÷ 1,000 = ${num(i.estimatedBiomassKg, 1)} kg. Harvested so far: ${num(i.totalHarvestKg, 1)} kg.`,
+                text: `Est. biomass: ${num(i.estimatedPopulation, 0)} shrimp × ${num(i.biomassAbwG, 2)} g (${i.biomassAbwSource === 'Harvest' ? 'selected partial-harvest ABW' : 'latest growth-sample ABW'}) ÷ 1,000 = ${num(i.estimatedBiomassKg, 1)} kg. Harvested so far: ${num(i.totalHarvestKg, 1)} kg.`,
             },
             {
                 text: `${num(i.cumulativeFeedKg, 1)} ÷ (${num(i.estimatedBiomassKg, 1)} + ${num(i.totalHarvestKg, 1)}) = ${num(i.fcrToDate, 2)}.`,

@@ -3,7 +3,7 @@ import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { FPMS_IMPORTS } from '../shared-imports';
-import { PRICE_METHODS, applyTerms, countFromAbw, num, pricingBody, referencePrice, termsEmpty } from '@shared/fpms/pricing';
+import { PRICE_METHODS, countFromAbw, num, pricingBody, referencePrice } from '@shared/fpms/pricing';
 import { PriceTermsComponent, SalePaymentComponent, initialPaymentOf } from '@shared/fpms/pricing-ui';
 import { whereItWent, WhereRow } from '@shared/fpms/crates';
 import { DisposalReasons } from '@shared/fpms/labels';
@@ -213,6 +213,15 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             }
                                         </div>
                                     </div>
+                                    @if (m.harvestType === 1 && m.abwG > 0) {
+                                        <div class="form-group mt-2 mb-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="useHarvestAbwForBiomass" name="useHarvestAbwForBiomass" [(ngModel)]="m.useHarvestAbwForBiomass" (ngModelChange)="keepDraft()" />
+                                                <label class="custom-control-label" for="useHarvestAbwForBiomass">Use this harvest ABW for the pond's remaining-biomass estimate</label>
+                                            </div>
+                                            <small class="form-text text-muted">Yes is selected by default. Clear it if the shrimp harvested may be larger than those left in the pond. A later growth sample will replace this ABW basis.</small>
+                                        </div>
+                                    }
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
                                             <label for="fc">Counted shrimp (pieces)</label>
@@ -493,6 +502,15 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     @if (m.sell) {
                                         <div class="card-body">
                                             <p class="small text-muted">@if (showGrades()) { All {{ sellKg() | num: 3 }} kg are sold to this buyer at one price{{ gradeKg() > 0 ? ', on every grade line' : ' as "Ungraded / mixed"' }}. Splitting between buyers or grades at different prices: save the harvest alone, then record each sale. } @else { All {{ sellKg() | num: 3 }} kg are sold to this buyer at one price. Splitting between buyers at different prices: save the harvest alone, then record each sale. }</p>
+                                            @if (m.sale.priceMethod === 2 && abwSchemes.length) {
+                                                <div class="form-group">
+                                                    <label for="absale">Farm pricing scheme</label>
+                                                    <select id="absale" class="form-control" name="saleAbwScheme" [(ngModel)]="m.sale.abwSchemeId" (ngModelChange)="applyAbwScheme($event)">
+                                                        <option value="">Choose a scheme or enter custom terms</option>
+                                                        @for (s of abwSchemes; track s.id) { <option [value]="s.id">{{ s.name }} · base {{ s.baseAbwG }}g</option> }
+                                                    </select>
+                                                </div>
+                                            }
                                             <div class="form-row">
                                                 <div class="form-group col-md-4">
                                                     <label for="spm">Price</label>
@@ -634,6 +652,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
         this.containers = (await this.api.get<any[]>('ContainerType', 'GetAll')).filter((t) => t.isActive);
         this.buyers = await this.api.get<any[]>('TallySheet', 'GetBuyerOptions');
         this.tables = this.can('Farm.Sales') ? (await this.api.get<any[]>('PriceTable', 'GetAll')).filter((t) => t.isActive) : [];
+        this.abwSchemes = this.can('Farm.Sales') ? await this.api.get<any[]>('Sale', 'GetBaseAbwPricingSchemes') : [];
         this.resetBulk();
         if (this.isNew) {
             const all = await this.api.get<any[]>('Batch', 'GetAll', { openOnly: true });
@@ -657,6 +676,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             this.readOnly = !h.canEdit;
             this.m = {
                 ...h,
+                useHarvestAbwForBiomass: h.useHarvestAbwForBiomass ?? false,
                 harvestedAt: FarmTime.toLocalInput(h.harvestedAtUtc),
                 gradeLines: h.gradeLines.map((g: any) => ({ sizeGradeId: g.sizeGradeId, kg: g.kg, soldKg: g.soldKg })),
                 disposals: h.disposals.map((d: any) => ({ ...d })),
@@ -681,7 +701,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
 
     private blank(batchId: string): any {
         return {
-            batchId, harvestType: 1, harvestedAt: FarmTime.nowInput(), totalKg: null, boxes: null, abwG: null, abwSampleWeightG: null, abwSamplePieces: null,
+            batchId, harvestType: 1, harvestedAt: FarmTime.nowInput(), totalKg: null, boxes: null, abwG: null, useHarvestAbwForBiomass: true, abwSampleWeightG: null, abwSamplePieces: null,
             finalCount: null, deadAtHarvest: null, shrimpLeft: null, pondEmptiedConfirmed: false, emergencyReason: null, emergencyNote: '', followUpOn: '', smoothShell: null, intactAppendages: null, noNecrosis: null, qualityNotes: '', gradeLines: [], disposals: [], crates: [],
             buyerId: '', weighedBy: null, sell: false, sale: this.blankSale(), gradeCrates: false,
             // DEC-133: one id per new harvest, kept in the draft, so a retried save returns the harvest already saved.
@@ -972,16 +992,15 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     }
     /** Active price tables (DEC-82), loaded only for users who can sell. */
     tables: any[] = [];
+    /** Active farm-level Base ABW presets, selected for this sale rather than inherited from a buyer. */
+    abwSchemes: any[] = [];
 
     blankSale(): any {
         return {
-            priceMethod: 1, pricePerKg: null, basePricePerKg: null, baseAbwG: null, stepPerG: null, baseCountPerKg: null, stepPerCount: null, priceTableId: '',
+            priceMethod: 1, pricePerKg: null, basePricePerKg: null, baseAbwG: null, stepPerG: null, priceAbwG: null, baseCountPerKg: null, stepPerCount: null, priceTableId: '',
             paymentTerms: '', dueDate: '', paidNow: null, paidMethod: '', paidInFull: true,
         };
     }
-
-    /** Last terms of the buyer chosen on this form (from GetBuyerDefaults). */
-    private buyerPriceTerms: any = null;
 
     buyerName(): string {
         return this.buyers.find((b) => b.id === this.m.buyerId)?.name ?? 'the buyer';
@@ -1008,12 +1027,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
         if (!sale.paymentTerms && d?.paymentTerms) {
             sale.paymentTerms = d.paymentTerms;
         }
-        this.buyerPriceTerms = d?.priceTerms ?? null;
-        if (this.buyerPriceTerms && (sale.priceMethod === 1 || termsEmpty(sale)) && !(num(sale.pricePerKg) > 0)) {
-            sale.priceMethod = this.buyerPriceTerms.priceMethod;
-            applyTerms(sale, this.buyerPriceTerms);
-            this.applySaleFormula();
-        }
+        // Pricing is selected per sale from the farm's configured schemes, never inherited from buyer defaults.
         this.keepDraft();
     }
 
@@ -1052,13 +1066,19 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     }
 
     onSaleMethod(): void {
-        const s = this.m.sale;
-        if (s.priceMethod > 1 && termsEmpty(s)) {
-            if (!applyTerms(s, this.buyerPriceTerms) && s.priceMethod === 4) {
-                const list = this.saleTables();
-                s.priceTableId = list.length && (list[0].buyerId === this.m.buyerId || list.length === 1) ? list[0].id : '';
-            }
-        }
+        // Pricing is selected for this sale, not inherited from the buyer or another transaction.
+        this.applySaleFormula();
+    }
+
+    applyAbwScheme(schemeId: string): void {
+        const scheme = this.abwSchemes.find((x) => x.id === schemeId);
+        if (!scheme) return;
+        Object.assign(this.m.sale, {
+            basePricePerKg: scheme.basePricePerKg,
+            baseAbwG: scheme.baseAbwG,
+            stepPerG: scheme.stepPerG,
+            priceAbwG: null,
+        });
         this.applySaleFormula();
     }
 
@@ -1143,6 +1163,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             totalKg: this.m.totalKg,
             boxes: this.m.boxes,
             abwG: this.m.abwG || null,
+            useHarvestAbwForBiomass: this.m.harvestType === 1 && this.m.useHarvestAbwForBiomass === true,
             abwSampleWeightG: this.sampleComplete() ? Number(this.m.abwSampleWeightG) : null,
             abwSamplePieces: this.sampleComplete() ? Number(this.m.abwSamplePieces) : null,
             // Every crate sends its tare (0 when none), so a later change to the container's empty weight does not alter it.

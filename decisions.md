@@ -88,6 +88,7 @@ All decisions below were accepted on 2026-10-22 by the capstone development team
 | DEC-78 | The Farm Owner can change the farm code; old codes stay reserved and point to the new one | Accepted (full write-up); extends DEC-75 |
 | DEC-79 | A missing SFSC number is warned at stocking and at sale, and listed at Close Batch and on the trace report | Accepted; settles the hold under DEC-70 |
 | DEC-140 | Harvest types (Emergency), remaining-shrimp figures, held unsold stock, Base 10 pricing per gram with farm-set terms | Proposed (full write-up); terms marked † need the partner farm |
+| DEC-141 | Farm-configured Base ABW pricing presets selected per sale; no buyer-specific pricing defaults | Accepted (full write-up, 2026-11-23); supersedes DEC-140 pricing setup |
 | DEC-84 | Trace report for one harvest lot code | Proposed (full write-up); built on `feature/lot-trace` (from `feature/harvest-tally`), not run |
 | DEC-83 | Harvest lot code YY-A-LL-FF-PP-HH (year, area, barangay or municipality, farm, pond, harvest) | Proposed (full write-up); format from the adviser; built on `feature/harvest-tally`, not run |
 | DEC-82 | Pricing by count and by price table, a size grade per crate, and a printable tally sheet | Proposed (full write-up); built on `feature/harvest-tally`, not run |
@@ -3622,3 +3623,53 @@ Each partial harvest is seeded only once its day has passed. The sample must be 
 ---
 
 Copy the decision section format for every new important choice involving architecture, database, authentication, hosting, APIs, libraries or security. Add the decision to the spec's Appendix A at the same time.
+
+
+---
+
+## Decision DEC-141: Farm-configured Base ABW pricing presets selected per sale
+
+Date: 2026-11-23
+Owners: Capstone development team
+Status: Accepted
+Builds on: DEC-80, DEC-140
+
+### Context
+
+The Base ABW formula already exists in the sales domain, but the new-sale flow had been sending fixed-price terms only. The initial DEC-140 proposal placed pricing terms in farm settings and suggested copying the buyer's last terms. The farm wants reusable farm-wide presets without making pricing buyer-specific at this stage.
+
+### Decision
+
+- Farm Settings holds up to 20 named Base ABW pricing schemes. Each scheme has a base price per kg, a base ABW in grams, a configurable peso adjustment per gram, and an active/inactive state. Any base ABW is allowed; names such as Base 5g, Base 10g and Base 15g are labels, not separate hard-coded modes.
+- Each sale selects its own scheme. The same applies to a sale recorded together with a harvest. Staff may instead enter custom Base ABW terms or use a fixed price.
+- Do not create buyer-specific pricing profiles, defaults or automatic reuse of a buyer's previous sale terms in this implementation. The harvest's buyer may still be preselected for the transaction; that does not determine its price.
+- Price = base price + (actual ABW − base ABW) × adjustment per gram. Apply the same adjustment in either direction above or below the base ABW. Round the ABW to 0.01 g and the price to centavos.
+- The calculated price is a reference. Staff may enter a different agreed price; the system warns about the difference and saves the agreed price.
+- The sale line stores the terms and formula reference used at the time of sale. Editing, deactivating or removing a scheme later never changes a historical sale.
+- A scheme is a reusable preset, not a live link from the sale. Selecting it copies its terms onto the sale line.
+
+### Consequences
+
+Farm staff can configure the farm's commonly used pricing agreements once and choose the applicable agreement for each transaction. Different sales to the same buyer can use different agreements without changing buyer records. A future buyer-specific pricing feature can be added separately if the farm needs it.
+
+
+---
+
+## Decision DEC-142: Optional partial-harvest ABW basis for remaining biomass
+
+Date: 2026-11-24
+Status: Accepted
+Builds on: DEC-140
+
+### Decision
+
+- When recording a Partial harvest with an ABW, ask whether that harvest ABW should be used for the pond's estimated remaining biomass.
+- Default the answer to **Yes**. Staff can clear the choice when the harvested shrimp may be larger than those left in the pond.
+- Save the choice on the harvest record and show it again when the harvest is edited. Existing harvests remain opted out so their historical biomass calculation does not change merely because the feature is introduced.
+- The current ABW shown on the batch remains the latest recorded growth-sample or harvest ABW. The ABW used for estimated biomass is a separate basis and its source is shown.
+- A selected Partial-harvest ABW is used only while it is newer than the latest growth sample. A newer growth sample supersedes it. A later Partial harvest can again choose Yes or No.
+- Final and Emergency harvest ABWs remain harvest measurements; this preference applies only to Partial harvests.
+
+### Consequences
+
+The farm can use a partial-harvest measurement when staff consider it representative of the shrimp remaining, while retaining an explicit opt-out for selective harvests. Biomass and FCR-to-date use the same selected ABW basis, and the source is visible to staff.

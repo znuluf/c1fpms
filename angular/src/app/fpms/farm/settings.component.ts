@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
-import { FarmTime } from '@shared/fpms/farm-time';
+import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FPMS_IMPORTS } from '../shared-imports';
 import { TimeListComponent } from '@shared/fpms/time-list.component';
 
@@ -50,6 +50,50 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                             </div>
                                             <small class="form-text text-muted">Turn this off if the farm tests water only on selected days. A day without a reading will not be counted as a missing daily test.</small>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header d-flex align-items-center">
+                                        <h3 class="card-title mr-auto">Base ABW pricing</h3>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAbwScheme()">Add scheme</button>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="small text-muted">Create reusable pricing presets for sales. Each sale copies the selected terms, so later changes here do not alter saved sales. The base price applies at the stated ABW; the per-gram adjustment works above and below that ABW.</p>
+                                        @for (s of p.baseAbwPricingSchemes; track s.id; let i = $index) {
+                                            <div class="border rounded p-2 mb-2">
+                                                <div class="form-row align-items-end">
+                                                    <div class="form-group col-md-3">
+                                                        <label [for]="'abwn' + i">Scheme name</label>
+                                                        <input [id]="'abwn' + i" class="form-control" [name]="'abwn' + i" [(ngModel)]="s.name" required maxlength="60" placeholder="e.g. Base 10g" />
+                                                    </div>
+                                                    <div class="form-group col-md-3">
+                                                        <label [for]="'abwp' + i">Base price (₱/kg)</label>
+                                                        <input [id]="'abwp' + i" type="number" min="0" step="0.01" class="form-control" [name]="'abwp' + i" [(ngModel)]="s.basePricePerKg" required />
+                                                    </div>
+                                                    <div class="form-group col-md-2">
+                                                        <label [for]="'abwg' + i">Base ABW (g)</label>
+                                                        <input [id]="'abwg' + i" type="number" min="0.01" max="60" step="0.01" class="form-control" [name]="'abwg' + i" [(ngModel)]="s.baseAbwG" required />
+                                                    </div>
+                                                    <div class="form-group col-md-2">
+                                                        <label [for]="'abws' + i">Adjustment (₱/g)</label>
+                                                        <input [id]="'abws' + i" type="number" min="0" step="0.01" class="form-control" [name]="'abws' + i" [(ngModel)]="s.stepPerG" required />
+                                                    </div>
+                                                    <div class="form-group col-md-1 fpms-check-cell">
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input" [id]="'abwa' + i" [name]="'abwa' + i" [(ngModel)]="s.isActive" />
+                                                            <label class="custom-control-label" [for]="'abwa' + i">Active</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-md-1 text-right">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeAbwScheme(i)" aria-label="Remove scheme"><i class="fas fa-times"></i></button>
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">At {{ s.baseAbwG || '—' }}g: {{ (s.basePricePerKg || 0) | php }}/kg; {{ (s.stepPerG || 0) | php }} per gram above or below.</small>
+                                            </div>
+                                        } @empty {
+                                            <p class="text-muted mb-0">No Base ABW schemes configured yet. Add one to make it available when recording a sale.</p>
+                                        }
+                                        <small class="form-text text-muted">Up to 20 schemes. You can add any base ABW, not only 5g, 10g or 15g. Deactivate a scheme to hide it from new sales without changing historical sales.</small>
                                     </div>
                                 </div>
                                 <div class="card">
@@ -119,6 +163,21 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                             <div class="card-body">{{ p.waterQualityDaily === false ? 'Water is tested on selected days.' : 'Water is tested every day.' }}</div>
                         </div>
                         <div class="card">
+                            <div class="card-header"><h3 class="card-title">Base ABW pricing</h3></div>
+                            <div class="card-body">
+                                @if (p.baseAbwPricingSchemes.length) {
+                                    @for (s of p.baseAbwPricingSchemes; track s.id) {
+                                        <div class="d-flex justify-content-between border-bottom py-2">
+                                            <span>{{ s.name }} · {{ s.baseAbwG }}g</span>
+                                            <span>{{ s.basePricePerKg | php }}/kg + {{ s.stepPerG | php }}/g {{ s.isActive ? '' : '· inactive' }}</span>
+                                        </div>
+                                    }
+                                } @else {
+                                    <span class="text-muted">No Base ABW pricing schemes configured.</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card">
                             <div class="card-header"><h3 class="card-title">System preferences</h3></div>
                             <div class="card-body">
                                 <dl class="row mb-0 fpms-dl">
@@ -150,6 +209,15 @@ export class FarmSettingsComponent extends FpmsPage implements OnInit {
 
     async load(): Promise<void> {
         this.p = await this.api.get<any>('FarmSettings', 'Get');
+        this.p.baseAbwPricingSchemes ??= [];
+    }
+
+    addAbwScheme(): void {
+        this.p.baseAbwPricingSchemes.push({ id: newGuid(), name: '', basePricePerKg: 0, baseAbwG: 10, stepPerG: 0, isActive: true });
+    }
+
+    removeAbwScheme(index: number): void {
+        this.p.baseAbwPricingSchemes.splice(index, 1);
     }
 
     feedingCount(): number {

@@ -86,6 +86,9 @@ public class Harvest : FarmEntity
     /// <summary>Sampled ABW at harvest (g). Worked out from the sample when both sample fields are given (DEC-80).</summary>
     public decimal? AbwG { get; set; }
 
+    /// <summary>For a Partial harvest, use this harvest ABW for remaining-biomass estimates until a newer growth sample (DEC-142). Existing records default to false.</summary>
+    public bool UseHarvestAbwForBiomass { get; set; }
+
     /// <summary>Optional ABW sample: total weight of the counted shrimp (g), e.g. 5,002 g (DEC-80).</summary>
     public decimal? AbwSampleWeightG { get; set; }
 

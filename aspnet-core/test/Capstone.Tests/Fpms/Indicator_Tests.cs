@@ -23,6 +23,7 @@ public class Indicator_Tests : FpmsTestBase
         i.StockingDensityPerM2.ShouldBe(100m);
         i.CumulativeFeedKg.ShouldBe(3000m);
         i.CumulativeMortality.ShouldBe(10000);
+        i.CumulativeMortalityPct.ShouldBe(5m); // 10,000 recorded deaths ÷ 200,000 PL stocked
         i.HarvestedPieces.ShouldBe(142500m);
         i.TotalHarvestKg.ShouldBe(2500m);
         i.EstimatedPopulation.ShouldBe(47500m);       // 200,000 − 10,000 − 142,500
@@ -34,6 +35,62 @@ public class Indicator_Tests : FpmsTestBase
         i.CultureDays.ShouldBe(99);                   // 8 Sep − 1 Jun (Asia/Manila)
         i.CurrentAbwG.ShouldBe(17.5m);                // harvest ABW after the last sample
         i.FinalAbwG.ShouldBe(17.5m);
+    }
+
+    [Fact]
+    public void Partial_harvest_abw_is_used_by_default_when_selected_and_a_new_growth_sample_supersedes_it()
+    {
+        var sampleAt = new DateTime(2026, 6, 10, 8, 0, 0, DateTimeKind.Utc);
+        var harvestAt = sampleAt.AddDays(1);
+        var facts = new BatchFacts
+        {
+            PlCountStocked = 100_000,
+            GrowthSamples = new List<GrowthSampleFact>
+            {
+                new() { LogId = Guid.NewGuid(), Date = new DateOnly(2026, 6, 10), ObservedAtUtc = sampleAt, AbwG = 10m },
+            },
+            Harvests = new List<HarvestFact>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(), Date = new DateOnly(2026, 6, 11), HarvestedAtUtc = harvestAt,
+                    IsPartial = true, AbwG = 12m, FinalCount = 1_000, UseHarvestAbwForBiomass = true,
+                },
+            },
+        };
+
+        var afterHarvest = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 11));
+        afterHarvest.EstimatedPopulation.ShouldBe(99_000m);
+        afterHarvest.BiomassAbwG.ShouldBe(12m);
+        afterHarvest.BiomassAbwSource.ShouldBe("Harvest");
+        afterHarvest.EstimatedBiomassKg.ShouldBe(1_188m);
+
+        facts.Harvests[0].UseHarvestAbwForBiomass = false;
+        var optedOut = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 11));
+        optedOut.BiomassAbwG.ShouldBe(10m);
+        optedOut.BiomassAbwSource.ShouldBe("Sample");
+        optedOut.EstimatedBiomassKg.ShouldBe(990m);
+
+        // A later partial harvest where staff opt out must not erase the earlier opted-in biomass basis.
+        facts.Harvests[0].UseHarvestAbwForBiomass = true;
+        facts.Harvests.Add(new HarvestFact
+        {
+            Id = Guid.NewGuid(), Date = new DateOnly(2026, 6, 12), HarvestedAtUtc = sampleAt.AddDays(2),
+            IsPartial = true, AbwG = 13m, FinalCount = 500, UseHarvestAbwForBiomass = false,
+        });
+        var laterOptOut = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 12));
+        laterOptOut.BiomassAbwG.ShouldBe(12m);
+        laterOptOut.BiomassAbwSource.ShouldBe("Harvest");
+
+        facts.GrowthSamples.Add(new GrowthSampleFact
+        {
+            LogId = Guid.NewGuid(), Date = new DateOnly(2026, 6, 12), ObservedAtUtc = sampleAt.AddDays(2), AbwG = 11m,
+        });
+        var afterNewSample = IndicatorCalculator.Compute(facts, new DateOnly(2026, 6, 12));
+        afterNewSample.BiomassAbwG.ShouldBe(11m);
+        afterNewSample.BiomassAbwSource.ShouldBe("Sample");
+        afterNewSample.EstimatedPopulation.ShouldBe(98_500m); // 100,000 − 1,000 − 500 harvested pieces
+        afterNewSample.EstimatedBiomassKg.ShouldBe(1_083.5m); // 98,500 × 11 g ÷ 1000
     }
 
     [Fact]

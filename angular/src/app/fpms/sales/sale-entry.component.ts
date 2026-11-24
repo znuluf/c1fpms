@@ -3,7 +3,7 @@ import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { FPMS_IMPORTS } from '../shared-imports';
-import { PRICE_METHODS, applyTerms, countFromAbw, pricingBody, referencePrice, termsEmpty, usedAbw, usedCount } from '@shared/fpms/pricing';
+import { PRICE_METHODS, countFromAbw, pricingBody, referencePrice, usedAbw, usedCount } from '@shared/fpms/pricing';
 import { PriceTermsComponent, SalePaymentComponent, initialPaymentOf } from '@shared/fpms/pricing-ui';
 import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
 
@@ -68,6 +68,16 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                 <span>{{ totalKg() | num: 3 : true }} kg · <strong>{{ total() | php }}</strong></span>
                             </div>
                             <div class="card-body pt-0">
+                                @if (abwSchemes.length) {
+                                    <div class="form-group mt-3">
+                                        <label for="saleAbwScheme">Base ABW pricing for this sale</label>
+                                        <select id="saleAbwScheme" class="custom-select" name="saleAbwScheme" [(ngModel)]="m.abwSchemeId" (ngModelChange)="applySaleAbwScheme($event)">
+                                            <option value="">Choose a scheme to apply to all lines</option>
+                                            @for (s of abwSchemes; track s.id) { <option [value]="s.id">{{ s.name }} · base {{ s.baseAbwG }}g</option> }
+                                        </select>
+                                        <small class="form-text text-muted">The selected terms are copied to every sale line and calculated against each harvest's ABW.</small>
+                                    </div>
+                                }
                                 @for (l of m.lines; track $index) {
                                     <div class="fpms-sale-line">
                                         <div class="harvest">
@@ -123,7 +133,7 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                 <details class="fpms-fold mt-3 mb-0">
                                     <summary>How kg and prices work <span class="fpms-fold-hint">buyer kg, base ABW price</span></summary>
                                     <p class="mb-1">Leave Buyer kg empty when the buyer pays on the farm's weight. When it is filled, the amount uses it; yield and FCR keep the farm weight.</p>
-                                    <p class="mb-0">"Base ABW price" works the price out from the buyer's base price at a base ABW plus a step for each gram above it; the shrimp ABW starts from the harvest's sampled ABW.</p>
+                                    <p class="mb-0">"Base ABW pricing" works the price out from the selected base price and base ABW, adjusting for each gram above or below it; the shrimp ABW starts from the harvest's sampled ABW.</p>
                                 </details>
                             </div>
                         </div>
@@ -199,8 +209,6 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
     sellable: any[] = [];
     original: any = null;
     m: any = { lines: [] };
-    /** Pricing terms from the buyer's last priced sale or their price table, fetched once per buyer (DEC-80, DEC-82). */
-    terms: Record<string, any> = {};
     readonly methods = PRICE_METHODS;
 
     /** Price by count is offered only on a line that already uses it: the partner farm always sells by kg (DEC-90). */
@@ -209,6 +217,8 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
     }
     /** Active price tables with their rows (DEC-82). */
     tables: any[] = [];
+    /** Active farm-level Base ABW presets; selected terms are copied onto each sale line. */
+    abwSchemes: any[] = [];
     /** Harvests with a crate tally, loaded as the sale's lines name them (DEC-86): id → the harvest, or null while unknown. */
     private crateSource: Record<string, any> = {};
     /** The crate numbers typed for each harvest, e.g. "1-10, 15". */
@@ -224,11 +234,13 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         this.isNew = !id;
         this.review = false;
         this.original = this.isNew ? null : await this.api.get<any>('Sale', 'Get', { id });
-        const [buyers, sellable] = await Promise.all([
+        const [buyers, sellable, settings] = await Promise.all([
             this.api.get<any[]>('Buyer', 'GetLookup'),
             this.api.get<any[]>('Sale', 'GetSellableLines', { saleId: this.original?.id }),
+            this.api.get<any[]>('Sale', 'GetBaseAbwPricingSchemes'),
         ]);
         this.buyers = buyers.filter((b) => b.isActive || b.id === this.original?.buyerId);
+        this.abwSchemes = settings ?? [];
         const keep = new Set((this.original?.lines ?? []).map((l: any) => l.priceTableId).filter((x: any) => x));
         this.tables = (await this.api.get<any[]>('PriceTable', 'GetAll')).filter((t) => t.isActive || keep.has(t.id));
         this.sellable = sellable;
@@ -273,6 +285,23 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         this.loading = false;
     }
 
+    applySaleAbwScheme(schemeId: string): void {
+        const scheme = this.abwSchemes.find((s) => s.id === schemeId);
+        if (!scheme) return;
+        for (const line of this.m.lines ?? []) {
+            line.priceMethod = 2;
+            this.copyAbwScheme(line, scheme);
+            this.applyFormula(line);
+        }
+    }
+
+    private copyAbwScheme(line: any, scheme: any): void {
+        line.basePricePerKg = scheme.basePricePerKg;
+        line.baseAbwG = scheme.baseAbwG;
+        line.stepPerG = scheme.stepPerG;
+        line.priceAbwG = null;
+    }
+
     option(l: any): any {
         return this.sellable.find((o) => o.harvestGradeLineId === l.harvestGradeLineId);
     }
@@ -311,7 +340,16 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
 
     addLine(): void {
         const free = this.sellable.find((o) => !this.m.lines.some((l: any) => l.harvestGradeLineId === o.harvestGradeLineId));
-        this.m.lines.push(this.blankLine(free?.harvestGradeLineId ?? ''));
+        const line = this.blankLine(free?.harvestGradeLineId ?? '');
+        if (this.m.abwSchemeId) {
+            const scheme = this.abwSchemes.find((s) => s.id === this.m.abwSchemeId);
+            if (scheme) {
+                line.priceMethod = 2;
+                this.copyAbwScheme(line, scheme);
+            }
+        }
+        this.m.lines.push(line);
+        if (line.priceMethod > 1) this.applyFormula(line);
         this.loadCrates();
     }
 
@@ -470,14 +508,8 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         this.m.lines = own.map((o) => ({ ...this.blankLine(o.harvestGradeLineId), kg: canPrefillAll ? o.unsoldKg : null }));
         const buyerId = own[0].harvestBuyerId;
         if (buyerId && this.buyers.some((b) => b.id === buyerId && b.isActive)) {
+            // The harvest's buyer is a useful starting point, but pricing is selected independently for each sale.
             this.m.buyerId = buyerId;
-            const t = await this.buyerTerms();
-            for (const l of this.m.lines) {
-                if (t) {
-                    l.priceMethod = t.priceMethod;
-                    await this.onMethod(l);
-                }
-            }
         }
     }
 
@@ -488,36 +520,11 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         };
     }
 
-    private async buyerTerms(): Promise<any> {
-        if (!this.m.buyerId) {
-            return null;
-        }
-        if (!(this.m.buyerId in this.terms)) {
-            this.terms[this.m.buyerId] = await this.api.get<any>('Sale', 'GetBuyerPriceTerms', { buyerId: this.m.buyerId });
-        }
-        return this.terms[this.m.buyerId];
-    }
-
-    /**
-     * Choosing a priced method fills its empty terms: from another line on this sale with the same method, else the buyer's
-     * last terms (or their price table); for a table with neither, the buyer's own table, else the only active one.
-     */
+    /** Pricing terms are chosen for this sale; no buyer's previous pricing is copied. */
     async onMethod(l: any): Promise<void> {
-        if (l.priceMethod > 1 && termsEmpty(l)) {
-            const sibling = this.m.lines.find((x: any) => x !== l && x.priceMethod === l.priceMethod && !termsEmpty(x));
-            if (sibling) {
-                applyTerms(l, { ...sibling });
-                l.termsFrom = null;
-            } else {
-                const t = await this.buyerTerms();
-                if (applyTerms(l, t)) {
-                    l.termsFrom = t.fromDispatchReceiptNo ?? null;
-                } else if (l.priceMethod === 4) {
-                    const own = this.tables.filter((x) => x.isActive && x.buyerId === this.m.buyerId);
-                    const any = this.tables.filter((x) => x.isActive);
-                    l.priceTableId = (own.length ? own[0] : any.length === 1 ? any[0] : null)?.id ?? '';
-                }
-            }
+        if (l.priceMethod === 2 && this.m.abwSchemeId) {
+            const scheme = this.abwSchemes.find((s) => s.id === this.m.abwSchemeId);
+            if (scheme) this.copyAbwScheme(l, scheme);
         }
         this.applyFormula(l);
     }
