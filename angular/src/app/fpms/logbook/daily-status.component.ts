@@ -9,6 +9,8 @@ interface StatusRow {
     pondCode: string;
     batchCode: string;
     cycleCode: string;
+    technicianName: string | null;
+    isMine: boolean;
     cells: CalendarCell[];
     gaps: number;
     daysSinceMortality: number | null;
@@ -307,6 +309,8 @@ export class DailyStatusComponent extends FpmsPage implements OnInit {
                     pondCode: r.pondCode,
                     batchCode: r.batchCode,
                     cycleCode: r.cycleCode ?? '',
+                    technicianName: r.technicianName ?? null,
+                    isMine: !!r.isMine,
                     cells,
                     gaps: gapDates.length,
                     daysSinceMortality: r.daysSinceMortality ?? null,
