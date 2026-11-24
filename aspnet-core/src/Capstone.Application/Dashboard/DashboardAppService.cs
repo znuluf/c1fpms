@@ -294,6 +294,7 @@ public class DashboardAppService : CapstoneAppServiceBase
                         where m.IsOutOfRange && l.ObservedAtUtc >= since
                         orderby l.ObservedAtUtc descending
                         select new { l.Id, l.BatchId, l.PondId, l.ObservedAtUtc, b.BatchCode, m.ParameterCode, m.Value, m.UnitCode, m.Side }).ToListAsync();
+        var alertBatchIds = wq.Select(w => w.BatchId).ToHashSet();
         var pondCodes = ponds.ToDictionary(p => p.Id, p => p.PondCode);
         var grouped = wq.GroupBy(w => new { w.PondId, Day = FarmClock.LocalDate(w.ObservedAtUtc, zone) })
             .Select(g =>
@@ -362,7 +363,7 @@ public class DashboardAppService : CapstoneAppServiceBase
                 PondId = pond.Id, PondCode = pond.PondCode, PondName = PondNaming.DisplayName(pond.Prefix?.Name, pond.Number), AreaM2 = pond.AreaM2,
                 Status = PondAppService.DeriveStatus(pond.ManualStatus, batch?.Status, round != null, round?.PreparedAtUtc != null),
                 BatchId = batch?.Id, BatchCode = batch?.BatchCode, BatchStatus = batch?.Status,
-                HasWaterQualityAlert = batch != null && wq.Any(w => w.BatchId == batch.Id),
+                HasWaterQualityAlert = batch != null && alertBatchIds.Contains(batch.Id),
                 TechnicianName = batch == null ? null
                     : batch.IsCoveredOn(today) ? NameOf(people, batch.CoverUserId)
                     : Production.PeopleText.Join(batch.Technicians.Select(t => NameOf(people, t.UserId)).OrderBy(n => n)),
