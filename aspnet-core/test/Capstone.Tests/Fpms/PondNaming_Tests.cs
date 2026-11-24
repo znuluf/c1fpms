@@ -51,8 +51,23 @@ public class PondNaming_Tests : FpmsTestBase
         var ponds = Resolve<PondAppService>();
         var id = await ponds.Create(NewPond(PrefixId("GP")));
         (await ponds.Get(id)).PondCode.ShouldBe("GP-04");
-        var nursery = await ponds.Create(NewPond(PrefixId("NP")));
-        (await ponds.Get(nursery)).PondCode.ShouldBe("NP-01");
+        await Should.ThrowAsync<UserFriendlyException>(() => ponds.Create(NewPond(PrefixId("NP"))));
+        (await ponds.GetPrefixes()).Single(p => p.ShortCode == "NP").NextNumber.ShouldBe(1);
+    }
+
+    [Theory]
+    [InlineData(PondPurpose.Nursery)]
+    [InlineData(PondPurpose.Reservoir)]
+    [InlineData(PondPurpose.Treatment)]
+    public async Task New_ponds_must_be_grow_out(PondPurpose purpose)
+    {
+        var input = NewPond(PrefixId("GP"));
+        input.Purpose = purpose;
+
+        var ex = await Should.ThrowAsync<UserFriendlyException>(() => Resolve<PondAppService>().Create(input));
+
+        ex.Message.ShouldContain("grow-out");
+        (await Resolve<PondAppService>().GetAll()).ShouldNotContain(p => p.PondCode == "GP-04");
     }
 
     [Fact]
