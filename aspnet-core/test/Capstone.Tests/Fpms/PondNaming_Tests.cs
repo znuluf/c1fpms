@@ -51,8 +51,10 @@ public class PondNaming_Tests : FpmsTestBase
         var ponds = Resolve<PondAppService>();
         var id = await ponds.Create(NewPond(PrefixId("GP")));
         (await ponds.Get(id)).PondCode.ShouldBe("GP-04");
-        await Should.ThrowAsync<UserFriendlyException>(() => ponds.Create(NewPond(PrefixId("NP"))));
-        (await ponds.GetPrefixes()).Single(p => p.ShortCode == "NP").NextNumber.ShouldBe(1);
+        var nurseryPrefixId = PrefixId("NP");
+        var nurseryPrefixedGrowOutId = await ponds.Create(NewPond(nurseryPrefixId));
+        (await ponds.Get(nurseryPrefixedGrowOutId)).PondCode.ShouldBe("NP-01");
+        (await ponds.GetPrefixes()).Single(p => p.ShortCode == "NP").NextNumber.ShouldBe(2);
     }
 
     [Theory]
