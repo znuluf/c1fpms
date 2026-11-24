@@ -56,10 +56,30 @@ interface PondCard {
             <div class="container-fluid">
                 @if (pondSummary(); as summary) {
                     <div class="row mb-3" aria-label="Pond summary">
-                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.total }}</div><div class="small text-muted">Ponds on record</div></div></div></div>
-                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.growOut }}</div><div class="small text-muted">Grow-out ponds</div></div></div></div>
-                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.inProduction }}</div><div class="small text-muted">In production</div></div></div></div>
-                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.areaHa | num: 2 }} ha</div><div class="small text-muted">Total pond area</div></div></div></div>
+                        <div class="col-6 col-lg-3 mb-2">
+                            <div class="fpms-overview-stat h-100">
+                                <span class="fpms-overview-icon fpms-overview-icon-blue"><i class="fas fa-water" aria-hidden="true"></i></span>
+                                <div class="fpms-overview-copy"><div class="v">{{ summary.total }}</div><div class="l">Ponds on record</div></div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3 mb-2">
+                            <div class="fpms-overview-stat h-100">
+                                <span class="fpms-overview-icon fpms-overview-icon-teal"><i class="fas fa-shrimp" aria-hidden="true"></i></span>
+                                <div class="fpms-overview-copy"><div class="v">{{ summary.growOut }}</div><div class="l">Grow-out ponds</div></div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3 mb-2">
+                            <div class="fpms-overview-stat h-100">
+                                <span class="fpms-overview-icon fpms-overview-icon-green"><i class="fas fa-seedling" aria-hidden="true"></i></span>
+                                <div class="fpms-overview-copy"><div class="v">{{ summary.inProduction }}</div><div class="l">In production</div></div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3 mb-2">
+                            <div class="fpms-overview-stat h-100">
+                                <span class="fpms-overview-icon fpms-overview-icon-amber"><i class="fas fa-vector-square" aria-hidden="true"></i></span>
+                                <div class="fpms-overview-copy"><div class="v">{{ summary.areaHa | num: 2 }} ha</div><div class="l">Total pond area</div></div>
+                            </div>
+                        </div>
                     </div>
                 }
                 <section class="card" aria-labelledby="pond-h">
