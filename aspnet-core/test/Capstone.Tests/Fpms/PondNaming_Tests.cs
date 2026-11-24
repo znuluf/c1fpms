@@ -124,6 +124,7 @@ public class PondNaming_Tests : FpmsTestBase
     public async Task Ponds_inherit_the_farm_farming_system_unless_overridden()
     {
         var ponds = Resolve<PondAppService>();
+        (await ponds.GetFarmFarmingSystem()).ShouldBe(FarmingSystem.SemiIntensive);
         (await ponds.Get(PondId("GP-01"))).FarmingSystem.ShouldBe(FarmingSystem.SemiIntensive);
         (await ponds.Get(PondId("GP-03"))).FarmingSystem.ShouldBe(FarmingSystem.Intensive);
 
@@ -133,6 +134,7 @@ public class PondNaming_Tests : FpmsTestBase
         await settings.Update(farmSettings);
 
         ponds = Resolve<PondAppService>(); // a new request reads the saved farm setting
+        (await ponds.GetFarmFarmingSystem()).ShouldBe(FarmingSystem.Extensive);
         var inherited = await ponds.Get(PondId("GP-01"));
         inherited.FarmingSystem.ShouldBe(FarmingSystem.Extensive);
         inherited.FarmingSystemOverride.ShouldBeNull();
