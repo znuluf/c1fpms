@@ -10,6 +10,9 @@ interface PondCard {
     code: string;
     name: string;
     areaM2: number;
+    averageDepthM: number;
+    maxDepthM: number;
+    constructionType: number;
     purpose: number;
     status: number;
     archived: boolean;
@@ -51,6 +54,14 @@ interface PondCard {
         </fpms-page-header>
         <section class="content px-2 pb-3">
             <div class="container-fluid">
+                @if (pondSummary(); as summary) {
+                    <div class="row mb-3" aria-label="Pond summary">
+                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.total }}</div><div class="small text-muted">Active ponds</div></div></div></div>
+                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.growOut }}</div><div class="small text-muted">Grow-out ponds</div></div></div></div>
+                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.inProduction }}</div><div class="small text-muted">In production</div></div></div></div>
+                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.areaHa | num: 2 }} ha</div><div class="small text-muted">Total pond area</div></div></div></div>
+                    </div>
+                }
                 <section class="card" aria-labelledby="pond-h">
                     <div class="card-header">
                         <h2 id="pond-h" class="card-title pd-h2">All ponds</h2>
@@ -94,6 +105,8 @@ interface PondCard {
                                         <thead>
                                             <tr>
                                                 <th scope="col">Pond</th>
+                                                <th scope="col">Purpose</th>
+                                                <th scope="col">Construction</th>
                                                 <th scope="col">Status</th>
                                                 <th scope="col">Batch</th>
                                                 <th scope="col">DOC</th>
@@ -117,6 +130,8 @@ interface PondCard {
                                                         <div class="small text-muted">{{ p.name }} · {{ p.areaM2 | num: 0 }} m²</div>
                                                         @if (p.isReserved) { <div class="small text-warning-dark">Reserved for {{ p.reservedByDelivery }}</div> }
                                                     </td>
+                                                    <td>{{ p.purpose | label: L.PondPurposes }}</td>
+                                                    <td>{{ p.constructionType | label: L.ConstructionTypes }}</td>
                                                     <td><fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge></td>
                                                     <td>@if (p.batchId) { <a [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a> } @else { <span class="text-muted">—</span> }</td>
                                                     <td>{{ p.doc ?? '—' }}</td>
@@ -173,6 +188,7 @@ interface PondCard {
                                                 <a class="pd-code" [routerLink]="['/app/ponds', p.id]">{{ p.code }}</a>
                                                 <div class="small text-muted">
                                                     {{ p.name }} · {{ p.areaM2 | num: 0 }} m²
+                                                    <span class="d-block">{{ p.purpose | label: L.PondPurposes }} · {{ p.constructionType | label: L.ConstructionTypes }}</span>
                                                 </div>
                                             </div>
                                             <div class="text-right"><fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge>@if (p.isReserved) { <div class="small text-warning-dark mt-1">Reserved for {{ p.reservedByDelivery }}</div> }</div>
@@ -485,6 +501,16 @@ export class PondsComponent extends FpmsPage implements OnInit {
         const all = this.allCards();
         return all && [...all.filter((c) => !c.archived), ...all.filter((c) => c.archived)];
     });
+    /** Facility totals exclude archived ponds; production figures remain tied to the active batch. */
+    pondSummary = computed(() => {
+        const active = (this.cards() ?? []).filter((p) => !p.archived);
+        return {
+            total: active.length,
+            growOut: active.filter((p) => p.purpose === 1).length,
+            inProduction: active.filter((p) => p.status === 3).length,
+            areaHa: active.reduce((sum, p) => sum + Number(p.areaM2 || 0), 0) / 10000,
+        };
+    });
     /** The cards are shown a page at a time, so a farm with very many ponds still opens quickly. */
     readonly pageSize = 24;
     private readonly limit = signal(this.pageSize);
@@ -546,6 +572,9 @@ export class PondsComponent extends FpmsPage implements OnInit {
                     code: p.pondCode,
                     name: p.name,
                     areaM2: p.areaM2,
+                    averageDepthM: p.averageDepthM,
+                    maxDepthM: p.maxDepthM,
+                    constructionType: p.constructionType,
                     purpose: p.purpose,
                     status: p.status,
                     archived: !!p.isArchived,
