@@ -327,6 +327,9 @@ public class PondAppService : CapstoneAppServiceBase
         return openBatch is BatchStatus.Harvested or BatchStatus.Failed ? PondDisplayStatus.PostHarvest : PondDisplayStatus.Available;
     }
 
+    /// <summary>The farm's default farming system, available to users who can manage ponds without granting access to all farm settings.</summary>
+    public virtual async Task<FarmingSystem> GetFarmFarmingSystem() => (await Farm.GetSettingsAsync()).FarmingSystem;
+
     /// <summary>The farm's ponds. Archived ponds are left out unless asked for.</summary>
     public virtual async Task<List<PondListDto>> GetAll(bool includeArchived = false)
     {
