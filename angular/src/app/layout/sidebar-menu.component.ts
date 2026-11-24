@@ -82,12 +82,13 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             new MenuItem('Dashboard', '/app/dashboard', 'fas fa-tachometer-alt', 'Farm.Dashboard'),
             ...myPond,
             this.inSection(farm, new MenuItem('Ponds', '/app/ponds', 'fas fa-water', 'Farm.Ponds')),
-            this.inSection(farm, this.sectionItem('resources', 'Resources', 'fas fa-boxes')),
             this.inSection(farm, this.sectionItem('farm', 'Farm', 'fas fa-home')),
+            this.inSection(farm, this.sectionItem('personnel', 'Personnel', 'fas fa-users')),
+            this.inSection('Resources', this.sectionItem('resources', 'Resources', 'fas fa-boxes')),
             this.inSection(production, this.sectionItem('operations', 'Operations', 'fas fa-clipboard-check')),
             this.inSection(production, this.sectionItem('production', 'Production', 'fas fa-seedling', '/app/production/batches')),
             this.inSection(production, this.sectionItem('harvest', canSell ? 'Harvest and sales' : 'Harvest', 'fas fa-shrimp')),
-            this.inSection(production, new MenuItem('Reports', '/app/reports', 'fas fa-chart-line', 'Farm.Reports')),
+            new MenuItem('Reports', '/app/reports', 'fas fa-chart-line', 'Farm.Reports'),
         ];
     }
 
