@@ -11,8 +11,8 @@
     --fpms-ref-ground: #f3f6f5;
     --fpms-ref-border: #e1e8e5;
     --fpms-ref-heading: #203b4d;
+    --fpms-nav-active: #18845b;
 }
-
 html[data-theme='neutral'] {
     --fpms-ref-nav: #202b35;
     --fpms-ref-nav-hover: #344653;
@@ -22,9 +22,9 @@ html[data-theme='neutral'] {
     --fpms-ref-ground: #f2f4f5;
     --fpms-ref-border: #d9dfe2;
     --fpms-ref-heading: #202b35;
+    --fpms-nav-active: #176b52;
 }
 
-// Workspace ground and page rhythm.
 body,
 .content-wrapper {
     background: var(--fpms-ref-ground) !important;
@@ -45,9 +45,11 @@ body,
     }
 }
 
-// Deep navy navigation rail, with a green active state like the reference application.
+// Deep navy navigation rail and green active state.
 .main-sidebar.fpms-sidebar,
-.fpms-nav-card {
+.fpms-nav-card,
+.main-sidebar.fpms-sidebar .sidebar,
+.main-sidebar.fpms-sidebar .fpms-nav-foot {
     background: var(--fpms-ref-nav);
     border-color: rgba(255, 255, 255, 0.12);
 }
@@ -55,18 +57,11 @@ body,
     background: #fff;
     border-bottom-color: var(--fpms-ref-border);
 }
-.main-sidebar.fpms-sidebar .sidebar {
-    background: var(--fpms-ref-nav);
-}
 .main-sidebar.fpms-sidebar .fpms-user-panel {
     border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
-.main-sidebar.fpms-sidebar .fpms-user-name {
-    color: #fff;
-}
-.main-sidebar.fpms-sidebar .fpms-user-role {
-    color: #c2d0d8;
-}
+.main-sidebar.fpms-sidebar .fpms-user-name { color: #fff; }
+.main-sidebar.fpms-sidebar .fpms-user-role { color: #c2d0d8; }
 .main-sidebar.fpms-sidebar .fpms-avatar {
     color: #fff;
     background: rgba(255, 255, 255, 0.16);
@@ -77,13 +72,9 @@ body,
     text-transform: uppercase;
     font-size: 0.75rem;
 }
-.main-sidebar.fpms-sidebar .nav-sidebar .nav-link {
-    color: #e5edf1;
-}
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-link { color: #e5edf1; }
 .main-sidebar.fpms-sidebar .nav-sidebar .nav-link .nav-icon,
-.main-sidebar.fpms-sidebar .fpms-chevron {
-    color: #b4c6d0;
-}
+.main-sidebar.fpms-sidebar .fpms-chevron { color: #b4c6d0; }
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item:hover > .nav-link,
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link:focus,
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item.has-treeview.menu-open > .nav-link {
@@ -95,52 +86,48 @@ body,
     color: #fff;
     box-shadow: inset 3px 0 0 #b9e2cc;
 }
-.main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link.active .nav-icon {
-    color: #fff;
-}
-.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview::before {
-    background: rgba(255, 255, 255, 0.2);
-}
-.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item::before {
-    border-color: rgba(255, 255, 255, 0.2);
-}
-.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link {
-    color: #c7d5dc;
-}
+.main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link.active .nav-icon { color: #fff; }
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview::before { background: rgba(255, 255, 255, 0.2); }
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item::before { border-color: rgba(255, 255, 255, 0.2); }
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link { color: #c7d5dc; }
 .main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link.active {
     color: #fff;
     background: var(--fpms-ref-nav-hover);
 }
-.main-sidebar.fpms-sidebar .fpms-nav-foot {
-    background: var(--fpms-ref-nav);
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
-}
-.main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link {
-    color: #d7e2e8;
-}
+.main-sidebar.fpms-sidebar .fpms-nav-foot { border-top: 1px solid rgba(255, 255, 255, 0.14); }
+.main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link { color: #d7e2e8; }
 .main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link:hover,
 .main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link:focus {
     color: #fff;
     background: var(--fpms-ref-nav-hover);
 }
 
-// White top bar and clearer workspace headings.
+// White top bar, clean section navigation and clearer page headings.
 .main-header.navbar {
     background: #fff;
     border-bottom: 1px solid var(--fpms-ref-border);
 }
-.fpms-crumbs li:last-child {
-    color: var(--fpms-ref-heading);
-}
+.fpms-crumbs li:last-child,
 .fpms-page-header h1,
-.fpms-report-header h4 {
-    color: var(--fpms-ref-heading);
+.fpms-report-header h4 { color: var(--fpms-ref-heading); }
+.fpms-page-header { margin-bottom: 1rem; }
+.fpms-section-bar {
+    background: #fff;
+    border-bottom: 1px solid var(--fpms-ref-border);
 }
-.fpms-page-header {
-    margin-bottom: 1rem;
+.fpms-section-tabs {
+    background: #fff;
+    border-color: var(--fpms-ref-border);
+    box-shadow: none;
 }
+.fpms-section-tab.active {
+    background: var(--fpms-ref-green);
+    color: #fff;
+}
+.fpms-section-tab.active:hover,
+.fpms-section-tab.active:focus { color: #fff; }
 
-// Cards and summary surfaces: consistent borders, restrained elevation and spacing.
+// Consistent white cards and summary surfaces. Avoid clipping menus/popovers inside cards.
 .card,
 .fpms-kpi,
 .fpms-status-tile,
@@ -151,26 +138,24 @@ body,
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(24, 54, 75, 0.045);
 }
-.card {
-    overflow: hidden;
-}
 .card-header {
     background: #fff;
     border-bottom: 1px solid var(--fpms-ref-border);
 }
-.card-title {
-    color: var(--fpms-ref-heading);
-    font-weight: 600;
-}
+.card-title { color: var(--fpms-ref-heading); font-weight: 600; }
 .fpms-kpi {
     border-left: 3px solid var(--fpms-ref-green);
     box-shadow: 0 2px 8px rgba(24, 54, 75, 0.045);
 }
-.fpms-kpi .v {
-    color: var(--fpms-ref-heading);
+.fpms-kpi .v { color: var(--fpms-ref-heading); }
+.fpms-stats { gap: 0.75rem; }
+.fpms-stat {
+    border: 1px solid var(--fpms-ref-border);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(24, 54, 75, 0.045);
 }
 
-// Green is reserved for primary navigation/actions and links; semantic status colors remain untouched.
+// Green primary actions and links; semantic status colors remain untouched.
 .btn-primary {
     background: var(--fpms-ref-green);
     border-color: var(--fpms-ref-green);
@@ -190,32 +175,20 @@ body,
     background: var(--fpms-ref-green);
     border-color: var(--fpms-ref-green);
 }
-a {
-    color: var(--fpms-ref-green-dark);
-}
-a:hover {
-    color: var(--fpms-ref-green);
-}
+a { color: var(--fpms-ref-green-dark); }
+a:hover { color: var(--fpms-ref-green); }
 
-// Consistent table chrome, keeping all existing row/status semantics.
+// Table chrome and form controls.
 .table thead th {
     background: #f4f7f6;
     color: #52636c;
     border-bottom: 1px solid var(--fpms-ref-border);
     font-weight: 600;
 }
-.table tbody tr:hover {
-    background: #f7faf8;
-}
+.table tbody tr:hover { background: #f7faf8; }
 .table td,
-.table th {
-    border-color: var(--fpms-ref-border);
-}
-.table-responsive {
-    border-radius: 8px;
-}
-
-// Fields and filters use a quiet, consistent control treatment.
+.table th { border-color: var(--fpms-ref-border); }
+.table-responsive { border-radius: 8px; }
 .form-control,
 .custom-select,
 select.form-control {
