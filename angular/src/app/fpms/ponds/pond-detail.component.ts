@@ -376,14 +376,19 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     </div>
                                 }
                                 <div class="form-group col-md-4">
-                                    <label for="purpose">Purpose</label>
-                                    <select id="purpose" class="form-control" name="purpose" [(ngModel)]="pond.purpose" [disabled]="isLocked('purpose')">
-                                        @for (o of Options.pondPurpose; track o.value) {
-                                            <option [ngValue]="o.value">{{ o.label }}</option>
+                                    <label>Purpose</label>
+                                    @if (isNew) {
+                                        <p class="form-control-plaintext">Grow-out</p>
+                                        <small class="form-text text-muted">New ponds are created for grow-out production. Existing ponds keep their recorded purpose.</small>
+                                    } @else {
+                                        <select id="purpose" class="form-control" name="purpose" [(ngModel)]="pond.purpose" [disabled]="isLocked('purpose')">
+                                            @for (o of Options.pondPurpose; track o.value) {
+                                                <option [ngValue]="o.value">{{ o.label }}</option>
+                                            }
+                                        </select>
+                                        @if (isLocked('purpose')) {
+                                            <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('purpose') }}</small>
                                         }
-                                    </select>
-                                    @if (isLocked('purpose')) {
-                                        <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('purpose') }}</small>
                                     }
                                 </div>
                                 <div class="form-group col-md-4">
@@ -673,9 +678,9 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
         this.isNew = !id;
         this.tabChosen = false;
         if (this.isNew) {
-            const [prefixes, profile] = await Promise.all([this.api.get<any[]>('Pond', 'GetPrefixes'), this.api.get<any>('FarmProfile', 'Get')]);
+            const [prefixes, settings] = await Promise.all([this.api.get<any[]>('Pond', 'GetPrefixes'), this.api.get<any>('FarmSettings', 'Get')]);
             this.prefixes = prefixes;
-            this.farmSystem = profile.farmingSystem;
+            this.farmSystem = settings.farmingSystem;
             this.pond = {
                 id: '00000000-0000-0000-0000-000000000000',
                 number: null,
