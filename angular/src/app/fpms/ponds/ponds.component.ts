@@ -107,6 +107,7 @@ interface PondCard {
                                                 <th scope="col">Pond</th>
                                                 <th scope="col">Purpose</th>
                                                 <th scope="col">Construction</th>
+                                                <th scope="col">Depth (avg / max)</th>
                                                 <th scope="col">Status</th>
                                                 <th scope="col">Batch</th>
                                                 <th scope="col">DOC</th>
@@ -132,6 +133,7 @@ interface PondCard {
                                                     </td>
                                                     <td>{{ p.purpose | label: L.PondPurposes }}</td>
                                                     <td>{{ p.constructionType | label: L.ConstructionTypes }}</td>
+                                                    <td class="text-nowrap">{{ p.averageDepthM | num: 2 }} / {{ p.maxDepthM | num: 2 }} m</td>
                                                     <td><fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge></td>
                                                     <td>@if (p.batchId) { <a [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a> } @else { <span class="text-muted">—</span> }</td>
                                                     <td>{{ p.doc ?? '—' }}</td>
