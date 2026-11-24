@@ -61,8 +61,9 @@ export const SECTIONS: Section[] = [
     {
         key: 'production',
         label: 'Production',
-        prefixes: ['/app/production'],
+        prefixes: ['/app/production', '/app/resources/fry-deliveries'],
         tabs: [
+            { label: 'Fry deliveries', route: '/app/resources/fry-deliveries', permission: 'Farm.FryDeliveries' },
             { label: 'Cycles', route: '/app/production/cycles', permission: 'Farm.Production' },
             { label: 'Batches', route: '/app/production/batches', permission: 'Farm.Production' },
         ],
@@ -97,27 +98,33 @@ export const SECTIONS: Section[] = [
         ],
     },
     {
-        key: 'resources',
-        label: 'Resources',
-        prefixes: ['/app/resources', '/app/inventory'],
+        key: 'personnel',
+        label: 'Personnel',
+        prefixes: ['/app/farm/users', '/app/farm/activity'],
         tabs: [
-            { label: 'Hatchery sources', route: '/app/resources/hatcheries', permission: 'Farm.Hatcheries' },
-            { label: 'Fry deliveries', route: '/app/resources/fry-deliveries', permission: 'Farm.FryDeliveries' },
-            { label: 'Buyers', route: '/app/resources/buyers', permission: 'Farm.Buyers' },
-            { label: 'Inventory', route: '/app/inventory', permission: 'Farm.Inventory' },
+            { label: 'Users', route: '/app/farm/users', permission: 'Farm.Users' },
+            { label: 'Activity log', route: '/app/farm/activity', permission: 'Farm.ActivityLog' },
         ],
     },
     {
         key: 'farm',
         label: 'Farm',
-        prefixes: ['/app/farm'],
+        prefixes: ['/app/farm/profile', '/app/farm/settings', '/app/farm/standards', '/app/farm/documents'],
         tabs: [
             { label: 'Profile', route: '/app/farm/profile', permission: 'Farm.Profile' },
             { label: 'Farm Settings', route: '/app/farm/settings', permission: 'Farm.Settings' },
             { label: 'Farm standards', route: '/app/farm/standards', permission: 'Farm.Profile' },
-            { label: 'Users', route: '/app/farm/users', permission: 'Farm.Users' },
             { label: 'Permits and licenses', route: '/app/farm/documents', permission: 'Farm.Compliance' },
-            { label: 'Activity log', route: '/app/farm/activity', permission: 'Farm.ActivityLog' },
+        ],
+    },
+    {
+        key: 'resources',
+        label: 'Resources',
+        prefixes: ['/app/resources', '/app/inventory'],
+        tabs: [
+            { label: 'Hatchery sources', route: '/app/resources/hatcheries', permission: 'Farm.Hatcheries' },
+            { label: 'Buyers', route: '/app/resources/buyers', permission: 'Farm.Buyers' },
+            { label: 'Inventory', route: '/app/inventory', permission: 'Farm.Inventory' },
         ],
     },
 ];
