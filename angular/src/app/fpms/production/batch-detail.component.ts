@@ -54,8 +54,17 @@ interface CalMonth {
         </fpms-page-header>
         <section class="content px-2 pb-3">
             <div class="container-fluid">
-                @if (!b) {
+                @if (loading) {
                     <fpms-loading></fpms-loading>
+                } @else if (loadError) {
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <span class="mr-auto">This production batch could not be loaded. Check the connection, then try again.</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="load()">Try again</button>
+                    </div>
+                } @else if (!b) {
+                    <fpms-empty text="This production batch could not be found or you do not have access to it." icon="fas fa-water">
+                        <a routerLink="/app/production/batches" class="btn btn-sm btn-outline-primary">Back to batches</a>
+                    </fpms-empty>
                 } @else {
                     @if (b.harvestReadinessReached) {
                         <div
@@ -693,6 +702,9 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
     dayParam = '';
 
     b: any = null;
+    loading = true;
+    loadError = false;
+    private loadRequest = 0;
     logs: any[] = [];
     sessions: any[] = [];
     harvests: any[] = [];
@@ -874,17 +886,40 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
     }
 
     async load(): Promise<void> {
+        const request = ++this.loadRequest;
         const id = this.param('id');
-        this.b = await this.api.get<any>('Batch', 'Get', { id });
-        this.setPageTitle(this.b ? `Batch ${this.b.batchCode}` : null);
+        this.loading = true;
+        this.loadError = false;
+        this.b = null;
+        this.logs = [];
+        this.sessions = [];
+        this.harvests = [];
+        this.calendar = null;
         this.closing = null;
         this.reopening = null;
-        this.loadLogs();
-        this.loadFeeding();
-        this.loadCalendar();
-        if (this.can('Farm.Harvests')) {
-            // A batch has a handful of harvests, so the first 100 cover it.
-            this.harvests = (await this.api.get<any>('Harvest', 'GetList', { batchId: id, maxResultCount: 100, sorting: 'harvestedAt desc' })).items;
+        try {
+            const batch = await this.api.get<any>('Batch', 'Get', { id });
+            if (request !== this.loadRequest) return;
+            this.b = batch;
+            this.setPageTitle(batch ? `Batch ${batch.batchCode}` : null);
+            if (!batch) return;
+            this.loadLogs();
+            this.loadFeeding();
+            this.loadCalendar();
+            if (this.can('Farm.Harvests')) {
+                // A batch has a handful of harvests, so the first 100 cover it.
+                const result = await this.api.get<any>('Harvest', 'GetList', { batchId: id, maxResultCount: 100, sorting: 'harvestedAt desc' });
+                if (request !== this.loadRequest) return;
+                this.harvests = result?.items ?? [];
+            }
+        } catch (e) {
+            if (request === this.loadRequest) {
+                console.warn(e);
+                this.loadError = true;
+                this.b = null;
+            }
+        } finally {
+            if (request === this.loadRequest) this.loading = false;
         }
     }
 
