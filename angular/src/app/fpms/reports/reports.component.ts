@@ -635,6 +635,8 @@ export class ReportsComponent extends FpmsPage implements OnInit {
     r: any = null;
     /** Filters that produced the report currently on screen; edits to the form must not change its export. */
     appliedFilters: any = null;
+    /** Prevents a slower, earlier report request from replacing a newer result. */
+    private reportRequest = 0;
     generatedAt = '';
     cycles: any[] = [];
     batches: any[] = [];
@@ -725,6 +727,7 @@ export class ReportsComponent extends FpmsPage implements OnInit {
     }
 
     async runReport(): Promise<void> {
+        const request = ++this.reportRequest;
         const f = { ...this.f };
         const range = { from: f.from || null, to: f.to || null };
         const key = this.key;
@@ -751,7 +754,7 @@ export class ReportsComponent extends FpmsPage implements OnInit {
                     break;
             }
         });
-        if (ok) {
+        if (ok && request === this.reportRequest) {
             this.shown = key;
             this.pagers = {};
             this.generatedAt = new Date().toISOString();
