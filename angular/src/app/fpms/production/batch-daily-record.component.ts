@@ -129,6 +129,13 @@ function daysBetween(a: string, b: string): number {
                 }
             </div>
 
+            @if (mode() === 'day' && !error() && !loading()) {
+                <nav class="fpms-dr-section-nav no-print" aria-label="Daily record sections">
+                    <a class="btn btn-sm btn-outline-secondary" href="#daily-feeding">Feeding</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="#daily-water">Water quality</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="#daily-other">Other entries</a>
+                </nav>
+            }
             @if (error()) {
                 <div class="alert alert-warning d-flex align-items-center" role="alert">
                     <span class="mr-auto"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>The records for these dates could not be loaded. {{ error() }}</span>
@@ -149,7 +156,7 @@ function daysBetween(a: string, b: string): number {
 
                 <div class="fpms-dr-columns">
                     <div class="fpms-dr-main">
-                        <div class="card">
+                        <div class="card" id="daily-feeding">
                             <div class="card-header d-flex align-items-center">
                                 <h4 class="card-title mr-auto">Feeding</h4>
                                 <span class="text-muted">{{ statusOf(day()).text }} · {{ feedKg(fs) | num: 1 }} kg</span>
@@ -201,7 +208,7 @@ function daysBetween(a: string, b: string): number {
                             </div>
                         </div>
 
-                        <div class="card">
+                        <div class="card" id="daily-water">
                             <div class="card-header d-flex align-items-center">
                                 <h4 class="card-title mr-auto">Water quality</h4>
                                 @if (outOfRange(ls).length) {
@@ -239,7 +246,7 @@ function daysBetween(a: string, b: string): number {
                     </div>
 
                     <div class="fpms-dr-side">
-                        <div class="card">
+                        <div class="card" id="daily-other">
                             <div class="card-header d-flex align-items-center">
                                 <h4 class="card-title mr-auto">Other entries</h4>
                                 @if (deadOn(ls)) { <span class="text-muted">{{ deadOn(ls) | num: 0 }} dead</span> }
