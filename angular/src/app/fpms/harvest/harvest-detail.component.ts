@@ -11,7 +11,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
     template: `
         <fpms-page-header
             [title]="harvest ? 'Harvest · ' + (harvest.lotCode || (harvest.harvestedAtUtc | farmDate)) : 'Harvest'"
-            [subtitle]="harvest ? (harvest.pondCode || batch?.pondCode || 'Pond') + ' · ' + (harvest.batchCode || batch?.batchCode || 'Batch') : 'Harvest record'"
+            [subtitle]="harvest ? (harvest.pondCode || batch?.pondCode || 'Pond') + ' · ' + (harvest.batchCode || batch?.batchCode || 'Batch') + ' · ' + (harvest.harvestedAtUtc | farmDate) : 'Harvest record'"
             backLink="/app/harvests"
             backLabel="Harvests">
             @if (harvest) {
@@ -56,7 +56,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                             <div class="small-box bg-light mb-0"><div class="inner"><h3>{{ harvest.boxes ?? '—' }}</h3><p>Crates</p></div></div>
                         </div>
                         <div class="col-6 col-lg-3 mb-3">
-                            <div class="small-box bg-light mb-0"><div class="inner"><h3>{{ harvest.harvestedAtUtc | farmDate }}</h3><p>Harvest date</p></div></div>
+                            <div class="small-box bg-light mb-0"><div class="inner"><h3>{{ harvest.finalCount == null ? '—' : (harvest.finalCount | num: 0) }}</h3><p>Pieces counted</p></div></div>
                         </div>
                     </div>
                     <div class="row">
