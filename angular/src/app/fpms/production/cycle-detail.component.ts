@@ -26,7 +26,12 @@ import { batchShort } from '@shared/fpms/labels';
         </fpms-page-header>
         <section class="content px-2 pb-3">
             <div class="container-fluid">
-                @if (!c) {
+                @if (failed()) {
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <span class="mr-auto">This production cycle could not be loaded. Check the connection, then try again.</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy()" (click)="load()">Try again</button>
+                    </div>
+                } @else if (!c) {
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (reopening) {
@@ -170,9 +175,11 @@ import { batchShort } from '@shared/fpms/labels';
 })
 export class CycleDetailComponent extends FpmsPage implements OnInit {
     readonly cycle = signal<any>(null);
+    readonly failed = signal(false);
     readonly batchShort = batchShort;
     closing: any = null;
     reopening: { reason: string } | null = null;
+    private loadRequest = 0;
 
     openRecord(id: string, event: Event): void {
         const target = event.target as HTMLElement | null;
@@ -187,11 +194,23 @@ export class CycleDetailComponent extends FpmsPage implements OnInit {
     }
 
     async load(): Promise<void> {
+        const request = ++this.loadRequest;
+        this.failed.set(false);
+        this.cycle.set(null);
         this.closing = null;
         this.reopening = null;
-        const c = await this.api.get<any>('Cycle', 'Get', { id: this.param('id') });
-        this.cycle.set(c);
-        this.setPageTitle(c ? `Cycle ${c.cycleCode}` : null);
+        try {
+            const c = await this.api.get<any>('Cycle', 'Get', { id: this.param('id') });
+            if (request !== this.loadRequest) return;
+            this.cycle.set(c);
+            this.failed.set(!c);
+            this.setPageTitle(c ? `Cycle ${c.cycleCode}` : null);
+        } catch (e) {
+            if (request === this.loadRequest) {
+                console.warn(e);
+                this.failed.set(true);
+            }
+        }
     }
 
     async close(): Promise<void> {
