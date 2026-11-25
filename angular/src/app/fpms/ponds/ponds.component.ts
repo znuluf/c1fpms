@@ -131,7 +131,7 @@ interface PondCard {
                                                 <th scope="col">Latest water</th>
                                                 <th scope="col">Log · 7 days</th>
                                                 <th scope="col">Attention</th>
-                                                <th scope="col">Actions</th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -190,9 +190,9 @@ interface PondCard {
                                                         } @else { <span class="text-muted">—</span> }
                                                     </td>
                                                     <td class="text-nowrap">
-                                                        @if (p.batchId) { <a (click)="$event.stopPropagation()" [routerLink]="['/app/production/batches', p.batchId]">Batch</a><span class="mx-1">·</span> }
-                                                        <a (click)="$event.stopPropagation()" [routerLink]="['/app/ponds', p.id]">Pond</a>
-                                                        @if (!p.batchId && p.status === 7 && can('Farm.Production.Stock')) { <span class="mx-1">·</span><a (click)="$event.stopPropagation()" routerLink="/app/production/create-batch">Stock</a> }
+                                                        @if (!p.batchId && p.status === 7 && can('Farm.Production.Stock')) {
+                                                            <a (click)="$event.stopPropagation()" routerLink="/app/production/create-batch">Stock</a>
+                                                        } @else { <span class="text-muted">—</span> }
                                                     </td>
                                                 </tr>
                                             }
