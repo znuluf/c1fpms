@@ -265,3 +265,40 @@ body,
     .fpms-section-tabs { flex: 1 1 auto; min-width: 0; }
     .fpms-section-tab { padding-right: 0.75rem; padding-left: 0.75rem; }
 }
+
+// Entry workspaces keep their connected-panel behavior, but give each section a quiet visual
+// heading so long harvest and sale forms are easier to scan without adding extra cards.
+.fpms-form-stack > .card:not(.card-outline) > .card-header,
+.fpms-form-stack > fieldset > .card:not(.card-outline) > .card-header {
+    padding: 0.85rem 1.25rem;
+    background: #f8fafc;
+}
+.fpms-form-stack > .card:not(.card-outline) > .card-header .card-title,
+.fpms-form-stack > fieldset > .card:not(.card-outline) > .card-header .card-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+.fpms-form-stack > .card:not(.card-outline) > .card-body,
+.fpms-form-stack > fieldset > .card:not(.card-outline) > .card-body {
+    padding: 1.25rem;
+}
+.fpms-form-stack .form-group > label {
+    color: var(--fpms-ref-heading);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.fpms-form-stack .form-text {
+    line-height: 1.4;
+}
+@media (max-width: 575.98px) {
+    .fpms-form-stack > .card:not(.card-outline) > .card-header,
+    .fpms-form-stack > fieldset > .card:not(.card-outline) > .card-header {
+        padding: 0.75rem 1rem;
+    }
+    .fpms-form-stack > .card:not(.card-outline) > .card-body,
+    .fpms-form-stack > fieldset > .card:not(.card-outline) > .card-body {
+        padding: 1rem;
+    }
+}
