@@ -18,6 +18,7 @@ namespace Capstone.Tests.Fpms;
 public class SimpleSampleData_Tests : FpmsTestBase
 {
     private readonly int _farm;
+    private readonly int _farmi;
 
     public SimpleSampleData_Tests()
     {
@@ -30,7 +31,31 @@ public class SimpleSampleData_Tests : FpmsTestBase
             new SimpleSampleDataBuilder(context).Create(); // a second run adds nothing
         });
         _farm = GetTenantId(SimpleSampleDataBuilder.FarmCode);
+        _farmi = GetTenantId("farmi");
         LoginAsTenant(SimpleSampleDataBuilder.FarmCode, "arkabubba");
+    }
+
+    [Fact]
+    public void Farmi_is_a_separate_empty_tenant_with_four_idempotently_seeded_accounts()
+    {
+        var users = Q(c => c.Users.IgnoreQueryFilters()
+            .Where(u => u.TenantId == _farmi)
+            .OrderBy(u => u.UserName)
+            .Select(u => new { u.UserName, u.Name, u.Surname })
+            .ToList());
+
+        users.Select(u => (u.UserName, u.Name, u.Surname)).ShouldBe(new[]
+        {
+            ("haraff", "Har", "Aff"),
+            ("maysuli", "May", "Suli"),
+            ("rafah", "Raf", "Ah"),
+            ("yamilus", "Yam", "Ilus"),
+        });
+        Q(c => c.Users.IgnoreQueryFilters().Count(u => u.TenantId == _farmi)).ShouldBe(4);
+        Q(c => c.Ponds.IgnoreQueryFilters().Count(p => p.TenantId == _farmi)).ShouldBe(0);
+        Q(c => c.ProductionCycles.IgnoreQueryFilters().Count(x => x.TenantId == _farmi)).ShouldBe(0);
+        Q(c => c.FarmProfiles.IgnoreQueryFilters().Any(p => p.Id == _farmi && p.FarmName == "Farmi")).ShouldBeTrue();
+        Q(c => c.Users.IgnoreQueryFilters().Where(u => u.TenantId == _farm).Count()).ShouldBe(4);
     }
 
     [Fact]
