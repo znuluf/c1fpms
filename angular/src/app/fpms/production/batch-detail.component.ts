@@ -907,10 +907,18 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
             this.loadFeeding();
             this.loadCalendar();
             if (this.can('Farm.Harvests')) {
-                // A batch has a handful of harvests, so the first 100 cover it.
-                const result = await this.api.get<any>('Harvest', 'GetList', { batchId: id, maxResultCount: 100, sorting: 'harvestedAt desc' });
-                if (request !== this.loadRequest) return;
-                this.harvests = result?.items ?? [];
+                // A batch has a handful of harvests, so the first 100 cover it. A harvest-list
+                // failure should not hide the rest of a successfully loaded batch.
+                try {
+                    const result = await this.api.get<any>('Harvest', 'GetList', { batchId: id, maxResultCount: 100, sorting: 'harvestedAt desc' });
+                    if (request !== this.loadRequest) return;
+                    this.harvests = result?.items ?? [];
+                } catch (e) {
+                    if (request === this.loadRequest) {
+                        console.warn(e);
+                        this.harvests = [];
+                    }
+                }
             }
         } catch (e) {
             if (request === this.loadRequest) {
