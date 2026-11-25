@@ -96,7 +96,18 @@ import { DisposalReasons } from '@shared/fpms/labels';
                     <!-- One panel (DEC-107): the harvest's parts are sections of it, with Save as its footer. -->
                     <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="harvest" [fpmsReviewNew]="isNew" novalidate>
                         <fieldset [disabled]="readOnly">
-                            <div class="card">
+                            <nav class="fpms-harvest-entry-nav mb-3" aria-label="Harvest form sections">
+                                <a class="btn btn-sm btn-outline-secondary" href="#harvest-details">Harvest details</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="#harvest-crates">Crate tally</a>
+                                @if (showGrades()) {
+                                    <a class="btn btn-sm btn-outline-secondary" href="#harvest-grades">Size grading</a>
+                                }
+                                <a class="btn btn-sm btn-outline-secondary" href="#harvest-outcomes">Not-sold outcomes</a>
+                                @if (isNew && m.buyerId && canSell) {
+                                    <a class="btn btn-sm btn-outline-secondary" href="#harvest-sale">Sale</a>
+                                }
+                            </nav>
+                            <div class="card" id="harvest-details">
                                 <div class="card-body">
                                     <div class="form-row">
                                         <div class="form-group col-md-8">
@@ -231,7 +242,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     </div>
                                 </div>
                             </div>
-                            <div class="card">
+                            <div class="card" id="harvest-crates">
                                 <div class="card-header">
                                     <a href="javascript:;" class="card-title text-reset" role="button" (click)="showCrates = !showCrates" [attr.aria-expanded]="showCrates">
                                         <i class="fas mr-1" [class.fa-chevron-right]="!showCrates" [class.fa-chevron-down]="showCrates" aria-hidden="true"></i>Crate tally (optional)
@@ -364,7 +375,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                             </div>
                             <!-- Size grading only on farms that grade, or on a harvest graded before grading was turned off (DEC-100). -->
                             @if (showGrades()) {
-                            <div class="card">
+                            <div class="card" id="harvest-grades">
                                 <div class="card-header"><h3 class="card-title">Size grading</h3></div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
@@ -406,7 +417,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                 </div>
                             </div>
                             }
-                            <div class="card">
+                            <div class="card" id="harvest-outcomes">
                                 <div class="card-header"><h3 class="card-title">Record what was not sold (optional)</h3></div>
                                 <div class="card-body">
                                     <p class="small text-muted">Use this only for shrimp that will no longer be sold: staff or home use, given away, spoiled, or lost. Shrimp kept for a later sale stay in the unsold balance and remain available to sell. You can record their outcome later without changing the original harvest.</p>
@@ -492,7 +503,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                 </div>
                             </div>
                             @if (isNew && m.buyerId && canSell) {
-                                <div class="card card-outline card-primary">
+                                <div class="card card-outline card-primary" id="harvest-sale">
                                     <div class="card-header">
                                         <div class="custom-control custom-switch">
                                             <input type="checkbox" class="custom-control-input" id="sell" name="sell" [(ngModel)]="m.sell" (ngModelChange)="keepDraft()" />
@@ -580,6 +591,18 @@ import { DisposalReasons } from '@shared/fpms/labels';
     `,
     styles: [
         `
+            .fpms-harvest-entry-nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            #harvest-details,
+            #harvest-crates,
+            #harvest-grades,
+            #harvest-outcomes,
+            #harvest-sale {
+                scroll-margin-top: 1rem;
+            }
             .tally-table th {
                 white-space: nowrap;
                 font-size: 0.875rem;
