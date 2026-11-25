@@ -421,14 +421,14 @@ export class InventoryComponent extends FpmsPage implements OnInit {
 
     selectItemFromRow(i: any, event: Event): void {
         const target = event.target as HTMLElement | null;
-        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (target?.closest('a, button, input, select, textarea')) return;
         if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
         void this.selectItem(i);
     }
 
     selectLotFromRow(l: any, event: Event): void {
         const target = event.target as HTMLElement | null;
-        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (target?.closest('a, button, input, select, textarea')) return;
         if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
         void this.selectLot(l);
     }
