@@ -8,6 +8,18 @@ import { DisposalReasons } from '@shared/fpms/labels';
 @Component({
     standalone: true,
     imports: FPMS_IMPORTS,
+    styles: [`
+        .fpms-harvest-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scrollbar-width: thin;
+        }
+        .fpms-harvest-tabs .nav-link {
+            white-space: nowrap;
+        }
+    `],
     template: `
         <fpms-page-header
             [title]="harvest ? (harvest.lotCode ? 'Harvest · ' + harvest.lotCode : 'Harvest') : 'Harvest'"
@@ -39,7 +51,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                         <a routerLink="/app/harvests" class="btn btn-sm btn-outline-primary">Back to harvests</a>
                     </fpms-empty>
                 } @else {
-                    <nav class="nav nav-tabs mb-3" aria-label="Harvest sections">
+                    <nav class="nav nav-tabs mb-3 fpms-harvest-tabs" aria-label="Harvest sections">
                         <a class="nav-link active" href="#overview">Overview</a>
                         <a class="nav-link" href="#breakdown">Size grades</a>
                         <a class="nav-link" href="#where-it-went">Dispatches &amp; sales</a>
