@@ -40,7 +40,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                     <div>
                         <div class="mb-3" role="group" aria-label="Report">
                             @for (o of reports; track o.key) {
-                                <button type="button" class="rp-chip" [attr.aria-pressed]="key === o.key" (click)="key = o.key; r = null">{{ o.label }}</button>
+                                <button type="button" class="rp-chip" [attr.aria-pressed]="key === o.key" (click)="key = o.key; r = null; appliedFilters = null">{{ o.label }}</button>
                             }
                         </div>
                         <div class="form-row align-items-end">
@@ -633,6 +633,8 @@ export class ReportsComponent extends FpmsPage implements OnInit {
     /** DEC-84: the lot code typed in "Trace a lot code". */
     lotCode = '';
     r: any = null;
+    /** Filters that produced the report currently on screen; edits to the form must not change its export. */
+    appliedFilters: any = null;
     generatedAt = '';
     cycles: any[] = [];
     batches: any[] = [];
@@ -723,7 +725,7 @@ export class ReportsComponent extends FpmsPage implements OnInit {
     }
 
     async runReport(): Promise<void> {
-        const f = this.f;
+        const f = { ...this.f };
         const range = { from: f.from || null, to: f.to || null };
         const key = this.key;
         let result: any;
@@ -753,13 +755,14 @@ export class ReportsComponent extends FpmsPage implements OnInit {
             this.shown = key;
             this.pagers = {};
             this.generatedAt = new Date().toISOString();
+            this.appliedFilters = f;
             this.r = result;
         }
     }
 
     /** Downloads the CSV of the report on screen with the same filters (Owner only; the server logs the export). */
     async exportReport(): Promise<void> {
-        const f = this.f;
+        const f = this.appliedFilters ?? this.f;
         const kinds: Record<ReportKey, string> = {
             cycle: 'CyclePerformance',
             harvest: 'BatchHarvestAndSurvival',
