@@ -39,6 +39,7 @@ interface AttentionRow {
     action: string;
     actionLink: any[];
     actionParams?: any;
+    actionFragment?: string;
 }
 
 interface GlanceTile {
@@ -322,7 +323,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                                                     </div>
                                                                     @if (r.detail) { <div class="detail">{{ r.detail }}</div> }
                                                                 </div>
-                                                                <a class="btn btn-sm btn-outline-primary" [routerLink]="r.actionLink" [queryParams]="r.actionParams">{{ r.action }}</a>
+                                                                <a class="btn btn-sm btn-outline-primary" [routerLink]="r.actionLink" [queryParams]="r.actionParams" [fragment]="r.actionFragment">{{ r.action }}</a>
                                                             </li>
                                                         }
                                                     </ul>
@@ -721,8 +722,9 @@ export class DashboardComponent extends FpmsPage implements OnInit {
                 whereSub: u.pondCode,
                 whereLink: ['/app/harvests', u.harvestId],
                 since: `Follow up ${this.shortDate(String(u.followUpOn).substring(0, 10))}`,
-                action: 'Open harvest',
-                actionLink: ['/app/harvests', u.harvestId],
+                action: 'Record outcome',
+                actionLink: ['/app/harvests', u.harvestId, 'edit'],
+                actionFragment: 'harvest-outcomes',
             });
         }
         for (const f of (dash.finishStocking as any[]) ?? []) {
