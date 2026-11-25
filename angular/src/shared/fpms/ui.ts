@@ -193,7 +193,7 @@ export class FormHintComponent {
 }
 
 /**
- * "More" menu for page-header actions that are rare or drastic (close, reopen, declare failure, export).
+ * "More" menu for page-header actions that are rare or drastic (close, reopen, export).
  * Built on <details>, so it works with keyboard and screen readers without extra libraries.
  * Put <button class="dropdown-item"> or <a class="dropdown-item"> children inside.
  */
