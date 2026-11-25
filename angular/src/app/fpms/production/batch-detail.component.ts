@@ -466,9 +466,9 @@ interface CalMonth {
                                         <thead><tr><th fpmsSort="observedAt" [pager]="logPager" (sorted)="loadLogs()">Observed</th><th fpmsSort="logType" [pager]="logPager" (sorted)="loadLogs()">Type</th><th>Details</th><th>By</th></tr></thead>
                                         <tbody>
                                             @for (l of logs; track l.id) {
-                                                <tr>
+                                                <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open log entry" (click)="openRecord(l.id, $event)" (keydown.enter)="openRecord(l.id, $event)">
                                                     <td class="text-nowrap">
-                                                        <a [routerLink]="['/app/logbook', l.id]">{{ l.observedAtUtc | farmDate }}</a>
+                                                        <a (click)="$event.stopPropagation()" [routerLink]="['/app/logbook', l.id]">{{ l.observedAtUtc | farmDate }}</a>
                                                         <div class="text-muted">{{ time(l.observedAtUtc) }} · Day {{ docOf(isoDateOf(l.observedAtUtc)) }}</div>
                                                     </td>
                                                     <td>
@@ -769,6 +769,13 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
         if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
         if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
         this.router.navigate(['/app/harvests', id]);
+    }
+
+    openRecord(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/logbook', id]);
     }
 
     ngOnInit(): void {
