@@ -34,8 +34,14 @@ Only `FPMS_Scenarios` is dropped by that command.
 | `rkabubba-aqua` | `samsedel` | Farm Owner | `Fpms@2026` |
 | `rkabubba-aqua` | `konacsus` | Farm Technician | `Fpms@2026` |
 | `rkabubba-aqua` | `filusyam` | Farm Technician | `Fpms@2026` |
+| `farmi` | `rafah` | Raf Ah — Farm Owner | `Fpms@2026` |
+| `farmi` | `haraff` | Har Aff — Farm Owner | `Fpms@2026` |
+| `farmi` | `maysuli` | May Suli — Farm Technician | `Fpms@2026` |
+| `farmi` | `yamilus` | Yam Ilus — Farm Technician | `Fpms@2026` |
 
 The System Administrator account is `admin`; its password is the local `ADMIN_PASSWORD` value in `.devcontainer/local.env`.
+
+**Farmi** is a second, separate tenant included for multi-farm and tenant-isolation testing. It has the four accounts above and default farm configuration, but intentionally starts without ponds, cycles, or production records. Its address fields are test placeholders; update them in Farm Settings when testing farm profile details.
 
 ## Scenario coverage
 
