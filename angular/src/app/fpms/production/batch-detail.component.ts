@@ -437,7 +437,7 @@ interface CalMonth {
                                             @for (s of sessions; track s.id) {
                                                 <tr>
                                                     <td class="text-nowrap">
-                                                        <a href="javascript:;" (click)="drawer.open({ kind: 'feeding', batchId: b.id, date: String(s.feedDate).substring(0, 10) })">{{ s.feedDate | farmDate }}</a>
+                                                        <button type="button" class="btn btn-link p-0 align-baseline" (click)="drawer.open({ kind: 'feeding', batchId: b.id, date: String(s.feedDate).substring(0, 10) })">{{ s.feedDate | farmDate }}</button>
                                                         <div class="text-muted">Day {{ docOf(s.feedDate) }}</div>
                                                     </td>
                                                     <td>{{ s.session | label: L.FeedingSessions }}</td>
