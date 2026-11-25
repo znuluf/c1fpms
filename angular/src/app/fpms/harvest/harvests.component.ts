@@ -157,7 +157,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                     <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                                                 </a>
                                                 @if (h.canEdit && h.unaccountedKg > 0) {
-                                                    <a class="btn btn-sm btn-outline-secondary mr-1" (click)="$event.stopPropagation()" [routerLink]="['/app/harvests', h.id, 'edit'] title="Account for remaining kilograms">Account</a>
+                                                    <a class="btn btn-sm btn-outline-secondary mr-1" (click)="$event.stopPropagation()" [routerLink]="['/app/harvests', h.id, 'edit']" title="Account for remaining kilograms">Account</a>
                                                 }
                                                 @if (can('Farm.Sales') && sellable(h) > 0) {
                                                     <a
