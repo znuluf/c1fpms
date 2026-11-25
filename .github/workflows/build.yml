@@ -14,6 +14,8 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: "1"
     steps:
       - uses: actions/checkout@v5
+      - name: Validate scenario database setup script
+        run: bash -n .devcontainer/create-scenario-db.sh
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "9.0.x"
