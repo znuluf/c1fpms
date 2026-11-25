@@ -179,6 +179,7 @@ interface CalMonth {
                                         <strong>{{ closeCheck.flaggedLots.length }} stock lot{{ closeCheck.flaggedLots.length === 1 ? '' : 's' }} used by this batch {{ closeCheck.flaggedLots.length === 1 ? 'is' : 'are' }} flagged for reconciliation:</strong>
                                         @for (l of closeCheck.flaggedLots; track $index) { <span class="d-block">{{ l.product }}, lot {{ l.lotNumber }}</span> }
                                         The feed or chemical amounts for this batch may be off until the stock is reconciled on the Inventory page. You can still close.
+                                        <a class="btn btn-xs btn-outline-secondary mt-2" routerLink="/app/inventory">Review inventory</a>
                                     </div>
                                 }
                                 @if (closeCheck?.unaccountedKg > 0.0005) {
