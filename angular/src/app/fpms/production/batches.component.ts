@@ -185,8 +185,12 @@ export class BatchesComponent extends FpmsPage implements OnInit {
                     search: this.search || undefined,
                     ...this.pager.params,
                 }),
+                // Status counts enrich the filter chips; the batch list remains useful without them.
                 this.api.get<any[]>('Batch', 'GetStatusCounts', {
                     search: this.search || undefined,
+                }).catch((e) => {
+                    console.warn('Could not load batch status counts.', e);
+                    return [];
                 }),
             ]);
             if (request !== this.loadRequest) return;
