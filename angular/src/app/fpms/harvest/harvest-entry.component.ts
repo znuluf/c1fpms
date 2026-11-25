@@ -404,7 +404,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                         <tfoot>
                                             <tr>
                                                 <td><button type="button" class="btn btn-sm btn-outline-secondary" (click)="addGrade()" [disabled]="m.gradeLines.length >= grades.length || gradedByCrate()"><i class="fas fa-plus mr-1"></i>Add grade</button></td>
-                                                <td [class.text-danger]="gradeOver()" colspan="3"><strong>{{ gradeKg() | num: 3 }}</strong> of {{ m.totalKg || 0 | num: 3 }} kg graded</td>
+                                                <td [class.text-danger]="gradeOver()" [attr.colspan]="isNew ? 2 : 3"><strong>{{ gradeKg() | num: 3 }}</strong> of {{ m.totalKg || 0 | num: 3 }} kg graded</td>
                                             </tr>
                                         </tfoot>
                                     </table>
