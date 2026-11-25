@@ -101,9 +101,9 @@ import { batchShort } from '@shared/fpms/labels';
                                 </thead>
                                 <tbody>
                                     @for (b of c.batches; track b.id) {
-                                        <tr>
+                                        <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open batch details" (click)="openRecord(b.id, $event)" (keydown.enter)="openRecord(b.id, $event)">
                                             <td>
-                                                <a class="text-nowrap" [routerLink]="['/app/production/batches', b.id]" [title]="b.batchCode"><span class="fpms-pond-tag">{{ b.pondCode }}</span> {{ batchShort(b.batchCode) }}</a>
+                                                <a (click)="$event.stopPropagation()" class="text-nowrap" [routerLink]="['/app/production/batches', b.id]" [title]="b.batchCode"><span class="fpms-pond-tag">{{ b.pondCode }}</span> {{ batchShort(b.batchCode) }}</a>
                                                 <div class="mt-1"><fpms-badge [text]="b.status | label: L.BatchStatuses"></fpms-badge></div>
                                             </td>
                                             <td class="text-nowrap">
@@ -173,6 +173,13 @@ export class CycleDetailComponent extends FpmsPage implements OnInit {
     readonly batchShort = batchShort;
     closing: any = null;
     reopening: { reason: string } | null = null;
+
+    openRecord(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/production/batches', id]);
+    }
 
     ngOnInit(): void {
         // Detail routes reuse this component when only the :id changes, so reload on every change.
