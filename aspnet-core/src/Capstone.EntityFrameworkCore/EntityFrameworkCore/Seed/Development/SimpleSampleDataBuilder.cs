@@ -83,6 +83,14 @@ public class SimpleSampleDataBuilder
         var kim = farms.EnsureUser(farm.Id, "konacsus", "Kim", "Onacsus", StaticRoleNames.Tenants.FarmTechnician, pw);
         var far = farms.EnsureUser(farm.Id, "filusyam", "Far", "Ilusyam", StaticRoleNames.Tenants.FarmTechnician, pw);
 
+        // A second, intentionally lean farm for testing tenant isolation and multi-farm sign-in.
+        // It has users and default farm configuration, but no ponds or production records.
+        var farmi = farms.EnsureFarm("farmi", "Farmi", "Test address", "Test municipality", "Test province");
+        farms.EnsureUser(farmi.Id, "rafah", "Raf", "Ah", StaticRoleNames.Tenants.FarmOwner, pw);
+        farms.EnsureUser(farmi.Id, "haraff", "Har", "Aff", StaticRoleNames.Tenants.FarmOwner, pw);
+        farms.EnsureUser(farmi.Id, "maysuli", "May", "Suli", StaticRoleNames.Tenants.FarmTechnician, pw);
+        farms.EnsureUser(farmi.Id, "yamilus", "Yam", "Ilus", StaticRoleNames.Tenants.FarmTechnician, pw);
+
         if (_context.Ponds.IgnoreQueryFilters().Any(p => p.TenantId == farm.Id))
         {
             return;
