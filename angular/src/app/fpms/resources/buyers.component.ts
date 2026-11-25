@@ -131,7 +131,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                 </thead>
                                 <tbody>
                                     @for (b of f.visible(); track b.id) {
-                                        <tr [class.text-muted]="!b.isActive" [class.table-active]="detail()?.id === b.id">
+                                        <tr class="fpms-clickable-row" tabindex="0" role="button" aria-label="Show buyer sales" (click)="openBuyerDetails(b, $event)" (keydown.enter)="openBuyerDetails(b, $event)" [class.text-muted]="!b.isActive" [class.table-active]="detail()?.id === b.id">
                                             <td>
                                                 <strong>{{ b.name }}</strong>
                                                 <div class="text-muted">{{ b.buyerType | label: L.BuyerTypes }}{{ b.address ? ' · ' + b.address : '' }}</div>
@@ -191,6 +191,13 @@ export class BuyersComponent extends FpmsPage implements OnInit {
         if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
         if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
         this.router.navigate(['/app/sales', id]);
+    }
+
+    openBuyerDetails(b: any, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        void this.showSales(b);
     }
 
     async showSales(b: any): Promise<void> {
