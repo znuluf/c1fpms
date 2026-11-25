@@ -10,7 +10,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header
-            [title]="harvest ? 'Harvest · ' + (harvest.lotCode || (harvest.harvestedAtUtc | farmDate)) : 'Harvest'"
+            [title]="harvest ? (harvest.lotCode ? 'Harvest · ' + harvest.lotCode : 'Harvest') : 'Harvest'"
             [subtitle]="harvest ? (harvest.pondCode || batch?.pondCode || 'Pond') + ' · ' + (harvest.batchCode || batch?.batchCode || 'Batch') + ' · ' + (harvest.harvestedAtUtc | farmDate) : 'Harvest record'"
             backLink="/app/harvests"
             backLabel="Harvests">
