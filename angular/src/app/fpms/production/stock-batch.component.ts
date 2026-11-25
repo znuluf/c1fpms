@@ -273,7 +273,7 @@ interface Allocation {
                                             }
                                         </tbody>
                                         <tfoot>
-                                            <tr><th>Total allocated</th><th class="text-right">{{ allocated | num: 0 }}</th><th colspan="3">PL left after this: {{ remaining | num: 0 }}</th></tr>
+                                            <tr><th>Total allocated</th><th class="text-right">{{ allocated | num: 0 }}</th><th colspan="2">PL left after this: {{ remaining | num: 0 }}</th></tr>
                                         </tfoot>
                                     </table>
                                     </div>
