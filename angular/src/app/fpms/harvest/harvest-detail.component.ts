@@ -39,7 +39,13 @@ import { DisposalReasons } from '@shared/fpms/labels';
                         <a routerLink="/app/harvests" class="btn btn-sm btn-outline-primary">Back to harvests</a>
                     </fpms-empty>
                 } @else {
-                    <div class="row">
+                    <nav class="nav nav-tabs mb-3" aria-label="Harvest sections">
+                        <a class="nav-link active" href="#overview">Overview</a>
+                        <a class="nav-link" href="#breakdown">Size grades</a>
+                        <a class="nav-link" href="#where-it-went">Dispatches &amp; sales</a>
+                        <a class="nav-link" [routerLink]="['/app/harvests', harvest.id, 'tally']">Harvest tally</a>
+                    </nav>
+                    <div class="row" id="overview">
                         <div class="col-6 col-lg-3 mb-3">
                             <div class="small-box bg-light mb-0"><div class="inner"><h3>{{ harvest.totalKg | num: 2 }}</h3><p>Total harvested · kg</p></div></div>
                         </div>
@@ -88,7 +94,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                         </div>
                     </div>
                     @if (harvest.gradeLines?.length) {
-                        <div class="card mb-3">
+                        <div class="card mb-3" id="breakdown">
                             <div class="card-header"><h3 class="card-title">Harvest breakdown</h3></div>
                             <div class="card-body p-0 table-responsive">
                                 <table class="table mb-0">
@@ -103,7 +109,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                         </div>
                     }
                     @if (whereRows().length) {
-                        <div class="card">
+                        <div class="card" id="where-it-went">
                             <div class="card-header"><h3 class="card-title">Where this harvest went</h3></div>
                             <div class="card-body p-0 table-responsive">
                                 <table class="table mb-0">
