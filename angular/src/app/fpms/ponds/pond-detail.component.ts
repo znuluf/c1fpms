@@ -246,7 +246,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <thead><tr><th>Batch</th><th>Cycle</th><th>Status</th><th>Stocked</th></tr></thead>
                                     <tbody>
                                         @for (b of pond.batches; track b.id) {
-                                            <tr [class.table-info]="b.id === pond.currentBatchId">
+                                            <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open batch details" (click)="openBatch(b.id, $event)" (keydown.enter)="openBatch(b.id, $event)" [class.table-info]="b.id === pond.currentBatchId">
                                                 <td class="text-nowrap"><a [routerLink]="['/app/production/batches', b.id]">{{ b.batchCode }}</a></td>
                                                 <td class="small text-muted text-nowrap">{{ b.cycleCode }}</td>
                                                 <td><fpms-badge [text]="b.status | label: L.BatchStatuses"></fpms-badge></td>
@@ -666,6 +666,13 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
 
     get depthError(): boolean {
         return this.pond?.maxDepthM != null && this.pond?.averageDepthM != null && Number(this.pond.maxDepthM) < Number(this.pond.averageDepthM);
+    }
+
+    openBatch(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/production/batches', id]);
     }
 
     ngOnInit(): void {
