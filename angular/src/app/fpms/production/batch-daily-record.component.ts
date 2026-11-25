@@ -298,7 +298,7 @@ function daysBetween(a: string, b: string): number {
                                     <tr [class.fpms-dr-today]="d === today" [class.text-muted]="!inRange(d)">
                                         <th scope="row">
                                             @if (inRange(d)) {
-                                                <a href="javascript:;" (click)="openDay(d)">Day {{ docOf(d) }}</a>
+                                                <button type="button" class="btn btn-link p-0 align-baseline" (click)="openDay(d)">Day {{ docOf(d) }}</button>
                                             } @else {
                                                 Day {{ docOf(d) }}
                                             }
