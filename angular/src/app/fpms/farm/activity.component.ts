@@ -56,35 +56,31 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             <fpms-loading></fpms-loading>
                         } @else if (tab === 'changes') {
                             <table class="table table-sm mb-0">
-                                <thead><tr><th>Time</th><th>User</th><th>Record</th><th>Change</th><th>Values</th></tr></thead>
+                                <thead><tr><th>When · who</th><th>Record · change</th><th>Values</th></tr></thead>
                                 <tbody>
                                     @for (c of changes(); track $index) {
                                         <tr>
-                                            <td class="text-nowrap">{{ c.changeTime | farmDateTime }}</td>
-                                            <td>{{ c.userName }}</td>
-                                            <td>{{ c.recordType }}</td>
-                                            <td>{{ c.changeType }}</td>
+                                            <td class="text-nowrap">{{ c.changeTime | farmDateTime }}<div class="small text-muted">{{ c.userName }}</div></td>
+                                            <td>{{ c.recordType }}<div class="small text-muted">{{ c.changeType }}</div></td>
                                             <td class="small text-muted">{{ c.changes.join('; ') }}</td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="5" class="text-center text-muted py-3">No data changes in this range.</td></tr>
+                                        <tr><td colspan="3" class="text-center text-muted py-3">No data changes in this range.</td></tr>
                                     }
                                 </tbody>
                             </table>
                         } @else {
                             <table class="table table-sm mb-0">
-                                <thead><tr><th>Time</th><th>User</th><th>Area</th><th>Action</th><th>Result</th></tr></thead>
+                                <thead><tr><th>When · who</th><th>Area · action</th><th>Result</th></tr></thead>
                                 <tbody>
                                     @for (a of actions(); track $index) {
                                         <tr>
-                                            <td class="text-nowrap">{{ a.executionTime | farmDateTime }}</td>
-                                            <td>{{ a.userName }}</td>
-                                            <td>{{ a.area }}</td>
-                                            <td>{{ a.action }}</td>
+                                            <td class="text-nowrap">{{ a.executionTime | farmDateTime }}<div class="small text-muted">{{ a.userName }}</div></td>
+                                            <td>{{ a.area }}<div class="small text-muted">{{ a.action }}</div></td>
                                             <td><fpms-badge [text]="a.failed ? 'Failed' : 'OK'" [tone]="a.failed ? 'danger' : 'success'"></fpms-badge></td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="5" class="text-center text-muted py-3">No user actions in this range.</td></tr>
+                                        <tr><td colspan="3" class="text-center text-muted py-3">No user actions in this range.</td></tr>
                                     }
                                 </tbody>
                             </table>
