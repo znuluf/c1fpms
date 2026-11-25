@@ -210,7 +210,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                             <table class="table table-hover mb-0">
                                 <thead>
                                     <!-- Five columns that each hold what belongs together, so the list fits 1,000 px (DEC-111). -->
-                                    <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open fry delivery details" (click)="openRecord(d.id, $event)" (keydown.enter)="openRecord(d.id, $event)">
+                                    <tr>
                                         <th fpmsSort="hatcheryBatchNumber" [pager]="pager" (sorted)="load()">Delivery</th>
                                         <th fpmsSort="deliveryDate" [pager]="pager" (sorted)="load()">Delivered</th>
                                         <th class="text-right" fpmsSort="plReceived" [pager]="pager" (sorted)="load()" title="The farm's count, and how it compares with the PL ordered (DEC-93)">PL counted</th>
@@ -220,7 +220,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 </thead>
                                 <tbody>
                                     @for (d of list(); track d.id) {
-                                        <tr>
+                                        <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open fry delivery details" (click)="openRecord(d.id, $event)" (keydown.enter)="openRecord(d.id, $event)">
                                             <td>
                                                 <a class="text-nowrap" [routerLink]="['/app/resources/fry-deliveries', d.id]">{{ d.hatcheryBatchNumber }}</a>
                                                 <div class="text-muted">{{ d.hatcheryName }}</div>
