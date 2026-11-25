@@ -67,14 +67,13 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </table>
                         } @else {
                             <table class="table table-sm mb-0">
-                                <thead><tr><th>Time</th><th title="Farm and user ID">Who</th><th title="Service and method">Action</th><th class="text-right">ms</th><th>Result</th></tr></thead>
+                                <thead><tr><th>Time</th><th title="Farm and user ID">Who</th><th title="Service, method and duration">Action · ms</th><th>Result</th></tr></thead>
                                 <tbody>
                                     @for (e of events(); track $index) {
                                         <tr>
                                             <td class="text-nowrap">{{ e.executionTime | farmDayOf }}<div class="text-muted">{{ e.executionTime | farmTime }}</div></td>
                                             <td>{{ farmCode(e.tenantId) }}<div class="text-muted">{{ e.userId != null ? 'User ' + e.userId : 'No user' }}</div></td>
-                                            <td class="fpms-break-any">{{ e.method }}<div class="text-muted">{{ e.service }}</div></td>
-                                            <td class="text-right">{{ e.durationMs }}</td>
+                                            <td class="fpms-break-any">{{ e.method }}<div class="text-muted">{{ e.service }} · {{ e.durationMs }} ms</div></td>
                                             <td>
                                                 @if (e.failed) {
                                                     <fpms-badge text="Failed" tone="danger"></fpms-badge><div class="fpms-break-any">{{ e.errorType }}</div>
@@ -84,7 +83,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                             </td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="5" class="text-center text-muted py-3">No events in this range.</td></tr>
+                                        <tr><td colspan="4" class="text-center text-muted py-3">No events in this range.</td></tr>
                                     }
                                 </tbody>
                             </table>
