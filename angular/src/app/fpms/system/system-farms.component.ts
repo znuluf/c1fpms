@@ -64,12 +64,11 @@ import { unbroken } from '@shared/fpms/labels';
                         } @else {
                             <!-- Six columns (DEC-122): the farm as its code tag and name; actions stack. -->
                             <table class="table table-hover mb-0">
-                                <thead><tr><th>Farm</th><th>Farm ID</th><th>Registered</th><th class="text-right">Accounts</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                                <thead><tr><th>Farm · ID</th><th>Registered</th><th class="text-right">Accounts</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
                                 <tbody>
                                     @for (x of farms(); track x.tenantId) {
                                         <tr [class.text-muted]="!x.isActive">
-                                            <td><span class="fpms-pond-tag">{{ unbroken(x.farmCode) }}</span><div class="mt-1">{{ x.name }}</div></td>
-                                            <td class="text-nowrap">@if (x.farmId) { <code>{{ x.farmId }}</code> } @else { <span class="text-muted">Not given yet</span> }</td>
+                                            <td><span class="fpms-pond-tag">{{ unbroken(x.farmCode) }}</span><div class="mt-1">{{ x.name }}</div><div class="small text-muted">ID: @if (x.farmId) { <code>{{ x.farmId }}</code> } @else { Not given yet }</div></td>
                                             <td class="text-nowrap">{{ x.creationTime | farmDate }}</td>
                                             <td class="text-right">{{ x.userCount }}</td>
                                             <td><fpms-badge [text]="x.isActive ? 'Active' : 'Inactive'" [tone]="x.isActive ? 'success' : 'secondary'"></fpms-badge></td>
@@ -84,7 +83,7 @@ import { unbroken } from '@shared/fpms/labels';
                                             </td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="6" class="text-center text-muted py-3">No farms registered.</td></tr>
+                                        <tr><td colspan="5" class="text-center text-muted py-3">No farms registered.</td></tr>
                                     }
                                 </tbody>
                             </table>
