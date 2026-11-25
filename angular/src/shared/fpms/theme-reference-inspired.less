@@ -15,21 +15,22 @@ html[data-theme='neutral'] {
     --fpms-ref-heading: #202b35;
 }
 
-body,
-.content-wrapper {
+.main-sidebar.fpms-sidebar ~ .content-wrapper {
     background: var(--fpms-ref-ground) !important;
-}
-.content-wrapper {
     min-height: calc(100vh - 3.5rem);
 }
-.content-wrapper > .content,
-.content-wrapper > .content-header {
+/* Scope workspace chrome to the FPMS layout; admin and other modules keep their own theme. */
+.main-sidebar.fpms-sidebar ~ .content-wrapper {
+    min-height: calc(100vh - 3.5rem);
+}
+.main-sidebar.fpms-sidebar ~ .content-wrapper > .content,
+.main-sidebar.fpms-sidebar ~ .content-wrapper > .content-header {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
 }
 @media (max-width: 767.98px) {
-    .content-wrapper > .content,
-    .content-wrapper > .content-header {
+    .main-sidebar.fpms-sidebar ~ .content-wrapper > .content,
+    .main-sidebar.fpms-sidebar ~ .content-wrapper > .content-header {
         padding-left: 0.75rem;
         padding-right: 0.75rem;
     }
@@ -94,7 +95,7 @@ body,
 }
 
 // White top bar and clear page titles.
-.main-header.navbar {
+body:has(.main-sidebar.fpms-sidebar) .main-header.navbar { 
     background: #fff;
     border-bottom: 1px solid var(--fpms-ref-border);
 }
@@ -159,7 +160,7 @@ body,
     font-size: 0.875rem;
 }
 
-.card,
+.main-sidebar.fpms-sidebar ~ .content-wrapper .card,
 .fpms-kpi,
 .fpms-status-tile,
 .fpms-paper,
@@ -169,11 +170,11 @@ body,
     border-radius: 14px;
     box-shadow: 0 1px 3px rgba(18, 35, 54, 0.045), 0 7px 20px rgba(18, 35, 54, 0.035);
 }
-.card-header {
+.main-sidebar.fpms-sidebar ~ .content-wrapper .card-header {
     background: #fff;
     border-bottom: 1px solid var(--fpms-ref-border);
 }
-.card-title {
+.main-sidebar.fpms-sidebar ~ .content-wrapper .card-title {
     color: var(--fpms-ref-heading);
     font-weight: 700;
 }
@@ -245,7 +246,7 @@ body,
 }
 
 // Calm table chrome, keeping status colors and row semantics unchanged.
-.table thead th {
+.main-sidebar.fpms-sidebar ~ .content-wrapper .table thead th {
     background: #f7f9fb;
     color: #596775;
     font-size: 0.875rem;
@@ -254,10 +255,10 @@ body,
     text-transform: uppercase;
     border-bottom: 1px solid var(--fpms-ref-border);
 }
-.table tbody tr:hover { background: #f7fafc; }
-.table td,
-.table th { border-color: var(--fpms-ref-border); }
-.table-responsive { border-radius: 8px; }
+.main-sidebar.fpms-sidebar ~ .content-wrapper .table tbody tr:hover { background: #f7fafc; }
+.main-sidebar.fpms-sidebar ~ .content-wrapper .table td,
+.main-sidebar.fpms-sidebar ~ .content-wrapper .table th { border-color: var(--fpms-ref-border); }
+.main-sidebar.fpms-sidebar ~ .content-wrapper .table-responsive { border-radius: 8px; }
 
 @media (max-width: 575.98px) {
     .fpms-page-header h1 { font-size: 1.55rem; }
