@@ -30,3 +30,8 @@ Ready to try "Stock a batch": two newer ponds, EP-02 (earthen, 2,000 m²) and HP
  (development only)
 
 The sign-in page shows one-click buttons for the accounts above when the app runs from `ng serve` / `yarn start` (the development environment). The list is in `angular/src/environments/environment.ts` (`devAccounts`); `environment.prod.ts` leaves it empty, so production builds show no buttons and contain no passwords. A button fills the farm code, username and password and signs in. Only the accounts seeded in the database you are running will work, and `admin` in a Codespace uses your `ADMIN_INITIAL_PASSWORD` secret, so its button only works where the password is still `Fpms@2026`.
+
+
+## Dedicated scenario database
+
+For a separate SQL Server database with the full linked development scenario dataset, see [Comprehensive scenario test database](scenario-test-database.md). Create it with `bash .devcontainer/create-scenario-db.sh`; this keeps `FPMS` and `FPMS_Simple` untouched.
