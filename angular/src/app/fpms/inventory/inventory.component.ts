@@ -348,13 +348,12 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                         <div class="card-body p-0 table-responsive">
                             <table class="table table-sm mb-0">
                                 <thead>
-                                    <tr><th>Date</th><th>Type</th><th class="text-right">Quantity</th><th class="text-right">Unit cost</th><th class="text-right">Balance</th><th>Batch</th><th>Source / reason</th><th>By</th></tr>
+                                    <tr><th>Date · type</th><th class="text-right">Quantity</th><th class="text-right">Unit cost</th><th class="text-right">Balance</th><th>Batch</th><th>Source / reason</th></tr>
                                 </thead>
                                 <tbody>
                                     @for (m of movements(); track m.id) {
                                         <tr>
-                                            <td class="text-nowrap">{{ m.movementDateUtc | farmDateTime }}</td>
-                                            <td>{{ m.type | label: L.MovementTypes }}</td>
+                                            <td class="text-nowrap">{{ m.movementDateUtc | farmDateTime }}<div class="small text-muted">{{ m.type | label: L.MovementTypes }}</div></td>
                                             <td class="text-right" [class.text-danger]="m.quantity < 0">{{ m.quantity | num: 3 }}</td>
                                             <td class="text-right">{{ m.unitCost | php }}</td>
                                             <td class="text-right">{{ m.runningBalance | num: 3 }}</td>
@@ -363,11 +362,10 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                                     <a [routerLink]="['/app/production/batches', m.batchId]">{{ m.batchCode }}</a>
                                                 }
                                             </td>
-                                            <td class="small">{{ m.source }}{{ m.source && m.reason ? ' · ' : '' }}{{ m.reason }}</td>
-                                            <td class="small text-muted">{{ m.recordedBy }}</td>
+                                            <td>{{ m.source }}{{ m.source && m.reason ? ' · ' : '' }}{{ m.reason }}<div class="small text-muted">By {{ m.recordedBy }}</div></td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="8" class="text-center text-muted py-3">No movements.</td></tr>
+                                        <tr><td colspan="6" class="text-center text-muted py-3">No movements.</td></tr>
                                     }
                                 </tbody>
                             </table>
