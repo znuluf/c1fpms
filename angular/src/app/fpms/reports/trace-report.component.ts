@@ -252,8 +252,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                         <thead><tr><th>Lot code</th><th>Harvested</th><th>Size grades</th><th class="n">Kg</th></tr></thead>
                                         <tbody>
                                             @for (h of t.harvests; track h.harvestId) {
-                                                <tr>
-                                                    <td>@if (h.lotCode) { <a class="ts-code" [routerLink]="['/app/reports/trace/lot', h.lotCode]">{{ h.lotCode }}</a> } @else { <span class="ts-quiet">—</span> }</td>
+                                                <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open harvest details" (click)="openHarvest(h.harvestId, $event)" (keydown.enter)="openHarvest(h.harvestId, $event)">
+                                                    <td>@if (h.lotCode) { <a (click)="$event.stopPropagation()" class="ts-code" [routerLink]="['/app/reports/trace/lot', h.lotCode]">{{ h.lotCode }}</a> } @else { <span class="ts-quiet">—</span> }</td>
                                                     <td>{{ h.harvestedAtUtc | farmDateTime }}<span class="ts-d">{{ h.harvestType | label: L.HarvestTypes }}</span></td>
                                                     <td>@for (g of h.grades; track g.gradeLineId; let last = $last) { {{ g.sizeLabel }} {{ g.kg | num: 1 }}@if (!last) { · } }</td>
                                                     <td class="n">{{ h.totalKg | num: 1 }}</td>
@@ -296,9 +296,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     <tr class="ts-group"><td colspan="5">{{ b.buyer }}<small>{{ receiptCount(b.lines) }} {{ receiptCount(b.lines) === 1 ? 'receipt' : 'receipts' }} · {{ b.kg | num: 1 }} kg</small></td></tr>
                                                 }
                                                 @for (s of b.lines; track $index) {
-                                                    <tr>
+                                                    <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open sale details" (click)="openSale(s.saleId, $event)" (keydown.enter)="openSale(s.saleId, $event)">
                                                         <td>
-                                                            <a [routerLink]="['/app/sales', s.saleId]">{{ s.dispatchReceiptNo }}</a>
+                                                            <a (click)="$event.stopPropagation()" [routerLink]="['/app/sales', s.saleId]">{{ s.dispatchReceiptNo }}</a>
                                                         </td>
                                                         <td>{{ s.saleDate | farmDate }}</td>
                                                         <td>{{ s.sizeLabel }}</td>
@@ -852,6 +852,20 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
         }
         return Array.from(by.values());
     });
+
+    openHarvest(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/harvests', id]);
+    }
+
+    openSale(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/sales', id]);
+    }
 
     /** A treatment's lot and supplier, as one quiet line. */
     treatmentSource(x: any): string {
