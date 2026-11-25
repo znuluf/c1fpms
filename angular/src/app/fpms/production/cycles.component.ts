@@ -38,7 +38,12 @@ import { unbroken } from '@shared/fpms/labels';
                 </div>
                 <div class="card">
                     <div class="card-body p-0 table-responsive">
-                        @if (!cycles()) {
+                        @if (failed()) {
+                            <div class="alert alert-warning m-3 d-flex align-items-center" role="alert">
+                                <span class="mr-auto">Production cycles could not be loaded. Check the connection, then try again.</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy()" (click)="load()">Try again</button>
+                            </div>
+                        } @else if (!cycles()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!cycles().length) {
                             <fpms-empty
@@ -93,6 +98,8 @@ import { unbroken } from '@shared/fpms/labels';
 export class CyclesComponent extends FpmsPage implements OnInit {
     cycles = signal<any[] | null>(null);
     counts = signal<Record<number, number>>({});
+    failed = signal(false);
+    private loadRequest = 0;
     total = signal(0);
     status: number | null = null;
     search = '';
@@ -135,18 +142,28 @@ export class CyclesComponent extends FpmsPage implements OnInit {
     }
 
     async load(): Promise<void> {
+        const request = ++this.loadRequest;
+        this.failed.set(false);
         const q = { search: this.search || undefined };
-        const [r, counts] = await Promise.all([
-            this.api.get<any>('Cycle', 'GetPage', { status: this.status, ...q, ...this.pager.params }),
-            this.api.get<any[]>('Cycle', 'GetStatusCounts', q),
-        ]);
-        this.cycles.set(r.items);
-        this.total.set(r.totalCount);
-        this.counts.set(Object.fromEntries((counts ?? []).map((x) => [x.status, x.count])));
-        const reload = this.pager.update(r.totalCount);
-        this.syncPager(this.pager);
-        if (reload) {
-            await this.load();
+        try {
+            const [r, counts] = await Promise.all([
+                this.api.get<any>('Cycle', 'GetPage', { status: this.status, ...q, ...this.pager.params }),
+                this.api.get<any[]>('Cycle', 'GetStatusCounts', q),
+            ]);
+            if (request !== this.loadRequest) return;
+            this.cycles.set(r.items);
+            this.total.set(r.totalCount);
+            this.counts.set(Object.fromEntries((counts ?? []).map((x) => [x.status, x.count])));
+            const reload = this.pager.update(r.totalCount);
+            this.syncPager(this.pager);
+            if (reload) {
+                await this.load();
+            }
+        } catch (e) {
+            if (request === this.loadRequest) {
+                console.warn(e);
+                this.failed.set(true);
+            }
         }
     }
 }
