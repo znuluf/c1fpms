@@ -147,7 +147,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                         } @else {
                             <table class="table table-hover mb-0">
                                 <thead>
-                                    <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open sale details" (click)="openRecord(s.id, $event)" (keydown.enter)="openRecord(s.id, $event)">
+                                    <tr>
                                         <!-- Columns that belong together share a cell, so the list fits a 1,000 px screen (DEC-99, DEC-107):
                                              date and receipt; buyer, batch and lot; total, kg and paid; balance and due date. -->
                                         <th fpmsSort="saleDate" [pager]="pager" (sorted)="load()">Date · receipt · payment</th>
@@ -162,7 +162,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 </thead>
                                 <tbody>
                                     @for (s of sales(); track s.id) {
-                                        <tr>
+                                        <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open sale details" (click)="openRecord(s.id, $event)" (keydown.enter)="openRecord(s.id, $event)">
                                             <td class="text-nowrap">
                                                 {{ s.saleDate | farmDate }}
                                                 <div><a [routerLink]="['/app/sales', s.id]" title="Open the dispatch receipt">{{ s.dispatchReceiptNo }}</a></div>
