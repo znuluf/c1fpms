@@ -61,9 +61,9 @@ import { unbroken } from '@shared/fpms/labels';
                                 </thead>
                                 <tbody>
                                     @for (c of cycles(); track c.id) {
-                                        <tr>
+                                        <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open cycle details" (click)="openRecord(c.id, $event)" (keydown.enter)="openRecord(c.id, $event)">
                                             <td>
-                                                <a class="text-nowrap" [routerLink]="['/app/production/cycles', c.id]">{{ unbroken(c.cycleCode) }}</a>
+                                                <a (click)="$event.stopPropagation()" class="text-nowrap" [routerLink]="['/app/production/cycles', c.id]">{{ unbroken(c.cycleCode) }}</a>
                                                 <div class="text-muted"><span [title]="c.hatcheryName">{{ c.hatcheryShortCode || c.hatcheryName }}</span> · {{ c.hatcheryBatchNumber }}</div>
                                             </td>
                                             <td class="text-nowrap">
@@ -125,6 +125,13 @@ export class CyclesComponent extends FpmsPage implements OnInit {
         this.status = value as number | null;
         this.pager.reset();
         this.load();
+    }
+
+    openRecord(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/production/cycles', id]);
     }
 
     async load(): Promise<void> {
