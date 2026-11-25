@@ -125,20 +125,11 @@ interface PondCard {
                                         <thead>
                                             <tr>
                                                 <th scope="col">Pond</th>
-                                                <th scope="col">Purpose</th>
-                                                <th scope="col">Construction</th>
-                                                <th scope="col">Depth (avg / max)</th>
-                                                <th scope="col">Status</th>
-                                                <th scope="col">Batch</th>
-                                                <th scope="col">DOC</th>
-                                                <th scope="col">ABW</th>
-                                                <th scope="col">FCR</th>
-                                                <th scope="col">Est. survival</th>
-                                                <th scope="col">Est. biomass</th>
-                                                <th scope="col">Feed used</th>
+                                                <th scope="col">Status · batch</th>
+                                                <th scope="col">Production indicators</th>
                                                 <th scope="col">Last sample</th>
                                                 <th scope="col">Latest water</th>
-                                                <th scope="col">Log, last 7 days</th>
+                                                <th scope="col">Log · 7 days</th>
                                                 <th scope="col">Attention</th>
                                                 <th scope="col">Actions</th>
                                             </tr>
@@ -149,19 +140,26 @@ interface PondCard {
                                                     <td>
                                                         <a (click)="$event.stopPropagation()" [routerLink]="['/app/ponds', p.id]"><strong>{{ p.code }}</strong></a>
                                                         <div class="small text-muted">{{ p.name }} · {{ p.areaM2 | num: 0 }} m²</div>
+                                                        <div class="small text-muted">{{ p.purpose | label: L.PondPurposes }} · {{ p.constructionType | label: L.ConstructionTypes }}</div>
+                                                        <div class="small text-muted">Depth {{ p.averageDepthM | num: 2 }} / {{ p.maxDepthM | num: 2 }} m</div>
                                                         @if (p.isReserved) { <div class="small text-warning-dark">Reserved for {{ p.reservedByDelivery }}</div> }
                                                     </td>
-                                                    <td>{{ p.purpose | label: L.PondPurposes }}</td>
-                                                    <td>{{ p.constructionType | label: L.ConstructionTypes }}</td>
-                                                    <td class="text-nowrap">{{ p.averageDepthM | num: 2 }} / {{ p.maxDepthM | num: 2 }} m</td>
-                                                    <td><fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge></td>
-                                                    <td>@if (p.batchId) { <a (click)="$event.stopPropagation()" [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a> } @else { <span class="text-muted">—</span> }</td>
-                                                    <td>{{ p.doc ?? '—' }}</td>
-                                                    <td>{{ p.abwG === null ? '—' : (p.abwG | num: 1) + ' g' }}</td>
-                                                    <td>{{ p.fcr === null ? '—' : (p.fcr | num: 2) }}</td>
-                                                    <td>{{ p.survival === null ? '—' : (p.survival | num: 1) + '%' }}</td>
-                                                    <td>{{ p.biomassKg === null ? '—' : (p.biomassKg | num: 1) + ' kg' }}</td>
-                                                    <td>{{ p.feedKg === null ? '—' : (p.feedKg | num: 1) + ' kg' }}</td>
+                                                    <td>
+                                                        <fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge>
+                                                        @if (p.batchId) {
+                                                            <div class="mt-1"><a (click)="$event.stopPropagation()" [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a></div>
+                                                        } @else { <div class="small text-muted">No active batch</div> }
+                                                    </td>
+                                                    <td>
+                                                        <div class="pd-stats">
+                                                            <div><span class="l">DOC</span><div class="v">{{ p.doc ?? '—' }}</div></div>
+                                                            <div><span class="l">ABW</span><div class="v">{{ p.abwG === null ? '—' : (p.abwG | num: 1) + ' g' }}</div></div>
+                                                            <div><span class="l">FCR</span><div class="v">{{ p.fcr === null ? '—' : (p.fcr | num: 2) }}</div></div>
+                                                            <div><span class="l">Survival</span><div class="v">{{ p.survival === null ? '—' : (p.survival | num: 1) + '%' }}</div></div>
+                                                            <div><span class="l">Biomass</span><div class="v">{{ p.biomassKg === null ? '—' : (p.biomassKg | num: 1) + ' kg' }}</div></div>
+                                                            <div><span class="l">Feed used</span><div class="v">{{ p.feedKg === null ? '—' : (p.feedKg | num: 1) + ' kg' }}</div></div>
+                                                        </div>
+                                                    </td>
                                                     <td [class.text-warning-dark]="p.batchId && (p.sampleDays === null || p.sampleDays > 14)">{{ p.batchId ? sampleText(p.sampleDays) : '—' }}</td>
                                                     <td>
                                                         @if (p.water.length) {
