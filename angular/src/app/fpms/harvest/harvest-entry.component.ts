@@ -22,7 +22,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
     standalone: true,
     imports: [...FPMS_IMPORTS, PriceTermsComponent, SalePaymentComponent],
     template: `
-        <fpms-page-header [narrow]="true" [title]="isNew ? 'Record harvest' : 'Edit harvest' + (batch ? ' · ' + batch.pondCode + ' ' + (batch.letter ? 'Batch ' + batch.letter : batch.batchCode) : '')" [subtitle]="isNew ? (batch ? batch.pondCode + ' · ' + (batch.letter ? 'Batch ' + batch.letter : batch.batchCode) : '') : (h ? (h.lotCode ? 'Lot ' + h.lotCode + ' · ' : '') + (h.harvestType | label: L.HarvestTypes) + ' harvest on ' + (h.harvestedAtUtc | farmDate) + '. Edit it here until the batch is closed.' : '')" backLink="/app/harvests" backLabel="Harvests">
+        <fpms-page-header [narrow]="true" [title]="isNew ? 'Record harvest' : 'Edit harvest' + (batch ? ' · ' + batch.pondCode + ' ' + (batch.letter ? 'Batch ' + batch.letter : batch.batchCode) : '')" [subtitle]="isNew ? (batch ? batch.pondCode + ' · ' + (batch.letter ? 'Batch ' + batch.letter : batch.batchCode) : '') : (h ? (h.lotCode ? 'Lot ' + h.lotCode + ' · ' : '') + (h.harvestType | label: L.HarvestTypes) + ' harvest on ' + (h.harvestedAtUtc | farmDate) + '. Edit it here until the batch is closed.' : '')" [backLink]="!isNew && h?.id ? '/app/harvests/' + h.id : '/app/harvests'" [backLabel]="isNew ? 'Harvests' : 'Harvest'">
             @if (!isNew && h) {
                 <a class="btn btn-outline-primary mr-1" [routerLink]="['/app/harvests', h.id, 'tally']"><i class="fas fa-clipboard-list mr-1" aria-hidden="true"></i>Tally sheet</a>
             }
