@@ -224,7 +224,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                 </thead>
                                 <tbody>
                                     @for (i of f.visible(); track i.id) {
-                                        <tr [class.table-active]="selectedItem?.id === i.id" [class.text-muted]="!i.isActive">
+                                        <tr class="fpms-clickable-row" tabindex="0" role="button" aria-label="Show inventory item lots" (click)="selectItemFromRow(i, $event)" (keydown.enter)="selectItemFromRow(i, $event)" [class.table-active]="selectedItem?.id === i.id" [class.text-muted]="!i.isActive">
                                             <td>
                                                 <a href="javascript:;" (click)="selectItem(i)">
                                                     @if (i.code) { <span class="fpms-pond-tag mr-1">{{ i.code }}</span>{{ i.brand }} {{ i.productName }} } @else { {{ i.displayName }} }
@@ -271,7 +271,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                 </thead>
                                 <tbody>
                                     @for (l of lots() ?? []; track l.id) {
-                                        <tr [class.table-active]="selectedLot?.id === l.id">
+                                        <tr class="fpms-clickable-row" tabindex="0" role="button" aria-label="Show inventory lot movements" (click)="selectLotFromRow(l, $event)" (keydown.enter)="selectLotFromRow(l, $event)" [class.table-active]="selectedLot?.id === l.id">
                                             <td>
                                                 <a class="text-nowrap" href="javascript:;" (click)="selectLot(l)" title="Show this lot's movements">{{ l.lotNumber }}</a>
                                                 <div class="text-muted">received {{ l.receivedDate | farmDate }}</div>
@@ -417,6 +417,20 @@ export class InventoryComponent extends FpmsPage implements OnInit {
 
     unitOf(itemId: string): string {
         return this.items()?.find((i) => i.id === itemId)?.unit ?? '';
+    }
+
+    selectItemFromRow(i: any, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        void this.selectItem(i);
+    }
+
+    selectLotFromRow(l: any, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        void this.selectLot(l);
     }
 
     async selectItem(i: any): Promise<void> {
