@@ -154,7 +154,10 @@ interface CalMonth {
                                         Review them before closing; the final indicators use only what was recorded.
                                         <ul class="mb-0 mt-1 fpms-scroll-list">
                                             @for (d of closeCheck.blankDays; track d.date) {
-                                                <li>{{ d.date | farmDate }}: {{ d.missing }}</li>
+                                                <li class="d-flex align-items-center flex-wrap">
+                                                    <span class="mr-2">{{ d.date | farmDate }}: {{ d.missing }}</span>
+                                                    <button type="button" class="btn btn-xs btn-outline-secondary ml-auto" (click)="reviewCloseDay(d.date)">Review day</button>
+                                                </li>
                                             }
                                             @if (closeCheck.blankDaysTotal > closeCheck.blankDays.length) {
                                                 <li class="text-muted">…and {{ closeCheck.blankDaysTotal - closeCheck.blankDays.length }} more</li>
@@ -168,6 +171,7 @@ interface CalMonth {
                                     <div class="alert alert-warning small">
                                         <strong>No Shrimp Fry Source Certificate number</strong> on fry delivery {{ closeCheck.fryDeliveryBatchNumber }}.
                                         BFAR FAO 225-1 requires it, and the harvest can be confiscated without it. Add it on the fry delivery. You can still close.
+                                        <a class="btn btn-xs btn-outline-secondary ml-2" [routerLink]="['/app/resources/fry-deliveries', b.fryDeliveryId]">Review fry delivery</a>
                                     </div>
                                 }
                                 @if (closeCheck?.flaggedLots?.length) {
@@ -182,6 +186,7 @@ interface CalMonth {
                                         <strong>{{ closeCheck.unaccountedKg | num: 3 }} kg harvested but still unsold, awaiting an outcome:</strong>
                                         harvested {{ closeCheck.harvestedKg | num: 3 }} kg, sold {{ closeCheck.soldKg | num: 3 }} kg, not sold (home use, given away, spoiled) {{ closeCheck.notSoldKg | num: 3 }} kg.
                                         Record the remaining sales or not-sold kg before closing this batch.
+                                        <button type="button" class="btn btn-xs btn-outline-secondary mt-2" (click)="reviewCloseHarvests()">Review harvests</button>
                                     </div>
                                 } @else if (closeCheck && closeCheck.harvestedKg > 0) {
                                     <p class="small text-success"><i class="fas fa-check mr-1"></i>All {{ closeCheck.harvestedKg | num: 3 }} harvested kg are sold or recorded as not sold.</p>
@@ -837,6 +842,18 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
             sellable: sum((h) => this.sellableOf(h)),
             ungraded: sum((h) => Math.min(h.ungradedRemainderKg || 0, h.unaccountedKg || 0)),
         };
+    }
+
+    /** Open a missing daily record directly from the batch-close review. */
+    reviewCloseDay(date: string): void {
+        this.closing = null;
+        this.openDay({ date });
+    }
+
+    /** Return to this batch's harvest list to account for every harvested kilo before closing. */
+    reviewCloseHarvests(): void {
+        this.closing = null;
+        this.setTab('sec-harvests');
     }
 
     /** Keeps the tab in the address, so a refresh or Back returns to it (as on the pond page). */
