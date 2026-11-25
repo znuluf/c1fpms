@@ -54,7 +54,8 @@ const routes: Routes = [
             { path: 'harvests/crate-types', title: 'Crate types', loadComponent: () => import('./fpms/harvest/container-types.component').then((m) => m.ContainerTypesComponent), ...page('Farm.Harvests') },
             { path: 'harvests/:id/tally', title: 'Harvest tally sheet', loadComponent: () => import('./fpms/harvest/tally-print.component').then((m) => m.TallyPrintComponent), ...page('Farm.Harvests') },
             { path: 'harvests/new', title: 'Record harvest', loadComponent: () => import('./fpms/harvest/harvest-entry.component').then((m) => m.HarvestEntryComponent), ...page('Farm.Harvests.Create') },
-            { path: 'harvests/:id', title: 'Harvest', loadComponent: () => import('./fpms/harvest/harvest-entry.component').then((m) => m.HarvestEntryComponent), ...page('Farm.Harvests') },
+            { path: 'harvests/:id/edit', title: 'Edit harvest', loadComponent: () => import('./fpms/harvest/harvest-entry.component').then((m) => m.HarvestEntryComponent), ...page('Farm.Harvests') },
+            { path: 'harvests/:id', title: 'Harvest', loadComponent: () => import('./fpms/harvest/harvest-detail.component').then((m) => m.HarvestDetailComponent), ...page('Farm.Harvests') },
 
             { path: 'sales', title: 'Sales', loadComponent: () => import('./fpms/sales/sales.component').then((m) => m.SalesComponent), ...page('Farm.Sales') },
             { path: 'sales/new', title: 'Record sale', loadComponent: () => import('./fpms/sales/sale-entry.component').then((m) => m.SaleEntryComponent), ...page('Farm.Sales') },
