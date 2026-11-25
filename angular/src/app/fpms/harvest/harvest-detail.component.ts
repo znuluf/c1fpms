@@ -36,7 +36,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                     </a>
                 }
                 @if (harvest.canEdit && harvest.unaccountedKg > 0) {
-                    <a class="btn btn-outline-secondary" [routerLink]="['/app/harvests', harvest.id, 'edit']>
+                    <a class="btn btn-outline-secondary" [routerLink]="['/app/harvests', harvest.id, 'edit']">
                         <i class="fas fa-clipboard-check mr-1" aria-hidden="true"></i> Account for remaining kg
                     </a>
                 }
