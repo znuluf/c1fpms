@@ -154,9 +154,13 @@ export class MyPondComponent extends FpmsPage implements OnInit {
         this.b.set(null);
         this.calendar.set(null);
         try {
+            // The batch page and daily record remain useful if the optional calendar summary is unavailable.
             const [b, cal] = await Promise.all([
                 this.api.get<any>('Batch', 'Get', { id }),
-                this.api.get<any>('Batch', 'GetLogCalendar', { id }),
+                this.api.get<any>('Batch', 'GetLogCalendar', { id }).catch((e) => {
+                    console.warn('Could not load the pond log calendar.', e);
+                    return null;
+                }),
             ]);
             if (request !== this.loadRequest) return;
             if (!b) {
