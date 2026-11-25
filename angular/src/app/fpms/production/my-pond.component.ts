@@ -90,6 +90,7 @@ export class MyPondComponent extends FpmsPage implements OnInit {
     readonly b = signal<any>(null);
     readonly calendar = signal<any>(null);
     readonly failed = signal(false);
+    private loadRequest = 0;
 
     /** Reloads after a save in the log drawer, as the batch page does. */
     private readonly reloadOnDrawerSave = (() => {
@@ -120,8 +121,13 @@ export class MyPondComponent extends FpmsPage implements OnInit {
     }
 
     async init(): Promise<void> {
+        const request = ++this.loadRequest;
         this.failed.set(false);
+        this.mine.set(null);
+        this.b.set(null);
+        this.calendar.set(null);
         const all = await this.run(() => this.api.get<any[]>('Batch', 'GetAll', { openOnly: true }));
+        if (request !== this.loadRequest) return;
         if (!all) {
             this.failed.set(true);
             this.mine.set([]);
@@ -143,9 +149,28 @@ export class MyPondComponent extends FpmsPage implements OnInit {
     }
 
     async show(id: string): Promise<void> {
-        const [b, cal] = await Promise.all([this.api.get<any>('Batch', 'Get', { id }), this.run(() => this.api.get<any>('Batch', 'GetLogCalendar', { id }))]);
-        this.calendar.set(cal ?? null);
-        this.b.set(b);
-        this.setPageTitle(`My pond ${b.pondCode}`);
+        const request = ++this.loadRequest;
+        this.failed.set(false);
+        this.b.set(null);
+        this.calendar.set(null);
+        try {
+            const [b, cal] = await Promise.all([
+                this.api.get<any>('Batch', 'Get', { id }),
+                this.api.get<any>('Batch', 'GetLogCalendar', { id }),
+            ]);
+            if (request !== this.loadRequest) return;
+            if (!b) {
+                this.failed.set(true);
+                return;
+            }
+            this.calendar.set(cal ?? null);
+            this.b.set(b);
+            this.setPageTitle(`My pond ${b.pondCode}`);
+        } catch (e) {
+            if (request === this.loadRequest) {
+                console.warn(e);
+                this.failed.set(true);
+            }
+        }
     }
 }
