@@ -478,3 +478,24 @@ body:has(.main-sidebar.fpms-sidebar) :where(
         transition-duration: 0.01ms !important;
     }
 }
+
+
+/* Record rows navigate as a whole; nested links and controls retain their own actions. */
+.fpms-clickable-row {
+    cursor: pointer;
+}
+
+.fpms-clickable-row:hover > td {
+    background-color: var(--fpms-hover, rgba(0, 0, 0, 0.035));
+}
+
+.fpms-clickable-row:focus-visible {
+    outline: 2px solid var(--fpms-focus, #4779b8);
+    outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .fpms-clickable-row > td {
+        transition: background-color 120ms ease;
+    }
+}
