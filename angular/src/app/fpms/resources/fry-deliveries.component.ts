@@ -45,7 +45,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
             <div class="container-fluid">
                 @if (form) {
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
-                        <div class="card card-outline card-primary">
+                        <div class="card card-outline card-primary fpms-delivery-dialog">
                             <div class="card-header">
                                 <h3 class="card-title">
                                     <i class="fas fa-truck" aria-hidden="true"></i>
