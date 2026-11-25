@@ -10,7 +10,7 @@ The older `pilot-farm` and `test-farm-b` development farms are gone from the app
 
 ## Codespace sample database (FPMS_Simple)
 
-Started by default with `bash .devcontainer/start-fpms.sh`. It is the only sample database on this branch. One small test farm, all passwords `Fpms@2026`. Built by `SimpleSampleDataBuilder`; fixed dates.
+Started by default with `bash .devcontainer/start-fpms.sh`. It contains the Rkabubba production scenario plus a separate, intentionally empty Farmi tenant for multi-farm and tenant-isolation testing. Farm account passwords are `Fpms@2026`. Built by `SimpleSampleDataBuilder`; production scenario dates are fixed.
 
 | Farm code | User | Role |
 |---|---|---|
@@ -18,6 +18,13 @@ Started by default with `bash .devcontainer/start-fpms.sh`. It is the only sampl
 | `rkabubba-aqua` | `samsedel` (Sam Amsedel) | Farm Owner |
 | `rkabubba-aqua` | `konacsus` (Kim Onacsus) | Farm Technician |
 | `rkabubba-aqua` | `filusyam` (Far Ilusyam) | Farm Technician; looks after CP-01 (Kim covers for three days) and shares HP-01 with Kim |
+
+| `farmi` | `rafah` (Raf Ah) | Farm Owner |
+| `farmi` | `haraff` (Har Aff) | Farm Owner |
+| `farmi` | `maysuli` (May Suli) | Farm Technician |
+| `farmi` | `yamilus` (Yam Ilus) | Farm Technician |
+
+Farmi is a separate tenant with default farm settings and no ponds or production records yet. Its address is deliberately placeholder test data. These four accounts are intended for `FPMS_Scenarios`; they will not exist in `FPMS_Simple` unless that database is rebuilt/reseeded with this branch's updated builder.
 
 Rkabubba Aqua Farm (test), Barangay Tambler, General Santos City; farming system Intensive. Three ponds, one per construction type, each stocked inside its intensive density band: EP-01 earthen 2,000 m² at 85 PL/m², CP-01 concrete 600 m² at 130 PL/m², HP-01 HDPE-lined 1,000 m² at 130 PL/m² (inside the PNS/BAFS 197:2025 intensive bands, 70–90 earthen and 100–140 lined).
 
