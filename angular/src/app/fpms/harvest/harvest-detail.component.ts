@@ -81,6 +81,10 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                         <dt class="col-sm-5">Pond</dt><dd class="col-sm-7">{{ harvest.pondCode || batch?.pondCode || '—' }}</dd>
                                         <dt class="col-sm-5">Batch</dt><dd class="col-sm-7"><a [routerLink]="['/app/production/batches', harvest.batchId]">{{ harvest.batchCode || batch?.batchCode || 'View batch' }}</a></dd>
                                         <dt class="col-sm-5">Cycle</dt><dd class="col-sm-7">{{ batch?.cycleCode || '—' }}</dd>
+                                        @if (harvest.harvestType === 3) {
+                                            <dt class="col-sm-5">Emergency reason</dt><dd class="col-sm-7">{{ emergencyReasonLabel() }}</dd>
+                                            <dt class="col-sm-5">Shrimp remained</dt><dd class="col-sm-7">{{ harvest.shrimpLeft == null ? 'Not recorded' : harvest.shrimpLeft ? 'Yes' : 'No' }}</dd>
+                                        }
                                         <dt class="col-sm-5">Buyer recorded</dt><dd class="col-sm-7">{{ harvest.buyerName || 'Not specified' }}</dd>
                                         <dt class="col-sm-5">Recorded by</dt><dd class="col-sm-7">{{ harvest.weighedByName || harvest.recordedByName || '—' }}</dd>
                                         <dt class="col-sm-5">Notes</dt><dd class="col-sm-7 text-break">{{ harvest.qualityNotes || harvest.emergencyNote || '—' }}</dd>
@@ -159,6 +163,10 @@ export class HarvestDetailComponent extends FpmsPage implements OnInit {
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(() => void this.load());
+    }
+
+    emergencyReasonLabel(): string {
+        return this.Options.emergencyReason.find((reason: any) => reason.value === this.harvest?.emergencyReason)?.label ?? 'Not recorded';
     }
 
     openSale(id: string | null | undefined, event: Event): void {
