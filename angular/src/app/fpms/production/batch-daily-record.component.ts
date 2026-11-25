@@ -147,7 +147,7 @@ function daysBetween(a: string, b: string): number {
                 @let fs = feedingsOn(day());
                 @let ls = logsOn(day());
                 <!-- The batch's figures as they stood at the end of this day, each opening its working (DEC-101). -->
-                @if (asOf() && day() !== today) {
+                @if (asOf()) {
                     <section class="fpms-summary" [attr.aria-label]="day() === today ? 'Figures so far today' : 'Figures at the end of this day'">
                         <h4 class="fpms-dr-asof-h">{{ day() === today ? 'Figures so far today' : 'Figures at the end of ' + longDate(day()) }}</h4>
                         <fpms-batch-figures [indicators]="asOf()" [stockingDate]="start()" [compact]="true"></fpms-batch-figures>
