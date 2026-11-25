@@ -210,7 +210,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                             <table class="table table-hover mb-0">
                                 <thead>
                                     <!-- Five columns that each hold what belongs together, so the list fits 1,000 px (DEC-111). -->
-                                    <tr>
+                                    <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open fry delivery details" (click)="openRecord(d.id, $event)" (keydown.enter)="openRecord(d.id, $event)">
                                         <th fpmsSort="hatcheryBatchNumber" [pager]="pager" (sorted)="load()">Delivery</th>
                                         <th fpmsSort="deliveryDate" [pager]="pager" (sorted)="load()">Delivered</th>
                                         <th class="text-right" fpmsSort="plReceived" [pager]="pager" (sorted)="load()" title="The farm's count, and how it compares with the PL ordered (DEC-93)">PL counted</th>
@@ -306,6 +306,13 @@ export class FryDeliveriesComponent extends FpmsPage implements OnInit {
         this.status = value as number | null;
         this.pager.reset();
         this.load();
+    }
+
+    openRecord(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/resources/fry-deliveries', id]);
     }
 
     async load(): Promise<void> {
