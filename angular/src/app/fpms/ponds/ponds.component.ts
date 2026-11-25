@@ -145,9 +145,9 @@ interface PondCard {
                                         </thead>
                                         <tbody>
                                             @for (p of shownCards(); track p.id) {
-                                                <tr [class.table-warning]="!!p.alert" [class.text-muted]="p.archived">
+                                                <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open pond details" (click)="openPond(p.id, $event)" (keydown.enter)="openPond(p.id, $event)" [class.table-warning]="!!p.alert" [class.text-muted]="p.archived">
                                                     <td>
-                                                        <a [routerLink]="['/app/ponds', p.id]"><strong>{{ p.code }}</strong></a>
+                                                        <a (click)="$event.stopPropagation()" [routerLink]="['/app/ponds', p.id]"><strong>{{ p.code }}</strong></a>
                                                         <div class="small text-muted">{{ p.name }} · {{ p.areaM2 | num: 0 }} m²</div>
                                                         @if (p.isReserved) { <div class="small text-warning-dark">Reserved for {{ p.reservedByDelivery }}</div> }
                                                     </td>
@@ -155,7 +155,7 @@ interface PondCard {
                                                     <td>{{ p.constructionType | label: L.ConstructionTypes }}</td>
                                                     <td class="text-nowrap">{{ p.averageDepthM | num: 2 }} / {{ p.maxDepthM | num: 2 }} m</td>
                                                     <td><fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge></td>
-                                                    <td>@if (p.batchId) { <a [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a> } @else { <span class="text-muted">—</span> }</td>
+                                                    <td>@if (p.batchId) { <a (click)="$event.stopPropagation()" [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a> } @else { <span class="text-muted">—</span> }</td>
                                                     <td>{{ p.doc ?? '—' }}</td>
                                                     <td>{{ p.abwG === null ? '—' : (p.abwG | num: 1) + ' g' }}</td>
                                                     <td>{{ p.fcr === null ? '—' : (p.fcr | num: 2) }}</td>
@@ -188,13 +188,13 @@ interface PondCard {
                                                     <td>
                                                         @if (p.alert) {
                                                             <span class="text-warning-dark">{{ p.alert }}</span>
-                                                            @if (p.alertLog) { <div><a [routerLink]="['/app/logbook', p.alertLog]">Open log</a></div> }
+                                                            @if (p.alertLog) { <div><a (click)="$event.stopPropagation()" [routerLink]="['/app/logbook', p.alertLog]">Open log</a></div> }
                                                         } @else { <span class="text-muted">—</span> }
                                                     </td>
                                                     <td class="text-nowrap">
-                                                        @if (p.batchId) { <a [routerLink]="['/app/production/batches', p.batchId]">Batch</a><span class="mx-1">·</span> }
-                                                        <a [routerLink]="['/app/ponds', p.id]">Pond</a>
-                                                        @if (!p.batchId && p.status === 7 && can('Farm.Production.Stock')) { <span class="mx-1">·</span><a routerLink="/app/production/create-batch">Stock</a> }
+                                                        @if (p.batchId) { <a (click)="$event.stopPropagation()" [routerLink]="['/app/production/batches', p.batchId]">Batch</a><span class="mx-1">·</span> }
+                                                        <a (click)="$event.stopPropagation()" [routerLink]="['/app/ponds', p.id]">Pond</a>
+                                                        @if (!p.batchId && p.status === 7 && can('Farm.Production.Stock')) { <span class="mx-1">·</span><a (click)="$event.stopPropagation()" routerLink="/app/production/create-batch">Stock</a> }
                                                     </td>
                                                 </tr>
                                             }
@@ -204,7 +204,7 @@ interface PondCard {
                             } @else {
                             <div class="pd-grid">
                                 @for (p of shownCards(); track p.id) {
-                                    <article class="pd-card" [class.pd-alert]="!!p.alert" [class.pd-archived]="p.archived">
+                                    <article class="pd-card fpms-clickable-row" tabindex="0" role="link" aria-label="Open pond details" (click)="openPond(p.id, $event)" (keydown.enter)="openPond(p.id, $event)" [class.pd-alert]="!!p.alert" [class.pd-archived]="p.archived">
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div>
                                                 <a class="pd-code" [routerLink]="['/app/ponds', p.id]">{{ p.code }}</a>
@@ -684,6 +684,13 @@ export class PondsComponent extends FpmsPage implements OnInit {
             default:
                 return { title: 'No open batch', body: '' };
         }
+    }
+
+    openPond(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/ponds', id]);
     }
 
     openFeeding(batchId: string, date: string): void {
