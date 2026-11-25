@@ -18,6 +18,11 @@ import { DisposalReasons } from '@shared/fpms/labels';
                 <a class="btn btn-outline-secondary" [routerLink]="['/app/harvests', harvest.id, 'tally']">
                     <i class="fas fa-clipboard-list mr-1" aria-hidden="true"></i> Tally sheet
                 </a>
+                @if (can('Farm.Sales') && sellableKg() > 0) {
+                    <a class="btn btn-outline-primary" routerLink="/app/sales/new" [queryParams]="{ harvestId: harvest.id }">
+                        <i class="fas fa-cash-register mr-1" aria-hidden="true"></i> Record sale
+                    </a>
+                }
                 @if (harvest.canEdit) {
                     <a class="btn btn-primary" [routerLink]="['/app/harvests', harvest.id, 'edit']">
                         <i class="fas fa-edit mr-1" aria-hidden="true"></i> Edit harvest
@@ -136,6 +141,10 @@ export class HarvestDetailComponent extends FpmsPage implements OnInit {
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(() => void this.load());
+    }
+
+    sellableKg(): number {
+        return (this.harvest?.gradeLines ?? []).reduce((sum: number, line: any) => sum + (Number(line.unsoldKg) || 0), 0);
     }
 
     whereRows(): WhereRow[] {
