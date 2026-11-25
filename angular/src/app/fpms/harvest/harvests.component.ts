@@ -16,6 +16,9 @@ import { ToolbarChip } from '@shared/fpms/ui';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="Harvests" subtitle="Partial, final and emergency harvests by batch.">
+            @if (can('Farm.Harvests.Create')) {
+                <a routerLink="/app/harvests/new" class="btn btn-primary mr-2"><i class="fas fa-plus mr-1" aria-hidden="true"></i>Record harvest</a>
+            }
             <a routerLink="/app/harvests/blank-tally" class="btn btn-outline-secondary mr-2"><i class="fas fa-clipboard-list mr-1" aria-hidden="true"></i>Blank tally sheet</a>
             @if (can('Farm.Reports')) {
                 <button
