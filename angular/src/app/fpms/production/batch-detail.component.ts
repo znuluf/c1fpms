@@ -531,12 +531,12 @@ interface CalMonth {
                                         </thead>
                                         <tbody>
                                             @for (h of harvests; track h.id) {
-                                                <tr>
+                                                <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open harvest details" (click)="openRecord(h.id, $event)" (keydown.enter)="openRecord(h.id, $event)">
                                                     <td class="text-nowrap">
-                                                        <a [routerLink]="['/app/harvests', h.id]">{{ h.harvestedAtUtc | farmDateTime }}</a>
+                                                        <a (click)="$event.stopPropagation()" [routerLink]="['/app/harvests', h.id]">{{ h.harvestedAtUtc | farmDateTime }}</a>
                                                         @if (h.lotCode) {
                                                             <div class="small text-monospace">
-                                                                @if (can('Farm.Reports')) { <a [routerLink]="['/app/reports/trace/lot', h.lotCode]" title="Trace this lot">{{ h.lotCode }}</a> } @else { {{ h.lotCode }} }
+                                                                @if (can('Farm.Reports')) { <a (click)="$event.stopPropagation()" [routerLink]="['/app/reports/trace/lot', h.lotCode]" title="Trace this lot">{{ h.lotCode }}</a> } @else { {{ h.lotCode }} }
                                                             </div>
                                                         }
                                                     </td>
@@ -561,9 +561,9 @@ interface CalMonth {
                                                     </td>
                                                     <td class="text-right text-nowrap">
                                                         @if (sellableOf(h) > 0 && can('Farm.Sales')) {
-                                                            <a class="btn btn-xs btn-outline-primary mr-1" routerLink="/app/sales/new" [queryParams]="{ harvestId: h.id }" [title]="'Sell the ' + (sellableOf(h) | num: 2) + ' kg left'">Sell</a>
+                                                            <a (click)="$event.stopPropagation()" class="btn btn-xs btn-outline-primary mr-1" routerLink="/app/sales/new" [queryParams]="{ harvestId: h.id }" [title]="'Sell the ' + (sellableOf(h) | num: 2) + ' kg left'">Sell</a>
                                                         }
-                                                        <a class="btn btn-xs btn-outline-secondary" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" aria-label="Tally sheet"><i class="fas fa-clipboard-list" aria-hidden="true"></i></a>
+                                                        <a (click)="$event.stopPropagation()" class="btn btn-xs btn-outline-secondary" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" aria-label="Tally sheet"><i class="fas fa-clipboard-list" aria-hidden="true"></i></a>
                                                     </td>
                                                 </tr>
                                             } @empty {
@@ -763,6 +763,13 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
     })();
 
     protected readonly String = String;
+
+    openRecord(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/harvests', id]);
+    }
 
     ngOnInit(): void {
         // Detail routes reuse this component when only the :id changes, so reload on every change.
