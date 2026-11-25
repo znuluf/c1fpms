@@ -114,15 +114,15 @@ import { batchShort } from '@shared/fpms/labels';
                                 </thead>
                                 @for (l of logs(); track l.id) {
                                     <tbody [class.lb-voided]="l.isVoided">
-                                        <tr [class.fpms-row-warn]="l.hasOutOfRange && !l.isVoided">
+                                        <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open log entry details" (click)="openRecord(l.id, $event)" (keydown.enter)="openRecord(l.id, $event)" [class.fpms-row-warn]="l.hasOutOfRange && !l.isVoided">
                                             <td class="text-nowrap">
-                                                <a [routerLink]="['/app/logbook', l.id]">
+                                                <a (click)="$event.stopPropagation()" [routerLink]="['/app/logbook', l.id]">
                                                     {{ l.observedAtUtc | farmDate }}
                                                 </a>
                                                 <div class="text-muted">{{ timeOf(l.observedAtUtc) }}</div>
                                             </td>
                                             <td>
-                                                <a class="text-nowrap" [routerLink]="['/app/production/batches', l.batchId]" [title]="l.batchCode"><span class="fpms-pond-tag">{{ l.pondCode }}</span> {{ batchShort(l.batchCode) }}</a>
+                                                <a (click)="$event.stopPropagation()" class="text-nowrap" [routerLink]="['/app/production/batches', l.batchId]" [title]="l.batchCode"><span class="fpms-pond-tag">{{ l.pondCode }}</span> {{ batchShort(l.batchCode) }}</a>
                                                 <div>{{ l.logType | label: L.LogTypes }}</div>
                                                 @if (l.hasOutOfRange || l.isHighMortality) {
                                                     <div class="fpms-badge-stack mt-1">
@@ -173,7 +173,7 @@ import { batchShort } from '@shared/fpms/labels';
                                                 } @else {
                                                     <div class="fpms-actions-stack">
                                                     @if (l.canEdit) {
-                                                        <a
+                                                        <a (click)="$event.stopPropagation()"
                                                             class="btn btn-sm btn-outline-secondary"
                                                             [routerLink]="['/app/logbook', l.id]">
                                                             Correct
@@ -196,7 +196,7 @@ import { batchShort } from '@shared/fpms/labels';
                                                                 The Owner can reopen it.
                                                             </span>
                                                         } @else {
-                                                            <a
+                                                            <a (click)="$event.stopPropagation()"
                                                                 class="btn btn-sm btn-outline-secondary"
                                                                 [routerLink]="['/app/logbook', l.id]">
                                                                 View
@@ -343,6 +343,13 @@ export class LogbookComponent extends FpmsPage implements OnInit {
     });
 
     resultText = computed(() => (this.total() === 1 ? '1 entry' : `${this.total()} entries`));
+
+    openRecord(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/logbook', id]);
+    }
 
     ngOnInit(): void {
         this.f.batchId = this.query('batchId') || null;
