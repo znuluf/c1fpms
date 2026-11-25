@@ -153,9 +153,12 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                 </div>
                                             </td>
                                             <td class="text-right text-nowrap">
-                                                <a class="btn btn-sm btn-outline-secondary" (click)="$event.stopPropagation()" [class.mr-1]="can('Farm.Sales') && sellable(h) > 0" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" [attr.aria-label]="'Tally sheet of the ' + (h.harvestedAtUtc | farmDate) + ' harvest'">
+                                                <a class="btn btn-sm btn-outline-secondary" (click)="$event.stopPropagation()" [class.mr-1]="(can('Farm.Sales') && sellable(h) > 0) || (h.canEdit && h.unaccountedKg > 0)" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" [attr.aria-label]="'Tally sheet of the ' + (h.harvestedAtUtc | farmDate) + ' harvest'">
                                                     <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                                                 </a>
+                                                @if (h.canEdit && h.unaccountedKg > 0) {
+                                                    <a class="btn btn-sm btn-outline-secondary mr-1" (click)="$event.stopPropagation()" [routerLink]="['/app/harvests', h.id, 'edit']" fragment="harvest-outcomes" title="Account for remaining kilograms">Account</a>
+                                                }
                                                 @if (can('Farm.Sales') && sellable(h) > 0) {
                                                     <a
                                                         class="btn btn-sm btn-outline-primary"
