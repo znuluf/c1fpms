@@ -116,12 +116,12 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     <thead><tr><th>Went to</th><th>Dispatch receipt</th><th class="text-right">Crates</th><th class="text-right">Kg</th><th class="text-right">Amount</th></tr></thead>
                                     <tbody>
                                         @for (r of whereRows(); track $index) {
-                                            <tr>
+                                            <tr [class.fpms-clickable-row]="!!r.saleId" [attr.tabindex]="r.saleId ? 0 : null" [attr.role]="r.saleId ? 'link' : null" (click)="openSale(r.saleId, $event)" (keydown.enter)="openSale(r.saleId, $event)">
                                                 <td>{{ r.to }}</td>
                                                 <td class="text-nowrap">
                                                     @if (r.saleId) {
-                                                        <a [routerLink]="['/app/sales', r.saleId]">{{ r.receipt }}</a>
-                                                        <a class="small ml-2" [routerLink]="['/app/sales', r.saleId, 'tally']">Tally sheet</a>
+                                                        <a (click)="$event.stopPropagation()" [routerLink]="['/app/sales', r.saleId]">{{ r.receipt }}</a>
+                                                        <a class="small ml-2" (click)="$event.stopPropagation()" [routerLink]="['/app/sales', r.saleId, 'tally']">Tally sheet</a>
                                                     } @else { {{ r.receipt }} }
                                                 </td>
                                                 <td class="text-right">{{ r.crates }}</td>
@@ -147,6 +147,14 @@ export class HarvestDetailComponent extends FpmsPage implements OnInit {
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(() => void this.load());
+    }
+
+    openSale(id: string | null | undefined, event: Event): void {
+        if (!id) return;
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/sales', id]);
     }
 
     sellableKg(): number {
