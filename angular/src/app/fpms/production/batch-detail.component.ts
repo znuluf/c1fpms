@@ -58,8 +58,18 @@ interface CalMonth {
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (b.harvestReadinessReached) {
-                        <div class="alert alert-success border" role="status">
-                            <strong><i class="fas fa-check-circle mr-1" aria-hidden="true"></i>Ready for harvest</strong>
+                        <div
+                            class="alert border"
+                            [class.alert-success]="!(b.earliestSafeHarvestDate && b.earliestSafeHarvestDate > today)"
+                            [class.alert-warning]="b.earliestSafeHarvestDate && b.earliestSafeHarvestDate > today"
+                            role="status">
+                            <strong>
+                                @if (b.earliestSafeHarvestDate && b.earliestSafeHarvestDate > today) {
+                                    <i class="fas fa-hourglass-half mr-1" aria-hidden="true"></i>Growth targets reached · withdrawal period active
+                                } @else {
+                                    <i class="fas fa-check-circle mr-1" aria-hidden="true"></i>Ready for harvest
+                                }
+                            </strong>
                             <div>DOC {{ b.doc }} and ABW {{ b.indicators.latestSampleAbwG }} g reach this farm's targets (DOC {{ b.harvestReadinessDocTarget }}, {{ b.harvestReadinessAbwTargetG }} g).</div>
                             @if (b.earliestSafeHarvestDate && b.earliestSafeHarvestDate > today) {
                                 <div class="mt-1"><i class="fas fa-hourglass-half mr-1" aria-hidden="true"></i>Withdrawal period is still active. Safe harvest date: {{ b.earliestSafeHarvestDate | farmDate }}.</div>
