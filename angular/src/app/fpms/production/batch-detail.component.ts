@@ -928,7 +928,10 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
      * A cell shows the date, the day of culture, its feeding and water records as bars (one per feeding, DEC-61), and dots for other entries.
      */
     async loadCalendar(): Promise<void> {
-        const cal = await this.run(() => this.api.get<any>('Batch', 'GetLogCalendar', { id: this.b.id }));
+        const request = this.loadRequest;
+        const batchId = this.b.id;
+        const cal = await this.run(() => this.api.get<any>('Batch', 'GetLogCalendar', { id: batchId }));
+        if (request !== this.loadRequest) return;
         this.calendar = cal;
         const days: any[] = cal?.days ?? [];
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -1013,7 +1016,10 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
     }
 
     async loadLogs(): Promise<void> {
-        const r = await this.api.get<any>('Log', 'GetList', { batchId: this.b.id, logType: this.logType, ...this.logPager.params });
+        const request = this.loadRequest;
+        const batchId = this.b.id;
+        const r = await this.api.get<any>('Log', 'GetList', { batchId, logType: this.logType, ...this.logPager.params });
+        if (request !== this.loadRequest) return;
         this.logs = r.items;
         if (this.logPager.update(r.totalCount)) {
             await this.loadLogs();
@@ -1021,7 +1027,10 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
     }
 
     async loadFeeding(): Promise<void> {
-        const r = await this.api.get<any>('Feeding', 'GetList', { batchId: this.b.id, ...this.feedPager.params });
+        const request = this.loadRequest;
+        const batchId = this.b.id;
+        const r = await this.api.get<any>('Feeding', 'GetList', { batchId, ...this.feedPager.params });
+        if (request !== this.loadRequest) return;
         this.sessions = r.items;
         if (this.feedPager.update(r.totalCount)) {
             await this.loadFeeding();
