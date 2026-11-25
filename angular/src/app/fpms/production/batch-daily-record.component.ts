@@ -130,10 +130,10 @@ function daysBetween(a: string, b: string): number {
             </div>
 
             @if (mode() === 'day' && !error() && !loading()) {
-                <nav class="fpms-dr-section-nav no-print" aria-label="Daily record sections">
-                    <a class="btn btn-sm btn-outline-secondary" href="#daily-feeding">Feeding</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="#daily-water">Water quality</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="#daily-other">Other entries</a>
+                <nav class="d-flex flex-wrap mb-3 no-print" aria-label="Daily record sections">
+                    <a class="btn btn-sm btn-outline-secondary mr-2 mb-2" href="#daily-feeding">Feeding</a>
+                    <a class="btn btn-sm btn-outline-secondary mr-2 mb-2" href="#daily-water">Water quality</a>
+                    <a class="btn btn-sm btn-outline-secondary mr-2 mb-2" href="#daily-other">Other entries</a>
                 </nav>
             }
             @if (error()) {
