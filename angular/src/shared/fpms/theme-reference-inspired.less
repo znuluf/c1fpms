@@ -15,12 +15,9 @@ html[data-theme='neutral'] {
     --fpms-ref-heading: #202b35;
 }
 
-.main-sidebar.fpms-sidebar ~ .content-wrapper {
-    background: var(--fpms-ref-ground) !important;
-    min-height: calc(100vh - 3.5rem);
-}
 /* Scope workspace chrome to the FPMS layout; admin and other modules keep their own theme. */
 .main-sidebar.fpms-sidebar ~ .content-wrapper {
+    background: var(--fpms-ref-ground) !important;
     min-height: calc(100vh - 3.5rem);
 }
 .main-sidebar.fpms-sidebar ~ .content-wrapper > .content,
