@@ -46,7 +46,12 @@ const CLOSED = 5;
                 </div>
                 <div class="card">
                     <div class="card-body p-0 table-responsive">
-                        @if (!batches()) {
+                        @if (failed()) {
+                            <div class="alert alert-warning m-3 d-flex align-items-center" role="alert">
+                                <span class="mr-auto">Production batches could not be loaded. Check the connection, then try again.</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy()" (click)="load()">Try again</button>
+                            </div>
+                        } @else if (!batches()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!batches().length) {
                             <fpms-empty
@@ -108,6 +113,8 @@ const CLOSED = 5;
 export class BatchesComponent extends FpmsPage implements OnInit {
     batches = signal<any[] | null>(null);
     counts = signal<Record<number, number>>({});
+    failed = signal(false);
+    private loadRequest = 0;
     status: number | null = null;
     openOnly = true;
     search = '';
@@ -168,24 +175,34 @@ export class BatchesComponent extends FpmsPage implements OnInit {
     }
 
     async load(): Promise<void> {
-        const [r, counts] = await Promise.all([
-            this.api.get<any>('Batch', 'GetPage', {
-                status: this.status,
-                openOnly: this.openOnly,
-                search: this.search || undefined,
-                ...this.pager.params,
-            }),
-            this.api.get<any[]>('Batch', 'GetStatusCounts', {
-                search: this.search || undefined,
-            }),
-        ]);
-        this.batches.set(r.items);
-        this.total.set(r.totalCount);
-        this.counts.set(Object.fromEntries((counts ?? []).map((x) => [x.status, x.count])));
-        const reload = this.pager.update(r.totalCount);
-        this.syncPager(this.pager);
-        if (reload) {
-            await this.load();
+        const request = ++this.loadRequest;
+        this.failed.set(false);
+        try {
+            const [r, counts] = await Promise.all([
+                this.api.get<any>('Batch', 'GetPage', {
+                    status: this.status,
+                    openOnly: this.openOnly,
+                    search: this.search || undefined,
+                    ...this.pager.params,
+                }),
+                this.api.get<any[]>('Batch', 'GetStatusCounts', {
+                    search: this.search || undefined,
+                }),
+            ]);
+            if (request !== this.loadRequest) return;
+            this.batches.set(r.items);
+            this.total.set(r.totalCount);
+            this.counts.set(Object.fromEntries((counts ?? []).map((x) => [x.status, x.count])));
+            const reload = this.pager.update(r.totalCount);
+            this.syncPager(this.pager);
+            if (reload) {
+                await this.load();
+            }
+        } catch (e) {
+            if (request === this.loadRequest) {
+                console.warn(e);
+                this.failed.set(true);
+            }
         }
     }
 }
