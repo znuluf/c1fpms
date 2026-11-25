@@ -111,8 +111,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <thead><tr><th>Pond</th><th class="text-right">Planned PL</th><th>Status</th></tr></thead>
                                     <tbody>
                                         @for (a of d.pondAllocations; track a.id) {
-                                            <tr>
-                                                <td><a [routerLink]="['/app/ponds', a.pondId]">{{ a.pondCode }}</a><div class="small text-muted">{{ a.pondName }}</div></td>
+                                            <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open pond allocation" (click)="openRecord(a.pondId, $event)" (keydown.enter)="openRecord(a.pondId, $event)">
+                                                <td><a (click)="$event.stopPropagation()" [routerLink]="['/app/ponds', a.pondId]">{{ a.pondCode }}</a><div class="small text-muted">{{ a.pondName }}</div></td>
                                                 <td class="text-right">{{ a.plannedPlCount | num: 0 }}</td>
                                                 <td>{{ a.fulfilledAtUtc ? 'Stocked' : a.releasedAtUtc ? 'Released' : 'Reserved' }}</td>
                                             </tr>
@@ -352,6 +352,13 @@ export class FryDeliveryDetailComponent extends FpmsPage implements OnInit {
             this.notifySaved('Stocking finished. The delivery is accounted for.');
             this.load();
         }
+    }
+
+    openRecord(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/ponds', id]);
     }
 
     ngOnInit(): void {
