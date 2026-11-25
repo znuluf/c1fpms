@@ -156,7 +156,7 @@ interface CalMonth {
                                             @for (d of closeCheck.blankDays; track d.date) {
                                                 <li class="d-flex align-items-center flex-wrap">
                                                     <span class="mr-2">{{ d.date | farmDate }}: {{ d.missing }}</span>
-                                                    <button type="button" class="btn btn-xs btn-outline-secondary ml-auto" (click)="reviewCloseDay(d.date)">Review day</button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary ml-auto" (click)="reviewCloseDay(d.date)">Review day</button>
                                                 </li>
                                             }
                                             @if (closeCheck.blankDaysTotal > closeCheck.blankDays.length) {
@@ -171,7 +171,7 @@ interface CalMonth {
                                     <div class="alert alert-warning small">
                                         <strong>No Shrimp Fry Source Certificate number</strong> on fry delivery {{ closeCheck.fryDeliveryBatchNumber }}.
                                         BFAR FAO 225-1 requires it, and the harvest can be confiscated without it. Add it on the fry delivery. You can still close.
-                                        <a class="btn btn-xs btn-outline-secondary ml-2" [routerLink]="['/app/resources/fry-deliveries', b.fryDeliveryId]">Review fry delivery</a>
+                                        <a class="btn btn-sm btn-outline-secondary ml-2" [routerLink]="['/app/resources/fry-deliveries', b.fryDeliveryId]">Review fry delivery</a>
                                     </div>
                                 }
                                 @if (closeCheck?.flaggedLots?.length) {
@@ -179,7 +179,7 @@ interface CalMonth {
                                         <strong>{{ closeCheck.flaggedLots.length }} stock lot{{ closeCheck.flaggedLots.length === 1 ? '' : 's' }} used by this batch {{ closeCheck.flaggedLots.length === 1 ? 'is' : 'are' }} flagged for reconciliation:</strong>
                                         @for (l of closeCheck.flaggedLots; track $index) { <span class="d-block">{{ l.product }}, lot {{ l.lotNumber }}</span> }
                                         The feed or chemical amounts for this batch may be off until the stock is reconciled on the Inventory page. You can still close.
-                                        <a class="btn btn-xs btn-outline-secondary mt-2" routerLink="/app/inventory">Review inventory</a>
+                                        <a class="btn btn-sm btn-outline-secondary mt-2" routerLink="/app/inventory">Review inventory</a>
                                     </div>
                                 }
                                 @if (closeCheck?.unaccountedKg > 0.0005) {
@@ -187,7 +187,7 @@ interface CalMonth {
                                         <strong>{{ closeCheck.unaccountedKg | num: 3 }} kg harvested but still unsold, awaiting an outcome:</strong>
                                         harvested {{ closeCheck.harvestedKg | num: 3 }} kg, sold {{ closeCheck.soldKg | num: 3 }} kg, not sold (home use, given away, spoiled) {{ closeCheck.notSoldKg | num: 3 }} kg.
                                         Record the remaining sales or not-sold kg before closing this batch.
-                                        <button type="button" class="btn btn-xs btn-outline-secondary mt-2" (click)="reviewCloseHarvests()">Review harvests</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" (click)="reviewCloseHarvests()">Review harvests</button>
                                     </div>
                                 } @else if (closeCheck && closeCheck.harvestedKg > 0) {
                                     <p class="small text-success"><i class="fas fa-check mr-1"></i>All {{ closeCheck.harvestedKg | num: 3 }} harvested kg are sold or recorded as not sold.</p>
