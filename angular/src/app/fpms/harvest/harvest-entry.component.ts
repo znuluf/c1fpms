@@ -1200,7 +1200,11 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             if (saved?.warnings?.length) {
                 this.showWarnings(saved.warnings);
             }
-            this.router.navigate(['/app/production/batches', saved?.batchId ?? body.batchId], { queryParams: { tab: 'harvests' }, replaceUrl: true });
+            if (saved?.id) {
+                this.router.navigate(['/app/harvests', saved.id], { replaceUrl: true });
+            } else {
+                this.router.navigate(['/app/production/batches', saved?.batchId ?? body.batchId], { queryParams: { tab: 'harvests' }, replaceUrl: true });
+            }
         }
     }
 
