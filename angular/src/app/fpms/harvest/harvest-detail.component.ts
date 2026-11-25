@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FPMS_IMPORTS } from '../shared-imports';
+import { whereItWent, WhereRow } from '@shared/fpms/crates';
+import { DisposalReasons } from '@shared/fpms/labels';
 
 /** Read-oriented home for one harvest; editing and tally entry remain dedicated workflows. */
 @Component({
@@ -95,15 +97,26 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </div>
                         </div>
                     }
-                    @if (sheet?.sales?.length) {
+                    @if (whereRows().length) {
                         <div class="card">
-                            <div class="card-header"><h3 class="card-title">Sales from this harvest</h3></div>
+                            <div class="card-header"><h3 class="card-title">Where this harvest went</h3></div>
                             <div class="card-body p-0 table-responsive">
                                 <table class="table mb-0">
-                                    <thead><tr><th>Dispatch receipt</th><th>Buyer</th><th class="text-right">Farm kg</th><th class="text-right">Buyer kg</th><th></th></tr></thead>
+                                    <thead><tr><th>Went to</th><th>Dispatch receipt</th><th class="text-right">Crates</th><th class="text-right">Kg</th><th class="text-right">Amount</th></tr></thead>
                                     <tbody>
-                                        @for (sale of sheet.sales; track sale.id) {
-                                            <tr><td>{{ sale.dispatchReceiptNo }}</td><td>{{ sale.buyerName }}</td><td class="text-right">{{ sale.farmKg | num: 2 }}</td><td class="text-right">{{ sale.buyerKg | num: 2 }}</td><td class="text-right"><a class="btn btn-sm btn-outline-secondary" [routerLink]="['/app/sales', sale.id]">Open sale</a></td></tr>
+                                        @for (r of whereRows(); track $index) {
+                                            <tr>
+                                                <td>{{ r.to }}</td>
+                                                <td class="text-nowrap">
+                                                    @if (r.saleId) {
+                                                        <a [routerLink]="['/app/sales', r.saleId]">{{ r.receipt }}</a>
+                                                        <a class="small ml-2" [routerLink]="['/app/sales', r.saleId, 'tally']">Tally sheet</a>
+                                                    } @else { {{ r.receipt }} }
+                                                </td>
+                                                <td class="text-right">{{ r.crates }}</td>
+                                                <td class="text-right">{{ r.kg | num: 2 }}</td>
+                                                <td class="text-right">{{ r.amount != null ? (r.amount | php) : '' }}</td>
+                                            </tr>
                                         }
                                     </tbody>
                                 </table>
@@ -123,6 +136,10 @@ export class HarvestDetailComponent extends FpmsPage implements OnInit {
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(() => void this.load());
+    }
+
+    whereRows(): WhereRow[] {
+        return whereItWent(this.harvest, this.sheet?.showsSales ? (this.sheet.sales ?? []) : [], DisposalReasons);
     }
 
     async load(): Promise<void> {
