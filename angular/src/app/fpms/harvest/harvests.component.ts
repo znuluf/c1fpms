@@ -104,9 +104,9 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 </thead>
                                 <tbody>
                                     @for (h of list(); track h.id) {
-                                        <tr>
+                                        <tr class="fpms-clickable-row" tabindex="0" role="link" [attr.aria-label]="'Open harvest from ' + (h.harvestedAtUtc | farmDate)" (click)="openHarvest(h.id, $event)" (keydown.enter)="openHarvest(h.id, $event)">
                                             <td class="text-nowrap">
-                                                <a [routerLink]="['/app/harvests', h.id]">{{ h.harvestedAtUtc | farmDate }}</a>
+                                                <a [routerLink]="['/app/harvests', h.id]" (click)="$event.stopPropagation()">{{ h.harvestedAtUtc | farmDate }}</a>
                                                 <div class="text-muted">{{ time(h.harvestedAtUtc) }}</div>
                                                 <div class="text-monospace small">
                                                     @if (h.lotCode && can('Farm.Reports')) {
@@ -117,7 +117,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                 </div>
                                             </td>
                                             <td>
-                                                <a class="text-nowrap" [routerLink]="['/app/production/batches', h.batchId]" [title]="h.batchCode"><span class="fpms-pond-tag">{{ h.pondCode }}</span> {{ batchShort(h.batchCode) }}</a>
+                                                <a class="text-nowrap" [routerLink]="['/app/production/batches', h.batchId]" (click)="$event.stopPropagation()" [title]="h.batchCode"><span class="fpms-pond-tag">{{ h.pondCode }}</span> {{ batchShort(h.batchCode) }}</a>
                                                 <div class="small text-muted">Cycle {{ unbroken(h.cycleCode) }}</div>
                                             </td>
                                             <td class="text-right"><strong>{{ h.totalKg | num: 2 }}</strong><div class="text-muted">{{ h.harvestType | label: L.HarvestTypes }}</div></td>
@@ -150,12 +150,13 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                 </div>
                                             </td>
                                             <td class="text-right text-nowrap">
-                                                <a class="btn btn-sm btn-outline-secondary" [class.mr-1]="can('Farm.Sales') && sellable(h) > 0" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" [attr.aria-label]="'Tally sheet of the ' + (h.harvestedAtUtc | farmDate) + ' harvest'">
+                                                <a class="btn btn-sm btn-outline-secondary" (click)="$event.stopPropagation()" [class.mr-1]="can('Farm.Sales') && sellable(h) > 0" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" [attr.aria-label]="'Tally sheet of the ' + (h.harvestedAtUtc | farmDate) + ' harvest'">
                                                     <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                                                 </a>
                                                 @if (can('Farm.Sales') && sellable(h) > 0) {
                                                     <a
                                                         class="btn btn-sm btn-outline-primary"
+                                                        (click)="$event.stopPropagation()"
                                                         routerLink="/app/sales/new"
                                                         [queryParams]="{ harvestId: h.id }">
                                                         Record sale
@@ -310,6 +311,13 @@ export class HarvestsComponent extends FpmsPage implements OnInit {
                 await this.load();
             }
         });
+    }
+
+    openHarvest(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/harvests', id]);
     }
 
     sellable(h: any): number {
