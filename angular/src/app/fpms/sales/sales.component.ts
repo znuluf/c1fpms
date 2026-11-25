@@ -147,7 +147,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                         } @else {
                             <table class="table table-hover mb-0">
                                 <thead>
-                                    <tr>
+                                    <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open sale details" (click)="openRecord(s.id, $event)" (keydown.enter)="openRecord(s.id, $event)">
                                         <!-- Columns that belong together share a cell, so the list fits a 1,000 px screen (DEC-99, DEC-107):
                                              date and receipt; buyer, batch and lot; total, kg and paid; balance and due date. -->
                                         <th fpmsSort="saleDate" [pager]="pager" (sorted)="load()">Date · receipt · payment</th>
@@ -327,6 +327,13 @@ export class SalesComponent extends FpmsPage implements OnInit {
     clearFilters(): void {
         Object.assign(this.f, { search: '', from: null, to: null, buyerId: null, paymentStatus: null, overdueOnly: false });
         this.apply();
+    }
+
+    openRecord(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/sales', id]);
     }
 
     async load(): Promise<void> {
