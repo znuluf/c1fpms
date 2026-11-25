@@ -81,6 +81,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                         <dt class="col-sm-5">Pond</dt><dd class="col-sm-7">{{ harvest.pondCode || batch?.pondCode || '—' }}</dd>
                                         <dt class="col-sm-5">Batch</dt><dd class="col-sm-7"><a [routerLink]="['/app/production/batches', harvest.batchId]">{{ harvest.batchCode || batch?.batchCode || 'View batch' }}</a></dd>
                                         <dt class="col-sm-5">Cycle</dt><dd class="col-sm-7">{{ batch?.cycleCode || '—' }}</dd>
+                                        <dt class="col-sm-5">Batch status</dt><dd class="col-sm-7">@if (batch) { <fpms-badge [text]="batch.status | label: L.BatchStatuses"></fpms-badge> } @else { — }</dd>
                                         @if (harvest.harvestType === 3) {
                                             <dt class="col-sm-5">Emergency reason</dt><dd class="col-sm-7">{{ emergencyReasonLabel() }}</dd>
                                             <dt class="col-sm-5">Shrimp remained</dt><dd class="col-sm-7">{{ harvest.shrimpLeft == null ? 'Not recorded' : harvest.shrimpLeft ? 'Yes' : 'No' }}</dd>
