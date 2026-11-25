@@ -166,6 +166,7 @@ export class HarvestDetailComponent extends FpmsPage implements OnInit {
     harvest: any = null;
     batch: any = null;
     sheet: any = null;
+    private loadRequest = 0;
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(() => void this.load());
@@ -192,24 +193,28 @@ export class HarvestDetailComponent extends FpmsPage implements OnInit {
     }
 
     async load(): Promise<void> {
+        const request = ++this.loadRequest;
         this.loading = true;
         this.harvest = null;
         this.batch = null;
         this.sheet = null;
         try {
             const id = this.param('id');
-            this.harvest = await this.api.get<any>('Harvest', 'Get', { id });
-            if (!this.harvest) return;
+            const harvest = await this.api.get<any>('Harvest', 'Get', { id });
+            if (request !== this.loadRequest) return;
+            this.harvest = harvest;
+            if (!harvest) return;
             const results = await Promise.allSettled([
-                this.api.get<any>('Batch', 'Get', { id: this.harvest.batchId }),
+                this.api.get<any>('Batch', 'Get', { id: harvest.batchId }),
                 this.api.get<any>('TallySheet', 'GetPrint', { harvestId: id }),
             ]);
+            if (request !== this.loadRequest) return;
             if (results[0].status === 'fulfilled') this.batch = results[0].value;
             if (results[1].status === 'fulfilled') this.sheet = results[1].value;
         } catch {
-            this.harvest = null;
+            if (request === this.loadRequest) this.harvest = null;
         } finally {
-            this.loading = false;
+            if (request === this.loadRequest) this.loading = false;
         }
     }
 }
