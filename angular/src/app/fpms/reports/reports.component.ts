@@ -23,6 +23,12 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
         </fpms-page-header>
         <section class="content px-2 pb-3">
             <div class="container-fluid">
+                @if (lookupFailed) {
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <span class="mr-auto">Report filters could not be loaded. Check the connection, then try again.</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy()" (click)="ngOnInit()">Try again</button>
+                    </div>
+                }
                 <!-- Trace, report choice and filters on the page ground (DEC-115). -->
                 <form class="no-print fpms-list-filters" (ngSubmit)="traceLot()" aria-label="Trace a lot code">
                     <div class="form-row align-items-end">
@@ -633,6 +639,7 @@ export class ReportsComponent extends FpmsPage implements OnInit {
     /** DEC-84: the lot code typed in "Trace a lot code". */
     lotCode = '';
     r: any = null;
+    lookupFailed = false;
     /** Filters that produced the report currently on screen; edits to the form must not change its export. */
     appliedFilters: any = null;
     /** Prevents a slower, earlier report request from replacing a newer result. */
@@ -646,16 +653,23 @@ export class ReportsComponent extends FpmsPage implements OnInit {
     f: any = { cycleId: null, batchId: null, buyerId: null, itemId: null, from: FarmTime.addDays(FarmTime.today(), -30), to: FarmTime.today() };
 
     async ngOnInit(): Promise<void> {
-        const [cycles, batches, items, buyers] = await Promise.all([
-            this.api.get<any>('Cycle', 'GetPage', { maxResultCount: 100, sorting: 'startDate desc' }),
-            this.api.get<any>('Batch', 'GetPage', { maxResultCount: 100 }),
-            this.api.get<any[]>('Inventory', 'GetItems'),
-            this.api.get<any[]>('Buyer', 'GetLookup'),
-        ]);
-        this.cycles = cycles.items;
-        this.batches = batches.items;
-        this.items = items;
-        this.buyers = buyers ?? [];
+        this.lookupFailed = false;
+        try {
+            const [cycles, batches, items, buyers] = await Promise.all([
+                this.api.get<any>('Cycle', 'GetPage', { maxResultCount: 100, sorting: 'startDate desc' }),
+                this.api.get<any>('Batch', 'GetPage', { maxResultCount: 100 }),
+                this.api.get<any[]>('Inventory', 'GetItems'),
+                this.api.get<any[]>('Buyer', 'GetLookup'),
+            ]);
+            this.cycles = cycles.items ?? [];
+            this.batches = batches.items ?? [];
+            this.items = items ?? [];
+            this.buyers = buyers ?? [];
+        } catch (e) {
+            console.warn(e);
+            this.lookupFailed = true;
+            return;
+        }
         const report = this.query('report') as ReportKey;
         if (report && this.reports.some((x) => x.key === report)) {
             this.key = report;
