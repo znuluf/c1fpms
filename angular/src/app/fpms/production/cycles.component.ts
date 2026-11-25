@@ -148,7 +148,11 @@ export class CyclesComponent extends FpmsPage implements OnInit {
         try {
             const [r, counts] = await Promise.all([
                 this.api.get<any>('Cycle', 'GetPage', { status: this.status, ...q, ...this.pager.params }),
-                this.api.get<any[]>('Cycle', 'GetStatusCounts', q),
+                // Status counts enrich the filter chips; they must not hide a successfully loaded cycle list.
+                this.api.get<any[]>('Cycle', 'GetStatusCounts', q).catch((e) => {
+                    console.warn('Could not load production cycle status counts.', e);
+                    return [];
+                }),
             ]);
             if (request !== this.loadRequest) return;
             this.cycles.set(r.items);
