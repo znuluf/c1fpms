@@ -416,3 +416,65 @@ body:has(.main-sidebar.fpms-sidebar) .main-header.navbar {
         padding: 0.75rem 1rem;
     }
 }
+
+
+// Accessible interaction polish for the reference-inspired workspace.
+// Keep keyboard focus visible without changing the active/selected state styling.
+body:has(.main-sidebar.fpms-sidebar) :where(
+    a, button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])
+):focus-visible {
+    outline: 3px solid var(--fpms-primary);
+    outline-offset: 2px;
+    position: relative;
+    z-index: 2;
+}
+
+.main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link {
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.fpms-section-tab {
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fpms-section-subtabs .fpms-section-tab {
+    min-height: 2.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .fpms-section-bar {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+    .fpms-section-tabs {
+        max-width: 100%;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
+    }
+    .fpms-section-tab {
+        flex: 0 0 auto;
+        min-height: 2.75rem;
+        white-space: nowrap;
+    }
+    .fpms-section-actions {
+        flex: 0 0 auto;
+        align-self: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body:has(.main-sidebar.fpms-sidebar) *,
+    body:has(.main-sidebar.fpms-sidebar) *::before,
+    body:has(.main-sidebar.fpms-sidebar) *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
