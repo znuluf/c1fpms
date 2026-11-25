@@ -102,7 +102,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                 <thead><tr><th>Date · receipt</th><th class="text-right">Kg</th><th class="text-right">Amount</th><th>Payment</th></tr></thead>
                                 <tbody>
                                     @for (s of d.sales; track s.id) {
-                                        <tr>
+                                        <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open sale details" (click)="openSale(s.id, $event)" (keydown.enter)="openSale(s.id, $event)">
                                             <td class="text-nowrap"><a [routerLink]="['/app/sales', s.id]">{{ s.saleDate | farmDate }}</a><div class="text-muted">{{ s.dispatchReceiptNo || 'No receipt no.' }}</div></td>
                                             <td class="text-right">{{ s.totalKg | num: 2 }}</td>
                                             <td class="text-right">{{ s.totalAmount | php }}</td>
@@ -184,6 +184,13 @@ export class BuyersComponent extends FpmsPage implements OnInit {
 
     async load(): Promise<void> {
         this.list.set(await this.api.get<any[]>('Buyer', 'GetAll'));
+    }
+
+    openSale(id: string, event: Event): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('a, button, input, select, textarea, [role="button"]')) return;
+        if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+        this.router.navigate(['/app/sales', id]);
     }
 
     async showSales(b: any): Promise<void> {
