@@ -179,13 +179,21 @@ export class LoadingComponent {}
 })
 export class FormHintComponent {
     @Input({ required: true }) form!: NgForm | null;
+    private host = inject(ElementRef<HTMLElement>);
 
     show(): void {
         this.form?.form.markAllAsTouched();
+        // A page can contain multiple forms (including hidden dialogs). Keep focus
+        // inside the form whose hint the user activated instead of selecting the
+        // first invalid control anywhere in the document.
+        const ownerForm = this.host.nativeElement.closest('form');
+        if (!ownerForm) {
+            return;
+        }
         setTimeout(() =>
             (
-                document.querySelector(
-                    'form .form-control.ng-invalid, form .custom-select.ng-invalid'
+                ownerForm.querySelector(
+                    '.form-control.ng-invalid:not([disabled]), .custom-select.ng-invalid:not([disabled])'
                 ) as HTMLElement | null
             )?.focus()
         );
