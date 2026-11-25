@@ -9,7 +9,7 @@ import { whereItWent, WhereRow } from '@shared/fpms/crates';
 import { DisposalReasons } from '@shared/fpms/labels';
 
 /**
- * Harvest entry and detail (Ref 7.1, AC-14, step E): Partial or Total, grade lines on the farm's size grades, optional
+ * Harvest entry and editing (Ref 7.1, AC-14, step E): Partial or Total, grade lines on the farm's size grades, optional
  * counted shrimp, not-sold entries (DEC-67). DEC-140: Emergency harvests, and Weighed on, the quality checks and dead at harvest
  * are no longer on the form (saved values are kept and sent back unchanged). Optional crate tally and
  * ABW sample (DEC-80): with crates, the total kg and boxes come from them. Optional buyer and scale (DEC-81); for a new
