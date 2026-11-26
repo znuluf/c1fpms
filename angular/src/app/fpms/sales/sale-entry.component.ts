@@ -28,9 +28,9 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                     <div class="card">
                         <div class="card-body">
                             @if (!buyers.length) {
-                                <fpms-empty text="Add an active buyer first." icon="fas fa-handshake"><a routerLink="/app/resources/buyers" class="btn btn-sm btn-primary">Go to buyers</a></fpms-empty>
+                                <fpms-empty [text]="can('Farm.Buyers') ? 'Add an active buyer first.' : 'No active buyers are available to your account.'" icon="fas fa-handshake">@if (can('Farm.Buyers')) { <a routerLink="/app/resources/buyers" class="btn btn-sm btn-primary">Go to buyers</a> }</fpms-empty>
                             } @else {
-                                <fpms-empty [text]="grading ? 'No harvest grade has kilograms left to sell. Record a harvest with its size grades first.' : 'No harvest has kilograms left to sell. Record a harvest first.'" icon="fas fa-shrimp"><a routerLink="/app/harvests" class="btn btn-sm btn-primary">Go to harvests</a></fpms-empty>
+                                <fpms-empty [text]="grading ? 'No harvest grade has kilograms left to sell. Record a harvest with its size grades first.' : 'No harvest has kilograms left to sell. Record a harvest first.'" icon="fas fa-shrimp">@if (can('Farm.Harvests')) { <a routerLink="/app/harvests" class="btn btn-sm btn-primary">Go to harvests</a> }</fpms-empty>
                             }
                         </div>
                     </div>
@@ -212,8 +212,8 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
     readonly methods = PRICE_METHODS;
 
     /** Price by count is offered only on a line that already uses it: the partner farm always sells by kg (DEC-90). */
-    methodsFor(l: any): typeof PRICE_METHODS {
-        return PRICE_METHODS.filter((o) => o.value !== 3 || l.priceMethod === 3);
+    methodsFor(_l: any): typeof PRICE_METHODS {
+        return PRICE_METHODS;
     }
     /** Active price tables with their rows (DEC-82). */
     tables: any[] = [];
