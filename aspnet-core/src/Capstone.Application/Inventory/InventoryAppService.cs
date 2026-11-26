@@ -398,6 +398,12 @@ public class InventoryAppService : CapstoneAppServiceBase
     {
         var lot = await _inventory.GetLotWithItemAsync(input.LotId);
         var zone = await Farm.GetTimeZoneAsync();
+        var adjustmentDay = input.Date ?? await Farm.GetTodayAsync();
+        if (adjustmentDay < lot.ReceivedDate)
+        {
+            throw new UserFriendlyException($"Lot {lot.LotNumber} was not received until {lot.ReceivedDate:yyyy-MM-dd}; an adjustment cannot be dated {adjustmentDay:yyyy-MM-dd}.");
+        }
+
         var when = input.Date.HasValue ? FarmClock.StartOfDayUtc(input.Date.Value, zone).AddHours(12) : DateTime.UtcNow;
         await _inventory.RecordAdjustmentAsync(lot, input.Quantity, input.Reason.Trim(), when);
         await CurrentUnitOfWork.SaveChangesAsync();
