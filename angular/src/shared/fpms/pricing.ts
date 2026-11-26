@@ -8,6 +8,8 @@
 export const PRICE_METHODS = [
     { value: 1, label: 'Fixed price' },
     { value: 2, label: 'Base ABW pricing' },
+    { value: 3, label: 'Base count pricing' },
+    { value: 4, label: 'Price table' },
 ];
 
 const money = (v: number) => Math.round(v * 100) / 100;
@@ -75,22 +77,24 @@ export function referencePrice(t: any, abwG: number | null, countPerKg: number |
 export function pricingBody(t: any): any {
     const method = Number(t.priceMethod ?? 1);
     const isBaseAbw = method === 2;
+    const isBaseCount = method === 3;
+    const isTable = method === 4;
     return {
-        priceMethod: isBaseAbw ? 2 : 1,
-        basePricePerKg: isBaseAbw ? num(t.basePricePerKg) : null,
+        priceMethod: method >= 1 && method <= 4 ? method : 1,
+        basePricePerKg: isBaseAbw || isBaseCount ? num(t.basePricePerKg) : null,
         baseAbwG: isBaseAbw ? num(t.baseAbwG) : null,
         stepPerG: isBaseAbw ? num(t.stepPerG) : null,
         priceAbwG: isBaseAbw ? num(t.priceAbwG) : null,
-        baseCountPerKg: null,
-        stepPerCount: null,
-        priceCountPerKg: null,
-        priceTableId: null,
+        baseCountPerKg: isBaseCount ? num(t.baseCountPerKg) : null,
+        stepPerCount: isBaseCount ? num(t.stepPerCount) : null,
+        priceCountPerKg: isBaseCount || isTable ? num(t.priceCountPerKg) : null,
+        priceTableId: isTable ? (t.priceTableId || null) : null,
     };
 }
 
 /** Copies a buyer's last terms (from Sale/GetBuyerPriceTerms) onto a line when the method matches and nothing is typed yet. */
 export function applyTerms(target: any, terms: any): boolean {
-    if (!terms || terms.priceMethod !== 1 || target.priceMethod !== 1) {
+    if (!terms || Number(terms.priceMethod) !== Number(target.priceMethod)) {
         return false;
     }
     switch (terms.priceMethod) {
