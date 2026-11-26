@@ -78,6 +78,11 @@ jobs:
       - name: Install
         working-directory: angular
         run: yarn install --frozen-lockfile
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
+      - name: Test
+        working-directory: angular
+        run: npx ng test --watch=false --browsers=ChromeHeadless
       - name: Build
         working-directory: angular
         run: npx ng build
