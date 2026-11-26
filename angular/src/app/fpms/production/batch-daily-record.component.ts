@@ -156,7 +156,7 @@ function daysBetween(a: string, b: string): number {
 
                 <div class="fpms-dr-columns">
                     <div class="fpms-dr-main">
-                        <div class="card" id="daily-feeding">
+                        <div class="card" id="daily-feeding" style="scroll-margin-top: 1rem">
                             <div class="card-header d-flex align-items-center">
                                 <h4 class="card-title mr-auto">Feeding</h4>
                                 <span class="text-muted">{{ statusOf(day()).text }} · {{ feedKg(fs) | num: 1 }} kg</span>
@@ -189,7 +189,7 @@ function daysBetween(a: string, b: string): number {
                                                     }
                                                 </td>
                                                 @if (showActions()) {
-                                                    <!-- Row actions (DEC-125): each opens the feeding sheet for this pond and day in the log drawer. -->
+                                                    <!-- Row actions (DEC-125): each opens Feeding for this pond and day in the log drawer. -->
                                                     <td class="text-right">
                                                         <div class="fpms-actions-stack">
                                                             @if (!s) {
@@ -208,7 +208,7 @@ function daysBetween(a: string, b: string): number {
                             </div>
                         </div>
 
-                        <div class="card" id="daily-water">
+                        <div class="card" id="daily-water" style="scroll-margin-top: 1rem">
                             <div class="card-header d-flex align-items-center">
                                 <h4 class="card-title mr-auto">Water quality</h4>
                                 @if (outOfRange(ls).length) {
@@ -246,7 +246,7 @@ function daysBetween(a: string, b: string): number {
                     </div>
 
                     <div class="fpms-dr-side">
-                        <div class="card" id="daily-other">
+                        <div class="card" id="daily-other" style="scroll-margin-top: 1rem">
                             <div class="card-header d-flex align-items-center">
                                 <h4 class="card-title mr-auto">Other entries</h4>
                                 @if (deadOn(ls)) { <span class="text-muted">{{ deadOn(ls) | num: 0 }} dead</span> }
@@ -413,7 +413,7 @@ export class BatchDailyRecordComponent implements OnInit {
         this.drawer.open({ kind: 'log', batchId: this.batch().id, logType: l.logType, date: this.day(), logId: l.id, focus });
     }
 
-    /** Feeding is recorded, corrected and voided on the feeding sheet for the pond and day. */
+    /** The Feeding drawer records, corrects and voids sessions for this pond and day. */
     openFeeding(): void {
         this.drawer.open({ kind: 'feeding', batchId: this.batch().id, date: this.day() });
     }
