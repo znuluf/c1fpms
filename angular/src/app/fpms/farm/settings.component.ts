@@ -36,7 +36,7 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                         <div class="form-group mb-0">
                                             <span class="fpms-group-label" id="ftimes-l">Default feeding schedule</span>
                                             <fpms-time-list name="feedingTimes" [(ngModel)]="p.feedingTimes"></fpms-time-list>
-                                            <small class="form-text text-muted">One feeding per day for each time, from 1 to 8. The feeding sheet uses this schedule.</small>
+                                            <small class="form-text text-muted">One feeding per day for each time, from 1 to 8. The Feeding page uses this schedule.</small>
                                         </div>
                                     </div>
                                 </div>
