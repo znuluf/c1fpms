@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { FpmsApiService } from '@shared/fpms/api.service';
 import { FarmTime } from '@shared/fpms/farm-time';
 import { logSummary } from '@shared/fpms/log-summary';
@@ -131,9 +131,9 @@ function daysBetween(a: string, b: string): number {
 
             @if (mode() === 'day' && !error() && !loading()) {
                 <nav class="d-flex flex-wrap mb-3 no-print" aria-label="Daily record sections">
-                    <a class="btn btn-sm btn-outline-secondary mr-2 mb-2" href="#daily-feeding">Feeding</a>
-                    <a class="btn btn-sm btn-outline-secondary mr-2 mb-2" href="#daily-water">Water quality</a>
-                    <a class="btn btn-sm btn-outline-secondary mr-2 mb-2" href="#daily-other">Other entries</a>
+                    <button type="button" class="btn btn-sm btn-outline-secondary mr-2 mb-2" (click)="scrollToSection('daily-feeding', $event)">Feeding</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary mr-2 mb-2" (click)="scrollToSection('daily-water', $event)">Water quality</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary mr-2 mb-2" (click)="scrollToSection('daily-other', $event)">Other entries</button>
                 </nav>
             }
             @if (error()) {
@@ -351,7 +351,14 @@ function daysBetween(a: string, b: string): number {
     `,
 })
 export class BatchDailyRecordComponent implements OnInit {
+    private readonly host = inject(ElementRef<HTMLElement>);
     private readonly api = inject(FpmsApiService);
+
+    /** Scroll within the daily record without navigating back to the app root. */
+    scrollToSection(id: string, event: Event): void {
+        event.preventDefault();
+        this.host.nativeElement.querySelector<HTMLElement>(`#${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     /** The batch from Batch/Get. A new object (after a save) reloads the records shown. */
     readonly batch = input.required<any>();
