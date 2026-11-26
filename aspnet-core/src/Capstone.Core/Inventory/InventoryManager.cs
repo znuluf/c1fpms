@@ -26,17 +26,34 @@ public class InventoryManager : DomainService
     private readonly IRepository<InventoryLot, Guid> _lots;
     private readonly IRepository<StockMovement, Guid> _movements;
     private readonly FarmAlertPublisher _alerts;
+    private readonly IRowLocker _rowLocker;
 
     public InventoryManager(
         IRepository<InventoryItem, Guid> items,
         IRepository<InventoryLot, Guid> lots,
         IRepository<StockMovement, Guid> movements,
-        FarmAlertPublisher alerts)
+        FarmAlertPublisher alerts,
+        IRowLocker rowLocker)
     {
         _items = items;
         _lots = lots;
         _movements = movements;
         _alerts = alerts;
+        _rowLocker = rowLocker;
+    }
+
+    /// <summary>Locks all affected lots in a stable order before a multi-lot stock transaction.</summary>
+    public async Task LockLotsAsync(IEnumerable<Guid> lotIds)
+    {
+        if (_rowLocker == null)
+        {
+            return;
+        }
+
+        foreach (var id in lotIds.Where(id => id != Guid.Empty).Distinct().OrderBy(id => id))
+        {
+            await _rowLocker.LockAsync(RowLockTarget.InventoryLot, id);
+        }
     }
 
     public async Task<decimal> GetLotQuantityAsync(Guid lotId)
@@ -105,6 +122,7 @@ public class InventoryManager : DomainService
     {
         FpmsErrors.Require(signedQuantity != 0, "Adjustment quantity cannot be zero.");
         FpmsErrors.Require(!string.IsNullOrWhiteSpace(reason), "An adjustment needs a reason.");
+        await LockLotsAsync(new[] { lot.Id });
         var movement = new StockMovement
         {
             LotId = lot.Id,
@@ -136,6 +154,7 @@ public class InventoryManager : DomainService
             throw FpmsErrors.Rule($"Lot {lot.LotNumber} was not received until {lot.ReceivedDate:yyyy-MM-dd}; it cannot be used on {usedOn:yyyy-MM-dd}.");
         }
 
+        await LockLotsAsync(new[] { lot.Id });
         var item = lot.Item ?? await _items.GetAsync(lot.ItemId);
         await CurrentUnitOfWork.SaveChangesAsync();
         var before = await GetLotQuantityAsync(lot.Id);
@@ -154,7 +173,7 @@ public class InventoryManager : DomainService
         movement.Id = await _movements.InsertAndGetIdAsync(movement);
         await CurrentUnitOfWork.SaveChangesAsync();
 
-        var after = before - quantity;
+        var after = await GetLotQuantityAsync(lot.Id);
         var result = new StockUsageResult { MovementId = movement.Id, LotId = lot.Id, QuantityOnHandAfter = after };
         if (after < 0)
         {
@@ -188,6 +207,7 @@ public class InventoryManager : DomainService
         var mine = _movements.GetAll().Where(m => logId.HasValue ? m.SourceLogId == logId : m.FeedingSessionId == sessionId);
         var originals = await mine.Where(m => m.Type == StockMovementType.Usage).ToListAsync();
         var reversed = await mine.Where(m => m.ReversesMovementId != null).Select(m => m.ReversesMovementId.Value).ToListAsync();
+        await LockLotsAsync(originals.Select(o => o.LotId));
 
         foreach (var original in originals.Where(o => !reversed.Contains(o.Id)))
         {
