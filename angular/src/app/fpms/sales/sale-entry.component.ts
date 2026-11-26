@@ -3,7 +3,7 @@ import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
 import { FPMS_IMPORTS } from '../shared-imports';
-import { PRICE_METHODS, countFromAbw, pricingBody, referencePrice, usedAbw, usedCount } from '@shared/fpms/pricing';
+import { PRICE_METHODS, countFromAbw, pricingBody, referencePrice, savedTableLine, usedAbw, usedCount } from '@shared/fpms/pricing';
 import { PriceTermsComponent, SalePaymentComponent, initialPaymentOf } from '@shared/fpms/pricing-ui';
 import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
 
@@ -124,7 +124,7 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                         </div>
                                         @if (l.priceMethod > 1) {
                                             <div class="terms">
-                                                <fpms-price-terms [t]="l" [key]="'l' + $index" [tables]="tablesFor(l)" [abw]="option(l)?.harvestAbwG ?? null" [count]="defaultCount(l)" [termsFrom]="l.termsFrom" (changed)="applyFormula(l)"></fpms-price-terms>
+                                                <fpms-price-terms [t]="l" [key]="'l' + $index" [tables]="tablesFor(l)" [abw]="option(l)?.harvestAbwG ?? null" [count]="defaultCount(l)" [termsFrom]="l.termsFrom" [saved]="savedLine(l)" (changed)="applyFormula(l)"></fpms-price-terms>
                                             </div>
                                         }
                                     </div>
@@ -542,9 +542,14 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         return o?.defaultCountPerKg ?? countFromAbw(o?.harvestAbwG ?? null);
     }
 
+    /** The saved line whose table price this line keeps, when editing a sale. */
+    savedLine(l: any): any {
+        return savedTableLine(l, usedCount(l, this.defaultCount(l)), this.m.buyerId, this.original);
+    }
+
     /** The method's price; null until every term is filled (and for Fixed). Matches the server's SaleLine helpers. */
     formula(l: any): number | null {
-        return referencePrice(l, usedAbw(l, this.option(l)?.harvestAbwG ?? null), usedCount(l, this.defaultCount(l)), this.tablesFor(l));
+        return referencePrice(l, usedAbw(l, this.option(l)?.harvestAbwG ?? null), usedCount(l, this.defaultCount(l)), this.tablesFor(l), this.savedLine(l));
     }
 
     applyFormula(l: any): void {

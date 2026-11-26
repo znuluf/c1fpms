@@ -50,10 +50,24 @@ export function tableRow(table: any, count: number | null): any {
 }
 
 /**
- * The price a line's method gives, or null while a term is missing (and for Fixed). `abwG` and `countPerKg` are the values
- * the line uses (typed, else the harvest's ABW or the grade's middle count); `tables` are the price tables loaded.
+ * The saved sale line whose price-table price still applies, or null when the table is looked up again. The server's rule:
+ * a saved line keeps its price and row while its grade, table, count and the sale's buyer are unchanged, even if the table
+ * has been edited or deactivated since. `sale` is the saved sale (Sale/Get), null for a new one.
  */
-export function referencePrice(t: any, abwG: number | null, countPerKg: number | null, tables: any[]): number | null {
+export function savedTableLine(t: any, countPerKg: number | null, buyerId: string, sale: any): any {
+    if (t.priceMethod !== 4 || countPerKg == null || !sale || sale.buyerId !== buyerId) {
+        return null;
+    }
+    const line = (sale.lines ?? []).find((l: any) => l.harvestGradeLineId === t.harvestGradeLineId);
+    return line && line.priceMethod === 4 && line.priceTableId === t.priceTableId && line.priceCountPerKg === countPerKg ? line : null;
+}
+
+/**
+ * The price a line's method gives, or null while a term is missing (and for Fixed). `abwG` and `countPerKg` are the values
+ * the line uses (typed, else the harvest's ABW or the grade's middle count); `tables` are the price tables loaded; `saved`
+ * is the result of `savedTableLine`.
+ */
+export function referencePrice(t: any, abwG: number | null, countPerKg: number | null, tables: any[], saved: any = null): number | null {
     const base = num(t.basePricePerKg);
     switch (t.priceMethod) {
         case 2: {
@@ -65,6 +79,9 @@ export function referencePrice(t: any, abwG: number | null, countPerKg: number |
             return base == null || baseCount == null || step == null || countPerKg == null ? null : baseCountPrice(base, baseCount, step, countPerKg);
         }
         case 4: {
+            if (saved) {
+                return num(saved.formulaPricePerKg);
+            }
             const row = tableRow(tables.find((x) => x.id === t.priceTableId), countPerKg);
             return row ? Number(row.pricePerKg) : null;
         }
@@ -138,7 +155,7 @@ export function usedCount(t: any, defaultCountPerKg: number | null): number | nu
 }
 
 /** How the method's price was worked out, as shown under the terms on every sale form (DEC-85). Empty for Fixed. */
-export function priceWorking(t: any, abwG: number | null, countPerKg: number | null, tables: any[]): string {
+export function priceWorking(t: any, abwG: number | null, countPerKg: number | null, tables: any[], saved: any = null): string {
     const php = (v: any) => '₱' + Number(v).toFixed(2);
     switch (t.priceMethod) {
         case 2:
@@ -147,7 +164,9 @@ export function priceWorking(t: any, abwG: number | null, countPerKg: number | n
             return `${php(t.basePricePerKg)} + (${t.baseCountPerKg} − ${countPerKg}) × ${php(t.stepPerCount)}`;
         case 4: {
             const table = (tables ?? []).find((x) => x.id === t.priceTableId);
-            return `${table?.name ?? ''}, ${tableRow(table, countPerKg)?.label ?? ''} (count ${countPerKg})`;
+            const name = saved ? saved.priceTableName : table?.name;
+            const row = saved ? saved.priceTableRowLabel : tableRow(table, countPerKg)?.label;
+            return `${name ?? ''}, ${row ?? ''} (count ${countPerKg})`;
         }
     }
     return '';

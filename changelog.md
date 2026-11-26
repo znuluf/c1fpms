@@ -10,6 +10,8 @@ All notable changes to this project are documented here.
 - **Feeding or chemical use dated before its lot was received** is saved with a warning instead of being refused (DEC-143).
 - **A stock adjustment that takes a lot below zero** flags the lot for checking.
 - **Two feeding sheets saved at the same moment** no longer fail one of them.
+- **Editing a sale priced from a price table** no longer says the price differs only because the table changed since. The saved price and row stay until the buyer, table or count changes.
+- **Section links on the harvest form and a batch's daily record** are ordinary links, opened with Enter; the harvest form's no longer pose as buttons that ignored Space. Neither page animates the move when reduced motion is on.
 
 ### Added and changed (harvests, DEC-140)
 - **Emergency harvests.** A harvest can be Partial, Final or **Emergency**. An Emergency harvest asks for a reason (disease concern, poor water conditions, weather, market opportunity, other), a short explanation (required for Other) and whether shrimp are still in the pond. It is never a batch failure: the batch becomes Harvested only when no shrimp are left, and correcting the answer reopens it. A batch has one harvest that empties the pond, and none can be dated after it.

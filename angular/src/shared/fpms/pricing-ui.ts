@@ -85,7 +85,7 @@ import { priceOverridden, priceWorking, referencePrice, usedAbw, usedCount } fro
                         @if (overridden()) {
                             <div class="text-warning-dark">Price differs. <a href="javascript:;" (click)="useFormula()">Use {{ formula() | php }}</a></div>
                         }
-                    } @else if (t.priceMethod === 4 && t.priceTableId && countUsed() !== null) {
+                    } @else if (t.priceMethod === 4 && t.priceTableId && countUsed() !== null && !saved) {
                         <div class="text-danger">No row of this table covers {{ countUsed() }} pcs/kg.</div>
                     }
                     @if (termsFrom) {
@@ -113,6 +113,8 @@ export class PriceTermsComponent {
     @Input() shrimpMissing = 'Enter the ABW above';
     /** The dispatch receipt the terms were copied from, when they were. */
     @Input() termsFrom: string | null = null;
+    /** The saved sale line whose table price still applies (`savedTableLine`), else null. */
+    @Input() saved: any = null;
     @Output() changed = new EventEmitter<void>();
 
     abwUsed(): number | null {
@@ -124,11 +126,11 @@ export class PriceTermsComponent {
     }
 
     formula(): number | null {
-        return referencePrice(this.t, this.abwUsed(), this.countUsed(), this.tables ?? []);
+        return referencePrice(this.t, this.abwUsed(), this.countUsed(), this.tables ?? [], this.saved);
     }
 
     working(): string {
-        return priceWorking(this.t, this.abwUsed(), this.countUsed(), this.tables ?? []);
+        return priceWorking(this.t, this.abwUsed(), this.countUsed(), this.tables ?? [], this.saved);
     }
 
     overridden(): boolean {

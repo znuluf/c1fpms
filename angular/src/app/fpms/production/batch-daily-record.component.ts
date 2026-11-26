@@ -131,9 +131,9 @@ function daysBetween(a: string, b: string): number {
 
             @if (mode() === 'day' && !error() && !loading()) {
                 <nav class="d-flex flex-wrap mb-3 no-print" aria-label="Daily record sections">
-                    <button type="button" class="btn btn-sm btn-outline-secondary mr-2 mb-2" (click)="scrollToSection('daily-feeding', $event)">Feeding</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary mr-2 mb-2" (click)="scrollToSection('daily-water', $event)">Water quality</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary mr-2 mb-2" (click)="scrollToSection('daily-other', $event)">Other entries</button>
+                    <a class="btn btn-sm btn-outline-secondary mr-2 mb-2" fpmsJump="daily-feeding">Feeding</a>
+                    <a class="btn btn-sm btn-outline-secondary mr-2 mb-2" fpmsJump="daily-water">Water quality</a>
+                    <a class="btn btn-sm btn-outline-secondary mr-2 mb-2" fpmsJump="daily-other">Other entries</a>
                 </nav>
             }
             @if (error()) {
@@ -352,12 +352,6 @@ function daysBetween(a: string, b: string): number {
 })
 export class BatchDailyRecordComponent implements OnInit {
     private readonly api = inject(FpmsApiService);
-
-    /** Scrolls within the current daily record without navigating to a fragment route. */
-    scrollToSection(id: string, event?: Event): void {
-        event?.preventDefault();
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
 
     /** The batch from Batch/Get. A new object (after a save) reloads the records shown. */
     readonly batch = input.required<any>();
