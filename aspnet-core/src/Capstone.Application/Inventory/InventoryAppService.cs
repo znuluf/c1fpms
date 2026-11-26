@@ -327,6 +327,21 @@ public class InventoryAppService : CapstoneAppServiceBase
     public virtual async Task<ReceiptResultDto> RecordReceipt(RecordReceiptInput input)
     {
         var item = await _items.FirstOrDefaultAsync(i => i.Id == input.ItemId) ?? throw new UserFriendlyException("Item not found.");
+        if (input.ExpiryDate.HasValue && input.ExpiryDate.Value < input.ReceivedDate)
+        {
+            throw new UserFriendlyException("The expiry date cannot be before the received date.");
+        }
+
+        if (input.PackCount.HasValue && (input.Quantity != 0 || input.UnitCost.HasValue))
+        {
+            throw new UserFriendlyException("Enter either packs and pack cost, or quantity and unit cost, not both.");
+        }
+
+        if (!input.PackCount.HasValue && input.PackCost.HasValue)
+        {
+            throw new UserFriendlyException("Pack cost can only be entered when the receipt is recorded in packs.");
+        }
+
         var lotNumber = input.LotNumber.Trim();
         // One receipt creates one lot; more stock of the same product is a new lot (lot-based cost, spec Section 5).
         if (await _lots.GetAll().AnyAsync(l => l.ItemId == item.Id && l.LotNumber == lotNumber))
