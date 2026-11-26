@@ -206,7 +206,7 @@ public class FeedingAppService : CapstoneAppServiceBase
         var notFed = input.Status == FeedingStatus.NotFed;
         var fedAtTime = notFed ? null : ParseFedAtTime(input.FedAtTime);
         var lines = (input.Lines ?? new List<FeedingLineInput>()).Where(l => l.LotId != Guid.Empty).GroupBy(l => l.LotId)
-            .Select(g => new FeedingLineInput { LotId = g.Key, Kg = g.Sum(x => x.Kg) }).ToList();
+            .Select(g => new FeedingLineInput { LotId = g.Key, Kg = g.Sum(x => x.Kg) }).OrderBy(l => l.LotId).ToList();
         if (notFed && lines.Count > 0)
         {
             throw new UserFriendlyException("A Not fed feeding has no feed lots. Remove the lots or choose Fed.");
@@ -242,6 +242,16 @@ public class FeedingAppService : CapstoneAppServiceBase
 
         var session = await _sessions.FirstOrDefaultAsync(s => s.BatchId == batch.Id && s.FeedDate == input.FeedDate && s.Session == input.Session);
         var isUpdate = session != null;
+        var lotsToLock = lots.Select(l => l.Id);
+        if (session != null)
+        {
+            var previousLotIds = await _movements.GetAll().Where(m => m.FeedingSessionId == session.Id && m.Type == StockMovementType.Usage)
+                .Select(m => m.LotId).Distinct().ToListAsync();
+            lotsToLock = lotsToLock.Concat(previousLotIds);
+        }
+
+        // Lock the union of old and new lots in one stable order before reversing or writing any movements.
+        await _inventory.LockLotsAsync(lotsToLock);
         if (isUpdate)
         {
             // Two people can look after one pond (DEC-127): a feeding the other already saved is named, never overwritten unseen.
