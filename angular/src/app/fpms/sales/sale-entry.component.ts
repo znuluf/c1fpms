@@ -11,8 +11,7 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
  * Record or edit a sale (Ref 7.3, AC-15, step E). Lines sell kg from harvest grade lines, possibly from several harvests.
  * The buyer's accepted kg, when the buyer re-weighs, sets the amount (DEC-67). Optional due date, transport details
  * (DEC-55) and a payment received with the sale. The dispatch receipt number is assigned on save. A line's price can be
- * fixed, worked out from a base price at a base ABW or a base count, or read from a price table by count (DEC-80, DEC-82),
- * prefilled from the buyer's last terms or their price table.
+ * fixed or worked out from a farm-configured base price at a base ABW. Only these two methods are offered for new sales.
  * "Sell this harvest" (?harvestId=) starts with that harvest's unsold grades and its buyer (DEC-81).
  */
 @Component({
@@ -215,7 +214,7 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
     methodsFor(_l: any): typeof PRICE_METHODS {
         return PRICE_METHODS;
     }
-    /** Active price tables with their rows (DEC-82). */
+    /** Legacy price-table data, retained only for reading older saved terms. */
     tables: any[] = [];
     /** Active farm-level Base ABW presets; selected terms are copied onto each sale line. */
     abwSchemes: any[] = [];
@@ -495,7 +494,7 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
         return this.crateHarvests().flatMap((h) => this.chosenCrates(h).map((c: any) => ({ harvestId: h.id, crateNo: c.crateNo })));
     }
 
-    /** "Sell this harvest": every unsold grade of the harvest, its buyer, and that buyer's last terms or price table. */
+    /** "Sell this harvest": every unsold grade of the harvest and its buyer. Pricing is selected for this sale. */
     private async startFromHarvest(harvestId: string | null): Promise<void> {
         const own = harvestId ? this.sellable.filter((o) => o.harvestId === harvestId && o.unsoldKg > 0) : [];
         if (!own.length) {
