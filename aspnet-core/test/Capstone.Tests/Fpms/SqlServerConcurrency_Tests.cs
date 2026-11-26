@@ -2,8 +2,6 @@ using Abp.UI;
 using Capstone.Domain;
 using Capstone.Harvests;
 using Capstone.Inventory;
-using Capstone.Logbooks;
-using Capstone.Logbooks.Dto;
 using Capstone.Production;
 using Capstone.Production.Dto;
 using Capstone.Resources;
@@ -301,7 +299,7 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
     }
 
     [SqlServerFact]
-    public async Task Concurrent_feedings_serialize_stock_checks_and_flag_the_combined_shortfall()
+    public async Task Concurrent_usage_on_the_same_lot_serializes_stock_checks_and_flags_the_combined_shortfall()
     {
         var tenantId = GetTenantId(PilotFarm);
         var feedItemId = Q(c => c.InventoryItems.IgnoreQueryFilters()
@@ -311,17 +309,25 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
             ItemId = feedItemId, LotNumber = "SQL-STOCK-RACE", ReceivedDate = Today, Quantity = 100, UnitCost = 80,
         });
 
-        var batches = new[] { BatchId(CurrentBatch), BatchId(ReferenceBatch) };
-        var inputs = batches.Select(id => new SaveFeedingSessionInput
+        var batchId = BatchId(CurrentBatch);
+        var sessionIds = new[] { Guid.NewGuid(), Guid.NewGuid() };
+        UsingDbContext(tenantId, c =>
         {
-            BatchId = id, FeedDate = Today, Session = 1, ClientRequestId = Guid.NewGuid(),
-            Lines = new() { new() { LotId = receipt.LotId, Kg = 80 } },
-        }).ToList();
+            c.FeedingSessions.AddRange(
+                new FeedingSession { Id = sessionIds[0], TenantId = tenantId, BatchId = batchId, FeedDate = Today, Session = 7, Status = FeedingStatus.Fed, ClientRequestId = Guid.NewGuid() },
+                new FeedingSession { Id = sessionIds[1], TenantId = tenantId, BatchId = batchId, FeedDate = Today, Session = 8, Status = FeedingStatus.Fed, ClientRequestId = Guid.NewGuid() });
+        });
 
-        var results = await AtOnce(2, i => Resolve<FeedingAppService>().Save(inputs[i]));
+        var results = await AtOnce(2, i => InUow(async () =>
+        {
+            var inventory = Resolve<InventoryManager>();
+            var lot = await inventory.GetLotWithItemAsync(receipt.LotId);
+            return await inventory.RecordUsageAsync(lot, 80, batchId, DateTime.UtcNow,
+                feedingSessionId: sessionIds[i], usedOn: Today);
+        }));
 
         results.ShouldAllBe(r => r.Error == null);
-        results.SelectMany(r => r.Value.Warnings).Count(w => w.Kind == "Stock").ShouldBe(1);
+        results.Count(r => !string.IsNullOrEmpty(r.Value.Warning)).ShouldBe(1);
         Q(c => c.InventoryLots.IgnoreQueryFilters().Single(l => l.Id == receipt.LotId).NeedsReconciliation).ShouldBeTrue();
         Q(c => c.StockMovements.IgnoreQueryFilters().Where(m => m.LotId == receipt.LotId).Sum(m => m.Quantity)).ShouldBe(-60m);
     }
