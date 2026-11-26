@@ -65,7 +65,7 @@ import { priceOverridden, priceWorking, referencePrice, usedAbw, usedCount } fro
                             }
                         </select>
                         @if (!tables?.length) {
-                            <small class="text-muted">No price tables yet. <a routerLink="/app/sales/price-tables">Add one</a>.</small>
+                            <small class="text-muted">No price tables yet. <a routerLink="/app/sales/price-tables">Add one under Setup</a>.</small>
                         }
                     </div>
                 }
