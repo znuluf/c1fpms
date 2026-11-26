@@ -1,9 +1,8 @@
 /**
- * Sale pricing methods (DEC-80, DEC-82), the same arithmetic as the server's SaleLine helpers, so a form shows the price
- * the server will check. The server stays the authority: it recomputes and warns when the agreed price differs.
- *
- * 1 Fixed · 2 Base ABW (base price at a base ABW + step per gram) · 3 Base count (base price at a base count + step per
- * piece fewer) · 4 Price table (the row covering the count).
+ * Current sale pricing methods: Fixed and Base ABW. The same arithmetic as the server's SaleLine helpers is used so a
+ * form shows the price the server will check. The server stays the authority: it recomputes and warns when the agreed
+ * price differs. Legacy count/table calculation helpers remain below for reading older saved terms; they are not offered
+ * as new pricing options.
  */
 export const PRICE_METHODS = [
     { value: 1, label: 'Fixed price' },
