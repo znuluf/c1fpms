@@ -24,8 +24,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
             <div class="container-fluid">
                 @if (notFound) {
                     <div class="alert alert-warning">
-                        No harvest has the lot code <strong class="text-monospace">{{ lotCode }}</strong>. Check the code on the crate, receipt or tally sheet,
-                        or search for it in @if (can('Farm.Harvests')) { <a routerLink="/app/harvests">Harvests</a> } @else { Harvests }.
+                        No harvest has the lot code <strong class="text-monospace">{{ lotCode }}</strong>. Check the code on the crate, receipt or tally sheet.
+                        @if (can('Farm.Harvests')) { <p class="mb-0">Or search for it in <a routerLink="/app/harvests">Harvests</a>.</p> }
                     </div>
                 } @else if (!t) {
                     <fpms-loading></fpms-loading>
