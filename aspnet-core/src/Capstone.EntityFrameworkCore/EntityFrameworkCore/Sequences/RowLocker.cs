@@ -34,6 +34,7 @@ public class RowLocker : IRowLocker, ITransientDependency
             RowLockTarget.Pond => "FpmsPonds",
             RowLockTarget.Batch => "FpmsPondBatches",
             RowLockTarget.Cycle => "FpmsProductionCycles",
+            RowLockTarget.InventoryLot => "FpmsInventoryLots",
             _ => throw new ArgumentOutOfRangeException(nameof(target)),
         };
 
