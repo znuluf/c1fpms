@@ -315,6 +315,15 @@ public class LogAppService : CapstoneAppServiceBase
         await PrevalidateAsync(input);
         log.Notes = input.Notes?.Trim();
 
+        if (log.LogType == LogType.ChemicalApplication)
+        {
+            var previousLotIds = await _movements.GetAll().Where(m => m.SourceLogId == log.Id && m.Type == StockMovementType.Usage)
+                .Select(m => m.LotId).Distinct().ToListAsync();
+            var nextLotIds = (input.ChemicalApplication?.Usages ?? new List<UsageLineInput>()).Select(u => u.LotId);
+            // Hold the union in one order: corrections may reverse old lots and consume different new lots.
+            await _inventory.LockLotsAsync(previousLotIds.Concat(nextLotIds));
+        }
+
         await _inventory.ReverseUsageForLogAsync(log.Id, DateTime.UtcNow, $"Correction of {Describe(log.LogType)} log edited");
         await RemoveDetailsAsync(log);
         await CurrentUnitOfWork.SaveChangesAsync();
@@ -595,13 +604,14 @@ public class LogAppService : CapstoneAppServiceBase
             case LogType.ChemicalApplication:
             {
                 var c = input.ChemicalApplication ?? throw new UserFriendlyException("Chemical or supplement details are required.");
-                var lines = (c.Usages ?? new List<UsageLineInput>()).ToList();
+                var lines = (c.Usages ?? new List<UsageLineInput>()).OrderBy(u => u.LotId).ToList();
                 if (lines.Count == 0 || lines.Any(u => u.Quantity <= 0))
                 {
                     throw new UserFriendlyException("Choose the product lot and enter a quantity greater than zero.");
                 }
 
                 var day = FarmClock.LocalDate(log.ObservedAtUtc, await Farm.GetTimeZoneAsync());
+                await _inventory.LockLotsAsync(lines.Select(u => u.LotId));
                 await _chemical.InsertAsync(new ChemicalApplicationDetail
                 {
                     Id = log.Id, Reason = Clean(c.Reason), Dosage = c.Dosage, DosageUnit = Clean(c.DosageUnit), Method = Clean(c.Method), EndDate = c.EndDate,
