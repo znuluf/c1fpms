@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ControlContainer, FormsModule, NgForm } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { FPMS_PIPES } from './pipes';
 import { priceOverridden, priceWorking, referencePrice, usedAbw, usedCount } from './pricing';
 
@@ -15,7 +14,7 @@ import { priceOverridden, priceWorking, referencePrice, usedAbw, usedCount } fro
 @Component({
     selector: 'fpms-price-terms',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink, ...FPMS_PIPES],
+    imports: [CommonModule, FormsModule, ...FPMS_PIPES],
     viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
     template: `
         @if (t && t.priceMethod > 1) {
@@ -65,7 +64,7 @@ import { priceOverridden, priceWorking, referencePrice, usedAbw, usedCount } fro
                             }
                         </select>
                         @if (!tables?.length) {
-                            <small class="text-muted">No price tables yet. <a routerLink="/app/sales/price-tables">Add one</a>.</small>
+                            <small class="text-muted">Price tables are no longer offered for new sales. Choose Fixed price or Base ABW pricing.</small>
                         }
                     </div>
                 }
