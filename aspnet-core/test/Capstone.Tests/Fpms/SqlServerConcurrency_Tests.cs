@@ -1,6 +1,9 @@
 using Abp.UI;
 using Capstone.Domain;
 using Capstone.Harvests;
+using Capstone.Inventory;
+using Capstone.Logbooks;
+using Capstone.Logbooks.Dto;
 using Capstone.Production;
 using Capstone.Production.Dto;
 using Capstone.Resources;
@@ -295,6 +298,32 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
         results.Single(r => r.Error != null).Error.ShouldBeOfType<UserFriendlyException>();
         saved.Select(s => s.DispatchReceiptNo).Distinct().Count().ShouldBe(5);
         Q(c => c.SaleLines.IgnoreQueryFilters().Where(l => l.HarvestGradeLineId == line).Sum(l => l.Kg)).ShouldBe(100m);
+    }
+
+    [SqlServerFact]
+    public async Task Concurrent_feedings_serialize_stock_checks_and_flag_the_combined_shortfall()
+    {
+        var tenantId = GetTenantId(PilotFarm);
+        var feedItemId = Q(c => c.InventoryItems.IgnoreQueryFilters()
+            .Single(i => i.TenantId == tenantId && i.ProductName == "Shrimp Grower #3").Id);
+        var receipt = await Resolve<InventoryAppService>().RecordReceipt(new RecordReceiptInput
+        {
+            ItemId = feedItemId, LotNumber = "SQL-STOCK-RACE", ReceivedDate = Today, Quantity = 100, UnitCost = 80,
+        });
+
+        var batches = new[] { BatchId(CurrentBatch), BatchId(ReferenceBatch) };
+        var inputs = batches.Select(id => new SaveFeedingSessionInput
+        {
+            BatchId = id, FeedDate = Today, Session = 1, ClientRequestId = Guid.NewGuid(),
+            Lines = new() { new() { LotId = receipt.LotId, Kg = 80 } },
+        }).ToList();
+
+        var results = await AtOnce(2, i => Resolve<FeedingAppService>().Save(inputs[i]));
+
+        results.ShouldAllBe(r => r.Error == null);
+        results.SelectMany(r => r.Value.Warnings).Count(w => w.Kind == "Stock").ShouldBe(1);
+        Q(c => c.InventoryLots.IgnoreQueryFilters().Single(l => l.Id == receipt.LotId).NeedsReconciliation).ShouldBeTrue();
+        Q(c => c.StockMovements.IgnoreQueryFilters().Where(m => m.LotId == receipt.LotId).Sum(m => m.Quantity)).ShouldBe(-60m);
     }
 
     [SqlServerFact]
