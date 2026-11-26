@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ControlContainer, FormsModule, NgForm } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { FPMS_PIPES } from './pipes';
 import { priceOverridden, priceWorking, referencePrice, usedAbw, usedCount } from './pricing';
 
@@ -15,7 +14,7 @@ import { priceOverridden, priceWorking, referencePrice, usedAbw, usedCount } fro
 @Component({
     selector: 'fpms-price-terms',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink, ...FPMS_PIPES],
+    imports: [CommonModule, FormsModule, ...FPMS_PIPES],
     viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
     template: `
         @if (t && t.priceMethod > 1) {
@@ -65,7 +64,7 @@ import { priceOverridden, priceWorking, referencePrice, usedAbw, usedCount } fro
                             }
                         </select>
                         @if (!tables?.length) {
-                            <small class="text-muted">No price tables yet. @if (canManageTables) { <a routerLink="/app/sales/price-tables">Add one under Setup</a>. } @else { Ask a farm owner to add one under Setup. }</small>
+                            <small class="text-muted">No price tables are available. Choose another price type.</small>
                         }
                     </div>
                 }
@@ -102,8 +101,6 @@ export class PriceTermsComponent {
     @Input() t: any;
     /** The price tables this buyer may use, the buyer's own first. */
     @Input() tables: any[] = [];
-    /** Only farm users with the setup permission may be invited to add a table. */
-    @Input() canManageTables = false;
     /** Prefix that keeps the control names unique in the form, e.g. "l0" for the first sale line. */
     @Input() key = 'pt';
     /** The harvest's sampled ABW (g), used unless the line types its own. */

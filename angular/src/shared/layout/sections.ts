@@ -86,13 +86,10 @@ export const SECTIONS: Section[] = [
             { label: 'Harvests', route: '/app/harvests', permission: 'Farm.Harvests' },
             { label: 'Sales', route: '/app/sales', permission: 'Farm.Sales' },
             {
-                label: 'Setup',
-                route: '/app/harvests/size-grades',
-                children: [
-                    { label: 'Size grades', route: '/app/harvests/size-grades', permission: 'Farm.Harvests', setting: 'usesSizeGrading' },
-                    { label: 'Crate types', route: '/app/harvests/crate-types', permission: 'Farm.Harvests', count: { service: 'ContainerType', method: 'GetAll' } },
-                    { label: 'Price tables', route: '/app/sales/price-tables', permission: 'Farm.Sales', count: { service: 'PriceTable', method: 'GetAll' } },
-                ],
+                label: 'Crate types',
+                route: '/app/harvests/crate-types',
+                permission: 'Farm.Harvests',
+                count: { service: 'ContainerType', method: 'GetAll' },
             },
         ],
         actions: [

@@ -1,7 +1,7 @@
 import { SectionNav } from '@shared/layout/section-nav.service';
 import { PagerComponent, SortHeaderComponent } from './pager';
 export { PagerComponent, SortHeaderComponent, PagerState } from './pager';
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Directive, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { NavHistory } from './nav-history';
@@ -489,7 +489,39 @@ export class ListToolbarComponent implements OnDestroy {
     }
 }
 
+/**
+ * A link to a section of the same page: <a fpmsJump="breakdown">. A bare "#breakdown" href resolves against
+ * <base href="/"> and leaves the page, so this scrolls and moves focus to the section without navigating.
+ */
+@Directive({
+    selector: 'a[fpmsJump]',
+    standalone: true,
+    host: { '[attr.href]': 'href', '(click)': 'jump($event)' },
+})
+export class JumpLinkDirective {
+    /** The id of the section. */
+    @Input({ required: true, alias: 'fpmsJump' }) target = '';
+
+    get href(): string {
+        return `${location.pathname}${location.search}#${this.target}`;
+    }
+
+    jump(event: Event): void {
+        event.preventDefault();
+        const section = document.getElementById(this.target);
+        if (!section) {
+            return;
+        }
+        section.classList.add('fpms-jump-target');
+        section.setAttribute('tabindex', '-1');
+        section.focus({ preventScroll: true });
+        const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        section.scrollIntoView({ block: 'start', behavior: still ? 'auto' : 'smooth' });
+    }
+}
+
 export const FPMS_UI = [
+    JumpLinkDirective,
     StatusBadgeComponent,
     PageHeaderComponent,
     EmptyStateComponent,

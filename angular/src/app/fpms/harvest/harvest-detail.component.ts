@@ -57,9 +57,13 @@ import { DisposalReasons } from '@shared/fpms/labels';
                     </fpms-empty>
                 } @else {
                     <nav class="nav nav-tabs mb-3 fpms-harvest-tabs" aria-label="Harvest sections">
-                        <a class="nav-link active" href="#overview">Overview</a>
-                        <a class="nav-link" href="#breakdown">Size grades</a>
-                        <a class="nav-link" href="#where-it-went">Dispatches &amp; sales</a>
+                        <a class="nav-link active" fpmsJump="overview">Overview</a>
+                        @if (harvest.gradeLines?.length) {
+                            <a class="nav-link" fpmsJump="breakdown">Size grades</a>
+                        }
+                        @if (whereRows().length) {
+                            <a class="nav-link" fpmsJump="where-it-went">Dispatches &amp; sales</a>
+                        }
                         <a class="nav-link" [routerLink]="['/app/harvests', harvest.id, 'tally']">Harvest tally</a>
                     </nav>
                     <div class="row" id="overview">

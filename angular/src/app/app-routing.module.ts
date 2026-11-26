@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 
 const page = (permission?: string) => ({ canActivate: [AppRouteGuard], canDeactivate: [unsavedChangesGuard], data: permission ? { permission } : {} });
 
-const routes: Routes = [
+export const routes: Routes = [
     {
         path: '',
         component: AppComponent,

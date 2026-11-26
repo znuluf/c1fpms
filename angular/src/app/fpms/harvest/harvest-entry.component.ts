@@ -538,7 +538,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                     <div class="form-control-plaintext font-weight-bold">{{ saleTotal() | php }}</div>
                                                 </div>
                                             </div>
-                                            <fpms-price-terms [t]="m.sale" key="sale" [tables]="saleTables()" [canManageTables]="can('Farm.Production.Manage')" [abw]="saleAbw()" [count]="saleCount()" [editShrimp]="false" shrimpSource="from the sample above" (changed)="applySaleFormula()"></fpms-price-terms>
+                                            <fpms-price-terms [t]="m.sale" key="sale" [tables]="saleTables()" [abw]="saleAbw()" [count]="saleCount()" [editShrimp]="false" shrimpSource="from the sample above" (changed)="applySaleFormula()"></fpms-price-terms>
                                             @if (m.sale.priceMethod > 1 && perGradePricing()) {
                                                 <p class="small text-muted mb-2">Several grades: each grade is priced from its own count, as listed. The price above applies to none of them.</p>
                                                 <ul class="small mb-2">

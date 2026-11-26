@@ -1,4 +1,5 @@
-import { SECTIONS, activeTab, effectiveUrl, pathOf, sectionOfUrl } from './sections';
+import { routes } from '../../app/app-routing.module';
+import { SECTIONS, activeTab, effectiveUrl, leafTabs, pathOf, sectionOfUrl } from './sections';
 
 describe('FPMS section navigation', () => {
     it('keeps harvest and sale detail pages in their parent sections', () => {
@@ -8,11 +9,16 @@ describe('FPMS section navigation', () => {
         expect(activeTab(SECTIONS.find((x) => x.key === 'harvest')!, '/app/sales/sale-1')?.tab.label).toBe('Sales');
     });
 
-    it('resolves the Setup child page rather than the parent tab route', () => {
+    it('links every tab and action to a page of its own', () => {
+        // An exact path: a link to a missing page would otherwise be taken by a route such as harvests/:id.
+        const pages = (routes[0].children ?? []).map((r) => '/app/' + r.path);
+        const links = SECTIONS.flatMap((s) => [...leafTabs(s), ...(s.actions ?? [])].map((x) => x.route));
+        expect(links.filter((link) => !pages.includes(link))).toEqual([]);
+    });
+
+    it('keeps Crate types as a tab of Harvest and sales', () => {
         const section = SECTIONS.find((x) => x.key === 'harvest')!;
-        const match = activeTab(section, '/app/sales/price-tables');
-        expect(match?.tab.label).toBe('Setup');
-        expect(match?.child?.label).toBe('Price tables');
+        expect(activeTab(section, '/app/harvests/crate-types')?.tab.label).toBe('Crate types');
     });
 
     it('keeps trace reports under the section they were opened from', () => {

@@ -124,7 +124,7 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                         </div>
                                         @if (l.priceMethod > 1) {
                                             <div class="terms">
-                                                <fpms-price-terms [t]="l" [key]="'l' + $index" [tables]="tablesFor(l)" [canManageTables]="can('Farm.Production.Manage')" [abw]="option(l)?.harvestAbwG ?? null" [count]="defaultCount(l)" [termsFrom]="l.termsFrom" (changed)="applyFormula(l)"></fpms-price-terms>
+                                                <fpms-price-terms [t]="l" [key]="'l' + $index" [tables]="tablesFor(l)" [abw]="option(l)?.harvestAbwG ?? null" [count]="defaultCount(l)" [termsFrom]="l.termsFrom" (changed)="applyFormula(l)"></fpms-price-terms>
                                             </div>
                                         }
                                     </div>
