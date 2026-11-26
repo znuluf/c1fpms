@@ -369,7 +369,8 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
             results.Select(r => r.Error?.ToString()).ShouldAllBe(error => error == null);
         }
 
-        LotQty(second).ShouldBe(980m);
+        // Ten sheets (two in each of five rounds), each taking 1 kg of this lot.
+        LotQty(second).ShouldBe(990m);
     }
 
     [SqlServerFact]
