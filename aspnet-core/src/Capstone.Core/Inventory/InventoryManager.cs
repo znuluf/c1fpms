@@ -131,6 +131,11 @@ public class InventoryManager : DomainService
     {
         FpmsErrors.Require(sourceLogId.HasValue != feedingSessionId.HasValue, "A usage movement needs exactly one source.");
         FpmsErrors.Require(quantity >= 0, "Usage quantity cannot be negative.");
+        if (usedOn.HasValue && usedOn.Value < lot.ReceivedDate)
+        {
+            throw FpmsErrors.Rule($"Lot {lot.LotNumber} was not received until {lot.ReceivedDate:yyyy-MM-dd}; it cannot be used on {usedOn:yyyy-MM-dd}.");
+        }
+
         var item = lot.Item ?? await _items.GetAsync(lot.ItemId);
         await CurrentUnitOfWork.SaveChangesAsync();
         var before = await GetLotQuantityAsync(lot.Id);
