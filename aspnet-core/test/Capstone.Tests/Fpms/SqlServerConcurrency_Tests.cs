@@ -327,7 +327,7 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
         }));
 
         results.ShouldAllBe(r => r.Error == null);
-        results.Count(r => !string.IsNullOrEmpty(r.Value.Warning)).ShouldBe(1);
+        results.Count(r => r.Value.Warning?.Contains("Stock shortfall") == true).ShouldBe(1);
         Q(c => c.InventoryLots.IgnoreQueryFilters().Single(l => l.Id == receipt.LotId).NeedsReconciliation).ShouldBeTrue();
         Q(c => c.StockMovements.IgnoreQueryFilters().Where(m => m.LotId == receipt.LotId).Sum(m => m.Quantity)).ShouldBe(-60m);
     }
