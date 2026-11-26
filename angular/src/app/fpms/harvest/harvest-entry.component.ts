@@ -1005,7 +1005,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
 
     readonly methods = PRICE_METHODS;
 
-    /** Price by count is offered only when the sale already uses it: the partner farm always sells by kg (DEC-90). */
+    /** Only Fixed price and Base ABW pricing are offered for new sales. */
     methodsFor(_t: any): typeof PRICE_METHODS {
         return PRICE_METHODS;
     }
@@ -1021,7 +1021,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     dispatchedCrates(): number {
         return (this.h?.crates ?? []).filter((c: any) => c.saleId).length;
     }
-    /** Active price tables (DEC-82), loaded only for users who can sell. */
+    /** Legacy price-table data, retained only for reading older saved terms. */
     tables: any[] = [];
     /** Active farm-level Base ABW presets, selected for this sale rather than inherited from a buyer. */
     abwSchemes: any[] = [];
