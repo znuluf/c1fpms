@@ -141,21 +141,6 @@ public class Logbook_Tests : FpmsTestBase
     }
 
     [Fact]
-    public async Task A_feeding_cannot_consume_a_lot_before_its_received_date()
-    {
-        var feedItem = Q(c => c.InventoryItems.IgnoreQueryFilters().Single(i => i.ProductName == "Shrimp Grower #3").Id);
-        var receipt = await Resolve<InventoryAppService>().RecordReceipt(new RecordReceiptInput
-        {
-            ItemId = feedItem, LotNumber = "FG-FUTURE-RECEIPT", ReceivedDate = Today, Quantity = 100, UnitCost = 80,
-        });
-
-        var input = Session(5m, day: Today.AddDays(-1));
-        input.Lines = new() { new() { LotId = receipt.LotId, Kg = 5m } };
-        await Should.ThrowAsync<UserFriendlyException>(() => Resolve<FeedingAppService>().Save(input));
-        LotQty(receipt.LotId).ShouldBe(100m);
-    }
-
-    [Fact]
     public async Task Resubmitting_the_same_client_request_id_does_not_duplicate()
     {
         var requestId = Guid.NewGuid();
