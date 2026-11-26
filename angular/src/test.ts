@@ -16,7 +16,7 @@ getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDyn
     teardown: { destroyAfterEach: false },
 });
 // Load every spec explicitly; otherwise Karma starts successfully but reports zero tests.
-const context = require.context('./', true, /\\.spec\\.ts$/);
+const context = require.context('./', true, /\.spec\.ts$/);
 context.keys().forEach(context);
 
 // Finally, start Karma to run the tests.
