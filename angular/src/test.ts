@@ -6,6 +6,7 @@ import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@ang
 // Unfortunately there's no typing for the `__karma__` variable. Just declare it as any.
 /* eslint-disable no-var */
 declare var __karma__: any;
+declare const require: any;
 
 // Prevent Karma from running prematurely.
 __karma__.loaded = function () {};
@@ -14,5 +15,9 @@ __karma__.loaded = function () {};
 getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
     teardown: { destroyAfterEach: false },
 });
+// Load every spec explicitly; otherwise Karma starts successfully but reports zero tests.
+const context = require.context('./', true, /\\.spec\\.ts$/);
+context.keys().forEach(context);
+
 // Finally, start Karma to run the tests.
 __karma__.start();
