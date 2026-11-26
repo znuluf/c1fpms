@@ -22,6 +22,12 @@ const DRAFT = 'log-entry';
                 @if (loading) {
                     <fpms-loading></fpms-loading>
                 } @else {
+                    @if (initError) {
+                        <div class="alert alert-danger" role="alert">
+                            <p class="mb-2">{{ initError }}</p>
+                            <button type="button" class="btn btn-sm btn-outline-danger" (click)="init()">Try again</button>
+                        </div>
+                    }
                     @if (restoredAt) {
                         <div class="alert alert-info d-flex align-items-center" role="status">
                             <i class="fas fa-history mr-2"></i>
@@ -545,6 +551,9 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
     /** Unsaved entries are kept as a browser draft, so leaving never needs to ask. */
     protected override keepsDrafts = true;
     loading = true;
+    initError: string | null = null;
+    private initSequence = 0;
+    private batchSequence = 0;
     isNew = true;
     readOnly = false;
     historical = false;
@@ -595,7 +604,9 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
     }
 
     async init(): Promise<void> {
+        const sequence = ++this.initSequence;
         this.loading = true;
+        this.initError = null;
         // A routed page has the entry in its address; in the log drawer it comes with the request (DEC-125).
         const id = this.param('id') ?? this.query('logId');
         this.isNew = !id;
@@ -603,23 +614,37 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
         this.restoredAt = null;
         this.log = null;
         this.historical = false;
-        const [params, suppLots, chemLots] = await Promise.all([
-            this.api.get<any[]>('Log', 'GetParameters'),
-            this.api.get<any[]>('Inventory', 'GetLotOptions', { category: 2 }),
-            this.api.get<any[]>('Inventory', 'GetLotOptions', { category: 3 }),
-        ]);
-        this.params = params.filter((p) => p.isActive);
-        this.productLots = this.sortLots([...suppLots, ...chemLots]);
-        this.resetDetails();
+        try {
+            // Inventory options are only needed for chemical/supplement entries. A stock lookup outage
+            // must not prevent the rest of Record Operations from opening.
+            const [params, suppLots, chemLots] = await Promise.all([
+                this.api.get<any[]>('Log', 'GetParameters'),
+                this.api.get<any[]>('Inventory', 'GetLotOptions', { category: 2 }).catch(() => []),
+                this.api.get<any[]>('Inventory', 'GetLotOptions', { category: 3 }).catch(() => []),
+            ]);
+            if (sequence !== this.initSequence) return;
+            this.params = params.filter((p) => p.isActive);
+            this.productLots = this.sortLots([...suppLots, ...chemLots]);
+            this.resetDetails();
 
-        if (this.isNew) {
-            await this.initNew();
-        } else {
-            await this.loadExisting(id!);
-        }
-        this.loading = false;
-        if (!this.isNew && this.query('focus') === 'void') {
-            setTimeout(() => document.getElementById('void-card')?.scrollIntoView({ block: 'center' }));
+            if (this.isNew) {
+                await this.initNew();
+            } else {
+                await this.loadExisting(id!);
+            }
+            if (sequence !== this.initSequence) return;
+            if (!this.isNew && this.query('focus') === 'void') {
+                setTimeout(() => document.getElementById('void-card')?.scrollIntoView({ block: 'center' }));
+            }
+        } catch (error) {
+            console.warn('Record Operations failed to initialize.', error);
+            if (sequence === this.initSequence) {
+                this.initError = 'Record Operations could not load. Check your connection and permissions, then try again.';
+            }
+        } finally {
+            if (sequence === this.initSequence) {
+                this.loading = false;
+            }
         }
     }
 
@@ -729,21 +754,37 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
     }
 
     async onBatch(preferredType?: number | null): Promise<void> {
-        if (!this.form.batchId) {
+        const sequence = ++this.batchSequence;
+        const batchId = this.form.batchId;
+        this.initError = null;
+        if (!batchId) {
             this.batch = null;
             this.allowedTypes = [];
+            this.pondDay = null;
             return;
         }
-        this.batch = await this.api.get<any>('Batch', 'Get', { id: this.form.batchId });
-        if (this.isNew) {
-            OpsMemory.set({ cycleId: this.batch.cycleId, batchId: this.batch.id });
+        try {
+            const batch = await this.api.get<any>('Batch', 'Get', { id: batchId });
+            if (sequence !== this.batchSequence || this.form.batchId !== batchId) return;
+            this.batch = batch;
+            if (this.isNew) {
+                OpsMemory.set({ cycleId: this.batch.cycleId, batchId: this.batch.id });
+            }
+            const allowed = (this.batch.allowedLogTypes as string[]).map((n) => this.L.LogTypeNames[n]);
+            this.allowedTypes = this.Options.newLogType.filter((o) => allowed.includes(o.value));
+            const wanted = preferredType ?? this.form.logType;
+            this.form.logType = this.allowedTypes.some((t) => t.value === wanted) ? wanted : null;
+            this.keepDraft();
+            void this.loadPanel();
+        } catch (error) {
+            console.warn('Record Operations could not load the selected batch.', error);
+            if (sequence === this.batchSequence) {
+                this.batch = null;
+                this.allowedTypes = [];
+                this.pondDay = null;
+                this.initError = 'The selected pond could not be loaded. Check your connection and try again.';
+            }
         }
-        const allowed = (this.batch.allowedLogTypes as string[]).map((n) => this.L.LogTypeNames[n]);
-        this.allowedTypes = this.Options.newLogType.filter((o) => allowed.includes(o.value));
-        const wanted = preferredType ?? this.form.logType;
-        this.form.logType = this.allowedTypes.some((t) => t.value === wanted) ? wanted : null;
-        this.keepDraft();
-        void this.loadPanel();
     }
 
     pickType(type: number): void {
