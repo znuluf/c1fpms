@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, inject } from '@angular/core';
 import { FpmsPage } from '@shared/fpms/fpms-page';
 import { FarmTime, newGuid } from '@shared/fpms/farm-time';
 import { FormDrafts } from '@shared/fpms/drafts';
@@ -97,14 +97,14 @@ import { DisposalReasons } from '@shared/fpms/labels';
                     <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="harvest" [fpmsReviewNew]="isNew" novalidate>
                         <fieldset [disabled]="readOnly">
                             <nav class="fpms-harvest-entry-nav mb-3" aria-label="Harvest form sections">
-                                <a class="btn btn-sm btn-outline-secondary" href="#harvest-details">Harvest details</a>
-                                <a class="btn btn-sm btn-outline-secondary" href="#harvest-crates">Crate tally</a>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-details', $event)">Harvest details</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-crates', $event)">Crate tally</button>
                                 @if (showGrades()) {
-                                    <a class="btn btn-sm btn-outline-secondary" href="#harvest-grades">Size grading</a>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-grades', $event)">Size grading</button>
                                 }
-                                <a class="btn btn-sm btn-outline-secondary" href="#harvest-outcomes">Not-sold outcomes</a>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-outcomes', $event)">Not sold</button>
                                 @if (isNew && m.buyerId && canSell) {
-                                    <a class="btn btn-sm btn-outline-secondary" href="#harvest-sale">Sale</a>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-sale', $event)">Sale</button>
                                 }
                             </nav>
                             <div class="card" id="harvest-details">
@@ -635,6 +635,14 @@ import { DisposalReasons } from '@shared/fpms/labels';
     ],
 })
 export class HarvestEntryComponent extends FpmsPage implements OnInit {
+    private readonly host = inject(ElementRef<HTMLElement>);
+
+    /** Scroll within this form without navigating away from the Angular route. */
+    scrollToSection(id: string, event: Event): void {
+        event.preventDefault();
+        this.host.nativeElement.querySelector<HTMLElement>(`#${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     /** Unsaved entries are kept as a browser draft, so leaving never needs to ask. */
     protected override keepsDrafts = true;
     loading = true;
