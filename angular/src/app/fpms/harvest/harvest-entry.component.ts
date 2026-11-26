@@ -640,7 +640,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     /** Scroll within this form without navigating away from the Angular route. */
     scrollToSection(id: string, event: Event): void {
         event.preventDefault();
-        this.host.nativeElement.querySelector<HTMLElement>(`#${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        (this.host.nativeElement.querySelector(`#${id}`) as HTMLElement | null)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     /** Unsaved entries are kept as a browser draft, so leaving never needs to ask. */
