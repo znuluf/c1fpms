@@ -2,6 +2,8 @@ using Abp.UI;
 using Capstone.Domain;
 using Capstone.Harvests;
 using Capstone.Inventory;
+using Capstone.Logbooks;
+using Capstone.Logbooks.Dto;
 using Capstone.Production;
 using Capstone.Production.Dto;
 using Capstone.Resources;
@@ -330,6 +332,44 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
         results.Count(r => r.Value.Warning?.Contains("Stock shortfall") == true).ShouldBe(1);
         Q(c => c.InventoryLots.IgnoreQueryFilters().Single(l => l.Id == receipt.LotId).NeedsReconciliation).ShouldBeTrue();
         Q(c => c.StockMovements.IgnoreQueryFilters().Where(m => m.LotId == receipt.LotId).Sum(m => m.Quantity)).ShouldBe(-60m);
+    }
+
+    [SqlServerFact]
+    public async Task Feeding_sheets_that_use_the_same_lots_in_opposite_order_are_both_saved()
+    {
+        var feedItemId = Q(c => c.InventoryItems.IgnoreQueryFilters()
+            .Single(i => i.TenantId == GetTenantId(PilotFarm) && i.ProductName == "Shrimp Grower #3").Id);
+        var second = (await Resolve<InventoryAppService>().RecordReceipt(new RecordReceiptInput
+        {
+            ItemId = feedItemId, LotNumber = "SQL-SHEET-RACE", ReceivedDate = new DateOnly(2026, 9, 1), Quantity = 1000, UnitCost = 80,
+        })).LotId;
+        var first = LotId(FeedLot);
+        var feeding = Resolve<FeedingAppService>();
+
+        SaveFeedingSheetInput Sheet(string batch, DateOnly day, Guid lotOfFirstRow, Guid lotOfSecondRow) => new()
+        {
+            Sessions = new[] { lotOfFirstRow, lotOfSecondRow }.Select((lot, i) => new SaveFeedingSessionInput
+            {
+                BatchId = BatchId(batch), FeedDate = day, Session = 7 + i, ClientRequestId = Guid.NewGuid(),
+                Lines = new() { new() { LotId = lot, Kg = 1m } },
+            }).ToList(),
+        };
+
+        // Several rounds, because the two saves have to overlap for the lock order to matter.
+        for (var round = 0; round < 5; round++)
+        {
+            var sheets = new[]
+            {
+                Sheet(ReferenceBatch, new DateOnly(2026, 9, 2).AddDays(round), first, second),
+                Sheet(CurrentBatch, Today.AddDays(-round), second, first),
+            };
+
+            var results = await AtOnce(2, i => feeding.SaveSheet(sheets[i]));
+
+            results.Select(r => r.Error?.ToString()).ShouldAllBe(error => error == null);
+        }
+
+        LotQty(second).ShouldBe(980m);
     }
 
     [SqlServerFact]

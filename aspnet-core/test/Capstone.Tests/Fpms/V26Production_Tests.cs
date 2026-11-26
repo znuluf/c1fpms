@@ -509,6 +509,22 @@ public class V26Production_Tests : FpmsTestBase
 
     // ---------------------------------------------------------------- DEC-68
     [Fact]
+    public async Task An_adjustment_that_takes_a_lot_below_zero_flags_it()
+    {
+        var inventory = Resolve<InventoryAppService>();
+        var feedItem = (await inventory.GetItems()).First(i => i.Category == InventoryCategory.Feed);
+        var receipt = await inventory.RecordReceipt(new RecordReceiptInput
+        {
+            ItemId = feedItem.Id, LotNumber = "FG-BELOW-ZERO", ReceivedDate = Today, Quantity = 10,
+        });
+
+        var left = await inventory.RecordAdjustment(new RecordAdjustmentInput { LotId = receipt.LotId, Quantity = -15, Reason = "Count correction" });
+
+        left.ShouldBe(-5m);
+        Q(c => c.InventoryLots.IgnoreQueryFilters().Single(l => l.Id == receipt.LotId).NeedsReconciliation).ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task Receipts_can_be_entered_in_packs_and_lots_are_offered_earliest_expiry_first()
     {
         var inventory = Resolve<InventoryAppService>();
