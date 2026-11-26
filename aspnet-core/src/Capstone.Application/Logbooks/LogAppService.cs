@@ -431,7 +431,7 @@ public class LogAppService : CapstoneAppServiceBase
                     var lot = await _inventory.GetLotWithItemAsync(usage.LotId);
                     if (lot.Item.Category == InventoryCategory.Feed)
                     {
-                        throw new UserFriendlyException("Feed is recorded on the Feeding sheet. Choose a supplement or chemical lot.");
+                        throw new UserFriendlyException("Feed is recorded under Feeding. Choose a supplement or chemical lot.");
                     }
                 }
 
@@ -612,7 +612,7 @@ public class LogAppService : CapstoneAppServiceBase
                     var lot = await _inventory.GetLotWithItemAsync(usage.LotId);
                     if (lot.Item.Category == InventoryCategory.Feed)
                     {
-                        throw new UserFriendlyException("Feed is recorded on the Feeding sheet. Choose a supplement or chemical lot.");
+                        throw new UserFriendlyException("Feed is recorded under Feeding. Choose a supplement or chemical lot.");
                     }
 
                     AddStockWarning(warnings, await _inventory.RecordUsageAsync(lot, usage.Quantity, batch.Id, log.ObservedAtUtc, sourceLogId: log.Id, usedOn: day));
