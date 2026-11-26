@@ -213,7 +213,7 @@ export class SaleEntryComponent extends FpmsPage implements OnInit {
 
     /** Price by count is offered only on a line that already uses it: the partner farm always sells by kg (DEC-90). */
     methodsFor(l: any): typeof PRICE_METHODS {
-        return PRICE_METHODS.filter((o) => o.value !== 3 || l.priceMethod === 3);
+        return PRICE_METHODS.filter((o) => (o.value !== 3 || l.priceMethod === 3) && (o.value !== 4 || l.priceMethod === 4));
     }
     /** Active price tables with their rows (DEC-82). */
     tables: any[] = [];
