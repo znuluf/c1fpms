@@ -529,6 +529,10 @@ public class V26Production_Tests : FpmsTestBase
         {
             ItemId = feedItem.Id, LotNumber = "FG-BAD-EXPIRY", ReceivedDate = Today, ExpiryDate = Today.AddDays(-1), Quantity = 10,
         }));
+        await Should.ThrowAsync<UserFriendlyException>(() => inventory.RecordAdjustment(new RecordAdjustmentInput
+        {
+            LotId = receipt.LotId, Quantity = -1, Reason = "Backdated correction", Date = Today.AddDays(-1),
+        }));
         await Should.ThrowAsync<UserFriendlyException>(() => inventory.RecordReceipt(new RecordReceiptInput
         {
             ItemId = feedItem.Id, LotNumber = "FG-CONFLICT", ReceivedDate = Today, Quantity = 10, UnitCost = 50, PackCount = 1, PackCost = 1500,
