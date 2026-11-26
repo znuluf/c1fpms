@@ -1005,7 +1005,7 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
 
     /** Price by count is offered only when the sale already uses it: the partner farm always sells by kg (DEC-90). */
     methodsFor(t: any): typeof PRICE_METHODS {
-        return PRICE_METHODS.filter((o) => o.value !== 3 || t?.priceMethod === 3);
+        return PRICE_METHODS.filter((o) => (o.value !== 3 || t?.priceMethod === 3) && (o.value !== 4 || t?.priceMethod === 4));
     }
     /** True while the harvest-form sale is shown for a last check before saving (DEC-85). */
     review = false;
