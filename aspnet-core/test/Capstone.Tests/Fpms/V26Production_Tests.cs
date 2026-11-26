@@ -525,6 +525,19 @@ public class V26Production_Tests : FpmsTestBase
 
         await Should.ThrowAsync<UserFriendlyException>(() => inventory.RecordReceipt(new RecordReceiptInput { ItemId = feedItem.Id, LotNumber = "FG-NONE", ReceivedDate = Today }));
 
+        await Should.ThrowAsync<UserFriendlyException>(() => inventory.RecordReceipt(new RecordReceiptInput
+        {
+            ItemId = feedItem.Id, LotNumber = "FG-BAD-EXPIRY", ReceivedDate = Today, ExpiryDate = Today.AddDays(-1), Quantity = 10,
+        }));
+        await Should.ThrowAsync<UserFriendlyException>(() => inventory.RecordReceipt(new RecordReceiptInput
+        {
+            ItemId = feedItem.Id, LotNumber = "FG-CONFLICT", ReceivedDate = Today, Quantity = 10, UnitCost = 50, PackCount = 1, PackCost = 1500,
+        }));
+        await Should.ThrowAsync<UserFriendlyException>(() => inventory.RecordReceipt(new RecordReceiptInput
+        {
+            ItemId = feedItem.Id, LotNumber = "FG-PACK-COST", ReceivedDate = Today, PackCost = 1500,
+        }));
+
         var lots = await inventory.GetLotOptions(InventoryCategory.Feed);
         lots.First().LotId.ShouldBe(receipt.LotId); // expires soonest
         lots.Where(l => l.QuantityOnHand > 0).Select(l => l.ExpiryDate ?? DateOnly.MaxValue)
