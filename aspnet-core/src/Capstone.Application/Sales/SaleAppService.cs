@@ -820,7 +820,8 @@ public class SaleAppService : CapstoneAppServiceBase
                 throw new UserFriendlyException($"Grade {grade.SizeGrade?.Label}: choose how the price was agreed.");
             }
 
-            var reference = await ReferencePriceAsync(l, grade, harvest);
+            var existingLine = isNew ? null : sale.Lines.FirstOrDefault(x => x.HarvestGradeLineId == l.HarvestGradeLineId);
+            var reference = await ReferencePriceAsync(l, grade, harvest, buyer.Id, existingLine, sale.BuyerId);
             references[l] = reference;
             if (reference.Price.HasValue && reference.Price.Value < 0)
             {
@@ -1089,7 +1090,7 @@ public class SaleAppService : CapstoneAppServiceBase
     /// Checks a priced line's terms and works out its reference price. Fills in the line's ABW or count when empty (from the
     /// harvest's ABW, or the grade's middle count), so the saved line shows what the price was based on.
     /// </summary>
-    private async Task<LineReference> ReferencePriceAsync(SaleLineInput l, HarvestGradeLine grade, Harvest harvest)
+    private async Task<LineReference> ReferencePriceAsync(SaleLineInput l, HarvestGradeLine grade, Harvest harvest, Guid buyerId, SaleLine existingLine, Guid previousBuyerId)
     {
         var label = grade.SizeGrade?.Label;
         switch (l.PriceMethod)
@@ -1127,10 +1128,34 @@ public class SaleAppService : CapstoneAppServiceBase
                     throw new UserFriendlyException($"Grade {label}: choose the price table.");
                 }
 
-                var table = await _priceTables.GetAll().AsNoTracking().Include(t => t.Rows).FirstOrDefaultAsync(t => t.Id == l.PriceTableId.Value)
-                            ?? throw new UserFriendlyException($"Grade {label}: choose a price table of this farm.");
                 l.PriceCountPerKg = SaleLine.WholeCount(l.PriceCountPerKg ?? DefaultCount(grade, harvest)
                     ?? throw new UserFriendlyException($"Grade {label}: enter the count to look up in the price table; the grade has no count range and the harvest has no ABW."));
+
+                // A correction to an existing sale must not silently reprice a saved line when its source table has
+                // since been edited or deactivated. Keep the original row/price snapshot when the table, buyer and
+                // count are unchanged; an intentional change to any of them uses the current active table below.
+                if (existingLine?.PriceMethod == PriceMethod.Table
+                    && existingLine.PriceTableId == l.PriceTableId
+                    && existingLine.PriceCountPerKg == l.PriceCountPerKg
+                    && previousBuyerId == buyerId)
+                {
+                    return new LineReference(existingLine.ReferencePricePerKg, "price-table",
+                        $"{existingLine.PriceTableName}, {existingLine.PriceTableRowLabel}, count {l.PriceCountPerKg:0}",
+                        existingLine.PriceTableName, existingLine.PriceTableRowLabel);
+                }
+
+                var table = await _priceTables.GetAll().AsNoTracking().Include(t => t.Rows).FirstOrDefaultAsync(t => t.Id == l.PriceTableId.Value)
+                            ?? throw new UserFriendlyException($"Grade {label}: choose a price table of this farm.");
+                if (!table.IsActive)
+                {
+                    throw new UserFriendlyException($"Grade {label}: the price table \"{table.Name}\" is inactive. Choose an active table.");
+                }
+
+                if (table.BuyerId.HasValue && table.BuyerId.Value != buyerId)
+                {
+                    throw new UserFriendlyException($"Grade {label}: the price table \"{table.Name}\" is assigned to a different buyer.");
+                }
+
                 var row = table.Find(l.PriceCountPerKg.Value)
                           ?? throw new UserFriendlyException($"Grade {label}: no row of the price table \"{table.Name}\" covers {l.PriceCountPerKg:0} pcs/kg.");
                 return new LineReference(row.PricePerKg, "price-table", $"{table.Name}, {row.Label}, count {l.PriceCountPerKg:0}", table.Name, row.Label);
