@@ -160,7 +160,7 @@ const DRAFT = 'log-entry';
                                                 <div class="fpms-lw-tiles fpms-lw-tiles-row mt-2" role="radiogroup" aria-label="Record type">
                                                     @if (!inWizard) {
                                                         <a class="fpms-lw-tile" [routerLink]="['/app/logbook/feeding']" [queryParams]="{ batchId: batch.id }">
-                                                            <i class="fas fa-utensils" aria-hidden="true"></i>Feeding <span class="sr-only">(opens the Feeding sheet)</span>
+                                                            <i class="fas fa-utensils" aria-hidden="true"></i>Feeding <span class="sr-only">(opens the Feeding page)</span>
                                                         </a>
                                                     }
                                                     @for (o of allowedTypes; track o.value) {
