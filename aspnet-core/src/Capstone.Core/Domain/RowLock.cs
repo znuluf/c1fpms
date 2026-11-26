@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Capstone.Domain;
 
 /// <summary>Parent rows that cross-row checks lock before checking (spec Section 6, DEC-38).</summary>
-public enum RowLockTarget { FryDelivery = 1, HarvestGradeLine = 2, Harvest = 3, Pond = 4, Batch = 5, Cycle = 6 }
+public enum RowLockTarget { FryDelivery = 1, HarvestGradeLine = 2, Harvest = 3, Pond = 4, Batch = 5, Cycle = 6, InventoryLot = 7 }
 
 /// <summary>
 /// Takes an update lock on a parent row inside the current transaction, so two saves that check the same total
