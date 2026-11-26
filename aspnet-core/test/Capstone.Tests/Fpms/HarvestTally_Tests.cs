@@ -932,6 +932,62 @@ public class HarvestTally_Tests : FpmsTestBase
     }
 
     [Fact]
+    public async Task Price_tables_must_be_active_and_assigned_to_the_sale_buyer()
+    {
+        var harvest = await Resolve<HarvestAppService>().Create(TallySheet());
+        var gradeLine = harvest.GradeLines.Single().Id;
+        var table = await Table("Buyer-only table", Buyer, (null, null, 220));
+        var line = Line(gradeLine, 100, 220, PriceMethod.Table);
+        line.PriceTableId = table;
+
+        var otherBuyer = Q(c => c.Buyers.IgnoreQueryFilters().Where(b => b.Id != Buyer).Select(b => b.Id).First());
+        await Should.ThrowAsync<UserFriendlyException>(() => Resolve<SaleAppService>().Create(new SaveSaleInput
+        {
+            BuyerId = otherBuyer, SaleDate = Today, Lines = new() { line },
+        }));
+
+        await Resolve<PriceTableAppService>().Save(new PriceTableDto
+        {
+            Id = table, Name = "Buyer-only table", BuyerId = Buyer, IsActive = false,
+            Rows = new() { new() { PricePerKg = 220 } },
+        });
+        await Should.ThrowAsync<UserFriendlyException>(() => Resolve<SaleAppService>().Create(new SaveSaleInput
+        {
+            BuyerId = Buyer, SaleDate = Today, Lines = new() { line },
+        }));
+    }
+
+    [Fact]
+    public async Task Editing_a_sale_keeps_its_original_price_table_snapshot_after_the_table_changes()
+    {
+        var harvest = await Resolve<HarvestAppService>().Create(TallySheet());
+        var gradeLine = harvest.GradeLines.Single().Id;
+        var table = await Table("Snapshot table", Buyer, (null, null, 220));
+        var line = Line(gradeLine, 100, 220, PriceMethod.Table);
+        line.PriceTableId = table;
+        var sales = Resolve<SaleAppService>();
+        var sale = await sales.Create(new SaveSaleInput { BuyerId = Buyer, SaleDate = Today, Lines = new() { line } });
+
+        await Resolve<PriceTableAppService>().Save(new PriceTableDto
+        {
+            Id = table, Name = "Snapshot table", BuyerId = Buyer,
+            Rows = new() { new() { PricePerKg = 999 } },
+        });
+
+        var correction = Line(gradeLine, 100, 220, PriceMethod.Table);
+        correction.PriceTableId = table;
+        correction.PriceCountPerKg = sale.Lines.Single().PriceCountPerKg;
+        var updated = await sales.Update(new SaveSaleInput
+        {
+            Id = sale.Id, RowVersion = sale.RowVersion, BuyerId = Buyer, SaleDate = Today, Lines = new() { correction },
+        });
+
+        updated.Lines.Single().FormulaPricePerKg.ShouldBe(220m);
+        updated.Lines.Single().PriceTableRowLabel.ShouldBe("any count");
+        updated.Lines.Single().PricePerKg.ShouldBe(220m);
+    }
+
+    [Fact]
     public async Task The_lot_code_shows_on_the_sale_and_finds_it()
     {
         var result = await Resolve<TallySheetAppService>().Save(SheetWithSale());
