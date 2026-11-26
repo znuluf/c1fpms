@@ -65,7 +65,7 @@ import { priceOverridden, priceWorking, referencePrice, usedAbw, usedCount } fro
                             }
                         </select>
                         @if (!tables?.length) {
-                            <small class="text-muted">No price tables yet. <a routerLink="/app/sales/price-tables">Add one under Setup</a>.</small>
+                            <small class="text-muted">No price tables yet. @if (canManageTables) { <a routerLink="/app/sales/price-tables">Add one under Setup</a>. } @else { Ask a farm owner to add one under Setup. }</small>
                         }
                     </div>
                 }
@@ -102,6 +102,8 @@ export class PriceTermsComponent {
     @Input() t: any;
     /** The price tables this buyer may use, the buyer's own first. */
     @Input() tables: any[] = [];
+    /** Only farm users with the setup permission may be invited to add a table. */
+    @Input() canManageTables = false;
     /** Prefix that keeps the control names unique in the form, e.g. "l0" for the first sale line. */
     @Input() key = 'pt';
     /** The harvest's sampled ABW (g), used unless the line types its own. */
