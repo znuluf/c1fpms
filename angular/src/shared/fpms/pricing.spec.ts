@@ -38,7 +38,7 @@ describe('sale pricing helpers', () => {
             .toEqual(jasmine.objectContaining({ priceMethod: 4, priceTableId: 'table-1', priceCountPerKg: 90 }));
     });
 
-    it('keeps legacy methods available for editing without offering them for new lines', () => {
+    it('defines all supported pricing method values for existing sale lines', () => {
         expect(PRICE_METHODS.map((x) => x.value)).toEqual([1, 2, 3, 4]);
     });
 });
