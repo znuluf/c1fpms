@@ -25,7 +25,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 @if (notFound) {
                     <div class="alert alert-warning">
                         No harvest has the lot code <strong class="text-monospace">{{ lotCode }}</strong>. Check the code on the crate, receipt or tally sheet,
-                        or search for it in <a routerLink="/app/harvests">Harvests</a>.
+                        or search for it in @if (can('Farm.Harvests')) { <a routerLink="/app/harvests">Harvests</a> } @else { Harvests }.
                     </div>
                 } @else if (!t) {
                     <fpms-loading></fpms-loading>
@@ -71,7 +71,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                 {{ g.what }}
                                                 @if (g.detail) { <div class="text-muted">{{ g.detail }}</div> }
                                             </div>
-                                            <a class="btn btn-sm btn-outline-primary text-nowrap" [routerLink]="g.link">{{ g.action }}<i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></a>
+                                            @if (canOpenGap(g)) { <a class="btn btn-sm btn-outline-primary text-nowrap" [routerLink]="g.link">{{ g.action }}<i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></a> }
                                         </li>
                                     }
                                 </ul>
@@ -252,7 +252,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                         <thead><tr><th>Lot code</th><th>Harvested</th><th>Size grades</th><th class="n">Kg</th></tr></thead>
                                         <tbody>
                                             @for (h of t.harvests; track h.harvestId) {
-                                                <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open harvest details" (click)="openHarvest(h.harvestId, $event)" (keydown.enter)="openHarvest(h.harvestId, $event)">
+                                                <tr [class.fpms-clickable-row]="can('Farm.Harvests')" [attr.tabindex]="can('Farm.Harvests') ? 0 : null" [attr.role]="can('Farm.Harvests') ? 'link' : null" [attr.aria-label]="can('Farm.Harvests') ? 'Open harvest details' : null" (click)="can('Farm.Harvests') && openHarvest(h.harvestId, $event)" (keydown.enter)="can('Farm.Harvests') && openHarvest(h.harvestId, $event)">
                                                     <td>@if (h.lotCode) { <a (click)="$event.stopPropagation()" class="ts-code" [routerLink]="['/app/reports/trace/lot', h.lotCode]">{{ h.lotCode }}</a> } @else { <span class="ts-quiet">—</span> }</td>
                                                     <td>{{ h.harvestedAtUtc | farmDateTime }}<span class="ts-d">{{ h.harvestType | label: L.HarvestTypes }}</span></td>
                                                     <td>@for (g of h.grades; track g.gradeLineId; let last = $last) { {{ g.sizeLabel }} {{ g.kg | num: 1 }}@if (!last) { · } }</td>
@@ -296,9 +296,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     <tr class="ts-group"><td colspan="5">{{ b.buyer }}<small>{{ receiptCount(b.lines) }} {{ receiptCount(b.lines) === 1 ? 'receipt' : 'receipts' }} · {{ b.kg | num: 1 }} kg</small></td></tr>
                                                 }
                                                 @for (s of b.lines; track $index) {
-                                                    <tr class="fpms-clickable-row" tabindex="0" role="link" aria-label="Open sale details" (click)="openSale(s.saleId, $event)" (keydown.enter)="openSale(s.saleId, $event)">
+                                                    <tr [class.fpms-clickable-row]="can('Farm.Sales')" [attr.tabindex]="can('Farm.Sales') ? 0 : null" [attr.role]="can('Farm.Sales') ? 'link' : null" [attr.aria-label]="can('Farm.Sales') ? 'Open sale details' : null" (click)="can('Farm.Sales') && openSale(s.saleId, $event)" (keydown.enter)="can('Farm.Sales') && openSale(s.saleId, $event)">
                                                         <td>
-                                                            <a (click)="$event.stopPropagation()" [routerLink]="['/app/sales', s.saleId]">{{ s.dispatchReceiptNo }}</a>
+                                                            @if (can('Farm.Sales')) { <a (click)="$event.stopPropagation()" [routerLink]="['/app/sales', s.saleId]">{{ s.dispatchReceiptNo }}</a> } @else { {{ s.dispatchReceiptNo }} }
                                                         </td>
                                                         <td>{{ s.saleDate | farmDate }}</td>
                                                         <td>{{ s.sizeLabel }}</td>
@@ -854,6 +854,7 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
     });
 
     openHarvest(id: string, event: Event): void {
+        if (!this.can('Farm.Harvests')) return;
         const target = event.target as HTMLElement | null;
         if (target?.closest('a, button, input, select, textarea')) return;
         if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
@@ -861,6 +862,7 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
     }
 
     openSale(id: string, event: Event): void {
+        if (!this.can('Farm.Sales')) return;
         const target = event.target as HTMLElement | null;
         if (target?.closest('a, button, input, select, textarea')) return;
         if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
@@ -894,6 +896,17 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
         return dates.length ? dates.sort()[dates.length - 1] : null;
     });
 
+    /** Only show a gap action when the person has access to its destination page. */
+    canOpenGap(g: { link: any[] }): boolean {
+        switch (g.link?.[0]) {
+            case '/app/resources/fry-deliveries': return this.can('Farm.FryDeliveries');
+            case '/app/resources/hatcheries': return this.can('Farm.Hatcheries');
+            case '/app/farm/documents': return this.can('Farm.Compliance');
+            case '/app/inventory': return this.can('Farm.Inventory');
+            default: return false;
+        }
+    }
+
     /** Things the sheet prints as "Not recorded", each with the place to record it. */
     gaps = computed<{ what: string; where: string; action: string; link: any[]; when?: string }[]>(() => {
         this.tick();
@@ -909,7 +922,7 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
             if (!f.sfscNo) out.push({ what: 'Shrimp Fry Source Certificate number', where: 'Origin · ' + f.hatcheryBatchNumber, action: 'Open fry delivery', link: delivery });
             if (!f.bfarAccreditationNo) out.push({ what: 'Hatchery BFAR accreditation number', where: 'Origin · ' + f.hatcheryName, action: 'Open hatcheries', link: ['/app/resources/hatcheries'] });
         }
-        if (!t.bfarRegistrationNo) out.push({ what: 'Farm BFAR registration number', where: 'Farm profile', action: 'Open farm profile', link: ['/app/farm/profile'] });
+        if (!t.bfarRegistrationNo) out.push({ what: 'Farm BFAR registration number', where: 'Farm profile · Permits and licenses', action: 'Open permits and licenses', link: ['/app/farm/documents'] });
         for (const l of t.feedLots ?? []) {
             if (!l.lotNumber) out.push({ what: `Lot number for ${l.product}`, where: 'Grow-out · feed', action: 'Open inventory', link: ['/app/inventory'] });
         }
