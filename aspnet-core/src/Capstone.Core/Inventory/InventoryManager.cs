@@ -136,13 +136,18 @@ public class InventoryManager : DomainService
             SourceLogId = sourceLogId,
         };
         movement.Id = await _movements.InsertAndGetIdAsync(movement);
+        if (await GetLotQuantityAsync(lot.Id) < 0)
+        {
+            lot.NeedsReconciliation = true;
+        }
+
         await RefreshLotFlagAsync(lot);
         return movement;
     }
 
     /// <summary>
     /// Usage from a feeding session or a chemical application log. A shortfall or an expired lot warns (and a shortfall
-    /// flags the lot) but never blocks.
+    /// flags the lot) but never blocks. Each lot is locked while its balance is checked and its movement is saved.
     /// </summary>
     public async Task<StockUsageResult> RecordUsageAsync(InventoryLot lot, decimal quantity, Guid batchId, DateTime movementUtc,
         Guid? sourceLogId = null, Guid? feedingSessionId = null, DateOnly? usedOn = null)
