@@ -126,7 +126,7 @@ public class Logbook_Tests : FpmsTestBase
     }
 
     [Fact]
-    public async Task A_feeding_cannot_consume_a_lot_before_its_received_date()
+    public async Task A_feeding_dated_before_its_lot_was_received_saves_with_a_warning()
     {
         var feedItem = Q(c => c.InventoryItems.IgnoreQueryFilters().Single(i => i.ProductName == "Shrimp Grower #3").Id);
         var receipt = await Resolve<InventoryAppService>().RecordReceipt(new RecordReceiptInput
@@ -136,8 +136,10 @@ public class Logbook_Tests : FpmsTestBase
 
         var input = Session(5m, day: Today.AddDays(-1));
         input.Lines = new() { new() { LotId = receipt.LotId, Kg = 5m } };
-        await Should.ThrowAsync<UserFriendlyException>(() => Resolve<FeedingAppService>().Save(input));
-        LotQty(receipt.LotId).ShouldBe(100m);
+        var result = await Resolve<FeedingAppService>().Save(input);
+
+        result.Warnings.ShouldContain(w => w.Kind == "Stock" && w.Message.Contains("FG-FUTURE-RECEIPT") && w.Message.Contains("received date"));
+        LotQty(receipt.LotId).ShouldBe(95m);
     }
 
     [Fact]

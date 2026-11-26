@@ -136,6 +136,8 @@ public class InventoryManager : DomainService
             SourceLogId = sourceLogId,
         };
         movement.Id = await _movements.InsertAndGetIdAsync(movement);
+        // Saved first, so the on-hand sum includes this adjustment.
+        await CurrentUnitOfWork.SaveChangesAsync();
         if (await GetLotQuantityAsync(lot.Id) < 0)
         {
             lot.NeedsReconciliation = true;
@@ -146,19 +148,15 @@ public class InventoryManager : DomainService
     }
 
     /// <summary>
-    /// Usage from a feeding session or a chemical application log. A shortfall or an expired lot warns (and a shortfall
-    /// flags the lot) but never blocks. Each lot is locked while its balance is checked and its movement is saved.
+    /// Usage from a feeding session or a chemical application log. A shortfall, an expired lot or an entry dated before the
+    /// lot was received warns (and a shortfall flags the lot) but never blocks (DEC-143). Each lot is locked while its balance
+    /// is checked and its movement is saved.
     /// </summary>
     public async Task<StockUsageResult> RecordUsageAsync(InventoryLot lot, decimal quantity, Guid batchId, DateTime movementUtc,
         Guid? sourceLogId = null, Guid? feedingSessionId = null, DateOnly? usedOn = null)
     {
         FpmsErrors.Require(sourceLogId.HasValue != feedingSessionId.HasValue, "A usage movement needs exactly one source.");
         FpmsErrors.Require(quantity >= 0, "Usage quantity cannot be negative.");
-        if (usedOn.HasValue && usedOn.Value < lot.ReceivedDate)
-        {
-            throw FpmsErrors.Rule($"Lot {lot.LotNumber} was not received until {lot.ReceivedDate:yyyy-MM-dd}; it cannot be used on {usedOn:yyyy-MM-dd}.");
-        }
-
         await LockLotsAsync(new[] { lot.Id });
         var item = lot.Item ?? await _items.GetAsync(lot.ItemId);
         await CurrentUnitOfWork.SaveChangesAsync();
@@ -196,6 +194,13 @@ public class InventoryManager : DomainService
         {
             var expired = $"Lot {lot.LotNumber} of {item.DisplayName} expired on {lot.ExpiryDate:yyyy-MM-dd}.";
             result.Warning = string.IsNullOrEmpty(result.Warning) ? expired : $"{result.Warning} {expired}";
+        }
+
+        if (usedOn.HasValue && usedOn.Value < lot.ReceivedDate)
+        {
+            var early = $"Lot {lot.LotNumber} of {item.DisplayName} has a received date of {lot.ReceivedDate:yyyy-MM-dd}, after this entry's date " +
+                        $"of {usedOn:yyyy-MM-dd}. The entry was saved; check that the lot and the date are right.";
+            result.Warning = string.IsNullOrEmpty(result.Warning) ? early : $"{result.Warning} {early}";
         }
 
         return result;

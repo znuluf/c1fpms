@@ -417,6 +417,7 @@ public class FeedingAppService : CapstoneAppServiceBase
             throw new UserFriendlyException("Enter at least one feeding.");
         }
 
+        await LockSheetAsync(input.Sessions);
         var results = new List<SaveFeedingResultDto>();
         foreach (var s in input.Sessions)
         {
@@ -424,6 +425,39 @@ public class FeedingAppService : CapstoneAppServiceBase
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// A sheet is saved in one transaction, so it takes all its locks before the first save: request ids, then batches, then
+    /// feed lots (the order a single save uses), each in id order. Two sheets that share batches or lots then wait for each
+    /// other instead of deadlocking.
+    /// </summary>
+    private async Task LockSheetAsync(List<SaveFeedingSessionInput> sheet)
+    {
+        foreach (var requestId in sheet.Select(s => s.ClientRequestId).Distinct().OrderBy(id => id))
+        {
+            await OneRequestAtATimeAsync("feeding", requestId);
+        }
+
+        if (RowLocker != null)
+        {
+            foreach (var batchId in sheet.Select(s => s.BatchId).Distinct().OrderBy(id => id))
+            {
+                await RowLocker.LockAsync(RowLockTarget.Batch, batchId);
+            }
+        }
+
+        var lotIds = sheet.SelectMany(s => s.Lines ?? new List<FeedingLineInput>()).Select(l => l.LotId).ToList();
+        foreach (var s in sheet)
+        {
+            // A correction also returns stock to the lots the saved feeding drew from. Read after the batch locks.
+            lotIds.AddRange(await (from m in _movements.GetAll()
+                                   join f in _sessions.GetAll() on m.FeedingSessionId equals (Guid?)f.Id
+                                   where f.BatchId == s.BatchId && f.FeedDate == s.FeedDate && f.Session == s.Session && m.Type == StockMovementType.Usage
+                                   select m.LotId).ToListAsync());
+        }
+
+        await _inventory.LockLotsAsync(lotIds);
     }
 
     /// <summary>The optional time of feeding as 24-hour "HH:mm", or null when blank (DEC-71). Never blocks beyond a malformed value.</summary>

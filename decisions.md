@@ -89,6 +89,8 @@ All decisions below were accepted on 2026-10-22 by the capstone development team
 | DEC-79 | A missing SFSC number is warned at stocking and at sale, and listed at Close Batch and on the trace report | Accepted; settles the hold under DEC-70 |
 | DEC-140 | Harvest types (Emergency), remaining-shrimp figures, held unsold stock, Base 10 pricing per gram with farm-set terms | Proposed (full write-up); terms marked † need the partner farm |
 | DEC-141 | Farm-configured Base ABW pricing presets selected per sale; no buyer-specific pricing defaults | Accepted (full write-up, 2026-11-23); supersedes DEC-140 pricing setup |
+| DEC-143 | Feed or chemical use dated before the lot was received warns and is saved | Accepted (full write-up, 2026-11-27) |
+| DEC-144 | Crate types is a tab of Harvest and sales again; no Setup group | Accepted (full write-up, 2026-11-27); amends DEC-85 step 1 |
 | DEC-84 | Trace report for one harvest lot code | Proposed (full write-up); built on `feature/lot-trace` (from `feature/harvest-tally`), not run |
 | DEC-83 | Harvest lot code YY-A-LL-FF-PP-HH (year, area, barangay or municipality, farm, pond, harvest) | Proposed (full write-up); format from the adviser; built on `feature/harvest-tally`, not run |
 | DEC-82 | Pricing by count and by price table, a size grade per crate, and a printable tally sheet | Proposed (full write-up); built on `feature/harvest-tally`, not run |
@@ -3673,3 +3675,44 @@ Builds on: DEC-140
 ### Consequences
 
 The farm can use a partial-harvest measurement when staff consider it representative of the shrimp remaining, while retaining an explicit opt-out for selective harvests. Biomass and FCR-to-date use the same selected ABW basis, and the source is visible to staff.
+
+---
+
+## Decision DEC-143: Feed or chemical use dated before the lot was received warns and is saved
+
+Date: 2026-11-27
+Status: Accepted
+
+### Context
+
+A check refused a feeding or a chemical application dated before the lot's received date. The receipt form starts that date at today and a saved lot's date cannot be edited, so a delivery typed in late blocked the records of the days before it. Recording at the pond is otherwise never blocked (AC-12).
+
+### Decision
+
+- The entry is saved, with a warning that names the lot and both dates and asks to check them.
+- A stock adjustment dated before the received date is still refused.
+
+### Consequences
+
+Late entry works. A wrong lot or date can be saved, so the warning has to be read.
+
+---
+
+## Decision DEC-144: Crate types is a tab of Harvest and sales again; no Setup group
+
+Date: 2026-11-27
+Status: Accepted
+Amends: DEC-85 step 1
+
+### Context
+
+The Setup group linked to Size grades and Price tables, whose pages have no route, so those links opened a harvest or dispatch receipt that does not exist. New sales cannot be priced by count or from a price table (DEC-140, DEC-141).
+
+### Decision
+
+- Harvest and sales shows Harvests, Sales and Crate types.
+- Size grades and Price tables are not linked from anywhere. Their saved data and the pricing of earlier sales are unchanged.
+
+### Consequences
+
+Size grades and price tables cannot be added or changed on screen. An earlier sale priced from a table keeps its saved price while its table, buyer and count are unchanged.

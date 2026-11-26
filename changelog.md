@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed (review, 27 Nov 2026)
+- **Harvest and sales** shows Harvests, Sales and Crate types. The Setup links to Size grades and Price tables, which opened pages that do not exist, are removed (DEC-144).
+- **A saved harvest's section links** (Overview, Size grades, Dispatches & sales) move down the page instead of leaving it. A link shows only when its section does.
+- **Feeding or chemical use dated before its lot was received** is saved with a warning instead of being refused (DEC-143).
+- **A stock adjustment that takes a lot below zero** flags the lot for checking.
+- **Two feeding sheets saved at the same moment** no longer fail one of them.
+
 ### Added and changed (harvests, DEC-140)
 - **Emergency harvests.** A harvest can be Partial, Final or **Emergency**. An Emergency harvest asks for a reason (disease concern, poor water conditions, weather, market opportunity, other), a short explanation (required for Other) and whether shrimp are still in the pond. It is never a batch failure: the batch becomes Harvested only when no shrimp are left, and correcting the answer reopens it. A batch has one harvest that empties the pond, and none can be dated after it.
 - **One batch lifecycle.** New batches move from Stocked to Harvested when a Final harvest or an Emergency Harvest with no shrimp left empties the pond, then to Closed when the Owner finalizes the records. An Emergency Harvest with shrimp remaining leaves the batch Stocked. The separate Declare failure action is no longer shown in the batch page. Historical batches stored with the retired Failed status are presented as Harvested; their underlying history is retained. The old API endpoint remains for compatibility only.
