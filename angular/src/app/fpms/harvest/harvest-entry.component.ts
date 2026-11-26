@@ -97,14 +97,14 @@ import { DisposalReasons } from '@shared/fpms/labels';
                     <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="harvest" [fpmsReviewNew]="isNew" novalidate>
                         <fieldset [disabled]="readOnly">
                             <nav class="fpms-harvest-entry-nav mb-3" aria-label="Harvest form sections">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-details', $event)">Harvest details</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-crates', $event)">Crate tally</button>
+                                <a class="btn btn-sm btn-outline-secondary" role="button" tabindex="0" (click)="scrollToSection('harvest-details', $event)" (keydown.enter)="scrollToSection('harvest-details', $event)">Harvest details</a>
+                                <a class="btn btn-sm btn-outline-secondary" role="button" tabindex="0" (click)="scrollToSection('harvest-crates', $event)" (keydown.enter)="scrollToSection('harvest-crates', $event)">Crate tally</a>
                                 @if (showGrades()) {
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-grades', $event)">Size grading</button>
+                                    <a class="btn btn-sm btn-outline-secondary" role="button" tabindex="0" (click)="scrollToSection('harvest-grades', $event)" (keydown.enter)="scrollToSection('harvest-grades', $event)">Size grading</a>
                                 }
-                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-outcomes', $event)">Not-sold outcomes</button>
+                                <a class="btn btn-sm btn-outline-secondary" role="button" tabindex="0" (click)="scrollToSection('harvest-outcomes', $event)" (keydown.enter)="scrollToSection('harvest-outcomes', $event)">Not-sold outcomes</a>
                                 @if (isNew && m.buyerId && canSell) {
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="scrollToSection('harvest-sale', $event)">Sale</button>
+                                    <a class="btn btn-sm btn-outline-secondary" role="button" tabindex="0" (click)="scrollToSection('harvest-sale', $event)" (keydown.enter)="scrollToSection('harvest-sale', $event)">Sale</a>
                                 }
                             </nav>
                             <div class="card" id="harvest-details">
