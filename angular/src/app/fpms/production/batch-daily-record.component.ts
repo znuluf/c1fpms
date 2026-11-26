@@ -357,7 +357,7 @@ export class BatchDailyRecordComponent implements OnInit {
     /** Scroll within the daily record without navigating back to the app root. */
     scrollToSection(id: string, event: Event): void {
         event.preventDefault();
-        this.host.nativeElement.querySelector<HTMLElement>(`#${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        (this.host.nativeElement.querySelector(`#${id}`) as HTMLElement | null)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     /** The batch from Batch/Get. A new object (after a save) reloads the records shown. */
