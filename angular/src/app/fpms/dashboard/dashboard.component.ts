@@ -686,7 +686,7 @@ export class DashboardComponent extends FpmsPage implements OnInit {
                 whereSub: r.batchCode,
                 whereLink: ['/app/production/batches', r.batchId],
                 since: `Since ${this.shortDate(first)}`,
-                action: this.can('Farm.Logs.Create') ? 'Open feeding sheet' : 'See daily status',
+                action: this.can('Farm.Logs.Create') ? 'Open Feeding' : 'See daily status',
                 actionLink: this.can('Farm.Logs.Create') ? ['/app/logbook/feeding'] : ['/app/logbook/status'],
                 actionParams: this.can('Farm.Logs.Create') ? { batchId: r.batchId, date: first } : undefined,
             });
