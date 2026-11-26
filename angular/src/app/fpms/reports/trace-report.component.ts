@@ -922,7 +922,7 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
             if (!f.sfscNo) out.push({ what: 'Shrimp Fry Source Certificate number', where: 'Origin · ' + f.hatcheryBatchNumber, action: 'Open fry delivery', link: delivery });
             if (!f.bfarAccreditationNo) out.push({ what: 'Hatchery BFAR accreditation number', where: 'Origin · ' + f.hatcheryName, action: 'Open hatcheries', link: ['/app/resources/hatcheries'] });
         }
-        if (!t.bfarRegistrationNo) out.push({ what: 'Farm BFAR registration number', where: 'Farm profile · Permits and licenses', action: 'Open permits and licenses', link: ['/app/farm/documents'] });
+        if (!t.bfarRegistrationNo) out.push({ what: 'Farm BFAR registration number', where: 'Farm · Permits and licenses', action: 'Open permits and licenses', link: ['/app/farm/documents'] });
         for (const l of t.feedLots ?? []) {
             if (!l.lotNumber) out.push({ what: `Lot number for ${l.product}`, where: 'Grow-out · feed', action: 'Open inventory', link: ['/app/inventory'] });
         }
@@ -951,11 +951,11 @@ export class TraceReportComponent extends FpmsPage implements OnInit {
             }
             sections.set(section, items);
         }
-        const order = ['Origin', 'Farm profile', 'Grow-out', 'Where it went'];
+        const order = ['Origin', 'Farm', 'Grow-out', 'Where it went'];
         return [...sections.entries()]
             .sort((a, b) => (order.indexOf(a[0]) + 99) % 99 - (order.indexOf(b[0]) + 99) % 99)
             .map(([section, items]) => ({
-                section: section === 'Farm profile' ? 'Farm' : section,
+                section,
                 items: items.map((i) => {
                     const dates = [...new Set(i.whens)].sort().map((d) => FarmTime.date(String(d).substring(0, 10)));
                     const records = i.count > 1 ? `${i.count} records` : '';
