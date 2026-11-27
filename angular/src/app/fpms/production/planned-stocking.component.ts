@@ -26,7 +26,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <label for="ps-pond">Grow-out pond</label>
                                     <select id="ps-pond" class="form-control" [(ngModel)]="form()!.pondId">
                                         <option value="">Choose a pond</option>
-                                        @for (p of ponds(); track p.id) { <option [value]="p.id">{{ p.pondCode }} · {{ p.prefixName || 'Grow-out pond' }}</option> }
+                                        @for (p of ponds(); track p.id) { <option [value]="p.id">{{ p.pondCode }} · {{ p.name || 'Grow-out pond' }}</option> }
                                     </select>
                                 </div>
                                 <div class="form-group col-md-4">
@@ -110,7 +110,7 @@ export class PlannedStockingComponent extends FpmsPage implements OnInit {
         ]);
         this.plans.set(plans ?? []);
         this.ponds.set((ponds ?? []).filter((p) => p.purpose === 1 && p.manualStatus !== 3 && !p.isArchived));
-        this.deliveries.set((deliveryPage?.items ?? []).filter((d) => d.status !== 4 && d.status !== 5));
+        this.deliveries.set((deliveryPage?.items ?? []).filter((d) => d.status !== 4 && d.status !== 5 && !d.isStockingFinished && d.plLeft > 0));
     }
 
     startNew(): void {
