@@ -28,6 +28,15 @@ public class IndicatorsDto
     public decimal? SurvivalRatePct { get; set; }
     public decimal? EstimatedSurvivalPct { get; set; }
 
+    /// <summary>Advisory harvest projection from recent growth samples; null dates mean the forecast is unavailable.</summary>
+    public DateOnly? EstimatedHarvestFrom { get; set; }
+    public DateOnly? EstimatedHarvestTo { get; set; }
+    public string HarvestForecastConfidence { get; set; }
+    public string HarvestForecastReason { get; set; }
+    public DateOnly? HarvestForecastSampleDate { get; set; }
+    public decimal? HarvestForecastLatestAbwG { get; set; }
+    public decimal? HarvestForecastGrowthRateGPerDay { get; set; }
+
     /// <summary>"Estimate" or "Mortality": what remaining population and biomass are based on (DEC-53).</summary>
     public string PopulationBasis { get; set; }
 
