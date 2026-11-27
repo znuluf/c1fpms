@@ -64,7 +64,7 @@ export class SectionNav {
     });
 
     /** The bar shows when there is something to choose: more than one tab, or an action. A page that is no tab hides it. */
-    readonly barVisible = computed(() => !!this.activeRoute() && (this.tabs().length > 1 || this.actions().length > 0));
+    readonly barVisible = computed(() => this.section()?.key !== 'resources' && !!this.activeRoute() && (this.tabs().length > 1 || this.actions().length > 0));
 
     /** Counts by page route, e.g. the number of size grades. Undefined until known. */
     readonly counts = signal<Record<string, number>>({});
