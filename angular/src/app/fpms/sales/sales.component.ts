@@ -81,60 +81,63 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 <div class="card card-outline card-primary">
                                     <div class="card-header">
                                         <h3 id="payment-dialog-title" class="card-title">
-                                <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
-                                Add payment: {{ payment.sale.dispatchReceiptNo }}, {{ payment.sale.buyerName }} (balance
-                                {{ payment.sale.balance | php }})
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-row align-items-end">
-                                <div class="form-group col-md-3 mb-0">
-                                    <label for="pon">Paid on</label>
-                                    <input
-                                        id="pon"
-                                        type="date"
-                                        class="form-control"
-                                        [(ngModel)]="payment.paidOn"
-                                        [min]="payment.sale.saleDate"
-                                        [max]="today" />
-                                </div>
-                                <div class="form-group col-md-3 mb-0">
-                                    <label for="amt">Amount (₱)</label>
-                                    <input
-                                        id="amt"
-                                        type="number"
-                                        min="0.01"
-                                        step="0.01"
-                                        class="form-control"
-                                        [(ngModel)]="payment.amount" />
-                                </div>
-                                <div class="form-group col-md-3 mb-0">
-                                    <label for="mth">Method</label>
-                                    <input
-                                        id="mth"
-                                        class="form-control"
-                                        [(ngModel)]="payment.method"
-                                        maxlength="50"
-                                        placeholder="cash, bank transfer, GCash" />
-                                </div>
-                                <div class="form-group col-md-3 mb-0">
-                                    <button
-                                        class="btn btn-outline-secondary btn-sm"
-                                        (click)="payment.amount = payment.sale.balance">
-                                        Pay the balance
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <button
-                                class="btn btn-primary mr-2"
-                                [disabled]="busy() || !(payment.amount > 0) || !payment.paidOn"
-                                (click)="savePayment()">
-                                Save payment
-                            </button>
-                            <button class="btn btn-default" (click)="payment = null">Cancel</button>
+                                            <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
+                                            Add payment: {{ payment.sale.dispatchReceiptNo }}, {{ payment.sale.buyerName }} (balance
+                                            {{ payment.sale.balance | php }})
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-row align-items-end">
+                                            <div class="form-group col-md-3 mb-0">
+                                                <label for="pon">Paid on</label>
+                                                <input
+                                                    id="pon"
+                                                    type="date"
+                                                    class="form-control"
+                                                    [(ngModel)]="payment.paidOn"
+                                                    [min]="payment.sale.saleDate"
+                                                    [max]="today" />
+                                            </div>
+                                            <div class="form-group col-md-3 mb-0">
+                                                <label for="amt">Amount (₱)</label>
+                                                <input
+                                                    id="amt"
+                                                    type="number"
+                                                    min="0.01"
+                                                    step="0.01"
+                                                    class="form-control"
+                                                    [(ngModel)]="payment.amount" />
+                                            </div>
+                                            <div class="form-group col-md-3 mb-0">
+                                                <label for="mth">Method</label>
+                                                <input
+                                                    id="mth"
+                                                    class="form-control"
+                                                    [(ngModel)]="payment.method"
+                                                    maxlength="50"
+                                                    placeholder="cash, bank transfer, GCash" />
+                                            </div>
+                                            <div class="form-group col-md-3 mb-0">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-outline-secondary btn-sm"
+                                                    (click)="payment.amount = payment.sale.balance">
+                                                    Pay the balance
+                                                </button>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary mr-2"
+                                            [disabled]="busy() || !(payment.amount > 0) || !payment.paidOn"
+                                            (click)="savePayment()">
+                                            Save payment
+                                        </button>
+                                        <button type="button" class="btn btn-default" (click)="payment = null">Cancel</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
