@@ -15,6 +15,8 @@ interface Allocation {
     technicianUserIds: number[];
     initialSurvivalEstimatePct: number | null;
     deadAtStocking: number | null;
+    targetHarvestAbwG: number | null;
+    maxCultureDays: number;
     readings: Record<string, number | null>;
 }
 
@@ -160,6 +162,23 @@ interface Allocation {
                                         }
                                     </div>
                                     <div class="card-body">
+                                        <h4 class="fpms-section-h mt-3">Harvest targets</h4>
+                                        <p class="small text-muted">Set the target shrimp weight and maximum culture duration for this batch. The maximum DOC is a limit, not a required waiting period.</p>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label [for]="'ta' + a.pond.id">Target harvest ABW (g)</label>
+                                                <input [id]="'ta' + a.pond.id" type="number" min="0.1" max="60" step="0.1" class="form-control" [(ngModel)]="a.targetHarvestAbwG" />
+                                                <small class="form-text text-muted">{{ options.defaultHarvestTargetAbwG != null ? 'Farm default: ' + options.defaultHarvestTargetAbwG + ' g. Change for this batch if needed.' : 'No farm default set. Enter a target for this batch, or leave blank if not yet decided.' }}</small>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label [for]="'mc' + a.pond.id">Maximum culture duration (DOC)</label>
+                                                <div class="input-group">
+                                                    <input [id]="'mc' + a.pond.id" type="number" min="1" max="180" step="1" class="form-control" [(ngModel)]="a.maxCultureDays" required />
+                                                    <div class="input-group-append"><span class="input-group-text">days</span></div>
+                                                </div>
+                                                <small class="form-text text-muted">Farm default: {{ options.defaultMaxCultureDays }} days. This does not prevent earlier harvest when target ABW is reached.</small>
+                                            </div>
+                                        </div>
                                         <div class="form-row">
                                             <div class="form-group col-md-6">
                                                 <label [for]="'sa' + a.pond.id">Stocking date and time <span class="text-danger">*</span></label>
@@ -450,6 +469,8 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
             technicianUserIds: [],
             initialSurvivalEstimatePct: null,
             deadAtStocking: null,
+            targetHarvestAbwG: options.defaultHarvestTargetAbwG ?? null,
+            maxCultureDays: options.defaultMaxCultureDays ?? 90,
             readings: Object.fromEntries(this.stockingParams.map((p) => [p.code, null])),
         }));
         this.options = options;
@@ -508,6 +529,8 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
         a.acclimationMinutes = f.acclimationMinutes;
         a.initialSurvivalEstimatePct = f.initialSurvivalEstimatePct;
         a.deadAtStocking = f.deadAtStocking;
+        a.targetHarvestAbwG = f.targetHarvestAbwG;
+        a.maxCultureDays = f.maxCultureDays;
         a.technicianUserIds = [...f.technicianUserIds];
         a.readings = { ...f.readings };
     }
@@ -528,6 +551,8 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
                 acclimationMinutes: a.acclimationMinutes,
                 initialSurvivalEstimatePct: a.initialSurvivalEstimatePct,
                 deadAtStocking: a.deadAtStocking,
+                targetHarvestAbwG: a.targetHarvestAbwG,
+                maxCultureDays: a.maxCultureDays,
                 technicianUserIds: a.technicianUserIds,
                 readings: this.stockingParams.map((p) => ({ parameterCode: p.code, value: a.readings[p.code] })),
             })),

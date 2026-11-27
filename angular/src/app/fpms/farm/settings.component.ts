@@ -33,6 +33,21 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                             </select>
                                             <small class="form-text text-muted">Used by each pond unless that pond has its own farming system.</small>
                                         </div>
+                                        <div class="form-row mt-3">
+                                            <div class="form-group col-md-6">
+                                                <label for="habw">Default target harvest ABW (g)</label>
+                                                <input id="habw" type="number" min="0.1" max="60" step="0.1" class="form-control" name="defaultHarvestTargetAbwG" [(ngModel)]="p.defaultHarvestTargetAbwG" />
+                                                <small class="form-text text-muted">Optional farm default. Farmers can adjust the target for each batch before stocking.</small>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="mcd">Maximum culture duration (DOC)</label>
+                                                <div class="input-group">
+                                                    <input id="mcd" type="number" min="1" max="180" step="1" class="form-control" name="defaultMaxCultureDays" [(ngModel)]="p.defaultMaxCultureDays" required />
+                                                    <div class="input-group-append"><span class="input-group-text">days</span></div>
+                                                </div>
+                                                <small class="form-text text-muted">Default is 90 days. This is a maximum time limit, not a minimum harvest age.</small>
+                                            </div>
+                                        </div>
                                         <div class="form-group mb-0">
                                             <span class="fpms-group-label" id="ftimes-l">Default feeding schedule</span>
                                             <fpms-time-list name="feedingTimes" [(ngModel)]="p.feedingTimes"></fpms-time-list>
@@ -154,6 +169,8 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                             <div class="card-body">
                                 <dl class="row mb-0 fpms-dl">
                                     <dt class="col-sm-4">Farming system</dt><dd class="col-sm-8">{{ p.farmingSystem | label: L.FarmingSystems }}</dd>
+                                    <dt class="col-sm-4">Default harvest target</dt><dd class="col-sm-8">{{ p.defaultHarvestTargetAbwG != null ? p.defaultHarvestTargetAbwG + ' g ABW' : 'Not configured' }}</dd>
+                                    <dt class="col-sm-4">Maximum culture duration</dt><dd class="col-sm-8">{{ p.defaultMaxCultureDays }} DOC</dd>
                                     <dt class="col-sm-4">Feeding schedule</dt><dd class="col-sm-8">{{ feedingCount() }} a day: {{ p.feedingTimes }}</dd>
                                 </dl>
                             </div>
