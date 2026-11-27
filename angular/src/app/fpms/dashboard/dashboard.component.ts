@@ -135,6 +135,44 @@ const SETUP_STEPS = ['profile', 'ponds'];
                         </section>
                     }
 
+                    @if (upcomingHarvests().length) {
+                        <section class="fpms-upcoming" aria-labelledby="upcoming-h">
+                            <div class="fpms-upcoming-head">
+                                <div>
+                                    <h2 id="upcoming-h" class="fpms-section-h mb-1">Upcoming harvests</h2>
+                                    <p class="text-muted mb-0">Planning estimates for the next 30 days. Confirm readiness and withdrawal requirements before harvesting.</p>
+                                </div>
+                                <span class="fpms-upcoming-count">{{ upcomingHarvests().length }} batches</span>
+                            </div>
+                            <div class="fpms-upcoming-summary">
+                                <div><span>Upcoming batches</span><strong>{{ upcomingHarvests().length }}</strong></div>
+                                <div><span>Current estimated biomass</span><strong>{{ upcomingBiomass() | number:'1.0-1' }} kg</strong></div>
+                                <div><span>Nearest date</span><strong>{{ shortDate(upcomingHarvests()[0].estimatedDate) }}</strong></div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm fpms-upcoming-table mb-0">
+                                    <thead><tr><th scope="col">Pond / batch</th><th scope="col">Estimated date</th><th scope="col">DOC</th><th scope="col">ABW (g)</th><th scope="col">Estimated biomass</th></tr></thead>
+                                    <tbody>
+                                        @for (h of upcomingHarvests(); track h.batchId) {
+                                            <tr>
+                                                <td><a [routerLink]="['/app/production/batches', h.batchId]"><strong>{{ h.pondCode }}</strong><span class="d-block text-muted small">{{ batchShort(h.batchCode) }}</span></a></td>
+                                                <td><strong>{{ shortDate(h.estimatedDate) }}</strong><span class="d-block text-muted small">{{ h.dateBasis }}</span></td>
+                                                <td>{{ h.doc }}</td>
+                                                <td>{{ h.currentAbwG === null ? '–' : (h.currentAbwG | num:1) }}<span class="text-muted small" *ngIf="h.targetAbwG"> / {{ h.targetAbwG | num:1 }} target</span></td>
+                                                <td>{{ h.estimatedBiomassKg === null ? '–' : (h.estimatedBiomassKg | num:1) + ' kg' }}</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    } @else if (hasStockedBatches()) {
+                        <section class="fpms-upcoming fpms-upcoming-empty" aria-labelledby="upcoming-h">
+                            <h2 id="upcoming-h" class="fpms-section-h mb-1">Upcoming harvests</h2>
+                            <p class="text-muted mb-0">No harvest estimates fall within the next 30 days. Estimates appear when a batch has a configured maximum culture duration.</p>
+                        </section>
+                    }
+
                     <!-- Ponds and log calendar (DEC-102): one row per pond, so a day reads down every pond. A row is the pond, its
                          last 7 days, then Day, ABW, FCR and survival; last sample and water status are on Daily log status. -->
                     <section class="fpms-ponds" aria-labelledby="cal-h">
@@ -420,6 +458,28 @@ const SETUP_STEPS = ['profile', 'ponds'];
                 height: 38px;
                 width: auto;
             }
+            .fpms-upcoming {
+                margin: 0 0 1.25rem;
+                padding: 1rem;
+                border: 1px solid var(--fpms-border);
+                border-radius: var(--fpms-r-card, 0.75rem);
+                background: var(--fpms-surface, #fff);
+            }
+            .fpms-upcoming-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:.75rem; }
+            .fpms-upcoming-count { color:var(--fpms-muted); font-size:.85rem; white-space:nowrap; }
+            .fpms-upcoming-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; padding:.75rem; margin-bottom:.75rem; background:var(--fpms-subtle, #f7f8fa); border-radius:.5rem; }
+            .fpms-upcoming-summary div { display:flex; flex-direction:column; gap:.15rem; min-width:0; }
+            .fpms-upcoming-summary span { color:var(--fpms-muted); font-size:.78rem; }
+            .fpms-upcoming-summary strong { color:var(--fpms-text); font-size:1.05rem; }
+            .fpms-upcoming-table { min-width:600px; }
+            .fpms-upcoming-table th { color:var(--fpms-muted); font-size:.78rem; font-weight:600; white-space:nowrap; }
+            .fpms-upcoming-table td { vertical-align:middle; }
+            .fpms-upcoming-empty { padding:1rem; }
+            @media (max-width: 575.98px) {
+                .fpms-upcoming { padding:.75rem; }
+                .fpms-upcoming-summary { grid-template-columns:1fr 1fr; }
+                .fpms-upcoming-summary div:last-child { grid-column:1 / -1; }
+            }
         `,
     ],
 })
@@ -449,6 +509,15 @@ export class DashboardComponent extends FpmsPage implements OnInit {
         this.d.set(data);
         this.s.set(status ?? { rows: [] });
     }
+
+    upcomingHarvests = computed<any[]>(() => {
+        const rows = ((this.d()?.upcomingHarvests as any[]) ?? [])
+            .filter(h => h.estimatedDate && String(h.estimatedDate).substring(0, 10) <= FarmTime.addDays(this.today, 30))
+            .sort((a, b) => String(a.estimatedDate).localeCompare(String(b.estimatedDate)));
+        return rows;
+    });
+    upcomingBiomass = computed(() => this.upcomingHarvests().reduce((sum, h) => sum + (h.estimatedBiomassKg ?? 0), 0));
+    hasStockedBatches = computed(() => ((this.d()?.ponds as any[]) ?? []).some(p => p.batchStatus === 2));
 
     // ---- calendar
 

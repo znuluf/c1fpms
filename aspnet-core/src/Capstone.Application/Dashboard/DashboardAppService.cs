@@ -157,6 +157,20 @@ public class HarvestReadinessAlertDto
     public DateOnly? EarliestSafeHarvestDate { get; set; }
 }
 
+public class UpcomingHarvestDto
+{
+    public Guid BatchId { get; set; }
+    public string BatchCode { get; set; }
+    public string PondCode { get; set; }
+    public DateOnly EstimatedDate { get; set; }
+    /// <summary>Projected from recent ABW growth, already at target, or a maximum-DOC review deadline.</summary>
+    public string DateBasis { get; set; }
+    public int Doc { get; set; }
+    public decimal? CurrentAbwG { get; set; }
+    public decimal? TargetAbwG { get; set; }
+    public decimal? EstimatedBiomassKg { get; set; }
+}
+
 public class HighMortalityDto
 {
     public Guid LogId { get; set; }
@@ -178,6 +192,7 @@ public class DashboardDto
     public List<WaterQualityAlertDto> WaterQualityAlerts { get; set; } = new();
     public List<HighMortalityDto> HighMortality { get; set; } = new();
     public List<HarvestReadinessAlertDto> HarvestReadinessAlerts { get; set; } = new();
+    public List<UpcomingHarvestDto> UpcomingHarvests { get; set; } = new();
     public List<StockAlertDto> StockAlerts { get; set; } = new();
     public List<DocumentAlertDto> DocumentAlerts { get; set; } = new();
 
@@ -369,7 +384,65 @@ public class DashboardAppService : CapstoneAppServiceBase
             {
                 var batchFacts = facts.TryGetValue(batch.Id, out var f) ? f : new BatchFacts();
                 var ind = IndicatorCalculator.Compute(batchFacts, today);
-                var latestGrowthSample = batchFacts.GrowthSamples.OrderByDescending(g => g.ObservedAtUtc).FirstOrDefault();
+                var latestGrowthSample = batchFacts.GrowthSamples.Where(g => g.Date <= today).OrderByDescending(g => g.ObservedAtUtc).FirstOrDefault();
+
+                // Upcoming harvest is a planning estimate, never an automatic harvest decision.
+                // Prefer a recent, positive measured growth trend; otherwise show the max-DOC date as a review deadline.
+                if (batch.Status == BatchStatus.Stocked && batch.MaxCultureDays.HasValue)
+                {
+                    var maxDocDate = batch.StockingDate.Value.AddDays(batch.MaxCultureDays.Value);
+                    var estimatedDate = maxDocDate < today ? today : maxDocDate;
+                    var dateBasis = "Review by maximum DOC";
+
+                    if (batch.TargetHarvestAbwG.HasValue && latestGrowthSample != null && latestGrowthSample.Date >= today.AddDays(-14))
+                    {
+                        if (latestGrowthSample.AbwG >= batch.TargetHarvestAbwG.Value)
+                        {
+                            estimatedDate = today;
+                            dateBasis = "Target ABW reached";
+                            var safeDate = await _withdrawal.EarliestSafeHarvestDateAsync(batch.Id, zone);
+                            if (safeDate.HasValue && safeDate.Value > estimatedDate)
+                            {
+                                estimatedDate = safeDate.Value;
+                                dateBasis = "Target reached · withdrawal period";
+                            }
+                        }
+                        else
+                        {
+                            var prior = batchFacts.GrowthSamples
+                                .Where(g => g.Date < latestGrowthSample.Date && g.Date >= latestGrowthSample.Date.AddDays(-30))
+                                .OrderByDescending(g => g.ObservedAtUtc)
+                                .FirstOrDefault();
+                            var rate = prior == null ? null : IndicatorCalculator.GrowthRate(prior.AbwG, prior.Date, latestGrowthSample.AbwG, latestGrowthSample.Date);
+                            if (rate.HasValue && rate.Value > 0)
+                            {
+                                var daysToTarget = (int)decimal.Ceiling((batch.TargetHarvestAbwG.Value - latestGrowthSample.AbwG) / rate.Value);
+                                var projectedDate = latestGrowthSample.Date.AddDays(Math.Max(0, daysToTarget));
+                                if (projectedDate <= maxDocDate)
+                                {
+                                    estimatedDate = projectedDate < today ? today : projectedDate;
+                                    dateBasis = "Projected from recent growth";
+                                }
+                            }
+                        }
+                    }
+
+                    if (estimatedDate <= today.AddDays(30))
+                    {
+                        dto.UpcomingHarvests.Add(new UpcomingHarvestDto
+                        {
+                            BatchId = batch.Id,
+                            BatchCode = batch.BatchCode,
+                            PondCode = tile.PondCode,
+                            EstimatedDate = estimatedDate,
+                            DateBasis = dateBasis,
+                            Doc = ind.Doc ?? 0,
+                            CurrentAbwG = ind.CurrentAbwG,
+                            TargetAbwG = batch.TargetHarvestAbwG,
+                            EstimatedBiomassKg = ind.EstimatedBiomassKg,
+                        });
+                    }
+                }
                 if (batch.Status == BatchStatus.Stocked && batch.TargetHarvestAbwG.HasValue && latestGrowthSample != null && latestGrowthSample.Date <= today && latestGrowthSample.Date >= today.AddDays(-7) && latestGrowthSample.AbwG >= batch.TargetHarvestAbwG.Value)
                 {
                     dto.HarvestReadinessAlerts.Add(new HarvestReadinessAlertDto { BatchId = batch.Id, BatchCode = batch.BatchCode, PondCode = tile.PondCode, Doc = ind.Doc.Value, AbwG = latestGrowthSample.AbwG, SampleDate = latestGrowthSample.Date, EarliestSafeHarvestDate = await _withdrawal.EarliestSafeHarvestDateAsync(batch.Id, zone) });
