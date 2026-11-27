@@ -44,10 +44,10 @@ import { ToolbarChip } from '@shared/fpms/ui';
         <section class="content px-2 pb-3">
             <div class="container-fluid">
                 @if (form) {
-                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
+                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="fry-delivery-dialog-title"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
                             <div class="card-header">
-                                <h3 class="card-title">
+                                <h3 id="fry-delivery-dialog-title" class="card-title">
                                     <i class="fas fa-truck" aria-hidden="true"></i>
                                     {{ arrived ? 'Record fry received' : 'Record an order' }}
                                 </h3>
