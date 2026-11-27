@@ -314,6 +314,11 @@ interface CalMonth {
                                             <div><dt>Initial survival est.</dt><dd>{{ b.initialSurvivalEstimatePct != null ? b.initialSurvivalEstimatePct + '%' : '—' }}</dd></div>
                                             <div><dt>Acclimation</dt><dd>{{ b.acclimationMinutes != null ? b.acclimationMinutes + ' min' : '—' }}</dd></div>
                                         </dl>
+                                        <h3 class="fpms-section-h">Harvest targets</h3>
+                                        <dl class="fpms-facts">
+                                            <div><dt>Target harvest ABW</dt><dd>{{ b.targetHarvestAbwG != null ? (b.targetHarvestAbwG | num: 1) + ' g' : 'Not configured' }}</dd></div>
+                                            <div><dt>Maximum culture duration</dt><dd>{{ b.maxCultureDays != null ? b.maxCultureDays + ' DOC' : '—' }}</dd></div>
+                                        </dl>
                                         <h3 class="fpms-section-h">Pond at stocking</h3>
                                         <dl class="fpms-facts">
                                             <div><dt>Pond</dt><dd><a [routerLink]="['/app/ponds', b.pondId]">{{ b.pondCode }}</a> · {{ b.pondAreaM2AtStocking | num: 0 }} m²</dd></div>
