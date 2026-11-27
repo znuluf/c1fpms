@@ -69,6 +69,7 @@ const CLOSED = 5;
                                         <th class="text-right">ABW (g)</th>
                                         <th class="text-right">FCR</th>
                                         <th class="text-right" title="Estimated survival">Survival</th>
+                                        <th title="Projected harvest window from recent growth samples">Est. harvest</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -92,6 +93,14 @@ const CLOSED = 5;
                                                     @if (b.estimatedSurvivalPct > 100) { <div title="Check the stocking count and the latest survival estimate">Above 100%</div> }
                                                 } @else {
                                                     —
+                                                }
+                                            </td>
+                                            <td class="text-nowrap" [title]="b.harvestForecastReason || ('Based on sample from ' + (b.harvestForecastSampleDate | farmDate) + ' at ' + b.harvestForecastGrowthRateGPerDay + ' g/day')">
+                                                @if (b.estimatedHarvestFrom && b.estimatedHarvestTo) {
+                                                    {{ b.estimatedHarvestFrom | farmDate }} – {{ b.estimatedHarvestTo | farmDate }}
+                                                    <div class="text-muted small">{{ b.harvestForecastConfidence }} confidence</div>
+                                                } @else {
+                                                    <span class="text-muted">Unavailable</span>
                                                 }
                                             </td>
                                         </tr>
