@@ -16,9 +16,9 @@ import { ClientListFilter } from '@shared/fpms/client-list';
         <section class="content px-2 pb-3">
             <div class="container-fluid">
                 @if (form) {
-                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
+                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="buyer-dialog-title"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
-                            <div class="card-header"><h3 class="card-title">{{ form.id === empty ? 'New buyer' : 'Edit ' + form.name }}</h3></div>
+                            <div class="card-header"><h3 id="buyer-dialog-title" class="card-title">{{ form.id === empty ? 'New buyer' : 'Edit ' + form.name }}</h3></div>
                             <form #f="ngForm" (ngSubmit)="save()" fpmsReview="buyer" [fpmsReviewNew]="form.id === empty" novalidate>
                                 <div class="card-body">
                                     <div class="form-group">
