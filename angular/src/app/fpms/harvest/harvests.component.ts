@@ -26,6 +26,11 @@ import { ToolbarChip } from '@shared/fpms/ui';
                     Export CSV
                 </button>
             }
+            @if (can('Farm.Harvests.Create')) {
+                <a routerLink="/app/harvests/new" class="btn btn-primary ml-2">
+                    <i class="fas fa-plus mr-1" aria-hidden="true"></i>Record harvest
+                </a>
+            }
         </fpms-page-header>
         <section class="content px-2 pb-3">
             <div class="container-fluid">
