@@ -40,7 +40,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                     <div>
                         <div class="mb-3" role="group" aria-label="Report">
                             @for (o of reports; track o.key) {
-                                <button type="button" class="rp-chip" [attr.aria-pressed]="key === o.key" (click)="key = o.key; r = null">{{ o.label }}</button>
+                                <button type="button" class="fpms-chip" [attr.aria-pressed]="key === o.key" (click)="key = o.key; r = null">{{ o.label }}</button>
                             }
                         </div>
                         <div class="form-row align-items-end">
@@ -567,37 +567,6 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
             </div>
         </section>
     `,
-    styles: [
-        `
-            .rp-chip {
-                min-height: 36px;
-                padding: 0 0.9rem;
-                margin: 0 0.4rem 0.4rem 0;
-                border-radius: 18px;
-                border: 1px solid var(--fpms-line-strong);
-                background: var(--fpms-ground-muted);
-                color: var(--fpms-text);
-                transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease), color var(--fpms-motion) var(--fpms-ease);
-                font-size: 0.9rem;
-                cursor: pointer;
-            }
-
-            .rp-chip:hover,
-            .rp-chip:focus-visible {
-                background: var(--fpms-tide-50);
-                border-color: var(--fpms-primary);
-                color: var(--fpms-primary-dark);
-            }
-            .rp-chip:focus-visible {
-                outline: 2px solid var(--fpms-primary);
-                outline-offset: 2px;
-            }            .rp-chip[aria-pressed='true'] {
-                background: var(--fpms-primary);
-                border-color: var(--fpms-primary);
-                color: var(--fpms-surface);
-            }
-        `,
-    ],
 })
 export class ReportsComponent extends FpmsPage implements OnInit {
     readonly batchShort = batchShort;

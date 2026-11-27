@@ -27,9 +27,9 @@ interface Sheet {
                 <div class="card no-print">
                     <div class="card-body">
                         <div class="mb-3" role="group" aria-label="Sheet">
-                            <button type="button" class="ls-chip" [attr.aria-pressed]="selected === 'all'" (click)="selected = 'all'">All sheets</button>
+                            <button type="button" class="fpms-chip" [attr.aria-pressed]="selected === 'all'" (click)="selected = 'all'">All sheets</button>
                             @for (s of sheets; track s.key) {
-                                <button type="button" class="ls-chip" [attr.aria-pressed]="selected === s.key" (click)="selected = s.key">{{ s.short }}</button>
+                                <button type="button" class="fpms-chip" [attr.aria-pressed]="selected === s.key" (click)="selected = s.key">{{ s.short }}</button>
                             }
                         </div>
                         <div class="form-row align-items-end">
@@ -98,37 +98,6 @@ interface Sheet {
             </div>
         </section>
     `,
-    styles: [
-        `
-            .ls-chip {
-                min-height: 36px;
-                padding: 0 0.9rem;
-                margin: 0 0.4rem 0.4rem 0;
-                border-radius: 18px;
-                border: 1px solid var(--fpms-line-strong);
-                background: var(--fpms-ground-muted);
-                color: var(--fpms-text);
-                transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease), color var(--fpms-motion) var(--fpms-ease);
-                font-size: 0.9rem;
-                cursor: pointer;
-            }
-
-            .ls-chip:hover,
-            .ls-chip:focus-visible {
-                background: var(--fpms-tide-50);
-                border-color: var(--fpms-primary);
-                color: var(--fpms-primary-dark);
-            }
-            .ls-chip:focus-visible {
-                outline: 2px solid var(--fpms-primary);
-                outline-offset: 2px;
-            }            .ls-chip[aria-pressed='true'] {
-                background: var(--fpms-primary);
-                border-color: var(--fpms-primary);
-                color: var(--fpms-surface);
-            }
-        `,
-    ],
 })
 export class LogSheetsComponent extends FpmsPage implements OnInit {
     /** A4 page with page numbers; sheets with eight or more columns print on landscape. */
