@@ -19,9 +19,9 @@ import { ClientListFilter } from '@shared/fpms/client-list';
         <section class="content px-2 pb-3">
             <div class="container-fluid">
                 @if (itemForm) {
-                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
+                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="inventory-item-dialog-title"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
-                            <div class="card-header"><h3 class="card-title">{{ itemForm.id === empty ? 'New inventory item' : 'Edit ' + itemForm.displayName }}</h3></div>
+                            <div class="card-header"><h3 id="inventory-item-dialog-title" class="card-title">{{ itemForm.id === empty ? 'New inventory item' : 'Edit ' + itemForm.displayName }}</h3></div>
                             <form #itf="ngForm" (ngSubmit)="saveItem()" fpmsReview="item" [fpmsReviewNew]="itemForm.id === empty" novalidate>
                                 <div class="card-body">
                                     <div class="form-row">
@@ -313,8 +313,11 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                 }
 
                 @if (adjust) {
-                    <div class="card card-outline card-primary">
-                        <div class="card-header"><h3 class="card-title">Adjust lot {{ adjust.lot.lotNumber }} (on hand {{ adjust.lot.quantityOnHand | num: 3 }} {{ adjust.lot.unit }})</h3></div>
+                    <div class="fpms-dialog-backdrop">
+                        <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="inventory-adjust-title">
+                            <div class="fpms-dialog-body p-0">
+                                <div class="card card-outline card-primary">
+                                    <div class="card-header"><h3 id="inventory-adjust-title" class="card-title">Adjust lot {{ adjust.lot.lotNumber }} (on hand {{ adjust.lot.quantityOnHand | num: 3 }} {{ adjust.lot.unit }})</h3></div>
                         <form #af="ngForm" (ngSubmit)="saveAdjust()" fpmsReview="adjustment" [fpmsReviewNew]="true" novalidate>
                             <div class="card-body">
                                 <div class="form-row">
@@ -340,8 +343,10 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                 <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !af.form.valid || !adjust.quantity">Save adjustment</button>
                                 <button type="button" class="btn btn-default" (click)="adjust = null">Cancel</button>
                                 <fpms-form-hint [form]="af"></fpms-form-hint>
-                            </div>
-                        </form>
+                                </div>
+                            </form>
+                                </div>
+                        </div>
                     </div>
                 }
 
