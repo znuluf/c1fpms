@@ -2107,3 +2107,84 @@ tr.fpms-clickable-row:focus-visible {
 tr.fpms-clickable-row:hover > td {
     background-color: var(--fpms-ground-muted);
 }
+
+// ---- Final component polish: consistent focus, grouped controls and PrimeNG surfaces
+// Keep focus treatment aligned with the reference palette: blue, not the legacy teal.
+.form-control:focus,
+.custom-select:focus,
+select.form-control:focus {
+    border-color: var(--fpms-accent);
+    box-shadow: 0 0 0 3px rgba(31, 95, 153, 0.18);
+}
+.form-control.ng-invalid.ng-touched:focus,
+form.ng-submitted .form-control.ng-invalid:focus {
+    border-color: var(--fpms-error);
+    box-shadow: 0 0 0 3px rgba(179, 58, 58, 0.16);
+}
+
+// Grouped controls share one visual rhythm without changing their behavior.
+.input-group > .form-control,
+.input-group > .custom-select,
+.input-group > .input-group-prepend > .input-group-text,
+.input-group > .input-group-append > .input-group-text {
+    min-height: 42px;
+}
+.input-group > .input-group-prepend > .input-group-text,
+.input-group > .input-group-append > .input-group-text {
+    border-radius: var(--fpms-r-control);
+}
+.input-group > .form-control:not(:first-child),
+.input-group > .custom-select:not(:first-child) {
+    border-top-left-radius: var(--fpms-r-control);
+    border-bottom-left-radius: var(--fpms-r-control);
+}
+.input-group > .form-control:not(:last-child),
+.input-group > .custom-select:not(:last-child) {
+    border-top-right-radius: var(--fpms-r-control);
+    border-bottom-right-radius: var(--fpms-r-control);
+}
+
+// PrimeNG paginator: bring the remaining third-party control into the same light, quiet component language.
+.p-paginator {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    border: 0;
+    border-top: 1px solid var(--fpms-line);
+    border-radius: 0 0 var(--fpms-r-card) var(--fpms-r-card);
+    background: var(--fpms-surface);
+    color: var(--fpms-muted);
+}
+.p-paginator .p-paginator-element {
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--fpms-r-control);
+    color: var(--fpms-text);
+}
+.p-paginator .p-paginator-element:not(.p-disabled):hover {
+    border-color: var(--fpms-line);
+    background: var(--fpms-tide-50);
+    color: var(--fpms-primary);
+}
+.p-paginator .p-paginator-element.p-highlight {
+    border-color: var(--fpms-primary);
+    background: var(--fpms-primary);
+    color: #fff;
+}
+.p-paginator .p-paginator-element:focus-visible {
+    outline: 2px solid var(--fpms-accent);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+.p-paginator .p-dropdown {
+    min-height: 2.25rem;
+    border: 1px solid var(--fpms-control-border);
+    border-radius: var(--fpms-r-control);
+    background: var(--fpms-surface);
+}
+.p-paginator .p-dropdown .p-dropdown-label {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+}
