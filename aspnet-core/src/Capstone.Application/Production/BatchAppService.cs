@@ -203,7 +203,10 @@ public class BatchAppService : CapstoneAppServiceBase
         var forecast = HarvestForecastCalculator.Compute(facts, today, harvestDocTarget, harvestAbwTarget, b.Status == BatchStatus.Stocked);
         var counts = await _logs.GetAll().Where(l => l.BatchId == id).GroupBy(l => l.LogType).Select(g => new { g.Key, N = g.Count() }).ToListAsync();
         var hasFinal = await _harvests.GetAll().Where(h => h.BatchId == id).AnyAsync(Harvest.EmptiesPondExpression);
-        var hasHarvest = await _harvests.GetAll().AnyAsync(h => h.BatchId == id);
+        var harvestDates = await _harvests.GetAll().AsNoTracking().Where(h => h.BatchId == id).Select(h => h.HarvestedAtUtc).ToListAsync();
+        var hasHarvest = harvestDates.Count > 0;
+        var firstHarvestDate = hasHarvest ? harvestDates.Min() : (DateTime?)null;
+        var lastHarvestDate = hasHarvest ? harvestDates.Max() : (DateTime?)null;
         var failure = await _failures.GetAll().AsNoTracking().FirstOrDefaultAsync(f => f.BatchId == id);
         var names = await GetUserNamesAsync(new[] { b.ClosedByUserId });
         var isOwner = await IsGrantedAsync(PermissionNames.Production_Manage);
@@ -215,6 +218,8 @@ public class BatchAppService : CapstoneAppServiceBase
         {
             Id = list.Id, BatchCode = list.BatchCode, Letter = list.Letter, CycleId = list.CycleId, CycleCode = list.CycleCode, PondId = list.PondId, PondCode = list.PondCode,
             Status = list.Status, StockingDate = list.StockingDate, PlCountStocked = list.PlCountStocked, Doc = list.Doc, CurrentAbwG = list.CurrentAbwG,
+            FirstHarvestDate = firstHarvestDate.HasValue ? FarmClock.LocalDate(firstHarvestDate.Value, zone) : null,
+            LastHarvestDate = lastHarvestDate.HasValue ? FarmClock.LocalDate(lastHarvestDate.Value, zone) : null,
             FcrToDate = list.FcrToDate, EstimatedSurvivalPct = list.EstimatedSurvivalPct,
             PondAreaM2AtStocking = b.PondAreaM2AtStocking, StockedAtUtc = b.StockedAtUtc, TransportMode = delivery?.TransportMode, TimePackedUtc = delivery?.TimePackedUtc,
             AcclimationMinutes = b.AcclimationMinutes, InitialSurvivalEstimatePct = b.InitialSurvivalEstimatePct,
