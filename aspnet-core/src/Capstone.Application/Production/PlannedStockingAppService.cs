@@ -64,7 +64,7 @@ public class PlannedStockingAppService : CapstoneAppServiceBase
     public virtual async Task<List<PlannedStockingDto>> GetAll()
     {
         var plans = await _plans.GetAll().AsNoTracking()
-            .Include(x => x.Pond)
+            .Include(x => x.Pond).ThenInclude(x => x.Prefix)
             .Include(x => x.FryDelivery).ThenInclude(x => x.Hatchery)
             .OrderBy(x => x.PlannedDate).ThenBy(x => x.Pond.PondCode)
             .ToListAsync();
@@ -87,14 +87,12 @@ public class PlannedStockingAppService : CapstoneAppServiceBase
         {
             var delivery = await _deliveries.GetAll().FirstOrDefaultAsync(x => x.Id == input.FryDeliveryId.Value)
                 ?? throw new UserFriendlyException("Fry delivery not found.");
-            if (delivery.Status == FryDeliveryStatus.Cancelled)
-                throw new UserFriendlyException("A cancelled fry delivery cannot be linked to a stocking plan.");
         }
 
         PlannedStocking plan;
         if (input.Id.HasValue)
         {
-            plan = await _plans.GetAll().Include(x => x.Pond).Include(x => x.FryDelivery).ThenInclude(x => x.Hatchery)
+            plan = await _plans.GetAll().Include(x => x.Pond).ThenInclude(x => x.Prefix).Include(x => x.FryDelivery).ThenInclude(x => x.Hatchery)
                 .FirstOrDefaultAsync(x => x.Id == input.Id.Value)
                 ?? throw new UserFriendlyException("Stocking plan not found.");
             if (plan.Status != PlannedStockingStatus.Planned)
@@ -138,7 +136,7 @@ public class PlannedStockingAppService : CapstoneAppServiceBase
         Id = x.Id,
         PondId = x.PondId,
         PondCode = x.Pond?.PondCode,
-        PondName = x.Pond?.Name,
+        PondName = x.Pond?.Prefix?.Name,
         FryDeliveryId = x.FryDeliveryId,
         HatcheryBatchNumber = x.FryDelivery?.HatcheryBatchNumber,
         HatcheryName = x.FryDelivery?.Hatchery?.Name,
