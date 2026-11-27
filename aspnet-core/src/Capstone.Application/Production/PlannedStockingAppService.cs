@@ -83,11 +83,17 @@ public class PlannedStockingAppService : CapstoneAppServiceBase
         if (pond.IsArchived || pond.Purpose != PondPurpose.GrowOut)
             throw new UserFriendlyException("Choose an active grow-out pond.");
 
+        FryDelivery delivery = null;
         if (input.FryDeliveryId.HasValue)
         {
-            var delivery = await _deliveries.GetAll().FirstOrDefaultAsync(x => x.Id == input.FryDeliveryId.Value)
+            delivery = await _deliveries.GetAll().Include(x => x.Hatchery).FirstOrDefaultAsync(x => x.Id == input.FryDeliveryId.Value)
                 ?? throw new UserFriendlyException("Fry delivery not found.");
         }
+
+        var duplicate = await _plans.GetAll().AnyAsync(x => x.Status == PlannedStockingStatus.Planned
+            && x.PondId == input.PondId && x.PlannedDate == input.PlannedDate && (!input.Id.HasValue || x.Id != input.Id.Value));
+        if (duplicate)
+            throw new UserFriendlyException("This pond already has a planned stocking event on that date.");
 
         PlannedStocking plan;
         if (input.Id.HasValue)
@@ -101,6 +107,8 @@ public class PlannedStockingAppService : CapstoneAppServiceBase
             plan.FryDeliveryId = input.FryDeliveryId;
             plan.PlannedDate = input.PlannedDate;
             plan.Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes.Trim();
+            plan.Pond = pond;
+            plan.FryDelivery = delivery;
         }
         else
         {
@@ -114,8 +122,7 @@ public class PlannedStockingAppService : CapstoneAppServiceBase
             };
             plan.Id = await _plans.InsertAndGetIdAsync(plan);
             plan.Pond = pond;
-            if (input.FryDeliveryId.HasValue)
-                plan.FryDelivery = await _deliveries.GetAll().Include(x => x.Hatchery).FirstAsync(x => x.Id == input.FryDeliveryId.Value);
+            plan.FryDelivery = delivery;
         }
 
         return ToDto(plan);
