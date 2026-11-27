@@ -80,7 +80,7 @@ public class PlannedStockingAppService : CapstoneAppServiceBase
 
         var pond = await _ponds.GetAll().FirstOrDefaultAsync(x => x.Id == input.PondId)
             ?? throw new UserFriendlyException("Pond not found.");
-        if (pond.IsArchived || pond.Purpose != PondPurpose.GrowOut)
+        if (pond.IsArchived || pond.ManualStatus != PondManualStatus.Active || pond.Purpose != PondPurpose.GrowOut)
             throw new UserFriendlyException("Choose an active grow-out pond.");
 
         FryDelivery delivery = null;
