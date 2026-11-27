@@ -193,6 +193,9 @@ public class CycleAppService : CapstoneAppServiceBase
     public virtual async Task<StockingOptionsDto> GetStockingOptions(GetStockingOptionsInput input)
     {
         var result = new StockingOptionsDto();
+        var farmSettings = await Farm.GetSettingsAsync();
+        result.DefaultHarvestTargetAbwG = farmSettings.DefaultHarvestTargetAbwG;
+        result.DefaultMaxCultureDays = farmSettings.DefaultMaxCultureDays;
         var today = await Farm.GetTodayAsync();
         if (input.CycleId.HasValue)
         {
@@ -400,6 +403,14 @@ public class CycleAppService : CapstoneAppServiceBase
             {
                 throw new UserFriendlyException($"{pond.PondCode}: dead at stocking cannot be negative.");
             }
+            if (b.TargetHarvestAbwG is < 0.1m or > 60m)
+            {
+                throw new UserFriendlyException($"{pond.PondCode}: target harvest ABW must be between 0.1 and 60 grams.");
+            }
+            if (b.MaxCultureDays is < 1 or > 180)
+            {
+                throw new UserFriendlyException($"{pond.PondCode}: maximum culture duration must be 1 to 180 days.");
+            }
 
             var readings = await _waterQuality.EvaluateAsync(b.Readings.Select(r => (r.ParameterCode, r.Value)), requireStockingSet: true);
             plans.Add((b, pond, round, stockedAtUtc, readings));
@@ -453,6 +464,7 @@ public class CycleAppService : CapstoneAppServiceBase
             {
                 CycleId = cycle.Id, PondId = pond.Id, PreparationRoundId = round.Id, Letter = letter, BatchCode = $"{cycle.CycleCode}-{letter}",
                 Status = BatchStatus.Stocked, StockedAtUtc = stockedAtUtc, StockingDate = stockingDate, PlCountStocked = b.PlCount,
+                TargetHarvestAbwG = b.TargetHarvestAbwG, MaxCultureDays = b.MaxCultureDays ?? settings.DefaultMaxCultureDays,
                 PondAreaM2AtStocking = pond.AreaM2,
                 AcclimationMinutes = b.AcclimationMinutes, InitialSurvivalEstimatePct = b.InitialSurvivalEstimatePct, DeadAtStocking = b.DeadAtStocking,
                 FarmingSystemAtStocking = pond.EffectiveFarmingSystem(settings.FarmingSystem), ConstructionTypeAtStocking = pond.ConstructionType,

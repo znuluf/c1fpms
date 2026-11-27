@@ -374,6 +374,8 @@ public class StockingOptionsDto
 
     public Guid? CycleId { get; set; }
     public string CycleCode { get; set; }
+    public decimal? DefaultHarvestTargetAbwG { get; set; }
+    public int DefaultMaxCultureDays { get; set; } = 90;
 }
 
 public class StockingDeliveryDto
@@ -429,6 +431,9 @@ public class BatchStockingInput
     /// <summary>PL found dead at stocking (DEC-59); shown separately, not deducted.</summary>
     [Range(0, 10000000)]
     public long? DeadAtStocking { get; set; }
+
+    [Range(typeof(decimal), "0.1", "60")] public decimal? TargetHarvestAbwG { get; set; }
+    [Range(1, 180)] public int? MaxCultureDays { get; set; }
 
     /// <summary>Who will look after the batch (DEC-127); optional. A technician who stocks is named whatever this says.</summary>
     public List<long> TechnicianUserIds { get; set; } = new();

@@ -85,6 +85,8 @@ public static class FpmsModelConfiguration
             {
                 t.HasCheckConstraint("CK_FpmsFarmSettings_DocumentAlertDays", "[DocumentExpiryAlertDays] BETWEEN 1 AND 365");
                 t.HasCheckConstraint("CK_FpmsFarmSettings_UnsoldFollowUpDays", "[UnsoldFollowUpDays] BETWEEN 1 AND 60");
+                t.HasCheckConstraint("CK_FpmsFarmSettings_HarvestTargetAbw", "[DefaultHarvestTargetAbwG] IS NULL OR [DefaultHarvestTargetAbwG] BETWEEN 0.1 AND 60");
+                t.HasCheckConstraint("CK_FpmsFarmSettings_MaxCultureDays", "[DefaultMaxCultureDays] BETWEEN 1 AND 180");
             });
             e.HasIndex(x => x.TenantId).IsUnique();
         });
@@ -434,6 +436,12 @@ public static class FpmsModelConfiguration
             e.Property(x => x.Letter).IsRequired().HasMaxLength(PondBatch.MaxLetterLength);
             e.Property(x => x.PondAreaM2AtStocking).HasPrecision(10, 2);
             e.Property(x => x.InitialSurvivalEstimatePct).HasPrecision(5, 2);
+            e.Property(x => x.TargetHarvestAbwG).HasPrecision(6, 2);
+            e.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_FpmsBatches_TargetHarvestAbw", "[TargetHarvestAbwG] IS NULL OR [TargetHarvestAbwG] BETWEEN 0.1 AND 60");
+                t.HasCheckConstraint("CK_FpmsBatches_MaxCultureDays", "[MaxCultureDays] IS NULL OR [MaxCultureDays] BETWEEN 1 AND 180");
+            });
             e.Property(x => x.HatcheryCertificationStatusAtStocking).HasMaxLength(500);
             e.ToTable(t => t.HasCheckConstraint("CK_FpmsBatches_DensityFlag", "[DensityFlag] IS NULL OR [DensityFlag] IN (1, 2, 3)"));
             e.ToTable(t => t.HasCheckConstraint("CK_FpmsBatches_DeadAtStocking", "[DeadAtStocking] IS NULL OR [DeadAtStocking] >= 0"));
