@@ -100,3 +100,25 @@ Actual harvest dates and quantities must come from recorded harvest transactions
 - Calendar and table links open the relevant source record.
 - All date calculations respect the farm's configured time zone.
 - No change silently makes harvest unavailable or changes existing batch lifecycle rules.
+
+
+## Implementation status on `feature/production-timeline-and-forecast`
+
+The first implementation increment now includes:
+
+- A separate `PlannedStocking` farm record and API. It supports planned dates, optional fry-delivery association, notes, editing, and cancellation.
+- A Stocking Plans page linked from the Cycles and Batches pages.
+- Server-side validation for past dates, active grow-out ponds, and duplicate active plans for the same pond/date.
+- A clear separation from actual stocking: a plan does not create a PondBatch, allocate PL, reserve a delivery, or start DOC.
+- A harvest forecast calculator using up to the latest three distinct growth-sample dates. It requires at least two samples, a recent latest sample (within 14 days), and a plausible positive growth rate. It projects the later of the farm DOC target and ABW target, returns a date window, and reports Moderate or High confidence.
+- Forecast fields on batch list/detail reads, an estimated-harvest column in the Batches overview, and a Production timeline section on batch detail.
+- Actual first/last harvest dates in the batch detail timeline, sourced from recorded harvest transactions.
+- A withdrawal-safe-date warning when the forecast window begins before the safe date.
+
+Not yet included in this increment:
+
+- Explicitly linking a planned event to the actual batch when stocking is confirmed. The planned event remains a separate planning record; users must not assume it has been fulfilled merely because a batch exists for the same pond.
+- A farm-wide calendar view combining plans, fry deliveries, active batches, forecast windows, safe dates, and actual harvests.
+- Automated browser-level verification and full CI confirmation.
+
+These are follow-on tasks before treating the production timeline as complete.
