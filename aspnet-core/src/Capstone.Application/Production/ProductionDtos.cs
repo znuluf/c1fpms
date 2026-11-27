@@ -286,6 +286,8 @@ public class TechnicianOptionDto
 
 public class BatchDetailDto : BatchListDto
 {
+    public DateOnly? FirstHarvestDate { get; set; }
+    public DateOnly? LastHarvestDate { get; set; }
     public decimal PondAreaM2AtStocking { get; set; }
     public DateTime? StockedAtUtc { get; set; }
     /// <summary>From the fry delivery (DEC-128): one trip for every pond stocked from it.</summary>
