@@ -23,6 +23,7 @@ interface PondCard {
     batchCode: string | null;
     doc: number | null;
     abwG: number | null;
+    adgGPerDay: number | null;
     fcr: number | null;
     survival: number | null;
     biomassKg: number | null;
@@ -616,6 +617,7 @@ export class PondsComponent extends FpmsPage implements OnInit {
                     batchCode: t?.batchCode ?? null,
                     doc: t?.doc ?? null,
                     abwG: t?.abwG ?? null,
+                    adgGPerDay: t?.adgGPerDay ?? null,
                     fcr: t?.fcrToDate ?? null,
                     survival: t?.estimatedSurvivalPct ?? null,
                     biomassKg: t?.estimatedBiomassKg ?? null,
