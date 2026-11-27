@@ -126,10 +126,10 @@ interface CalMonth {
                                     }
                                 </div>
                             </div>
-                            @if (b.estimatedHarvestTo && b.earliestSafeHarvestDate && b.estimatedHarvestTo < b.earliestSafeHarvestDate) {
+                            @if (b.estimatedHarvestFrom && b.earliestSafeHarvestDate && b.estimatedHarvestFrom < b.earliestSafeHarvestDate) {
                                 <div class="alert alert-warning small mb-0" role="status">
                                     <strong>Forecast overlaps the withdrawal period.</strong>
-                                    The projected harvest window ends before the earliest safe harvest date. Follow the safe date, not the forecast.
+                                    The projected harvest window begins before the earliest safe harvest date. Follow the safe date, not the forecast.
                                 </div>
                             }
                             <div class="small text-muted mt-2">Forecasts are estimates based on recent growth samples. They do not change batch status, confirm readiness, or replace the withdrawal-safe date.</div>
