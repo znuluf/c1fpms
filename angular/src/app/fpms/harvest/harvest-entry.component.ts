@@ -195,21 +195,21 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
-                                            <label for="sw">Sample weight (g)</label>
-                                            <input id="sw" type="number" min="0.01" step="0.01" class="form-control" name="abwSampleWeightG" [(ngModel)]="m.abwSampleWeightG" (ngModelChange)="onSample()" placeholder="e.g. 5002 (optional)" />
+                                            <label for="sw">Sample weight (g) <span class="text-danger">*</span></label>
+                                            <input id="sw" type="number" min="0.01" step="0.01" class="form-control" name="abwSampleWeightG" [(ngModel)]="m.abwSampleWeightG" (ngModelChange)="onSample()" required placeholder="e.g. 5002" />
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <label for="sp">Shrimp counted in the sample (pieces)</label>
-                                            <input id="sp" type="number" min="1" step="1" class="form-control" name="abwSamplePieces" [(ngModel)]="m.abwSamplePieces" (ngModelChange)="onSample()" placeholder="e.g. 414 (optional)" />
-                                            @if (sampleHalf()) { <small class="form-text text-danger">Enter both the weight and the pieces, or neither.</small> }
+                                            <label for="sp">Shrimp counted in the sample (pieces) <span class="text-danger">*</span></label>
+                                            <input id="sp" type="number" min="1" step="1" class="form-control" name="abwSamplePieces" [(ngModel)]="m.abwSamplePieces" (ngModelChange)="onSample()" required placeholder="e.g. 414" />
+                                            @if (sampleHalf()) { <small class="form-text text-danger">Enter both the weight and the pieces.</small> }
                                         </div>
                                         <div class="form-group col-md-4">
                                             <label for="abw">Average body weight, ABW (g per shrimp)</label>
-                                            <input id="abw" type="number" min="0.01" max="60" step="0.01" class="form-control" name="abwG" [(ngModel)]="m.abwG" (ngModelChange)="keepDraft()" [readonly]="sampleComplete()" />
+                                            <input id="abw" type="number" min="0.01" max="60" step="0.01" class="form-control" name="abwG" [(ngModel)]="m.abwG" (ngModelChange)="keepDraft()" readonly />
                                             @if (sampleComplete()) {
                                                 <small class="form-text text-muted">Worked out: {{ m.abwSampleWeightG | num: 2 }} g ÷ {{ m.abwSamplePieces | num: 0 }} pieces</small>
-                                            } @else if (m.abwG > 0) {
-                                                <small class="form-text text-muted">About {{ 1000 / m.abwG | num: 0 }} pieces per kg; used to estimate the pieces harvested.</small>
+                                            } @else {
+                                                <small class="form-text text-muted">Worked out from the sample weight and pieces.</small>
                                             }
                                         </div>
                                     </div>

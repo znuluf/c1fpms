@@ -32,7 +32,7 @@ public class RetrySafeSaves_Tests : FpmsTestBase
 
     private SaveHarvestInput NewHarvest(Guid? requestId) => new()
     {
-        BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = HarvestType.Partial, TotalKg = 300, AbwG = 9,
+        BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = HarvestType.Partial, TotalKg = 300, AbwSampleWeightG = 900, AbwSamplePieces = 100,
         GradeLines = new() { new GradeLineInput { SizeGradeId = Grade("100/120"), Kg = 300 } }, ClientRequestId = requestId,
     };
 

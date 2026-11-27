@@ -131,7 +131,7 @@ public class SaveHarvestInput
     /// <summary>Partial harvest only; defaults to using its ABW for remaining-biomass estimates.</summary>
     public bool UseHarvestAbwForBiomass { get; set; } = true;
 
-    /// <summary>Optional ABW sample weight (g); with the piece count it sets the ABW (DEC-80).</summary>
+    /// <summary>Required ABW sample weight (g); with the piece count it sets the ABW (DEC-144).</summary>
     [Range(0.01, 1000000, ErrorMessage = "The sample weight must be greater than zero.")]
     public decimal? AbwSampleWeightG { get; set; }
 
@@ -843,22 +843,19 @@ public class HarvestAppService : CapstoneAppServiceBase
                 .Select(g => new GradeLineInput { SizeGradeId = g.Key, Kg = g.Sum(c => c.Kg) }).ToList();
         }
 
-        // ABW sample (DEC-80): both fields or neither; together they set the ABW.
-        if (input.AbwSampleWeightG.HasValue != input.AbwSamplePieces.HasValue)
+        // ABW sample (DEC-144): every harvest records both fields, and together they set the ABW.
+        if (!input.AbwSampleWeightG.HasValue || !input.AbwSamplePieces.HasValue)
         {
-            throw new UserFriendlyException("Enter both the sample weight and the number of pieces, or leave both empty.");
+            throw new UserFriendlyException("Enter the sample weight and the number of shrimp counted in the sample.");
         }
 
-        if (input.AbwSampleWeightG.HasValue)
+        var abw = Harvest.AbwFromSample(input.AbwSampleWeightG.Value, input.AbwSamplePieces.Value);
+        if (abw < 0.01m || abw > 60m)
         {
-            var abw = Harvest.AbwFromSample(input.AbwSampleWeightG.Value, input.AbwSamplePieces.Value);
-            if (abw < 0.01m || abw > 60m)
-            {
-                throw new UserFriendlyException($"The sample gives an ABW of {abw:0.##} g; it must be between 0.01 and 60 g. Check the weight (in grams) and the piece count.");
-            }
-
-            input.AbwG = abw;
+            throw new UserFriendlyException($"The sample gives an ABW of {abw:0.##} g; it must be between 0.01 and 60 g. Check the weight (in grams) and the piece count.");
         }
+
+        input.AbwG = abw;
 
         if (input.FinalCount.HasValue && batch.PlCountStocked.HasValue && input.FinalCount.Value > batch.PlCountStocked.Value)
         {

@@ -30,7 +30,7 @@ public class SqlServerConcurrency_Tests : SqlServerTestBase
 
     private SaveHarvestInput NewHarvest(Guid? requestId, decimal kg = 300) => new()
     {
-        BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = HarvestType.Partial, TotalKg = kg, AbwG = 9,
+        BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = HarvestType.Partial, TotalKg = kg, AbwSampleWeightG = 900, AbwSamplePieces = 100,
         GradeLines = new() { new GradeLineInput { SizeGradeId = Grade("100/120"), Kg = kg } }, ClientRequestId = requestId,
     };
 

@@ -85,8 +85,6 @@ public class HarvestTally_Tests : FpmsTestBase
         input.Crates = new List<CrateInput>();
         input.TotalKg = 100;
         input.Boxes = 1;
-        input.AbwSampleWeightG = null;
-        input.AbwSamplePieces = null;
         input.GradeLines = new() { new() { SizeGradeId = Grade(SizeGrade.UngradedLabel), Kg = 100 } };
         var harvest = await Resolve<HarvestAppService>().Create(input);
         var saved = await Resolve<HarvestAppService>().RecordDisposal(new RecordDisposalInput
@@ -273,6 +271,12 @@ public class HarvestTally_Tests : FpmsTestBase
         var half = TallySheet();
         half.AbwSamplePieces = null;
         await Should.ThrowAsync<UserFriendlyException>(() => harvests.Create(half));
+
+        var none = TallySheet();
+        none.AbwSampleWeightG = null;
+        none.AbwSamplePieces = null;
+        none.AbwG = 12; // a typed ABW no longer replaces the sample (DEC-144)
+        await Should.ThrowAsync<UserFriendlyException>(() => harvests.Create(none));
 
         var kilograms = TallySheet();
         kilograms.AbwSampleWeightG = 5002;
@@ -828,7 +832,7 @@ public class HarvestTally_Tests : FpmsTestBase
         var harvests = Resolve<HarvestAppService>();
         var input = new SaveHarvestInput
         {
-            BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = HarvestType.Partial, TotalKg = 100, AbwG = 9,
+            BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = HarvestType.Partial, TotalKg = 100, AbwSampleWeightG = 900, AbwSamplePieces = 100,
             GradeLines = new() { new() { SizeGradeId = Grade("50/60"), Kg = 60 }, new() { SizeGradeId = Grade("100/120"), Kg = 30 } },
             Disposals = new() { new() { Kg = 10, Reason = DisposalReason.StaffOrHomeUse } },
         };

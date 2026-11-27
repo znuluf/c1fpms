@@ -32,7 +32,7 @@ public class LotTrace_Tests : FpmsTestBase
 
     private SaveHarvestInput Harvest(DateTime at, decimal kg) => new()
     {
-        BatchId = BatchId(CurrentBatch), HarvestedAt = at, HarvestType = HarvestType.Partial, TotalKg = kg,
+        BatchId = BatchId(CurrentBatch), HarvestedAt = at, HarvestType = HarvestType.Partial, TotalKg = kg, AbwSampleWeightG = 900, AbwSamplePieces = 100,
         GradeLines = new() { new() { SizeGradeId = Ungraded, Kg = kg } },
     };
 

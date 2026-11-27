@@ -495,7 +495,7 @@ public class V26Production_Tests : FpmsTestBase
 
         var harvest = await Resolve<HarvestAppService>().Create(new SaveHarvestInput
         {
-            BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddMinutes(-1), HarvestType = HarvestType.Partial, TotalKg = 100m, AbwG = 12m,
+            BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddMinutes(-1), HarvestType = HarvestType.Partial, TotalKg = 100m, AbwSampleWeightG = 1200, AbwSamplePieces = 100,
         });
         harvest.Warnings.ShouldContain(w => w.Kind == "Withdrawal");
 

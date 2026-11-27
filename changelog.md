@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (harvest ABW sample, DEC-144)
+- **The sample is required.** Every harvest, of any type, needs the sample weight and the shrimp counted. The ABW is worked out from them and can no longer be typed. An older harvest without a sample needs one before a correction can be saved.
+
 ### Changed (simpler, calmer interface, DEC-143)
 - **Fewer fields at first sight.** On the harvest form (sample weight and pieces, counted shrimp, the biomass checkbox), the pond form (inlet, outlet, aeration, map location, notes) and the inventory item form (brand, feed type or active ingredient, BAI registration no., reorder level), these fields are under **More details**. It opens by itself when one of them holds something. No field or saved value was removed.
 - **Theme.** A softer background, rounder cards with a light shadow, dark headings, bolder buttons, and a tinted highlight with an edge bar for the current page in the sidebar. Sidebar section labels are sentence case at 14 px.

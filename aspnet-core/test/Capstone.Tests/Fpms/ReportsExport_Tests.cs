@@ -45,7 +45,7 @@ public class ReportsExport_Tests : FpmsTestBase
     {
         var harvest = await Resolve<HarvestAppService>().Create(new SaveHarvestInput
         {
-            BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = HarvestType.Partial, TotalKg = 300, AbwG = 9,
+            BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = HarvestType.Partial, TotalKg = 300, AbwSampleWeightG = 900, AbwSamplePieces = 100,
             GradeLines = new() { new GradeLineInput { SizeGradeId = Grade("100/120"), Kg = 300 } },
         });
         var line = harvest.GradeLines.Single().Id;

@@ -32,7 +32,7 @@ public class HarvestSales_Tests : FpmsTestBase
 
     private SaveHarvestInput Harvest(HarvestType type, decimal kg, params (string Label, decimal Kg)[] grades) => new()
     {
-        BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = type, PondEmptiedConfirmed = type == HarvestType.Total, TotalKg = kg, AbwG = 9,
+        BatchId = BatchId(CurrentBatch), HarvestedAt = DateTime.UtcNow.AddHours(-2), HarvestType = type, PondEmptiedConfirmed = type == HarvestType.Total, TotalKg = kg, AbwSampleWeightG = 900, AbwSamplePieces = 100,
         GradeLines = grades.Select(g => new GradeLineInput { SizeGradeId = Grade(g.Label), Kg = g.Kg }).ToList(),
     };
 
@@ -303,7 +303,8 @@ public class HarvestSales_Tests : FpmsTestBase
     public async Task Base_abw_sale_calculates_symmetrically_below_and_above_its_configured_base()
     {
         var input = Harvest(HarvestType.Partial, 100, ("100/120", 100));
-        input.AbwG = 8;
+        input.AbwSampleWeightG = 800;
+        input.AbwSamplePieces = 100;
         var harvest = await Resolve<HarvestAppService>().Create(input);
         var line = harvest.GradeLines.Single();
 

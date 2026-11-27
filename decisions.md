@@ -8,6 +8,7 @@ All decisions below were accepted on 2026-10-22 by the capstone development team
 
 | ID | Decision | Status |
 | :---- | :---- | :---- |
+| DEC-144 | Every harvest records the ABW sample weight and pieces | Accepted (full write-up) |
 | DEC-143 | Optional fields folded on three forms, a calmer theme, and replacing AdminLTE with plain Bootstrap | Proposed (full write-up); screens not checked |
 | DEC-01 | Local on-premise MVP with a SaaS-ready multi-tenant model | Accepted (full write-up) |
 | DEC-02 | JWT Bearer authentication and framework password hashing | Accepted (full write-up) |
@@ -3703,3 +3704,26 @@ Positive:
 Negative:
 - A folded field is one more tap.
 - Until the swap is run and checked, AdminLTE is still loaded. `shell.less` was written without a visual check and may need adjustments.
+
+---
+
+## Decision DEC-144: Every harvest records the ABW sample weight and pieces
+
+Status: Accepted 2026-11-27 (branch design/simple-modern-ui; screens not checked)
+Date: 2026-11-27
+Supersedes in part: DEC-80 (the optional harvest ABW sample)
+Related: DEC-140, DEC-142
+
+### Context
+The sample weight and piece count are how ABW is recorded at harvest. While they were optional, a harvest could be saved without them.
+
+### Decision
+The server refuses a harvest, new or corrected, without both values, for every harvest type. The ABW is always weight ÷ pieces; a typed ABW is ignored. Growth sampling is unchanged. The database columns stay nullable for harvests already saved.
+
+### Consequences
+Positive:
+- Every harvest saved from now on has an ABW and the figures behind it.
+
+Negative:
+- A harvest whose sample was not written down cannot be saved.
+- Correcting an older harvest without a sample requires entering one.
