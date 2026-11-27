@@ -114,7 +114,15 @@ import { batchShort } from '@shared/fpms/labels';
                                 </thead>
                                 @for (l of logs(); track l.id) {
                                     <tbody [class.lb-voided]="l.isVoided">
-                                        <tr [class.fpms-row-warn]="l.hasOutOfRange && !l.isVoided">
+                                        <tr
+                                            class="fpms-clickable-row"
+                                            [class.fpms-row-warn]="l.hasOutOfRange && !l.isVoided"
+                                            tabindex="0"
+                                            role="link"
+                                            [attr.aria-label]="'Open log entry ' + (l.observedAtUtc | farmDate)"
+                                            (click)="openLogRow(l.id, $event)"
+                                            (keydown.enter)="openLogRow(l.id, $event)"
+                                            (keydown.space)="$event.preventDefault(); openLogRow(l.id, $event)">
                                             <td class="text-nowrap">
                                                 <a [routerLink]="['/app/logbook', l.id]">
                                                     {{ l.observedAtUtc | farmDate }}
@@ -393,6 +401,13 @@ export class LogbookComponent extends FpmsPage implements OnInit {
 
     private params(): Record<string, unknown> {
         return { ...this.f, search: this.f.search || undefined, includeVoided: this.f.includeVoided || undefined };
+    }
+
+    openLogRow(id: string, event: Event): void {
+        if (event.target instanceof Element && event.target.closest('a, button, input, select, textarea, [role="button"]')) {
+            return;
+        }
+        this.router.navigate(['/app/logbook', id]);
     }
 
     async load(): Promise<void> {
