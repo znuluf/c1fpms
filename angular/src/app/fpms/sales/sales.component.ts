@@ -75,9 +75,12 @@ import { ToolbarChip } from '@shared/fpms/ui';
                         }
                 </div>
                 @if (payment) {
-                    <div class="card card-outline card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">
+                    <div class="fpms-dialog-backdrop">
+                        <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="payment-dialog-title">
+                            <div class="fpms-dialog-body p-0">
+                                <div class="card card-outline card-primary">
+                                    <div class="card-header">
+                                        <h3 id="payment-dialog-title" class="card-title">
                                 <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
                                 Add payment: {{ payment.sale.dispatchReceiptNo }}, {{ payment.sale.buyerName }} (balance
                                 {{ payment.sale.balance | php }})
@@ -131,6 +134,8 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 Save payment
                             </button>
                             <button class="btn btn-default" (click)="payment = null">Cancel</button>
+                                        </div>
+                            </div>
                         </div>
                     </div>
                 }
