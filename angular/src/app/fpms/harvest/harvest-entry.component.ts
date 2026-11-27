@@ -195,15 +195,6 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
-                                            <label for="sw">Sample weight (g)</label>
-                                            <input id="sw" type="number" min="0.01" step="0.01" class="form-control" name="abwSampleWeightG" [(ngModel)]="m.abwSampleWeightG" (ngModelChange)="onSample()" placeholder="e.g. 5002 (optional)" />
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="sp">Shrimp counted in the sample (pieces)</label>
-                                            <input id="sp" type="number" min="1" step="1" class="form-control" name="abwSamplePieces" [(ngModel)]="m.abwSamplePieces" (ngModelChange)="onSample()" placeholder="e.g. 414 (optional)" />
-                                            @if (sampleHalf()) { <small class="form-text text-danger">Enter both the weight and the pieces, or neither.</small> }
-                                        </div>
-                                        <div class="form-group col-md-4">
                                             <label for="abw">Average body weight, ABW (g per shrimp)</label>
                                             <input id="abw" type="number" min="0.01" max="60" step="0.01" class="form-control" name="abwG" [(ngModel)]="m.abwG" (ngModelChange)="keepDraft()" [readonly]="sampleComplete()" />
                                             @if (sampleComplete()) {
@@ -213,22 +204,34 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             }
                                         </div>
                                     </div>
-                                    @if (m.harvestType === 1 && m.abwG > 0) {
-                                        <div class="form-group mt-2 mb-3">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="useHarvestAbwForBiomass" name="useHarvestAbwForBiomass" [(ngModel)]="m.useHarvestAbwForBiomass" (ngModelChange)="keepDraft()" />
-                                                <label class="custom-control-label" for="useHarvestAbwForBiomass">Use this harvest ABW for the pond's remaining-biomass estimate</label>
+                                    <details #moreHarvest class="fpms-fold" [open]="moreHarvest.open || hasHarvestExtras()">
+                                        <summary>More details <span class="fpms-fold-hint">sample weight and pieces, counted shrimp</span></summary>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="sw">Sample weight (g)</label>
+                                                <input id="sw" type="number" min="0.01" step="0.01" class="form-control" name="abwSampleWeightG" [(ngModel)]="m.abwSampleWeightG" (ngModelChange)="onSample()" placeholder="e.g. 5002 (optional)" />
                                             </div>
-                                            <small class="form-text text-muted">Yes is selected by default. Clear it if the shrimp harvested may be larger than those left in the pond. A later growth sample will replace this ABW basis.</small>
+                                            <div class="form-group col-md-4">
+                                                <label for="sp">Shrimp counted in the sample (pieces)</label>
+                                                <input id="sp" type="number" min="1" step="1" class="form-control" name="abwSamplePieces" [(ngModel)]="m.abwSamplePieces" (ngModelChange)="onSample()" placeholder="e.g. 414 (optional)" />
+                                                @if (sampleHalf()) { <small class="form-text text-danger">Enter both the weight and the pieces, or neither.</small> }
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="fc">Counted shrimp (pieces)</label>
+                                                <input id="fc" type="number" min="0" step="1" class="form-control" name="finalCount" [(ngModel)]="m.finalCount" (ngModelChange)="keepDraft()" placeholder="only if you counted them all" />
+                                                <small class="form-text text-muted">Leave empty to use the estimate from the ABW. A real count replaces the estimate.</small>
+                                            </div>
                                         </div>
-                                    }
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
-                                            <label for="fc">Counted shrimp (pieces)</label>
-                                            <input id="fc" type="number" min="0" step="1" class="form-control" name="finalCount" [(ngModel)]="m.finalCount" (ngModelChange)="keepDraft()" placeholder="only if you counted them all" />
-                                            <small class="form-text text-muted">Leave empty to use the estimate from the ABW. A real count replaces the estimate.</small>
-                                        </div>
-                                    </div>
+                                        @if (m.harvestType === 1 && m.abwG > 0) {
+                                            <div class="form-group mt-2 mb-3">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input" id="useHarvestAbwForBiomass" name="useHarvestAbwForBiomass" [(ngModel)]="m.useHarvestAbwForBiomass" (ngModelChange)="keepDraft()" />
+                                                    <label class="custom-control-label" for="useHarvestAbwForBiomass">Use this harvest ABW for the pond's remaining-biomass estimate</label>
+                                                </div>
+                                                <small class="form-text text-muted">Yes is selected by default. Clear it if the shrimp harvested may be larger than those left in the pond. A later growth sample will replace this ABW basis.</small>
+                                            </div>
+                                        }
+                                    </details>
                                 </div>
                             </div>
                             <div class="card">
@@ -1232,5 +1235,10 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
             }
             this.router.navigate(['/app/sales', saved.sale.id], { replaceUrl: true });
         }
+    }
+
+    /** Whether a folded harvest field holds something, so its section opens by itself (DEC-96). */
+    hasHarvestExtras(): boolean {
+        return [this.m.abwSampleWeightG, this.m.abwSamplePieces, this.m.finalCount].some((v) => v != null && v !== '') || this.m.useHarvestAbwForBiomass === false;
     }
 }

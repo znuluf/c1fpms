@@ -409,34 +409,37 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <i class="fas fa-exclamation-triangle mr-1"></i>{{ systemWarning }} You can still save the pond.
                                 </div>
                             }
-                            <div class="form-row">
-                                <div class="form-group col-md-4">
-                                    <label for="inlet">Inlet type</label>
-                                    <input id="inlet" class="form-control" name="inletType" [(ngModel)]="pond.inletType" maxlength="100" placeholder="e.g. PVC pipe with screen" />
+                            <details #morePond class="fpms-fold" [open]="morePond.open || hasPondExtras()">
+                                <summary>More details <span class="fpms-fold-hint">inlet, outlet, aeration, map location, notes</span></summary>
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="inlet">Inlet type</label>
+                                        <input id="inlet" class="form-control" name="inletType" [(ngModel)]="pond.inletType" maxlength="100" placeholder="e.g. PVC pipe with screen" />
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="outlet">Outlet type</label>
+                                        <input id="outlet" class="form-control" name="outletType" [(ngModel)]="pond.outletType" maxlength="100" placeholder="e.g. Monk / central drain" />
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="aer">Aeration system</label>
+                                        <input id="aer" class="form-control" name="aerationSystem" [(ngModel)]="pond.aerationSystem" maxlength="300" placeholder="Type, count, horsepower" />
+                                    </div>
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label for="outlet">Outlet type</label>
-                                    <input id="outlet" class="form-control" name="outletType" [(ngModel)]="pond.outletType" maxlength="100" placeholder="e.g. Monk / central drain" />
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="lat">Latitude</label>
+                                        <input id="lat" type="number" step="0.000001" min="-90" max="90" class="form-control" name="latitude" [(ngModel)]="pond.latitude" />
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="lng">Longitude</label>
+                                        <input id="lng" type="number" step="0.000001" min="-180" max="180" class="form-control" name="longitude" [(ngModel)]="pond.longitude" />
+                                    </div>
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label for="aer">Aeration system</label>
-                                    <input id="aer" class="form-control" name="aerationSystem" [(ngModel)]="pond.aerationSystem" maxlength="300" placeholder="Type, count, horsepower" />
+                                <div class="form-group">
+                                    <label for="notes">Notes</label>
+                                    <textarea id="notes" rows="2" class="form-control" name="notes" [(ngModel)]="pond.notes" maxlength="1000"></textarea>
                                 </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-4">
-                                    <label for="lat">Latitude</label>
-                                    <input id="lat" type="number" step="0.000001" min="-90" max="90" class="form-control" name="latitude" [(ngModel)]="pond.latitude" />
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label for="lng">Longitude</label>
-                                    <input id="lng" type="number" step="0.000001" min="-180" max="180" class="form-control" name="longitude" [(ngModel)]="pond.longitude" />
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="notes">Notes</label>
-                                <textarea id="notes" rows="2" class="form-control" name="notes" [(ngModel)]="pond.notes" maxlength="1000"></textarea>
-                            </div>
+                            </details>
                             @if (!isNew) {
                                 <div class="form-group mb-0">
                                     <label for="cn">Change note @if (noteRequired) { <span class="text-danger">*</span> } @else { (optional) }</label>
@@ -810,5 +813,10 @@ export class PondDetailComponent extends FpmsPage implements OnInit {
             this.notifySaved('Status changed.');
             this.load(this.pond.id);
         }
+    }
+
+    /** Whether a folded pond field holds something, so its section opens by itself (DEC-96). */
+    hasPondExtras(): boolean {
+        return [this.pond.inletType, this.pond.outletType, this.pond.aerationSystem, this.pond.latitude, this.pond.longitude, this.pond.notes].some((v) => v != null && v !== '');
     }
 }

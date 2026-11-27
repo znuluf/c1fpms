@@ -48,31 +48,9 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                         </div>
                                     </div>
                                     <div class="form-row">
-                                        <div class="form-group col-md-8">
+                                        <div class="form-group col-md-12">
                                             <label for="pn">Product name <span class="text-danger">*</span></label>
                                             <input id="pn" class="form-control" name="productName" [(ngModel)]="itemForm.productName" required maxlength="150" />
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="br">Brand</label>
-                                            <input id="br" class="form-control" name="brand" [(ngModel)]="itemForm.brand" maxlength="100" />
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        @if (itemForm.category === 1) {
-                                            <div class="form-group col-md-4">
-                                                <label for="ft">Feed type</label>
-                                                <input id="ft" class="form-control" name="feedType" [(ngModel)]="itemForm.feedType" maxlength="50" list="feedTypes" placeholder="starter, grower, finisher" />
-                                                <datalist id="feedTypes"><option value="Starter"></option><option value="Grower"></option><option value="Finisher"></option></datalist>
-                                            </div>
-                                        }
-                                        <div class="form-group col-md-4">
-                                            <label for="bai">BAI registration no.</label>
-                                            <input id="bai" class="form-control" name="baiRegistrationNo" [(ngModel)]="itemForm.baiRegistrationNo" maxlength="100" />
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="rl">Reorder level ({{ itemForm.unit }})</label>
-                                            <input id="rl" type="number" min="0" step="0.001" class="form-control" name="reorderLevel" [(ngModel)]="itemForm.reorderLevel" />
-                                            <small class="form-text text-muted">Stock at or below this shows as Low.</small>
                                         </div>
                                     </div>
                                     <div class="form-row">
@@ -81,6 +59,13 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                             <input id="ps" type="number" min="0.001" step="0.001" class="form-control" name="packSize" [(ngModel)]="itemForm.packSize" placeholder="e.g. 25 per bag" />
                                             <small class="form-text text-muted">Lets receipts be entered in packs.</small>
                                         </div>
+                                        @if (itemForm.category !== 1) {
+                                            <div class="form-group col-md-4">
+                                                <label for="wdd">Withdrawal period (days)</label>
+                                                <input id="wdd" type="number" min="0" max="365" step="1" class="form-control" name="defaultWithdrawalDays" [(ngModel)]="itemForm.defaultWithdrawalDays" />
+                                                <small class="form-text text-muted">Pre-filled when the product is applied.</small>
+                                            </div>
+                                        }
                                         <div class="form-group col-md-4 fpms-check-cell">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="iact" name="isActive" [(ngModel)]="itemForm.isActive" />
@@ -88,19 +73,37 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                             </div>
                                         </div>
                                     </div>
-                                    @if (itemForm.category !== 1) {
+                                    <details #moreItem class="fpms-fold" [open]="moreItem.open || hasItemExtras()">
+                                        <summary>More details <span class="fpms-fold-hint">brand, feed type or active ingredient, BAI no., reorder level</span></summary>
                                         <div class="form-row">
+                                        @if (itemForm.category === 1) {
+                                            <div class="form-group col-md-4">
+                                                <label for="ft">Feed type</label>
+                                                <input id="ft" class="form-control" name="feedType" [(ngModel)]="itemForm.feedType" maxlength="50" list="feedTypes" placeholder="starter, grower, finisher" />
+                                                <datalist id="feedTypes"><option value="Starter"></option><option value="Grower"></option><option value="Finisher"></option></datalist>
+                                            </div>
+                                        }
+                                            <div class="form-group col-md-4">
+                                                <label for="br">Brand</label>
+                                                <input id="br" class="form-control" name="brand" [(ngModel)]="itemForm.brand" maxlength="100" />
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="bai">BAI registration no.</label>
+                                                <input id="bai" class="form-control" name="baiRegistrationNo" [(ngModel)]="itemForm.baiRegistrationNo" maxlength="100" />
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="rl">Reorder level ({{ itemForm.unit }})</label>
+                                                <input id="rl" type="number" min="0" step="0.001" class="form-control" name="reorderLevel" [(ngModel)]="itemForm.reorderLevel" />
+                                                <small class="form-text text-muted">Stock at or below this shows as Low.</small>
+                                            </div>
+                                        @if (itemForm.category !== 1) {
                                             <div class="form-group col-md-6">
                                                 <label for="ai">Active ingredient</label>
                                                 <input id="ai" class="form-control" name="activeIngredient" [(ngModel)]="itemForm.activeIngredient" maxlength="150" placeholder="for drugs and chemicals" />
                                             </div>
-                                            <div class="form-group col-md-3">
-                                                <label for="wdd">Withdrawal period (days)</label>
-                                                <input id="wdd" type="number" min="0" max="365" step="1" class="form-control" name="defaultWithdrawalDays" [(ngModel)]="itemForm.defaultWithdrawalDays" />
-                                                <small class="form-text text-muted">Pre-filled when the product is applied.</small>
-                                            </div>
+                                        }
                                         </div>
-                                    }
+                                    </details>
                                 </div>
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !itf.form.valid">Save item</button>
@@ -511,5 +514,10 @@ export class InventoryComponent extends FpmsPage implements OnInit {
         if (await this.act(() => this.api.post('Inventory', 'ClearReconciliationFlag', { id: l.id }))) {
             this.selectItem(this.selectedItem);
         }
+    }
+
+    /** Whether a folded item field holds something, so its section opens by itself (DEC-96). */
+    hasItemExtras(): boolean {
+        return [this.itemForm?.brand, this.itemForm?.feedType, this.itemForm?.baiRegistrationNo, this.itemForm?.reorderLevel, this.itemForm?.activeIngredient].some((v) => v != null && v !== '');
     }
 }
