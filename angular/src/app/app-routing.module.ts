@@ -34,7 +34,8 @@ const routes: Routes = [
             { path: 'resources/buyers', title: 'Buyers', loadComponent: () => import('./fpms/resources/buyers.component').then((m) => m.BuyersComponent), ...page('Farm.Buyers') },
             { path: 'inventory', title: 'Inventory', loadComponent: () => import('./fpms/inventory/inventory.component').then((m) => m.InventoryComponent), ...page('Farm.Inventory') },
 
-            { path: 'production/cycles', title: 'Cycles', loadComponent: () => import('./fpms/production/cycles.component').then((m) => m.CyclesComponent), ...page('Farm.Production') },
+            { path: 'production/planning', title: 'Stocking plans', loadComponent: () => import('./fpms/production/planned-stocking.component').then((m) => m.PlannedStockingComponent), ...page('Farm.Production') },
+ title: 'Cycles', loadComponent: () => import('./fpms/production/cycles.component').then((m) => m.CyclesComponent), ...page('Farm.Production') },
             { path: 'production/cycles/:id', title: 'Cycle', loadComponent: () => import('./fpms/production/cycle-detail.component').then((m) => m.CycleDetailComponent), ...page('Farm.Production') },
             { path: 'production/batches', title: 'Batches', loadComponent: () => import('./fpms/production/batches.component').then((m) => m.BatchesComponent), ...page('Farm.Production') },
             { path: 'my-pond', title: 'My pond', loadComponent: () => import('./fpms/production/my-pond.component').then((m) => m.MyPondComponent), ...page('Farm.Logs') },
