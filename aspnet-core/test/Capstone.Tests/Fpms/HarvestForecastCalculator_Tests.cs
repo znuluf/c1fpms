@@ -17,8 +17,8 @@ public class HarvestForecastCalculator_Tests
             StockingDate = today.AddDays(-60),
             GrowthSamples = new List<GrowthSampleFact>
             {
-                new() { Date = today.AddDays(-10), ObservedAtUtc = today.AddDays(-10).ToDateTime(TimeOnly.Noon), AbwG = 10m },
-                new() { Date = today, ObservedAtUtc = today.ToDateTime(TimeOnly.Noon), AbwG = 15m },
+                new() { Date = today.AddDays(-10), ObservedAtUtc = today.AddDays(-10).ToDateTime(new TimeOnly(12, 0)), AbwG = 10m },
+                new() { Date = today, ObservedAtUtc = today.ToDateTime(new TimeOnly(12, 0)), AbwG = 15m },
             }
         };
 
@@ -53,8 +53,8 @@ public class HarvestForecastCalculator_Tests
             StockingDate = today.AddDays(-60),
             GrowthSamples = new List<GrowthSampleFact>
             {
-                new() { Date = today.AddDays(-30), ObservedAtUtc = today.AddDays(-30).ToDateTime(TimeOnly.Noon), AbwG = 10m },
-                new() { Date = today.AddDays(-20), ObservedAtUtc = today.AddDays(-20).ToDateTime(TimeOnly.Noon), AbwG = 15m },
+                new() { Date = today.AddDays(-30), ObservedAtUtc = today.AddDays(-30).ToDateTime(new TimeOnly(12, 0)), AbwG = 10m },
+                new() { Date = today.AddDays(-20), ObservedAtUtc = today.AddDays(-20).ToDateTime(new TimeOnly(12, 0)), AbwG = 15m },
             }
         };
 
