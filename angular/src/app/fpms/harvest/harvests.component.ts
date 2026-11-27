@@ -109,7 +109,14 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 </thead>
                                 <tbody>
                                     @for (h of list(); track h.id) {
-                                        <tr>
+                                        <tr
+                                            class="fpms-clickable-row"
+                                            tabindex="0"
+                                            role="link"
+                                            [attr.aria-label]="'Open harvest ' + (h.harvestedAtUtc | farmDate)"
+                                            (click)="openHarvestRow(h.id, $event)"
+                                            (keydown.enter)="openHarvestRow(h.id, $event)"
+                                            (keydown.space)="$event.preventDefault(); openHarvestRow(h.id, $event)">
                                             <td class="text-nowrap">
                                                 <a [routerLink]="['/app/harvests', h.id]">{{ h.harvestedAtUtc | farmDate }}</a>
                                                 <div class="text-muted">{{ time(h.harvestedAtUtc) }}</div>
@@ -291,6 +298,13 @@ export class HarvestsComponent extends FpmsPage implements OnInit {
     clearFilters(): void {
         Object.assign(this.f, { search: '', type: null, saleStatus: null, unaccountedOnly: false, buyerId: null, from: null, to: null });
         this.apply();
+    }
+
+    openHarvestRow(id: string, event: Event): void {
+        if (event.target instanceof Element && event.target.closest('a, button, input, select, textarea, [role="button"]')) {
+            return;
+        }
+        this.router.navigate(['/app/harvests', id]);
     }
 
     async load(): Promise<void> {
