@@ -109,8 +109,8 @@ export class PlannedStockingComponent extends FpmsPage implements OnInit {
             this.api.get<any>('FryDelivery', 'GetAll', { maxResultCount: 100, sorting: 'deliveryDate DESC' }),
         ]);
         this.plans.set(plans ?? []);
-        this.ponds.set((ponds ?? []).filter((p) => p.purpose === 1 && p.manualStatus !== 3 && !p.isArchived));
-        this.deliveries.set((deliveryPage?.items ?? []).filter((d) => d.status !== 4 && d.status !== 5 && !d.isStockingFinished && d.plLeft > 0));
+        this.ponds.set((ponds ?? []).filter((p) => p.purpose === 1 && p.manualStatus === 1 && !p.isArchived));
+        this.deliveries.set((deliveryPage?.items ?? []).filter((d) => d.status !== 4 && d.status !== 5 && !d.isStockingFinished && (d.status !== 3 || d.plLeft > 0)));
     }
 
     startNew(): void {
