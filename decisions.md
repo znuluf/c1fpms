@@ -8,6 +8,7 @@ All decisions below were accepted on 2026-10-22 by the capstone development team
 
 | ID | Decision | Status |
 | :---- | :---- | :---- |
+| DEC-145 | Default theme follows the reference traceability app | Proposed (full write-up); screens not checked |
 | DEC-144 | Every harvest records the ABW sample weight and pieces | Accepted (full write-up) |
 | DEC-143 | Optional fields folded on three forms, a calmer theme, and replacing AdminLTE with plain Bootstrap | Proposed (full write-up); screens not checked |
 | DEC-01 | Local on-premise MVP with a SaaS-ready multi-tenant model | Accepted (full write-up) |
@@ -3727,3 +3728,28 @@ Positive:
 Negative:
 - A harvest whose sample was not written down cannot be saved.
 - Correcting an older harvest without a sample requires entering one.
+
+---
+
+## Decision DEC-145: Default theme follows the reference traceability app
+
+Status: Proposed 2026-11-27 (branch design/simple-modern-ui; screens not checked)
+Date: 2026-11-27
+Related: DEC-143
+
+### Context
+Screenshots of another shrimp traceability app were given as the preferred look.
+
+### Options considered
+1. Add it as a third theme.
+2. Apply it to the default theme through the shared variables and rules.
+
+### Decision
+Option 2: colours, surfaces, page titles, sidebar current page, section tabs and status pills. Page layouts, icon tiles and step-by-step dialogs are not copied in this step. Text stays at 14 px or more and labels stay in sentence case, so the small uppercase headings of the reference are not used.
+
+### Consequences
+Positive:
+- Every screen changes together, with no component changes.
+
+Negative:
+- Pages keep their current layout; matching the reference further needs template work.

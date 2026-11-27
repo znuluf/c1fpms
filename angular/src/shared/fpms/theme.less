@@ -11,13 +11,13 @@
     --fpms-font: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
 
     // Derived palette
-    --fpms-tide-900: #244a63; // slate navy
-    --fpms-tide-50: #e9efee; // hover and selected tint
-    --fpms-accent-50: #e4f1f1; // teal tint
-    --fpms-accent-text: #0b5555; // teal for text on light backgrounds
+    --fpms-tide-900: #0d1b2a; // ink navy
+    --fpms-tide-50: #eef1f5; // hover and selected tint
+    --fpms-accent-50: #dbe7f3; // blue tint
+    --fpms-accent-text: #16436e; // blue for text on light backgrounds
     --fpms-glow: #ff921e; // the logo orange, for marks and active icons on dark only
-    --fpms-line: #e4e9ee;
-    --fpms-line-strong: #cbd4dc;
+    --fpms-line: #e2e8f0;
+    --fpms-line-strong: #cbd5e1;
     --fpms-surface: #ffffff;
     --fpms-warn-bg: #fff8e8;
     --fpms-warn-line: #e3c27a;
@@ -39,20 +39,20 @@
     // Shape: radius follows role, not one value for everything
     --fpms-r-control: 10px;
     --fpms-r-tile: 12px;
-    --fpms-r-card: 16px;
+    --fpms-r-card: 14px;
     --fpms-r-field: 14px; // soft form style: roomier controls on sign-in and form pages
     --fpms-field-h: 52px;
 
     // Surfaces and motion (shared by the app and the start page)
-    --fpms-ground: #f5f7f9;
-    --fpms-ground-muted: #edf1f4;
+    --fpms-ground: #fbfaf7;
+    --fpms-ground-muted: #f4f3ee;
     --fpms-gap: 24px;
     --fpms-motion: 160ms;
     --fpms-ease: ease-out;
 
     // Shadows are tinted with the primary color, kept small
-    --fpms-shadow-1: 0 1px 2px rgba(36, 74, 99, 0.06);
-    --fpms-shadow-2: 0 8px 24px rgba(36, 74, 99, 0.14);
+    --fpms-shadow-1: 0 1px 2px rgba(13, 27, 42, 0.04);
+    --fpms-shadow-2: 0 12px 32px rgba(13, 27, 42, 0.16);
 }
 
 // ---- Typography
@@ -83,9 +83,9 @@ h6,
     letter-spacing: -0.005em;
 }
 .fpms-page-header h1 {
-    font-size: 1.65rem;
-    font-weight: 600;
-    letter-spacing: -0.012em;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.022em;
     line-height: 1.2;
     color: var(--fpms-text);
 }
@@ -363,13 +363,13 @@ html body.sidebar-mini .wrapper .main-footer {
     color: var(--fpms-primary-dark);
 }
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link.active {
-    background-color: var(--fpms-accent-50);
-    color: var(--fpms-accent-text);
+    background-color: var(--fpms-primary);
+    color: #fff;
     font-weight: 600;
-    box-shadow: inset 3px 0 0 var(--fpms-accent);
+    box-shadow: none;
 }
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link.active .nav-icon {
-    color: var(--fpms-accent-text);
+    color: #fff;
 }
 .fpms-chevron {
     flex: none;
@@ -577,21 +577,24 @@ html body.sidebar-mini .wrapper .main-footer {
 // (Setup) show as a second row in the same style, smaller.
 .fpms-section-bar {
     display: flex;
-    align-items: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 0.75rem;
-    padding: 0.5rem 1rem 0;
-    background: var(--fpms-surface);
-    border-bottom: 1px solid var(--fpms-line);
+    padding: 1rem 1rem 0;
 }
 .fpms-section-tabs {
     display: flex;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     flex-wrap: nowrap;
     gap: 0.25rem;
     min-width: 0;
-    margin: 0;
-    padding: 0;
+    max-width: 100%;
+    margin: 0 auto 0 0;
+    padding: 0.25rem;
     overflow-x: auto;
+    background: var(--fpms-surface);
+    border: 1px solid var(--fpms-line);
+    border-radius: var(--fpms-r-tile);
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
 }
@@ -602,7 +605,6 @@ html body.sidebar-mini .wrapper .main-footer {
     display: flex;
     flex: 0 0 auto;
     gap: 0.5rem;
-    padding-bottom: 0.4rem;
 }
 .fpms-section-tab {
     display: inline-flex;
@@ -610,9 +612,10 @@ html body.sidebar-mini .wrapper .main-footer {
     align-items: center;
     min-height: 2.75rem;
     padding: 0 1rem;
-    border-bottom: 3px solid transparent;
-    color: var(--fpms-text);
+    border-radius: var(--fpms-r-control);
+    color: var(--fpms-muted);
     font-size: 0.95rem;
+    font-weight: 600;
     white-space: nowrap;
     text-decoration: none;
 }
@@ -623,22 +626,20 @@ html body.sidebar-mini .wrapper .main-footer {
     text-decoration: none;
 }
 .fpms-section-tab:focus-visible {
-    outline: 2px solid var(--fpms-primary);
-    outline-offset: -2px;
+    outline: 2px solid var(--fpms-accent);
+    outline-offset: 1px;
 }
 .fpms-section-tab.active {
-    color: var(--fpms-primary-dark);
-    font-weight: 600;
-    border-bottom-color: var(--fpms-primary);
+    color: #fff;
+    background: var(--fpms-primary);
 }
 .fpms-section-subtabs {
-    padding: 0 1rem;
-    background: var(--fpms-bg);
-    border-bottom: 1px solid var(--fpms-line);
+    width: fit-content;
+    max-width: calc(100% - 2rem);
+    margin: 0.5rem 1rem 0;
     .fpms-section-tab {
         min-height: 2.25rem;
         padding: 0 0.85rem;
-        border-bottom-width: 2px;
         font-size: 0.875rem;
     }
 }
@@ -763,7 +764,7 @@ fpms-logo {
     color: #fff;
 }
 .btn-primary:not(:disabled):not(.disabled) {
-    box-shadow: 0 1px 2px rgba(36, 74, 99, 0.2);
+    box-shadow: 0 1px 2px rgba(13, 27, 42, 0.2);
 }
 
 // ---- Forms
@@ -1151,24 +1152,24 @@ button.fpms-chip {
     padding: 0.32em 0.75em;
 }
 .badge.badge-success {
-    background-color: #e3f1e8;
-    color: #1d5c38;
+    background-color: #d5f3e6;
+    color: #11593a;
 }
 .badge.badge-info {
-    background-color: #e1eef6;
-    color: #1e5878;
+    background-color: #dbe7f3;
+    color: #16436e;
 }
 .badge.badge-warning {
-    background-color: #f8ebcb;
+    background-color: #fbeccb;
     color: #6b4500;
 }
 .badge.badge-danger {
-    background-color: #f6e1e1;
+    background-color: #fde3e4;
     color: #8c2b2b;
 }
 .badge.badge-secondary {
-    background-color: #e8eceb;
-    color: #3a4750;
+    background-color: #eef1f5;
+    color: #334155;
 }
 .badge.badge-primary {
     background-color: var(--fpms-tide-50);
