@@ -357,6 +357,7 @@ interface PondCard {
             }
             .pd-table .pd-col-pond { width: 24%; }
             .pd-table .pd-col-status { width: 18%; }
+            .pd-table .pd-indicator-heading { width: 19.33%; text-align: center; }
             .pd-table th {
                 padding: 0.7rem 0.85rem;
                 white-space: nowrap;
@@ -371,6 +372,7 @@ interface PondCard {
                 overflow-wrap: anywhere;
             }
             .pd-pond-cell > div:first-of-type { font-weight: 600; }
+            .pd-table .pd-indicator-value { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
             .pd-status-cell { white-space: normal; }
             .pd-indicators {
                 display: grid;

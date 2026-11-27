@@ -461,7 +461,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
             .fpms-upcoming {
                 margin: 0 0 1.25rem;
                 padding: 1rem;
-                border: 1px solid var(--fpms-border);
+                border: 1px solid var(--fpms-line, #d9dee5);
                 border-radius: var(--fpms-r-card, 0.75rem);
                 background: var(--fpms-surface, #fff);
             }
