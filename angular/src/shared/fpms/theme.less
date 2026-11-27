@@ -2188,3 +2188,28 @@ form.ng-submitted .form-control.ng-invalid:focus {
     padding-top: 0.4rem;
     padding-bottom: 0.4rem;
 }
+
+
+// Removable filter tags should read as quiet selected controls, not white pills on the page ground.
+// This final override also covers the legacy rule in fpms.less without changing filter behavior.
+button.fpms-filter-tag {
+    min-height: 32px;
+    padding: 0.2rem 0.65rem;
+    border: 1px solid var(--fpms-line-strong);
+    border-radius: 999px;
+    background: var(--fpms-accent-50);
+    color: var(--fpms-accent-text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease), color var(--fpms-motion) var(--fpms-ease);
+}
+button.fpms-filter-tag:hover,
+button.fpms-filter-tag:focus-visible {
+    border-color: var(--fpms-accent);
+    background: var(--fpms-tide-50);
+    color: var(--fpms-primary-dark);
+}
+button.fpms-filter-tag:focus-visible {
+    outline: 2px solid var(--fpms-accent);
+    outline-offset: 2px;
+}
