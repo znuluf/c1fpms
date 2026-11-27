@@ -116,9 +116,9 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                 }
 
                 @if (receipt) {
-                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
+                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="stock-receipt-dialog-title"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
-                            <div class="card-header"><h3 class="card-title">Record stock receipt</h3></div>
+                            <div class="card-header"><h3 id="stock-receipt-dialog-title" class="card-title">Record stock receipt</h3></div>
                             <form #rf="ngForm" (ngSubmit)="saveReceipt()" fpmsReview="receipt" [fpmsReviewNew]="true" novalidate>
                                 <div class="card-body">
                                     <div class="form-row">
