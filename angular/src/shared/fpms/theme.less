@@ -572,6 +572,62 @@ html body.sidebar-mini .wrapper .main-footer {
     }
 }
 
+// Dialogs stay floating on every screen size. On phones, use the available viewport
+// instead of retaining the desktop top offset and wide internal gutters.
+@media (max-width: 767.98px) {
+    .fpms-dialog-backdrop {
+        align-items: flex-start;
+        padding: 0.75rem;
+        padding-top: max(0.75rem, env(safe-area-inset-top));
+        padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    }
+    .fpms-dialog {
+        max-height: calc(100vh - 1.5rem);
+        max-height: calc(100dvh - 1.5rem);
+        border-radius: 12px;
+    }
+    .fpms-dialog-head {
+        padding: 1rem 1.125rem 0.875rem;
+    }
+    .fpms-dialog-body {
+        padding: 1.125rem;
+        min-height: 0;
+    }
+    .fpms-dialog-foot {
+        padding: 0.875rem 1.125rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .fpms-dialog-backdrop {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    .fpms-dialog {
+        max-height: calc(100vh - 1rem);
+        max-height: calc(100dvh - 1rem);
+        border-radius: 10px;
+    }
+    .fpms-dialog-head {
+        gap: 0.75rem;
+        padding: 0.875rem 1rem 0.75rem;
+    }
+    .fpms-dialog-head h1,
+    .fpms-dialog-head h2 {
+        font-size: 1.15rem;
+    }
+    .fpms-dialog-body {
+        padding: 1rem;
+    }
+    .fpms-dialog-foot {
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+    }
+    .fpms-dialog-foot > .btn {
+        min-height: 40px;
+    }
+}
+
 // ---- Section tabs: the pages of the open sidebar section (DEC-85 step 7). The bar holds the tabs, which stay on one
 // row and scroll sideways when they do not fit, and the section's actions at the right. Pages grouped under a tab
 // (Setup) show as a second row in the same style, smaller.
