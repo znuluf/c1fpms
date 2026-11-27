@@ -72,7 +72,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
         }
 
         // What the farm is made of first (farm management), daily work after it (production management).
-        // Sections with several pages show one item here; their pages are tabs across the top of the content.
+        // Operational sections keep their page tabs; Resources exposes each destination directly in the sidebar.
         const production = 'Production management';
         const farm = 'Farm management';
         const canSell = this.permission.isGranted('Farm.Sales');
