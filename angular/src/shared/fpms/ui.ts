@@ -437,9 +437,21 @@ export interface ToolbarChip {
                 margin: 0 0.4rem 0.3rem 0;
                 border-radius: 18px;
                 border: 1px solid var(--fpms-line-strong);
-                background: var(--fpms-surface);
+                background: var(--fpms-ground-muted);
+                color: var(--fpms-text);
                 font-size: 0.9rem;
                 cursor: pointer;
+                transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease), color var(--fpms-motion) var(--fpms-ease);
+            }
+            .fpms-lt-chip:hover,
+            .fpms-lt-chip:focus-visible {
+                background: var(--fpms-tide-50);
+                border-color: var(--fpms-primary);
+                color: var(--fpms-primary-dark);
+            }
+            .fpms-lt-chip:focus-visible {
+                outline: 2px solid var(--fpms-primary);
+                outline-offset: 2px;
             }
             .fpms-lt-chip[aria-pressed='true'] {
                 background: var(--fpms-primary);
