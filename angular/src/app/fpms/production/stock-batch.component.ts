@@ -167,8 +167,8 @@ interface Allocation {
                                         <div class="form-row">
                                             <div class="form-group col-md-6">
                                                 <label [for]="'ta' + a.pond.id">Target harvest ABW (g)</label>
-                                                <input [id]="'ta' + a.pond.id" type="number" min="0.1" max="60" step="0.1" class="form-control" [(ngModel)]="a.targetHarvestAbwG" />
-                                                <small class="form-text text-muted">{{ options.defaultHarvestTargetAbwG != null ? 'Farm default: ' + options.defaultHarvestTargetAbwG + ' g. Change for this batch if needed.' : 'No farm default set. Enter a target for this batch, or leave blank if not yet decided.' }}</small>
+                                                <input [id]="'ta' + a.pond.id" type="number" min="0.1" max="60" step="0.1" class="form-control" [(ngModel)]="a.targetHarvestAbwG" required />
+                                                <small class="form-text text-muted">{{ options.defaultHarvestTargetAbwG != null ? 'Farm default: ' + options.defaultHarvestTargetAbwG + ' g. Change for this batch if needed.' : 'No farm default set. Enter the target for this batch before stocking.' }}</small>
                                             </div>
                                             <div class="form-group col-md-6">
                                                 <label [for]="'mc' + a.pond.id">Maximum culture duration (DOC)</label>
