@@ -157,6 +157,7 @@ interface PondCard {
                                                     <td class="pd-indicator-value">
                                                         @if (p.batchId) {
                                                             {{ p.abwG === null ? '—' : (p.abwG | num: 1) }}
+                                                            <small class="d-block text-muted" [class.text-warning-dark]="p.sampleDays === null || p.sampleDays > 14">{{ sampleText(p.sampleDays) }}</small>
                                                         } @else { <span class="text-muted">—</span> }
                                                     </td>
                                                     <td class="pd-indicator-value">
