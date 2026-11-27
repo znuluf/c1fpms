@@ -26,35 +26,45 @@ import { unbroken } from '@shared/fpms/labels';
                     </div>
                 </div>
                 @if (fix(); as f) {
-                    <div class="card card-outline card-warning">
-                        <div class="card-header"><h3 class="card-title">Correct the Farm ID of {{ f.name }}</h3></div>
-                        <form (ngSubmit)="saveFix()" #ff="ngForm" novalidate>
-                            <div class="card-body">
-                                <p class="small text-muted">Use this only for an ID given in error. The ID is printed on lot codes and receipts, so a farm keeps its ID once it is in use. The reason is kept in the log.</p>
-                                <div class="form-row">
-                                    <div class="form-group col-md-3">
-                                        <label for="fx-a">Area (0 General Santos, 1 Sarangani)</label>
-                                        <input id="fx-a" type="number" min="0" max="9" class="form-control" name="area" [(ngModel)]="f.area" required />
+                    <div class="fpms-dialog-backdrop">
+                        <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="farm-id-correction-title" aria-describedby="farm-id-correction-help">
+                            <div class="fpms-dialog-body p-0">
+                                <div class="card card-outline card-warning">
+                                    <div class="card-header">
+                                        <h3 id="farm-id-correction-title" class="card-title">Correct the Farm ID of {{ f.name }}</h3>
                                     </div>
-                                    <div class="form-group col-md-3">
-                                        <label for="fx-p">Place (01 to 26)</label>
-                                        <input id="fx-p" type="number" min="1" max="99" class="form-control" name="place" [(ngModel)]="f.place" required />
-                                    </div>
-                                    <div class="form-group col-md-3">
-                                        <label for="fx-n">Farm number (01 to 99)</label>
-                                        <input id="fx-n" type="number" min="1" max="99" class="form-control" name="farmNumber" [(ngModel)]="f.farmNumber" required />
-                                    </div>
-                                </div>
-                                <div class="form-group mb-0">
-                                    <label for="fx-r">Reason</label>
-                                    <input id="fx-r" class="form-control" name="reason" [(ngModel)]="f.reason" required maxlength="300" />
+                                    <form (ngSubmit)="saveFix()" #ff="ngForm" novalidate>
+                                        <div class="card-body">
+                                            <p id="farm-id-correction-help" class="small text-muted">
+                                                Use this only for an ID given in error. The ID is printed on lot codes and receipts, so a farm keeps its ID once it is in use. The reason is kept in the log.
+                                            </p>
+                                            <div class="form-row">
+                                                <div class="form-group col-md-4">
+                                                    <label for="fx-a">Area (0 General Santos, 1 Sarangani)</label>
+                                                    <input id="fx-a" type="number" min="0" max="9" class="form-control" name="area" [(ngModel)]="f.area" required />
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="fx-p">Place (01 to 26)</label>
+                                                    <input id="fx-p" type="number" min="1" max="99" class="form-control" name="place" [(ngModel)]="f.place" required />
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="fx-n">Farm number (01 to 99)</label>
+                                                    <input id="fx-n" type="number" min="1" max="99" class="form-control" name="farmNumber" [(ngModel)]="f.farmNumber" required />
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label for="fx-r">Reason</label>
+                                                <input id="fx-r" class="form-control" name="reason" [(ngModel)]="f.reason" required maxlength="300" />
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <button type="submit" class="btn btn-primary" [disabled]="busy() || !ff.form.valid">Save Farm ID</button>
+                                            <button type="button" class="btn btn-default ml-1" (click)="fix.set(null)">Cancel</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" [disabled]="busy() || !ff.form.valid">Save Farm ID</button>
-                                <button type="button" class="btn btn-default ml-1" (click)="fix.set(null)">Cancel</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 }
                 <div class="card">
