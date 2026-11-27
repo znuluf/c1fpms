@@ -104,77 +104,66 @@ interface PondCard {
                                     <table class="table table-sm table-hover align-middle mb-0 pd-table">
                                         <thead>
                                             <tr>
-                                                <th scope="col">Pond</th>
-                                                <th scope="col">Purpose</th>
-                                                <th scope="col">Construction</th>
-                                                <th scope="col">Depth (avg / max)</th>
-                                                <th scope="col">Status</th>
-                                                <th scope="col">Batch</th>
-                                                <th scope="col">DOC</th>
-                                                <th scope="col">ABW</th>
-                                                <th scope="col">FCR</th>
-                                                <th scope="col">Est. survival</th>
-                                                <th scope="col">Est. biomass</th>
-                                                <th scope="col">Feed used</th>
-                                                <th scope="col">Last sample</th>
-                                                <th scope="col">Latest water</th>
-                                                <th scope="col">Log, last 7 days</th>
-                                                <th scope="col">Attention</th>
-                                                <th scope="col">Actions</th>
+                                                <th scope="col" class="pd-col-pond">Pond</th>
+                                                <th scope="col" class="pd-col-status">Status · batch</th>
+                                                <th scope="col">Production indicators</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @for (p of shownCards(); track p.id) {
                                                 <tr [class.table-warning]="!!p.alert" [class.text-muted]="p.archived">
-                                                    <td>
+                                                    <td class="pd-pond-cell">
                                                         <a [routerLink]="['/app/ponds', p.id]"><strong>{{ p.code }}</strong></a>
-                                                        <div class="small text-muted">{{ p.name }} · {{ p.areaM2 | num: 0 }} m²</div>
-                                                        @if (p.isReserved) { <div class="small text-warning-dark">Reserved for {{ p.reservedByDelivery }}</div> }
+                                                        <div>{{ p.name }} · {{ p.areaM2 | num: 0 }} m²</div>
+                                                        <div class="small text-muted">
+                                                            {{ p.purpose | label: L.PondPurposes }} · {{ p.constructionType | label: L.ConstructionTypes }}
+                                                            · {{ p.averageDepthM | num: 2 }} / {{ p.maxDepthM | num: 2 }} m
+                                                        </div>
+                                                        @if (p.isReserved) {
+                                                            <div class="small text-warning-dark">Reserved for {{ p.reservedByDelivery }}</div>
+                                                        }
                                                     </td>
-                                                    <td>{{ p.purpose | label: L.PondPurposes }}</td>
-                                                    <td>{{ p.constructionType | label: L.ConstructionTypes }}</td>
-                                                    <td class="text-nowrap">{{ p.averageDepthM | num: 2 }} / {{ p.maxDepthM | num: 2 }} m</td>
-                                                    <td><fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge></td>
-                                                    <td>@if (p.batchId) { <a [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a> } @else { <span class="text-muted">—</span> }</td>
-                                                    <td>{{ p.doc ?? '—' }}</td>
-                                                    <td>{{ p.abwG === null ? '—' : (p.abwG | num: 1) + ' g' }}</td>
-                                                    <td>{{ p.fcr === null ? '—' : (p.fcr | num: 2) }}</td>
-                                                    <td>{{ p.survival === null ? '—' : (p.survival | num: 1) + '%' }}</td>
-                                                    <td>{{ p.biomassKg === null ? '—' : (p.biomassKg | num: 1) + ' kg' }}</td>
-                                                    <td>{{ p.feedKg === null ? '—' : (p.feedKg | num: 1) + ' kg' }}</td>
-                                                    <td [class.text-warning-dark]="p.batchId && (p.sampleDays === null || p.sampleDays > 14)">{{ p.batchId ? sampleText(p.sampleDays) : '—' }}</td>
-                                                    <td>
-                                                        @if (p.water.length) {
-                                                            @for (w of p.water; track w.name) {
-                                                                <div class="text-nowrap" [class.text-warning-dark]="w.bad">{{ w.name }}: {{ w.value | num: 1 }} {{ w.unit }}@if (w.bad) { <strong>(out of range)</strong> }</div>
-                                                            }
-                                                            @if (p.waterDate) { <div class="small text-muted">Observed {{ p.waterDate }}</div> }
-                                                        } @else { <span class="text-muted">—</span> }
-                                                    </td>
-                                                    <td>
-                                                        @if (p.strip.length) {
-                                                            <div class="pd-strip">
-                                                                @for (c of p.strip; track c.date) {
-                                                                    <a class="sq" [class.is-today]="c.today" [ngClass]="c.state" [title]="c.title" [attr.aria-label]="c.title" role="button" tabindex="0" (click)="openFeeding(p.batchId!, c.date)" (keydown.enter)="openFeeding(p.batchId!, c.date)">@if (c.water !== 'na') { <span class="wq" [class.in]="c.water === 'in'" aria-hidden="true"></span> }</a>
+                                                    <td class="pd-status-cell">
+                                                        <fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge>
+                                                        @if (p.batchId) {
+                                                            <div class="mt-1"><a [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a></div>
+                                                        } @else {
+                                                            <div class="small text-muted mt-1">No active batch</div>
+                                                        }
+                                                        @if (p.alert) {
+                                                            <div class="small text-warning-dark mt-1">
+                                                                <i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ p.alert }}
+                                                                @if (p.alertLog) {
+                                                                    <div><a [routerLink]="['/app/logbook', p.alertLog]">Open record</a></div>
                                                                 }
                                                             </div>
-                                                            @if (p.today) {
-                                                                <div class="small text-nowrap mt-1">
-                                                                    @for (t of p.today; track t.label) { <span class="pd-chip" [class.done]="t.done">{{ t.label }} {{ t.done ? '✓' : '–' }}</span> }
-                                                                </div>
-                                                            }
-                                                        } @else { <span class="text-muted">—</span> }
+                                                        }
                                                     </td>
-                                                    <td>
-                                                        @if (p.alert) {
-                                                            <span class="text-warning-dark">{{ p.alert }}</span>
-                                                            @if (p.alertLog) { <div><a [routerLink]="['/app/logbook', p.alertLog]">Open log</a></div> }
-                                                        } @else { <span class="text-muted">—</span> }
-                                                    </td>
-                                                    <td class="text-nowrap">
-                                                        @if (p.batchId) { <a [routerLink]="['/app/production/batches', p.batchId]">Batch</a><span class="mx-1">·</span> }
-                                                        <a [routerLink]="['/app/ponds', p.id]">Pond</a>
-                                                        @if (!p.batchId && p.status === 7 && can('Farm.Production.Stock')) { <span class="mx-1">·</span><a routerLink="/app/production/create-batch">Stock</a> }
+                                                    <td class="pd-indicator-cell">
+                                                        @if (p.batchId) {
+                                                            <div class="pd-indicators">
+                                                                <span><b>DOC</b> {{ p.doc ?? '—' }}</span>
+                                                                <span><b>ABW</b> {{ p.abwG === null ? '—' : (p.abwG | num: 1) + ' g' }}</span>
+                                                                <span><b>FCR</b> {{ p.fcr === null ? '—' : (p.fcr | num: 2) }}</span>
+                                                                <span><b>Survival</b> {{ p.survival === null ? '—' : (p.survival | num: 1) + '%' }}</span>
+                                                                <span><b>Biomass</b> {{ p.biomassKg === null ? '—' : (p.biomassKg | num: 1) + ' kg' }}</span>
+                                                                <span><b>Feed</b> {{ p.feedKg === null ? '—' : (p.feedKg | num: 1) + ' kg' }}</span>
+                                                                <span [class.text-warning-dark]="p.sampleDays === null || p.sampleDays > 14"><b>Last sample</b> {{ sampleText(p.sampleDays) }}</span>
+                                                                @if (p.water.length) {
+                                                                    <span class="pd-water-indicator">
+                                                                        <b>Water</b>
+                                                                        @for (w of p.water; track w.name) {
+                                                                            <span [class.text-warning-dark]="w.bad">{{ w.name }} {{ w.value | num: 1 }} {{ w.unit }}</span>
+                                                                        }
+                                                                        @if (p.waterDate) { <small class="text-muted">Observed {{ p.waterDate }}</small> }
+                                                                    </span>
+                                                                } @else {
+                                                                    <span><b>Water</b> —</span>
+                                                                }
+                                                            </div>
+                                                        } @else {
+                                                            <span class="text-muted">No production indicators yet</span>
+                                                        }
                                                     </td>
                                                 </tr>
                                             }
@@ -359,14 +348,45 @@ interface PondCard {
                 font-size: 1.15rem;
             }
             .pd-table {
-                min-width: 1050px;
+                width: 100%;
+                min-width: 760px;
+                table-layout: fixed;
             }
+            .pd-table .pd-col-pond { width: 24%; }
+            .pd-table .pd-col-status { width: 18%; }
             .pd-table th {
+                padding: 0.7rem 0.85rem;
                 white-space: nowrap;
                 font-size: 0.82rem;
+                color: var(--fpms-muted);
+                border-bottom: 1px solid var(--fpms-line-strong);
             }
             .pd-table td {
+                padding: 0.8rem 0.85rem;
                 vertical-align: middle;
+                border-top-color: var(--fpms-line);
+                overflow-wrap: anywhere;
+            }
+            .pd-pond-cell > div:first-of-type { font-weight: 600; }
+            .pd-status-cell { white-space: normal; }
+            .pd-indicators {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 0.4rem 0.85rem;
+                align-items: start;
+                font-size: 0.875rem;
+            }
+            .pd-indicators > span { min-width: 0; }
+            .pd-indicators b {
+                display: block;
+                color: var(--fpms-muted);
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+            .pd-water-indicator > span { display: block; }
+            .pd-water-indicator small { display: block; }
+            @media (max-width: 1100px) {
+                .pd-indicators { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             }
             .pd-archived {
                 opacity: 0.7;
