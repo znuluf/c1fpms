@@ -417,6 +417,17 @@ public static class FpmsModelConfiguration
             e.HasIndex(x => new { x.TenantId, x.Status });
         });
 
+        b.Entity<PlannedStocking>(e =>
+        {
+            e.ToTable("FpmsPlannedStockings");
+            e.Property(x => x.Notes).HasMaxLength(PlannedStocking.MaxNotesLength);
+            e.ToTable(t => t.HasCheckConstraint("CK_FpmsPlannedStockings_Status", "[Status] IN (1, 2)"));
+            e.HasOne(x => x.Pond).WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(x => x.FryDelivery).WithMany().HasForeignKey(x => x.FryDeliveryId).OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(x => new { x.TenantId, x.PlannedDate, x.Status });
+            e.HasIndex(x => new { x.TenantId, x.PondId, x.Status });
+        });
+
         // DEC-127: who looks after a batch, one row per person.
         b.Entity<BatchTechnician>(e =>
         {
