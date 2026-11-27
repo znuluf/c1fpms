@@ -74,7 +74,7 @@ interface Sheet {
                             <thead>
                                 <tr>
                                     @for (c of s.columns; track c) {
-                                        <th>{{ c }}</th>
+                                        <th scope="col">{{ c }}</th>
                                     }
                                 </tr>
                             </thead>
