@@ -57,6 +57,17 @@ public class BatchAppService : CapstoneAppServiceBase
         _loader = loader;
     }
 
+    private static void ApplyForecast(BatchListDto dto, HarvestForecast forecast)
+    {
+        dto.EstimatedHarvestFrom = forecast.From;
+        dto.EstimatedHarvestTo = forecast.To;
+        dto.HarvestForecastConfidence = forecast.Confidence;
+        dto.HarvestForecastReason = forecast.Reason;
+        dto.HarvestForecastSampleDate = forecast.SampleDate;
+        dto.HarvestForecastLatestAbwG = forecast.LatestAbwG;
+        dto.HarvestForecastGrowthRateGPerDay = forecast.GrowthRateGPerDay;
+    }
+
     internal static BatchListDto MapList(PondBatch b, string cycleCode, BatchIndicators ind) => new()
     {
         Id = b.Id, BatchCode = b.BatchCode, Letter = b.Letter, CycleId = b.CycleId, CycleCode = cycleCode, PondId = b.PondId, PondCode = b.Pond?.PondCode,
@@ -142,7 +153,14 @@ public class BatchAppService : CapstoneAppServiceBase
         var batches = await ordered.Skip(input.SkipCount).Take(input.MaxResultCount).ToListAsync();
         var facts = await _loader.LoadAsync(batches.Select(b => b.Id).ToList(), await Farm.GetTimeZoneAsync());
         var today = await Farm.GetTodayAsync();
+        var targetDoc = (int)await _standards.GetAsync(FarmThresholds.HarvestReadyFromDoc);
+        var targetAbw = await _standards.GetAsync(FarmThresholds.HarvestReadyAtAbw);
         var items = batches.Select(b => MapList(b, b.Cycle?.CycleCode, IndicatorCalculator.Compute(facts.TryGetValue(b.Id, out var f) ? f : new BatchFacts(), today))).ToList();
+        for (var i = 0; i < batches.Count; i++)
+        {
+            var batchFacts = facts.TryGetValue(batches[i].Id, out var loaded) ? loaded : new BatchFacts();
+            ApplyForecast(items[i], HarvestForecastCalculator.Compute(batchFacts, today, targetDoc, targetAbw, batches[i].Status == BatchStatus.Stocked));
+        }
         await FillPeopleAsync(items);
         return new PagedResultDto<BatchListDto>(total, items);
     }
@@ -182,6 +200,7 @@ public class BatchAppService : CapstoneAppServiceBase
         var latestGrowthSample = facts.GrowthSamples.OrderByDescending(g => g.ObservedAtUtc).FirstOrDefault();
         var sampleIsRecent = latestGrowthSample != null && latestGrowthSample.Date <= today && latestGrowthSample.Date >= today.AddDays(-7);
         var harvestReadinessReached = b.Status == BatchStatus.Stocked && ind.Doc.HasValue && ind.Doc.Value >= harvestDocTarget && sampleIsRecent && latestGrowthSample.AbwG >= harvestAbwTarget;
+        var forecast = HarvestForecastCalculator.Compute(facts, today, harvestDocTarget, harvestAbwTarget, b.Status == BatchStatus.Stocked);
         var counts = await _logs.GetAll().Where(l => l.BatchId == id).GroupBy(l => l.LogType).Select(g => new { g.Key, N = g.Count() }).ToListAsync();
         var hasFinal = await _harvests.GetAll().Where(h => h.BatchId == id).AnyAsync(Harvest.EmptiesPondExpression);
         var hasHarvest = await _harvests.GetAll().AnyAsync(h => h.BatchId == id);
@@ -222,6 +241,7 @@ public class BatchAppService : CapstoneAppServiceBase
             IsReadOnly = b.Status == BatchStatus.Closed,
             TechnicianUserIds = b.Technicians.Select(t => t.UserId).ToList(), CoverUserId = b.CoverUserId, CoverUntil = b.CoverUntil,
         };
+        ApplyForecast(dto, forecast);
         await FillPeopleAsync(new BatchListDto[] { dto });
 
         dto.CanClose = isOwner && b.CanClose(failure != null);
