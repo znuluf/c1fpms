@@ -806,11 +806,6 @@ input[type='radio'] {
 .form-control::placeholder {
     color: #5e6e6e;
 }
-.form-control:focus,
-.custom-select:focus {
-    border-color: var(--fpms-accent);
-    box-shadow: 0 0 0 3px rgba(15, 111, 111, 0.22);
-}
 .form-control:disabled,
 .form-control[readonly] {
     background-color: #edf1f0;
@@ -886,7 +881,7 @@ label,
 .table-striped tbody tr:nth-of-type(odd) {
     background-color: #f9fbfa;
 }
-// The row that is "current" (open batch, selected item): a soft teal tint and an accent edge, not Bootstrap's blue
+// The row that is "current" (open batch, selected item): a soft accent tint and edge, not Bootstrap's default blue
 .table tbody tr.table-info,
 .table tbody tr.table-info > td {
     background-color: var(--fpms-accent-50);
