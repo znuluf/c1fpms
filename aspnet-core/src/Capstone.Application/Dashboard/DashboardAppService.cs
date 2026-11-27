@@ -29,6 +29,7 @@ public class PondTileDto
     public BatchStatus? BatchStatus { get; set; }
     public int? Doc { get; set; }
     public decimal? AbwG { get; set; }
+    public decimal? AdgGPerDay { get; set; }
     public decimal? FcrToDate { get; set; }
     public decimal? EstimatedSurvivalPct { get; set; }
     public bool HasWaterQualityAlert { get; set; }
@@ -449,6 +450,13 @@ public class DashboardAppService : CapstoneAppServiceBase
                 }
                 tile.Doc = batch.Status == BatchStatus.Stocked ? ind.Doc : null;
                 tile.AbwG = ind.CurrentAbwG;
+                var growthSamples = batchFacts.GrowthSamples.OrderBy(g => g.ObservedAtUtc).ToList();
+                if (growthSamples.Count >= 2)
+                {
+                    var previous = growthSamples[^2];
+                    var latest = growthSamples[^1];
+                    tile.AdgGPerDay = IndicatorCalculator.GrowthRate(previous.AbwG, previous.Date, latest.AbwG, latest.Date);
+                }
                 tile.FcrToDate = ind.FcrToDate;
                 tile.EstimatedSurvivalPct = ind.EstimatedSurvivalPct;
                 tile.EstimatedBiomassKg = ind.EstimatedBiomassKg;

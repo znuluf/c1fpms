@@ -104,9 +104,14 @@ interface PondCard {
                                     <table class="table table-sm table-hover align-middle mb-0 pd-table">
                                         <thead>
                                             <tr>
-                                                <th scope="col" class="pd-col-pond">Pond</th>
-                                                <th scope="col" class="pd-col-status">Status · batch</th>
-                                                <th scope="col">Production indicators</th>
+                                                <th scope="col" rowspan="2" class="pd-col-pond align-middle">Pond</th>
+                                                <th scope="col" rowspan="2" class="pd-col-status align-middle">Status · batch</th>
+                                                <th scope="colgroup" colspan="3" class="text-center">Production indicators</th>
+                                            </tr>
+                                            <tr>
+                                                <th scope="col" class="pd-indicator-heading">ABW (g)</th>
+                                                <th scope="col" class="pd-indicator-heading">ADG (g/day)</th>
+                                                <th scope="col" class="pd-indicator-heading">FCR</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -148,32 +153,21 @@ interface PondCard {
                                                             </div>
                                                         }
                                                     </td>
-                                                    <td class="pd-indicator-cell">
+                                                    <td class="pd-indicator-value">
                                                         @if (p.batchId) {
-                                                            <div class="pd-indicators">
-                                                                <span><b>DOC</b> {{ p.doc ?? '—' }}</span>
-                                                                <span><b>ABW</b> {{ p.abwG === null ? '—' : (p.abwG | num: 1) + ' g' }}</span>
-                                                                <span><b>FCR</b> {{ p.fcr === null ? '—' : (p.fcr | num: 2) }}</span>
-                                                                <span><b>Survival</b> {{ p.survival === null ? '—' : (p.survival | num: 1) + '%' }}</span>
-                                                                <span><b>Biomass</b> {{ p.biomassKg === null ? '—' : (p.biomassKg | num: 1) + ' kg' }}</span>
-                                                                <span><b>Feed</b> {{ p.feedKg === null ? '—' : (p.feedKg | num: 1) + ' kg' }}</span>
-                                                                <span [class.text-warning-dark]="p.sampleDays === null || p.sampleDays > 14"><b>Last sample</b> {{ sampleText(p.sampleDays) }}</span>
-                                                                @if (p.water.length) {
-                                                                    <span class="pd-water-indicator">
-                                                                        <b>Water</b>
-                                                                        @for (w of p.water; track w.name) {
-                                                                            <span [class.text-warning-dark]="w.bad">{{ w.name }} {{ w.value | num: 1 }} {{ w.unit }}</span>
-                                                                        }
-                                                                        @if (p.waterDate) { <small class="text-muted">Observed {{ p.waterDate }}</small> }
-                                                                    </span>
-                                                                } @else {
-                                                                    <span><b>Water</b> —</span>
-                                                                }
-                                                            </div>
-                                                        } @else {
-                                                            <span class="text-muted">No production indicators yet</span>
-                                                        }
+                                                            {{ p.abwG === null ? '—' : (p.abwG | num: 1) }}
+                                                        } @else { <span class="text-muted">—</span> }
                                                     </td>
+                                                    <td class="pd-indicator-value">
+                                                        @if (p.batchId) {
+                                                            {{ p.adgGPerDay === null ? '—' : (p.adgGPerDay | num: 3) }}
+                                                        } @else { <span class="text-muted">—</span> }
+                                                    </td>
+                                                    <td class="pd-indicator-value">
+                                                        @if (p.batchId) {
+                                                            {{ p.fcr === null ? '—' : (p.fcr | num: 2) }}
+                                                        } @else { <span class="text-muted">—</span> }
+                                                    </td></td>
                                                 </tr>
                                             }
                                         </tbody>
