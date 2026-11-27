@@ -41,6 +41,12 @@ public class PondBatch : FarmEntity
     /// <summary>Stocking count (PL).</summary>
     public long? PlCountStocked { get; set; }
 
+    /// <summary>Farm target ABW copied or customized at stocking; null when no target was configured.</summary>
+    public decimal? TargetHarvestAbwG { get; set; }
+
+    /// <summary>Maximum culture duration copied or customized at stocking; not a minimum age.</summary>
+    public int? MaxCultureDays { get; set; }
+
     /// <summary>Pond area when stocked; later pond edits do not change it.</summary>
     public decimal PondAreaM2AtStocking { get; set; }
 

@@ -35,6 +35,8 @@ public class FarmSettingsDto
     public bool Use24HourTime { get; set; }
     [StringLength(FeedingSchedule.MaxTimesLength)] public string FeedingTimes { get; set; }
     public bool WaterQualityDaily { get; set; } = true;
+    [Range(typeof(decimal), "0.1", "60")] public decimal? DefaultHarvestTargetAbwG { get; set; }
+    [Range(1, 180)] public int DefaultMaxCultureDays { get; set; } = 90;
     public List<BaseAbwPricingSchemeDto> BaseAbwPricingSchemes { get; set; } = new();
 }
 
@@ -64,6 +66,8 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
 
         if (!Enum.IsDefined(input.FarmingSystem)) throw new UserFriendlyException("Choose a valid farming system.");
         if (!Enum.IsDefined(input.DateOrder)) throw new UserFriendlyException("Choose a valid date display order.");
+        if (input.DefaultHarvestTargetAbwG is < 0.1m or > 60m) throw new UserFriendlyException("The target harvest ABW must be between 0.1 and 60 grams.");
+        if (input.DefaultMaxCultureDays is < 1 or > 180) throw new UserFriendlyException("The maximum culture duration must be 1 to 180 days.");
         var schemes = input.BaseAbwPricingSchemes ?? new List<BaseAbwPricingSchemeDto>();
         if (schemes.Count > 20) throw new UserFriendlyException("A farm can configure up to 20 Base ABW pricing schemes.");
         if (schemes.Any(x => x.Id == Guid.Empty || string.IsNullOrWhiteSpace(x.Name) || x.Name.Trim().Length > 60
@@ -89,6 +93,7 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
                 DocumentExpiryAlertDays = previous.DocumentExpiryAlertDays, UnsoldFollowUpDays = previous.UnsoldFollowUpDays, FarmingSystem = previous.FarmingSystem,
                 DateOrder = previous.DateOrder, Use24HourTime = previous.Use24HourTime,
                 FeedingTimes = previous.FeedingTimes, WaterQualityDaily = previous.WaterQualityDaily,
+                DefaultHarvestTargetAbwG = previous.DefaultHarvestTargetAbwG, DefaultMaxCultureDays = previous.DefaultMaxCultureDays,
                 BaseAbwPricingSchemesJson = previous.BaseAbwPricingSchemesJson,
             };
             await _settings.InsertAsync(s);
@@ -106,6 +111,8 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
         s.Use24HourTime = input.Use24HourTime;
         s.FeedingTimes = feedingTimes;
         s.WaterQualityDaily = input.WaterQualityDaily;
+        s.DefaultHarvestTargetAbwG = input.DefaultHarvestTargetAbwG;
+        s.DefaultMaxCultureDays = input.DefaultMaxCultureDays;
         s.BaseAbwPricingSchemesJson = JsonSerializer.Serialize(schemes);
     }
 
@@ -120,6 +127,8 @@ public class FarmSettingsAppService : CapstoneAppServiceBase
         Use24HourTime = s.Use24HourTime,
         FeedingTimes = FeedingSchedule.Format(FeedingSchedule.Times(s.FeedingTimes)),
         WaterQualityDaily = s.WaterQualityDaily,
+        DefaultHarvestTargetAbwG = s.DefaultHarvestTargetAbwG,
+        DefaultMaxCultureDays = s.DefaultMaxCultureDays,
         BaseAbwPricingSchemes = ReadSchemes(s.BaseAbwPricingSchemesJson),
     };
 
