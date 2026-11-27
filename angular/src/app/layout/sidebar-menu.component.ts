@@ -87,8 +87,8 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             this.inSection('Resources', new MenuItem('Hatcheries', '/app/resources/hatcheries', 'fas fa-warehouse', 'Farm.Hatcheries')),
             this.inSection('Resources', new MenuItem('Inventory', '/app/inventory', 'fas fa-boxes', 'Farm.Inventory')),
             this.inSection('Resources', new MenuItem('Buyers', '/app/resources/buyers', 'fas fa-users', 'Farm.Buyers')),
-            this.inSection(production, this.sectionItem('operations', 'Operations', 'fas fa-clipboard-check')),
             this.inSection(production, this.sectionItem('production', 'Production', 'fas fa-seedling', '/app/production/batches')),
+            this.inSection(production, this.sectionItem('operations', 'Operations', 'fas fa-clipboard-check')),
             this.inSection(production, this.sectionItem('harvest', canSell ? 'Harvest and sales' : 'Harvest', 'fas fa-shrimp')),
             this.inSection(production, new MenuItem('Reports', '/app/reports', 'fas fa-chart-line', 'Farm.Reports')),
         ];
