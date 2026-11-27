@@ -99,12 +99,12 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 <thead>
                                     <tr>
                                         <!-- The lot code sits under the date it was harvested (DEC-99). -->
-                                        <th fpmsSort="harvestedAt" [pager]="pager" (sorted)="load()">Harvested · lot</th>
-                                        <th fpmsSort="pondCode" [pager]="pager" (sorted)="load()">Pond · batch</th>
-                                        <th class="text-right" fpmsSort="totalKg" [pager]="pager" (sorted)="load()">Total kg · type</th>
-                                        @if (grading) { <th>Size grades</th> }
-                                        <th fpmsSort="unaccountedKg" [pager]="pager" (sorted)="load()">Sales · where it went</th>
-                                        <th><span class="sr-only">Actions</span></th>
+                                        <th scope="col" fpmsSort="harvestedAt" [pager]="pager" (sorted)="load()">Harvested · lot</th>
+                                        <th scope="col" fpmsSort="pondCode" [pager]="pager" (sorted)="load()">Pond · batch</th>
+                                        <th scope="col" class="text-right" fpmsSort="totalKg" [pager]="pager" (sorted)="load()">Total kg · type</th>
+                                        @if (grading) { <th scope="col">Size grades</th> }
+                                        <th scope="col" fpmsSort="unaccountedKg" [pager]="pager" (sorted)="load()">Sales · where it went</th>
+                                        <th scope="col"><span class="sr-only">Actions</span></th>
                                     </tr>
                                 </thead>
                                 <tbody>

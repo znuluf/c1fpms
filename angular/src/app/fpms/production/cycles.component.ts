@@ -52,11 +52,11 @@ import { unbroken } from '@shared/fpms/labels';
                             <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
-                                        <th fpmsSort="cycleCode" [pager]="pager" (sorted)="load()" title="The cycle, and the hatchery and delivery it was stocked from">Cycle</th>
-                                        <th fpmsSort="startDate" [pager]="pager" (sorted)="load()">Started</th>
-                                        <th class="text-right" fpmsSort="plStocked" [pager]="pager" (sorted)="load()">PL stocked</th>
-                                        <th class="text-right">Batches</th>
-                                        <th fpmsSort="status" [pager]="pager" (sorted)="load()">Status</th>
+                                        <th scope="col" fpmsSort="cycleCode" [pager]="pager" (sorted)="load()" title="The cycle, and the hatchery and delivery it was stocked from">Cycle</th>
+                                        <th scope="col" fpmsSort="startDate" [pager]="pager" (sorted)="load()">Started</th>
+                                        <th scope="col" class="text-right" fpmsSort="plStocked" [pager]="pager" (sorted)="load()">PL stocked</th>
+                                        <th scope="col" class="text-right">Batches</th>
+                                        <th scope="col" fpmsSort="status" [pager]="pager" (sorted)="load()">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>

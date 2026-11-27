@@ -211,11 +211,11 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 <thead>
                                     <!-- Five columns that each hold what belongs together, so the list fits 1,000 px (DEC-111). -->
                                     <tr>
-                                        <th fpmsSort="hatcheryBatchNumber" [pager]="pager" (sorted)="load()">Delivery</th>
-                                        <th fpmsSort="deliveryDate" [pager]="pager" (sorted)="load()">Delivered</th>
-                                        <th class="text-right" fpmsSort="plReceived" [pager]="pager" (sorted)="load()" title="The farm's count, and how it compares with the PL ordered (DEC-93)">PL counted</th>
-                                        <th class="text-right">PL left</th>
-                                        <th fpmsSort="status" [pager]="pager" (sorted)="load()">Status</th>
+                                        <th scope="col" fpmsSort="hatcheryBatchNumber" [pager]="pager" (sorted)="load()">Delivery</th>
+                                        <th scope="col" fpmsSort="deliveryDate" [pager]="pager" (sorted)="load()">Delivered</th>
+                                        <th scope="col" class="text-right" fpmsSort="plReceived" [pager]="pager" (sorted)="load()" title="The farm's count, and how it compares with the PL ordered (DEC-93)">PL counted</th>
+                                        <th scope="col" class="text-right">PL left</th>
+                                        <th scope="col" fpmsSort="status" [pager]="pager" (sorted)="load()">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>

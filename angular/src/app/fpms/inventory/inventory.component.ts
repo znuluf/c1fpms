@@ -223,7 +223,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                             <table class="table table-hover mb-0">
                                 <thead>
                                     <!-- The item with its code first (DEC-98); category, feed type and BAI number under its name (DEC-110). -->
-                                    <tr><th>Item</th><th class="text-right">On hand</th><th>Stock</th><th><span class="sr-only">Actions</span></th></tr>
+                                    <tr><th scope="col">Item</th><th scope="col" class="text-right">On hand</th><th scope="col">Stock</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
                                 </thead>
                                 <tbody>
                                     @for (i of f.visible(); track i.id) {
@@ -270,7 +270,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                         <div class="card-body p-0 table-responsive">
                             <table class="table table-sm mb-0">
                                 <thead>
-                                    <tr><th>Lot · received</th><th>Expiry</th><th>Supplier</th><th class="text-right">Unit cost</th><th class="text-right">On hand</th><th><span class="sr-only">Actions</span></th></tr>
+                                    <tr><th scope="col">Lot · received</th><th scope="col">Expiry</th><th scope="col">Supplier</th><th scope="col" class="text-right">Unit cost</th><th scope="col" class="text-right">On hand</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
                                 </thead>
                                 <tbody>
                                     @for (l of lots() ?? []; track l.id) {
@@ -361,7 +361,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                         <div class="card-body p-0 table-responsive">
                             <table class="table table-sm mb-0">
                                 <thead>
-                                    <tr><th>Date</th><th>Type</th><th class="text-right">Quantity</th><th class="text-right">Unit cost</th><th class="text-right">Balance</th><th>Batch</th><th>Source / reason</th><th>By</th></tr>
+                                    <tr><th scope="col">Date</th><th scope="col">Type</th><th scope="col" class="text-right">Quantity</th><th scope="col" class="text-right">Unit cost</th><th scope="col" class="text-right">Balance</th><th scope="col">Batch</th><th scope="col">Source / reason</th><th scope="col">By</th></tr>
                                 </thead>
                                 <tbody>
                                     @for (m of movements(); track m.id) {

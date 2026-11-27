@@ -99,7 +99,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                         </div>
                         <div class="card-body p-0 table-responsive">
                             <table class="table table-sm mb-0">
-                                <thead><tr><th>Date · receipt</th><th class="text-right">Kg</th><th class="text-right">Amount</th><th>Payment</th></tr></thead>
+                                <thead><tr><th scope="col">Date · receipt</th><th scope="col" class="text-right">Kg</th><th scope="col" class="text-right">Amount</th><th scope="col">Payment</th></tr></thead>
                                 <tbody>
                                     @for (s of d.sales; track s.id) {
                                         <tr>
@@ -127,7 +127,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                         } @else {
                             <table class="table table-hover mb-0">
                                 <thead>
-                                    <tr><th>Buyer</th><th>Contact</th><th class="text-right">Sales</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr>
+                                    <tr><th scope="col">Buyer</th><th scope="col">Contact</th><th scope="col" class="text-right">Sales</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
                                 </thead>
                                 <tbody>
                                     @for (b of f.visible(); track b.id) {

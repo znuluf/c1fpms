@@ -62,12 +62,12 @@ const CLOSED = 5;
                             <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
-                                        <th fpmsSort="pondCode" [pager]="pager" (sorted)="load()" title="The pond and batch, its cycle and its status">Batch</th>
-                                        <th fpmsSort="stockingDate" [pager]="pager" (sorted)="load()" title="Stocking date and PL stocked">Stocked</th>
-                                        <th class="text-right" title="Day of culture">DOC</th>
-                                        <th class="text-right">ABW (g)</th>
-                                        <th class="text-right">FCR</th>
-                                        <th class="text-right" title="Estimated survival">Survival</th>
+                                        <th scope="col" fpmsSort="pondCode" [pager]="pager" (sorted)="load()" title="The pond and batch, its cycle and its status">Batch</th>
+                                        <th scope="col" fpmsSort="stockingDate" [pager]="pager" (sorted)="load()" title="Stocking date and PL stocked">Stocked</th>
+                                        <th scope="col" class="text-right" title="Day of culture">DOC</th>
+                                        <th scope="col" class="text-right">ABW (g)</th>
+                                        <th scope="col" class="text-right">FCR</th>
+                                        <th scope="col" class="text-right" title="Estimated survival">Survival</th>
                                     </tr>
                                 </thead>
                                 <tbody>

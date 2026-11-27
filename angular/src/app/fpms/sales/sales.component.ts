@@ -158,12 +158,12 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                     <tr>
                                         <!-- Columns that belong together share a cell, so the list fits a 1,000 px screen (DEC-99, DEC-107):
                                              date and receipt; buyer, batch and lot; total, kg and paid; balance and due date. -->
-                                        <th fpmsSort="saleDate" [pager]="pager" (sorted)="load()">Date · receipt · payment</th>
-                                        <th fpmsSort="buyerName" [pager]="pager" (sorted)="load()">Buyer · batch · lot</th>
-                                        <th class="text-right" fpmsSort="total" [pager]="pager" (sorted)="load()">
+                                        <th scope="col" fpmsSort="saleDate" [pager]="pager" (sorted)="load()">Date · receipt · payment</th>
+                                        <th scope="col" fpmsSort="buyerName" [pager]="pager" (sorted)="load()">Buyer · batch · lot</th>
+                                        <th scope="col" class="text-right" fpmsSort="total" [pager]="pager" (sorted)="load()">
                                             Total · kg
                                         </th>
-                                        <th class="text-right" fpmsSort="balance" [pager]="pager" (sorted)="load()">
+                                        <th scope="col" class="text-right" fpmsSort="balance" [pager]="pager" (sorted)="load()">
                                             Balance
                                         </th>
                                     </tr>
