@@ -398,6 +398,12 @@ select:focus-visible {
         border: none;
         padding: 0;
         page-break-after: always;
+        break-after: page;
+    }
+    // Do not create an extra blank sheet after the final printable log or tally page.
+    .fpms-paper:last-child {
+        page-break-after: auto;
+        break-after: auto;
     }
     .fpms-break {
         page-break-before: always;
