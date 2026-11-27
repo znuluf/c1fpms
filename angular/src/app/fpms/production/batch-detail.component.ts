@@ -72,6 +72,70 @@ interface CalMonth {
                             <div>DOC target reached, but there is no ABW sample from the last 7 days. Record a recent growth sample to check the farm's ABW target of {{ b.harvestReadinessAbwTargetG }} g.</div>
                         </div>
                     }
+                    <section class="card mb-3" aria-label="Production timeline">
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-alt mr-1" aria-hidden="true"></i>Production timeline</h3></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-6 col-lg-3 mb-3">
+                                    <div class="small text-muted">Planned stocking</div>
+                                    <a routerLink="/app/production/planning">View stocking plans</a>
+                                    <div class="small text-muted">Planning date does not start DOC</div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3 mb-3">
+                                    <div class="small text-muted">Actual stocking · DOC starts here</div>
+                                    <strong>{{ b.stockingDate ? (b.stockingDate | farmDate) : 'Not recorded' }}</strong>
+                                </div>
+                                <div class="col-sm-6 col-lg-3 mb-3">
+                                    <div class="small text-muted">Estimated harvest window</div>
+                                    @if (b.estimatedHarvestFrom && b.estimatedHarvestTo) {
+                                        <strong>{{ b.estimatedHarvestFrom | farmDate }} – {{ b.estimatedHarvestTo | farmDate }}</strong>
+                                        <div class="small text-muted">{{ b.harvestForecastConfidence }} confidence</div>
+                                        <div class="small text-muted">Based on {{ b.harvestForecastSampleDate | farmDate }} sample · {{ b.harvestForecastLatestAbwG | num: 2 }} g ABW · {{ b.harvestForecastGrowthRateGPerDay | num: 3 }} g/day</div>
+                                    } @else {
+                                        <strong>Forecast unavailable</strong>
+                                        <div class="small text-muted">{{ b.harvestForecastReason }}</div>
+                                    }
+                                </div>
+                                <div class="col-sm-6 col-lg-3 mb-3">
+                                    <div class="small text-muted">Harvest readiness</div>
+                                    @if (b.harvestReadinessReached) {
+                                        <span class="text-success font-weight-bold">Ready for harvest</span>
+                                    } @else if (b.doc >= b.harvestReadinessDocTarget && !b.harvestReadinessSampleIsRecent) {
+                                        <span class="text-warning font-weight-bold">Needs recent ABW sample</span>
+                                    } @else {
+                                        <strong>Still growing</strong>
+                                    }
+                                    <div class="small text-muted">Farm targets: DOC {{ b.harvestReadinessDocTarget }} · ABW {{ b.harvestReadinessAbwTargetG }} g</div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3 mb-2">
+                                    <div class="small text-muted">Withdrawal-safe date</div>
+                                    @if (b.earliestSafeHarvestDate) {
+                                        <strong>{{ b.earliestSafeHarvestDate | farmDate }}</strong>
+                                        @if (b.earliestSafeHarvestDate > today) { <div class="small text-warning">Withdrawal period still active</div> }
+                                    } @else {
+                                        <span class="text-muted">No active withdrawal hold</span>
+                                    }
+                                </div>
+                                <div class="col-sm-6 col-lg-3 mb-2">
+                                    <div class="small text-muted">Actual harvest</div>
+                                    @if (b.firstHarvestDate && b.lastHarvestDate) {
+                                        <strong>{{ b.firstHarvestDate | farmDate }}@if (b.firstHarvestDate !== b.lastHarvestDate) { – {{ b.lastHarvestDate | farmDate }} }</strong>
+                                        <div class="small text-muted">From recorded harvest transactions</div>
+                                    } @else {
+                                        <span class="text-muted">Not recorded</span>
+                                    }
+                                </div>
+                            </div>
+                            @if (b.estimatedHarvestTo && b.earliestSafeHarvestDate && b.estimatedHarvestTo < b.earliestSafeHarvestDate) {
+                                <div class="alert alert-warning small mb-0" role="status">
+                                    <strong>Forecast overlaps the withdrawal period.</strong>
+                                    The projected harvest window ends before the earliest safe harvest date. Follow the safe date, not the forecast.
+                                </div>
+                            }
+                            <div class="small text-muted mt-2">Forecasts are estimates based on recent growth samples. They do not change batch status, confirm readiness, or replace the withdrawal-safe date.</div>
+                        </div>
+                    </section>
+
                     @if (assigning) {
                         <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-primary mb-0 border-0">
                             <div class="card-header"><h3 class="card-title"><i class="fas fa-user" aria-hidden="true"></i>Who looks after {{ b.pondCode }}</h3></div>
