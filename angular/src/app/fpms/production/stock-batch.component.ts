@@ -521,7 +521,7 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
                 this.inWindow(a) &&
                 this.stockingParams.every((p) => ['ok', 'out'].includes(this.state(p, a))) &&
                 Number.isInteger(Number(a.maxCultureDays)) && a.maxCultureDays >= 1 && a.maxCultureDays <= 180 &&
-                (a.targetHarvestAbwG == null || (a.targetHarvestAbwG >= 0.1 && a.targetHarvestAbwG <= 60)) &&
+                a.targetHarvestAbwG != null && a.targetHarvestAbwG >= 0.1 && a.targetHarvestAbwG <= 60 &&
                 (a.deadAtStocking == null || a.deadAtStocking >= 0)
         );
     }

@@ -403,7 +403,7 @@ public class CycleAppService : CapstoneAppServiceBase
             {
                 throw new UserFriendlyException($"{pond.PondCode}: dead at stocking cannot be negative.");
             }
-            if (b.TargetHarvestAbwG is < 0.1m or > 60m)
+            if (!b.TargetHarvestAbwG.HasValue || b.TargetHarvestAbwG is < 0.1m or > 60m)
             {
                 throw new UserFriendlyException($"{pond.PondCode}: target harvest ABW must be between 0.1 and 60 grams.");
             }
