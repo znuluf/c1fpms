@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (simpler, calmer interface, DEC-143)
+- **Fewer fields at first sight.** On the harvest form (sample weight and pieces, counted shrimp, the biomass checkbox), the pond form (inlet, outlet, aeration, map location, notes) and the inventory item form (brand, feed type or active ingredient, BAI registration no., reorder level), these fields are under **More details**. It opens by itself when one of them holds something. No field or saved value was removed.
+- **Theme.** A softer background, rounder cards with a light shadow, dark headings, bolder buttons, and a tinted highlight with an edge bar for the current page in the sidebar. Sidebar section labels are sentence case at 14 px.
+- **AdminLTE removal prepared, not yet applied.** Run `scripts/ui/remove-adminlte.sh` in the Codespace to switch to Bootstrap 4 and `shell.less`, then check the screens.
+
 ### Added and changed (harvests, DEC-140)
 - **Emergency harvests.** A harvest can be Partial, Final or **Emergency**. An Emergency harvest asks for a reason (disease concern, poor water conditions, weather, market opportunity, other), a short explanation (required for Other) and whether shrimp are still in the pond. It is never a batch failure: the batch becomes Harvested only when no shrimp are left, and correcting the answer reopens it. A batch has one harvest that empties the pond, and none can be dated after it.
 - **One batch lifecycle.** New batches move from Stocked to Harvested when a Final harvest or an Emergency Harvest with no shrimp left empties the pond, then to Closed when the Owner finalizes the records. An Emergency Harvest with shrimp remaining leaves the batch Stocked. The separate Declare failure action is no longer shown in the batch page. Historical batches stored with the retired Failed status are presented as Harvested; their underlying history is retained. The old API endpoint remains for compatibility only.

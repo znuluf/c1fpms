@@ -16,8 +16,8 @@
     --fpms-accent-50: #e4f1f1; // teal tint
     --fpms-accent-text: #0b5555; // teal for text on light backgrounds
     --fpms-glow: #ff921e; // the logo orange, for marks and active icons on dark only
-    --fpms-line: #dce4e3;
-    --fpms-line-strong: #c5d0d0;
+    --fpms-line: #e4e9ee;
+    --fpms-line-strong: #cbd4dc;
     --fpms-surface: #ffffff;
     --fpms-warn-bg: #fff8e8;
     --fpms-warn-line: #e3c27a;
@@ -37,21 +37,21 @@
     --fpms-highlight: #fff3c4; // a blank to fill in, in help text
 
     // Shape: radius follows role, not one value for everything
-    --fpms-r-control: 8px;
-    --fpms-r-tile: 10px;
-    --fpms-r-card: 12px;
+    --fpms-r-control: 10px;
+    --fpms-r-tile: 12px;
+    --fpms-r-card: 16px;
     --fpms-r-field: 14px; // soft form style: roomier controls on sign-in and form pages
     --fpms-field-h: 52px;
 
     // Surfaces and motion (shared by the app and the start page)
-    --fpms-ground: #f6f8f7;
-    --fpms-ground-muted: #eef3f2;
+    --fpms-ground: #f5f7f9;
+    --fpms-ground-muted: #edf1f4;
     --fpms-gap: 24px;
     --fpms-motion: 160ms;
     --fpms-ease: ease-out;
 
     // Shadows are tinted with the primary color, kept small
-    --fpms-shadow-1: none;
+    --fpms-shadow-1: 0 1px 2px rgba(36, 74, 99, 0.06);
     --fpms-shadow-2: 0 8px 24px rgba(36, 74, 99, 0.14);
 }
 
@@ -87,7 +87,7 @@ h6,
     font-weight: 600;
     letter-spacing: -0.012em;
     line-height: 1.2;
-    color: var(--fpms-primary);
+    color: var(--fpms-text);
 }
 .fpms-page-header .text-muted {
     font-size: 0.95rem;
@@ -320,13 +320,11 @@ html body.sidebar-mini .wrapper .main-footer {
     overflow-wrap: anywhere;
 }
 
-// Section labels use the same uppercase hierarchy as the reference navigation.
+// Section labels: sentence case and never below 14px.
 .main-sidebar.fpms-sidebar .nav-sidebar > .fpms-nav-label {
     padding: 1.1rem 0.75rem 0.3rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
+    font-size: 0.875rem;
+    font-weight: 600;
     color: var(--fpms-muted);
 }
 
@@ -340,7 +338,7 @@ html body.sidebar-mini .wrapper .main-footer {
     padding: 0.6rem 0.75rem;
     border-radius: var(--fpms-r-control);
     color: var(--fpms-text);
-    font-size: 0.9rem;
+    font-size: 0.9375rem;
     font-weight: 400;
     transition: background-color 0.12s ease, color 0.12s ease;
 }
@@ -365,13 +363,13 @@ html body.sidebar-mini .wrapper .main-footer {
     color: var(--fpms-primary-dark);
 }
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link.active {
-    background-color: var(--fpms-primary);
-    color: #fff;
-    font-weight: 500;
-    box-shadow: none;
+    background-color: var(--fpms-accent-50);
+    color: var(--fpms-accent-text);
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 var(--fpms-accent);
 }
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link.active .nav-icon {
-    color: #fff;
+    color: var(--fpms-accent-text);
 }
 .fpms-chevron {
     flex: none;
@@ -711,7 +709,7 @@ fpms-logo {
 .card-title {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--fpms-primary);
+    color: var(--fpms-text);
 }
 .card-footer {
     background: transparent;
@@ -742,7 +740,7 @@ fpms-logo {
 // ---- Buttons
 .btn {
     border-radius: var(--fpms-r-control);
-    font-weight: 500;
+    font-weight: 600;
     transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease),
         box-shadow var(--fpms-motion) var(--fpms-ease), transform var(--fpms-motion) var(--fpms-ease);
 }
@@ -847,7 +845,7 @@ label,
 }
 .table td,
 .table th {
-    border-top: 1px solid #e6ecea;
+    border-top: 1px solid var(--fpms-line);
     padding: 0.6rem 0.75rem;
 }
 .table-sm td,

@@ -8,6 +8,7 @@ All decisions below were accepted on 2026-10-22 by the capstone development team
 
 | ID | Decision | Status |
 | :---- | :---- | :---- |
+| DEC-143 | Optional fields folded on three forms, a calmer theme, and replacing AdminLTE with plain Bootstrap | Proposed (full write-up); screens not checked |
 | DEC-01 | Local on-premise MVP with a SaaS-ready multi-tenant model | Accepted (full write-up) |
 | DEC-02 | JWT Bearer authentication and framework password hashing | Accepted (full write-up) |
 | DEC-03 | SQL Server: Docker/OrbStack in development, Express in production | Accepted (full write-up) |
@@ -3673,3 +3674,32 @@ Builds on: DEC-140
 ### Consequences
 
 The farm can use a partial-harvest measurement when staff consider it representative of the shrimp remaining, while retaining an explicit opt-out for selective harvests. Biomass and FCR-to-date use the same selected ABW basis, and the source is visible to staff.
+
+---
+
+## Decision DEC-143: Optional fields folded on three forms, a calmer theme, and replacing AdminLTE with plain Bootstrap
+
+Status: Proposed 2026-11-27 (branch design/simple-modern-ui; screens not checked)
+Date: 2026-11-27
+Related: DEC-85, DEC-96, DEC-120
+
+### Context
+The system felt too complicated for a non-technical person, and the interface still loads the AdminLTE stylesheet.
+
+### Options considered
+1. Remove optional fields from the forms.
+2. Keep every field and fold the optional ones under "More details" (DEC-96 pattern).
+
+### Decision
+Option 2 for the harvest, pond and inventory item forms. Withdrawal period and the SFSC number stay in view. Desktop and laptop come first; layouts for small screens are not reworked.
+
+AdminLTE is replaced by Bootstrap 4.6.2 plus `shared/fpms/shell.less`. The swap needs a package install, so it is a script (`scripts/ui/remove-adminlte.sh`) still to be run and checked.
+
+### Consequences
+Positive:
+- Shorter forms with no change to saved data, reports or the API.
+- After the swap, the shell rules the app depends on are in the repository.
+
+Negative:
+- A folded field is one more tap.
+- Until the swap is run and checked, AdminLTE is still loaded. `shell.less` was written without a visual check and may need adjustments.
