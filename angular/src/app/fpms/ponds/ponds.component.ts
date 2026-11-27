@@ -167,7 +167,7 @@ interface PondCard {
                                                         @if (p.batchId) {
                                                             {{ p.fcr === null ? '—' : (p.fcr | num: 2) }}
                                                         } @else { <span class="text-muted">—</span> }
-                                                    </td></td>
+                                                    </td>
                                                 </tr>
                                             }
                                         </tbody>
