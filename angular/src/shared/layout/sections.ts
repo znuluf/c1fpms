@@ -93,7 +93,6 @@ export const SECTIONS: Section[] = [
             },
         ],
         actions: [
-            { label: 'Record harvest', route: '/app/harvests/new', icon: 'fas fa-plus', permission: 'Farm.Harvests.Create', onTabs: ['/app/harvests'] },
             { label: 'Record sale', route: '/app/sales/new', icon: 'fas fa-plus', permission: 'Farm.Sales', onTabs: ['/app/sales'] },
         ],
     },
