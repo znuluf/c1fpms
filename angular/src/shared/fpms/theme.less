@@ -2096,3 +2096,15 @@ body.fpms-account .login-box .card {
         transition: none !important;
     }
 }
+
+/* Whole-row navigation affordance for record tables. Nested links and controls retain their own actions. */
+tr.fpms-clickable-row {
+    cursor: pointer;
+}
+tr.fpms-clickable-row:focus-visible {
+    outline: 2px solid var(--fpms-primary);
+    outline-offset: -2px;
+}
+tr.fpms-clickable-row:hover > td {
+    background-color: var(--fpms-ground-muted);
+}
