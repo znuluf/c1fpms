@@ -425,7 +425,10 @@ public static class FpmsModelConfiguration
             e.HasOne(x => x.Pond).WithMany().HasForeignKey(x => x.PondId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(x => x.FryDelivery).WithMany().HasForeignKey(x => x.FryDeliveryId).OnDelete(DeleteBehavior.Restrict);
             e.HasIndex(x => new { x.TenantId, x.PlannedDate, x.Status });
-            e.HasIndex(x => new { x.TenantId, x.PondId, x.Status });
+            e.HasIndex(x => new { x.TenantId, x.PondId, x.PlannedDate }).IsUnique()
+                .HasFilter("[Status] = 1 AND [IsDeleted] = 0")
+                .HasDatabaseName("UX_FpmsPlannedStockings_OneActivePerPondDate");
+            e.HasIndex(x => new { x.TenantId, x.PlannedDate, x.Status });
         });
 
         // DEC-127: who looks after a batch, one row per person.
