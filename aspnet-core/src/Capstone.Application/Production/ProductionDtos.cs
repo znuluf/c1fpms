@@ -434,7 +434,7 @@ public class BatchStockingInput
     [Range(0, 10000000)]
     public long? DeadAtStocking { get; set; }
 
-    [Required, Range(typeof(decimal), "0.1", "60")] public decimal? TargetHarvestAbwG { get; set; }
+    [Range(typeof(decimal), "0.1", "60")] public decimal? TargetHarvestAbwG { get; set; }
     [Range(1, 180)] public int? MaxCultureDays { get; set; }
 
     /// <summary>Who will look after the batch (DEC-127); optional. A technician who stocks is named whatever this says.</summary>
