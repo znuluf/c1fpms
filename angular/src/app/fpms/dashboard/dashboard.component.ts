@@ -517,7 +517,7 @@ export class DashboardComponent extends FpmsPage implements OnInit {
         return rows;
     });
     upcomingBiomass = computed(() => this.upcomingHarvests().reduce((sum, h) => sum + (h.estimatedBiomassKg ?? 0), 0));
-    hasStockedBatches = computed(() => ((this.d()?.ponds as any[]) ?? []).some(p => p.batchStatus === 2));
+    hasStockedBatches = computed(() => ((this.d()?.ponds as any[]) ?? []).some(p => p.doc !== null && p.doc !== undefined));
 
     // ---- calendar
 
