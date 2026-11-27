@@ -14,6 +14,7 @@ const CLOSED = 5;
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="Pond batches" subtitle="One batch per grow-out pond per cycle.">
+            <a class="btn btn-outline-secondary" routerLink="/app/production/planning">Stocking plans</a>
             @if (can('Farm.Reports')) {
                 <button
                     class="btn btn-outline-secondary"
