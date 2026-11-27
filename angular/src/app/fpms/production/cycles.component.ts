@@ -13,6 +13,7 @@ import { unbroken } from '@shared/fpms/labels';
         <fpms-page-header
             title="Production cycles"
             subtitle="Each cycle holds the batches stocked from one fry delivery.">
+            <a class="btn btn-outline-secondary" routerLink="/app/production/planning">Stocking plans</a>
             @if (can('Farm.Reports')) {
                 <button
                     class="btn btn-outline-secondary"
