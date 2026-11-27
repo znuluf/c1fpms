@@ -92,25 +92,37 @@ const ROLES = [
                 }
 
                 @if (reset) {
-                    <div class="card card-outline card-warning">
-                        <div class="card-header"><h3 class="card-title">Reset password for {{ reset.user.name }} {{ reset.user.surname }}</h3></div>
-                        <div class="card-body">
-                            <div class="form-row align-items-end">
-                                <div class="form-group col-md-4">
-                                    <label for="rpw">New temporary password</label>
-                                    <div class="input-group">
-                                        <input id="rpw" class="form-control" name="rpw" [(ngModel)]="reset.password" minlength="8" autocomplete="new-password" />
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary" (click)="reset.password = generate()" aria-label="Generate a password" title="Generate a password"><i class="fas fa-dice" aria-hidden="true"></i></button>
+                    <div class="fpms-dialog-backdrop">
+                        <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="reset-password-title">
+                            <div class="fpms-dialog-body p-0">
+                                <div class="card card-outline card-warning">
+                                    <div class="card-header">
+                                        <h3 id="reset-password-title" class="card-title">
+                                            Reset password for {{ reset.user.name }} {{ reset.user.surname }}
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-row align-items-end">
+                                            <div class="form-group col-md-8">
+                                                <label for="rpw">New temporary password</label>
+                                                <div class="input-group">
+                                                    <input id="rpw" class="form-control" name="rpw" [(ngModel)]="reset.password" minlength="8" autocomplete="new-password" />
+                                                    <div class="input-group-append">
+                                                        <button type="button" class="btn btn-outline-secondary" (click)="reset.password = generate()" aria-label="Generate a password" title="Generate a password">
+                                                            <i class="fas fa-dice" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+                                        <p class="small text-muted mb-0">The account is unlocked and must set a new password at next sign-in.</p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <button type="button" class="btn btn-warning mr-2" [disabled]="busy() || (reset.password?.length ?? 0) < 8" (click)="doReset()">Reset password</button>
+                                        <button type="button" class="btn btn-default" (click)="reset = null">Cancel</button>
                                     </div>
                                 </div>
                             </div>
-                            <p class="small text-muted mb-0">The account is unlocked and must set a new password at next sign-in.</p>
-                        </div>
-                        <div class="card-footer">
-                            <button class="btn btn-warning mr-2" [disabled]="busy() || (reset.password?.length ?? 0) < 8" (click)="doReset()">Reset password</button>
-                            <button class="btn btn-default" (click)="reset = null">Cancel</button>
                         </div>
                     </div>
                 }
