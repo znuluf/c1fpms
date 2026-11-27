@@ -3691,7 +3691,7 @@ The system felt too complicated for a non-technical person, and the interface st
 2. Keep every field and fold the optional ones under "More details" (DEC-96 pattern).
 
 ### Decision
-Option 2 for the harvest, pond and inventory item forms. Withdrawal period and the SFSC number stay in view. Desktop and laptop come first; layouts for small screens are not reworked.
+Option 2 for the harvest, pond and inventory item forms. The harvest ABW sample (weight and pieces), withdrawal period and the SFSC number stay in view. Desktop and laptop come first; layouts for small screens are not reworked.
 
 AdminLTE is replaced by Bootstrap 4.6.2 plus `shared/fpms/shell.less`. The swap needs a package install, so it is a script (`scripts/ui/remove-adminlte.sh`) still to be run and checked.
 
