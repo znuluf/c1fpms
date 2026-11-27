@@ -784,11 +784,23 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 margin-right: 0.4rem;
                 border-radius: 18px;
                 border: 1px solid var(--fpms-line-strong);
-                background: var(--fpms-surface);
+                background: var(--fpms-ground-muted);
+                color: var(--fpms-text);
+                transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease), color var(--fpms-motion) var(--fpms-ease);
                 font-size: 0.9rem;
                 cursor: pointer;
             }
-            .tr-chip[aria-pressed='true'] {
+
+            .tr-chip:hover,
+            .tr-chip:focus-visible {
+                background: var(--fpms-tide-50);
+                border-color: var(--fpms-primary);
+                color: var(--fpms-primary-dark);
+            }
+            .tr-chip:focus-visible {
+                outline: 2px solid var(--fpms-primary);
+                outline-offset: 2px;
+            }            .tr-chip[aria-pressed='true'] {
                 background: var(--fpms-primary);
                 border-color: var(--fpms-primary);
                 color: var(--fpms-surface);
