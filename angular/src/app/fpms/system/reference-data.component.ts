@@ -12,9 +12,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
             <div class="container-fluid">
                 <p class="text-muted">Readings outside the optimal range are saved and flagged. Readings outside the physical limits are rejected as entry errors. Changes apply to new readings only.</p>
                 @if (edit) {
-                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true"><div class="fpms-dialog-body p-0">
+                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="parameter-edit-title"><div class="fpms-dialog-body p-0">
                         <form class="card card-outline card-primary" #pf="ngForm" (ngSubmit)="save()" fpmsReview="parameter" [fpmsReviewNew]="false" novalidate>
-                            <div class="card-header"><h3 class="card-title">Edit {{ edit.code }}</h3></div>
+                            <div class="card-header"><h3 id="parameter-edit-title" class="card-title">Edit {{ edit.code }}</h3></div>
                             <div class="card-body">
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
