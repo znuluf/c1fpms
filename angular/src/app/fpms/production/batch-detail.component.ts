@@ -73,8 +73,8 @@ interface CalMonth {
                         </div>
                     }
                     @if (assigning) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-primary mb-0 border-0">
-                            <div class="card-header"><h3 class="card-title"><i class="fas fa-user" aria-hidden="true"></i>Who looks after {{ b.pondCode }}</h3></div>
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="batch-assign-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-primary mb-0 border-0">
+                            <div class="card-header"><h3 id="batch-assign-title" class="card-title"><i class="fas fa-user" aria-hidden="true"></i>Who looks after {{ b.pondCode }}</h3></div>
                             <form #af="ngForm" (ngSubmit)="saveAssign()" fpmsReview="names" novalidate>
                                 <div class="card-body">
                                     @if (!people) {
@@ -121,8 +121,8 @@ interface CalMonth {
                     }
 
                     @if (reopening) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
-                            <div class="card-header"><h3 class="card-title"><i class="fas fa-undo" aria-hidden="true"></i>Reopen batch {{ b.batchCode }}</h3></div>
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="batch-reopen-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
+                            <div class="card-header"><h3 id="batch-reopen-title" class="card-title"><i class="fas fa-undo" aria-hidden="true"></i>Reopen batch {{ b.batchCode }}</h3></div>
                             <div class="card-body">
                                 <p class="small">
                                     The batch returns to Harvested so its records can be corrected. Its final indicators are worked out again when you close it.
@@ -139,8 +139,8 @@ interface CalMonth {
                     }
 
                     @if (closing) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
-                            <div class="card-header"><h3 class="card-title"><i class="fas fa-lock" aria-hidden="true"></i>Close batch {{ b.batchCode }}</h3></div>
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="batch-close-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
+                            <div class="card-header"><h3 id="batch-close-title" class="card-title"><i class="fas fa-lock" aria-hidden="true"></i>Close batch {{ b.batchCode }}</h3></div>
                             <div class="card-body">
                                 <p>Final FCR, survival rate, ABW and days of culture are fixed. Logs, feeding and harvests become read-only for everyone, and pond {{ b.pondCode }} becomes Available (or stays in preparation if a new round has started). The Owner can reopen the batch later, with a reason, to correct a mistake.</p>
                                 @if (!closeCheck) {
