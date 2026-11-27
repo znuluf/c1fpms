@@ -300,6 +300,8 @@ public class BatchDetailDto : BatchListDto
     public bool HarvestReadinessSampleIsRecent { get; set; }
     public int HarvestReadinessDocTarget { get; set; }
     public decimal HarvestReadinessAbwTargetG { get; set; }
+    public decimal? TargetHarvestAbwG { get; set; }
+    public int? MaxCultureDays { get; set; }
     public DateOnly? HarvestReadinessSampleDate { get; set; }
 
     /// <summary>Owner, Closed batch, cycle not Closed, and no other open batch in the pond (DEC-64).</summary>

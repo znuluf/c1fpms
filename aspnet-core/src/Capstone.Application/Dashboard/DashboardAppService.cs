@@ -282,8 +282,7 @@ public class DashboardAppService : CapstoneAppServiceBase
         var ponds = await _ponds.GetAll().AsNoTracking().Include(p => p.Prefix).Where(p => p.ManualStatus != PondManualStatus.Inactive && !p.IsArchived).OrderBy(p => p.PondCode).ToListAsync();
         var open = await _batches.GetAll().AsNoTracking().Include(b => b.Technicians).Where(b => b.Status != BatchStatus.Closed).ToListAsync();
         var facts = await _loader.LoadAsync(open.Select(b => b.Id).ToList(), zone);
-        var harvestDocTarget = (int)await _standards.GetAsync(FarmThresholds.HarvestReadyFromDoc);
-        var harvestAbwTarget = await _standards.GetAsync(FarmThresholds.HarvestReadyAtAbw);
+
 
         // Water-quality alerts in the last 7 farm days
         var since = FarmClock.StartOfDayUtc(today.AddDays(-6), zone);
@@ -371,7 +370,7 @@ public class DashboardAppService : CapstoneAppServiceBase
                 var batchFacts = facts.TryGetValue(batch.Id, out var f) ? f : new BatchFacts();
                 var ind = IndicatorCalculator.Compute(batchFacts, today);
                 var latestGrowthSample = batchFacts.GrowthSamples.OrderByDescending(g => g.ObservedAtUtc).FirstOrDefault();
-                if (batch.Status == BatchStatus.Stocked && ind.Doc.HasValue && ind.Doc.Value >= harvestDocTarget && latestGrowthSample != null && latestGrowthSample.Date <= today && latestGrowthSample.Date >= today.AddDays(-7) && latestGrowthSample.AbwG >= harvestAbwTarget)
+                if (batch.Status == BatchStatus.Stocked && batch.TargetHarvestAbwG.HasValue && latestGrowthSample != null && latestGrowthSample.Date <= today && latestGrowthSample.Date >= today.AddDays(-7) && latestGrowthSample.AbwG >= batch.TargetHarvestAbwG.Value)
                 {
                     dto.HarvestReadinessAlerts.Add(new HarvestReadinessAlertDto { BatchId = batch.Id, BatchCode = batch.BatchCode, PondCode = tile.PondCode, Doc = ind.Doc.Value, AbwG = latestGrowthSample.AbwG, SampleDate = latestGrowthSample.Date, EarliestSafeHarvestDate = await _withdrawal.EarliestSafeHarvestDateAsync(batch.Id, zone) });
                 }

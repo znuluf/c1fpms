@@ -177,11 +177,11 @@ public class BatchAppService : CapstoneAppServiceBase
         var facts = await _loader.LoadAsync(b.Id, zone);
         var today = await Farm.GetTodayAsync();
         var ind = IndicatorCalculator.Compute(facts, today);
-        var harvestDocTarget = (int)await _standards.GetAsync(FarmThresholds.HarvestReadyFromDoc);
-        var harvestAbwTarget = await _standards.GetAsync(FarmThresholds.HarvestReadyAtAbw);
+        var harvestDocTarget = b.MaxCultureDays ?? 90;
+        var harvestAbwTarget = b.TargetHarvestAbwG ?? 0m;
         var latestGrowthSample = facts.GrowthSamples.OrderByDescending(g => g.ObservedAtUtc).FirstOrDefault();
         var sampleIsRecent = latestGrowthSample != null && latestGrowthSample.Date <= today && latestGrowthSample.Date >= today.AddDays(-7);
-        var harvestReadinessReached = b.Status == BatchStatus.Stocked && ind.Doc.HasValue && ind.Doc.Value >= harvestDocTarget && sampleIsRecent && latestGrowthSample.AbwG >= harvestAbwTarget;
+        var harvestReadinessReached = b.Status == BatchStatus.Stocked && b.TargetHarvestAbwG.HasValue && sampleIsRecent && latestGrowthSample.AbwG >= b.TargetHarvestAbwG.Value;
         var counts = await _logs.GetAll().Where(l => l.BatchId == id).GroupBy(l => l.LogType).Select(g => new { g.Key, N = g.Count() }).ToListAsync();
         var hasFinal = await _harvests.GetAll().Where(h => h.BatchId == id).AnyAsync(Harvest.EmptiesPondExpression);
         var hasHarvest = await _harvests.GetAll().AnyAsync(h => h.BatchId == id);
@@ -204,6 +204,7 @@ public class BatchAppService : CapstoneAppServiceBase
             HatcheryCertificationStatusAtStocking = b.HatcheryCertificationStatusAtStocking, StockingDensityPerM2 = b.StockingDensityPerM2,
             DeadAtStocking = b.DeadAtStocking, PlHealthCertificateNo = delivery?.PlHealthCertificateNo, SfscNo = delivery?.SfscNo,
             EarliestSafeHarvestDate = await _withdrawal.EarliestSafeHarvestDateAsync(b.Id, zone),
+            TargetHarvestAbwG = b.TargetHarvestAbwG, MaxCultureDays = b.MaxCultureDays,
             HarvestReadinessReached = harvestReadinessReached,
             HarvestReadinessSampleIsRecent = sampleIsRecent,
             HarvestReadinessDocTarget = harvestDocTarget,
