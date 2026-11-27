@@ -30,8 +30,8 @@ import { batchShort } from '@shared/fpms/labels';
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (reopening) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
-                            <div class="card-header"><h3 class="card-title">Reopen cycle {{ c.cycleCode }}</h3></div>
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-reopen-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
+                            <div class="card-header"><h3 id="cycle-reopen-title" class="card-title">Reopen cycle {{ c.cycleCode }}</h3></div>
                             <div class="card-body">
                                 <p class="small">The cycle becomes Active again and its outcome is cleared. Its batches stay Closed; reopen a batch from its page to correct it. The reason is kept in the cycle's history.</p>
                                 <label for="rr">Reason <span class="text-danger">*</span></label>
@@ -44,8 +44,8 @@ import { batchShort } from '@shared/fpms/labels';
                         </div></div></div></div>
                     }
                     @if (closing) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
-                            <div class="card-header"><h3 class="card-title">Close production cycle {{ c.cycleCode }}</h3></div>
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-close-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
+                            <div class="card-header"><h3 id="cycle-close-title" class="card-title">Close production cycle {{ c.cycleCode }}</h3></div>
                             <div class="card-body">
                                 <p>Every batch is closed. Closing the cycle makes all its records read-only. Sales and payment status can still be updated.</p>
                                 <div class="form-group">
