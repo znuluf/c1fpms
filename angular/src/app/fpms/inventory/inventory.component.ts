@@ -317,35 +317,40 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                         <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="inventory-adjust-title">
                             <div class="fpms-dialog-body p-0">
                                 <div class="card card-outline card-primary">
-                                    <div class="card-header"><h3 id="inventory-adjust-title" class="card-title">Adjust lot {{ adjust.lot.lotNumber }} (on hand {{ adjust.lot.quantityOnHand | num: 3 }} {{ adjust.lot.unit }})</h3></div>
-                        <form #af="ngForm" (ngSubmit)="saveAdjust()" fpmsReview="adjustment" [fpmsReviewNew]="true" novalidate>
-                            <div class="card-body">
-                                <div class="form-row">
-                                    <div class="form-group col-md-3">
-                                        <label for="aq">Quantity change ({{ adjust.lot.unit }}) <span class="text-danger">*</span></label>
-                                        <input id="aq" type="number" step="0.001" class="form-control" name="quantity" [(ngModel)]="adjust.quantity" required />
-                                        <small class="form-text text-muted">Positive adds stock; negative removes it.</small>
+                                    <div class="card-header">
+                                        <h3 id="inventory-adjust-title" class="card-title">
+                                            Adjust lot {{ adjust.lot.lotNumber }} (on hand {{ adjust.lot.quantityOnHand | num: 3 }} {{ adjust.lot.unit }})
+                                        </h3>
                                     </div>
-                                    <div class="form-group col-md-3">
-                                        <label for="ad">Date</label>
-                                        <input id="ad" type="date" class="form-control" name="date" [(ngModel)]="adjust.date" [max]="today" />
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="ar">Reason <span class="text-danger">*</span></label>
-                                        <input id="ar" class="form-control" name="reason" [(ngModel)]="adjust.reason" required maxlength="300" placeholder="e.g. physical count, spoilage, opening balance" />
-                                    </div>
+                                    <form #af="ngForm" (ngSubmit)="saveAdjust()" fpmsReview="adjustment" [fpmsReviewNew]="true" novalidate>
+                                        <div class="card-body">
+                                            <div class="form-row">
+                                                <div class="form-group col-md-3">
+                                                    <label for="aq">Quantity change ({{ adjust.lot.unit }}) <span class="text-danger">*</span></label>
+                                                    <input id="aq" type="number" step="0.001" class="form-control" name="quantity" [(ngModel)]="adjust.quantity" required />
+                                                    <small class="form-text text-muted">Positive adds stock; negative removes it.</small>
+                                                </div>
+                                                <div class="form-group col-md-3">
+                                                    <label for="ad">Date</label>
+                                                    <input id="ad" type="date" class="form-control" name="date" [(ngModel)]="adjust.date" [max]="today" />
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label for="ar">Reason <span class="text-danger">*</span></label>
+                                                    <input id="ar" class="form-control" name="reason" [(ngModel)]="adjust.reason" required maxlength="300" placeholder="e.g. physical count, spoilage, opening balance" />
+                                                </div>
+                                            </div>
+                                            @if (adjust.quantity) {
+                                                <p class="mb-0">New balance: <strong>{{ adjust.lot.quantityOnHand + adjust.quantity | num: 3 }} {{ adjust.lot.unit }}</strong></p>
+                                            }
+                                        </div>
+                                        <div class="card-footer">
+                                            <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !af.form.valid || !adjust.quantity">Save adjustment</button>
+                                            <button type="button" class="btn btn-default" (click)="adjust = null">Cancel</button>
+                                            <fpms-form-hint [form]="af"></fpms-form-hint>
+                                        </div>
+                                    </form>
                                 </div>
-                                @if (adjust.quantity) {
-                                    <p class="mb-0">New balance: <strong>{{ adjust.lot.quantityOnHand + adjust.quantity | num: 3 }} {{ adjust.lot.unit }}</strong></p>
-                                }
                             </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !af.form.valid || !adjust.quantity">Save adjustment</button>
-                                <button type="button" class="btn btn-default" (click)="adjust = null">Cancel</button>
-                                <fpms-form-hint [form]="af"></fpms-form-hint>
-                                </div>
-                            </form>
-                                </div>
                         </div>
                     </div>
                 }
