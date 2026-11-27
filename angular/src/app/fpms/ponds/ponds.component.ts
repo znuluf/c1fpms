@@ -111,7 +111,16 @@ interface PondCard {
                                         </thead>
                                         <tbody>
                                             @for (p of shownCards(); track p.id) {
-                                                <tr [class.table-warning]="!!p.alert" [class.text-muted]="p.archived">
+                                                <tr
+                                                    class="fpms-clickable-row"
+                                                    [class.table-warning]="!!p.alert"
+                                                    [class.text-muted]="p.archived"
+                                                    tabindex="0"
+                                                    role="link"
+                                                    [attr.aria-label]="'Open pond ' + p.code"
+                                                    (click)="openPondRow(p.id, $event)"
+                                                    (keydown.enter)="openPondRow(p.id, $event)"
+                                                    (keydown.space)="$event.preventDefault(); openPondRow(p.id, $event)">
                                                     <td class="pd-pond-cell">
                                                         <a [routerLink]="['/app/ponds', p.id]"><strong>{{ p.code }}</strong></a>
                                                         <div>{{ p.name }} · {{ p.areaM2 | num: 0 }} m²</div>
@@ -692,6 +701,13 @@ export class PondsComponent extends FpmsPage implements OnInit {
 
     sampleText(days: number | null): string {
         return days === null ? 'None yet' : days === 0 ? 'Today' : days === 1 ? '1 day ago' : `${days} days ago`;
+    }
+
+    openPondRow(id: string, event: Event): void {
+        if (event.target instanceof Element && event.target.closest('a, button, input, select, textarea, [role="button"]')) {
+            return;
+        }
+        this.router.navigate(['/app/ponds', id]);
     }
 
     private isoDate(utc: string): string {
