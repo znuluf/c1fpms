@@ -106,11 +106,23 @@ interface Sheet {
                 margin: 0 0.4rem 0.4rem 0;
                 border-radius: 18px;
                 border: 1px solid var(--fpms-line-strong);
-                background: var(--fpms-surface);
+                background: var(--fpms-ground-muted);
+                color: var(--fpms-text);
+                transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease), color var(--fpms-motion) var(--fpms-ease);
                 font-size: 0.9rem;
                 cursor: pointer;
             }
-            .ls-chip[aria-pressed='true'] {
+
+            .ls-chip:hover,
+            .ls-chip:focus-visible {
+                background: var(--fpms-tide-50);
+                border-color: var(--fpms-primary);
+                color: var(--fpms-primary-dark);
+            }
+            .ls-chip:focus-visible {
+                outline: 2px solid var(--fpms-primary);
+                outline-offset: 2px;
+            }            .ls-chip[aria-pressed='true'] {
                 background: var(--fpms-primary);
                 border-color: var(--fpms-primary);
                 color: var(--fpms-surface);
