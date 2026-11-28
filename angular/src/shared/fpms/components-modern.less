@@ -1,0 +1,397 @@
+// Phase 3: shared component polish using the public design tokens.
+// These are presentation-only overrides; existing Angular templates, form rules,
+// component behavior, and Bootstrap/PrimeNG integrations remain unchanged.
+
+:root {
+    --fpms-primary: var(--ink);
+    --fpms-primary-dark: var(--ink-2);
+    --fpms-accent: var(--blue);
+    --fpms-link: var(--blue-deep);
+    --fpms-bg: var(--bg);
+    --fpms-text: var(--ink);
+    --fpms-muted: var(--muted);
+    --fpms-line: var(--line);
+    --fpms-line-strong: #cbd1d9;
+    --fpms-surface: var(--paper);
+    --fpms-control-border: #8a929d;
+    --fpms-r-control: var(--r-sm);
+    --fpms-r-tile: var(--r-md);
+    --fpms-r-card: var(--r-lg);
+    --fpms-shadow-1: var(--shadow-sm);
+    --fpms-shadow-2: var(--shadow-md);
+    --fpms-motion: 140ms;
+    --fpms-ease: ease;
+    --fpms-ground: var(--bg);
+    --fpms-ground-muted: #f0f2f5;
+    --fpms-success: var(--green-deep);
+    --fpms-warning: #8a5a13;
+    --fpms-error: var(--red);
+    --fpms-info: var(--blue-deep);
+}
+
+// Buttons: clear hierarchy, consistent shape, and comfortable pointer targets.
+.btn {
+    min-height: 2.75rem;
+    padding: 0.55rem 1rem;
+    border-radius: var(--r-sm);
+    border-width: 1px;
+    font-weight: 600;
+    box-shadow: none;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+.btn-sm,
+.btn-xs {
+    min-height: 2.5rem;
+    padding: 0.4rem 0.75rem;
+}
+.btn-primary,
+.btn-primary:focus {
+    color: var(--paper);
+    background: var(--ink);
+    border-color: var(--ink);
+}
+.btn-primary:not(:disabled):not(.disabled):hover {
+    color: var(--paper);
+    background: var(--ink-2);
+    border-color: var(--ink-2);
+}
+.btn-outline-primary {
+    color: var(--ink);
+    border-color: var(--line);
+    background: var(--paper);
+}
+.btn-outline-primary:not(:disabled):hover {
+    color: var(--ink);
+    background: var(--bg);
+    border-color: var(--ink-2);
+}
+.btn-outline-secondary,
+.btn-default {
+    color: var(--ink-2);
+    border-color: var(--line);
+    background: var(--paper);
+}
+.btn-outline-secondary:not(:disabled):hover,
+.btn-default:not(:disabled):hover {
+    color: var(--ink);
+    background: var(--bg);
+    border-color: var(--muted);
+}
+.btn-success {
+    color: var(--paper);
+    background: var(--green-deep);
+    border-color: var(--green-deep);
+}
+.btn-danger {
+    color: var(--paper);
+    background: var(--red-deep);
+    border-color: var(--red-deep);
+}
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.58;
+    box-shadow: none;
+    transform: none;
+}
+
+// Inputs and selects share a quiet surface, clear border, and visible focus state.
+.form-control,
+.custom-select,
+.input-group-text {
+    min-height: 2.75rem;
+    border-radius: var(--r-sm);
+    border-color: var(--line);
+    color: var(--ink);
+    background-color: var(--paper);
+    box-shadow: none;
+}
+textarea.form-control {
+    min-height: 5.5rem;
+}
+.form-control::placeholder {
+    color: var(--muted);
+    opacity: 1;
+}
+.form-control:focus,
+.custom-select:focus {
+    color: var(--ink);
+    background-color: var(--paper);
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-soft);
+    outline: 0;
+}
+.form-control:disabled,
+.form-control[readonly],
+.custom-select:disabled {
+    color: var(--muted);
+    background-color: var(--bg);
+}
+.input-group-text {
+    color: var(--muted);
+    background: var(--bg);
+}
+label,
+.col-form-label,
+.fpms-group-label {
+    color: var(--ink-2);
+    font-weight: 600;
+}
+.form-text,
+.text-muted {
+    color: var(--muted) !important;
+}
+.form-control.is-invalid,
+.was-validated .form-control:invalid {
+    border-color: var(--red);
+}
+.invalid-feedback {
+    color: var(--red-deep);
+}
+input[type='checkbox'],
+input[type='radio'] {
+    accent-color: var(--blue);
+}
+
+// Cards: one neutral surface treatment across dashboard, forms, and detail views.
+.card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+}
+.card-header {
+    padding: var(--s4) var(--s5) var(--s2);
+    background: var(--paper);
+    border-bottom: 0;
+}
+.card-body {
+    padding: var(--s5);
+}
+.card-footer {
+    padding: var(--s4) var(--s5);
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+}
+.card-title {
+    color: var(--ink);
+    font-size: 1rem;
+    font-weight: 650;
+}
+
+// Tables: restrained headings, subtle row separators, and predictable hover/selected states.
+table.table {
+    color: var(--ink-2);
+    background: var(--paper);
+}
+.table thead th {
+    color: var(--muted);
+    background: var(--paper);
+    border-top: 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+.table td,
+.table th {
+    border-top-color: var(--line);
+}
+.table-hover tbody tr:hover {
+    background-color: var(--bg);
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #fafbfc;
+}
+.table tbody tr.table-info,
+.table tbody tr.table-info > td {
+    color: var(--ink);
+    background-color: var(--blue-tint);
+}
+.table-bordered,
+.table-bordered td,
+.table-bordered th {
+    border-color: var(--line);
+}
+.table tfoot td,
+.table tfoot th {
+    color: var(--ink);
+    background: var(--bg);
+    border-top-color: var(--line);
+}
+
+// Tabs and pagination: active state is explicit without heavy gradients or shadows.
+.nav-tabs {
+    border-bottom-color: var(--line);
+}
+.nav-tabs .nav-link {
+    min-height: 2.75rem;
+    padding: 0.6rem 1rem;
+    color: var(--muted);
+    border-color: transparent;
+    border-radius: var(--r-sm) var(--r-sm) 0 0;
+    font-weight: 600;
+}
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+    color: var(--ink);
+    background: var(--bg);
+    border-color: var(--line) var(--line) transparent;
+}
+.nav-tabs .nav-link.active {
+    color: var(--ink);
+    background: var(--paper);
+    border-color: var(--line) var(--line) var(--paper);
+    box-shadow: inset 0 2px 0 var(--blue);
+}
+.page-link {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blue-deep);
+    background: var(--paper);
+    border-color: var(--line);
+    border-radius: var(--r-sm);
+}
+.page-item.active .page-link {
+    color: var(--paper);
+    background: var(--ink);
+    border-color: var(--ink);
+}
+.page-item.disabled .page-link {
+    color: var(--muted);
+    background: var(--bg);
+    border-color: var(--line);
+}
+
+// Filter chips and compact selection controls keep the selected state readable.
+.fpms-chip {
+    color: var(--ink-2);
+    background: var(--bg);
+    border-color: var(--line);
+    border-radius: 999px;
+}
+button.fpms-chip {
+    min-height: 2.75rem;
+    border-color: var(--line);
+    background: var(--paper);
+}
+button.fpms-chip:hover,
+button.fpms-chip:focus-visible {
+    color: var(--ink);
+    background: var(--blue-tint);
+    border-color: var(--blue);
+}
+button.fpms-chip[aria-pressed='true'] {
+    color: var(--blue-deep);
+    background: var(--blue-soft);
+    border-color: var(--blue);
+}
+.fpms-section-tabs {
+    background: var(--paper);
+    border-color: var(--line);
+    border-radius: var(--r-md);
+}
+.fpms-section-tab {
+    min-height: 2.75rem;
+    color: var(--muted);
+    border-radius: var(--r-sm);
+}
+.fpms-section-tab:hover,
+.fpms-section-tab:focus {
+    color: var(--ink);
+    background: var(--bg);
+}
+.fpms-section-tab.active {
+    color: var(--paper);
+    background: var(--ink);
+}
+.fpms-tab-count {
+    color: var(--muted);
+    background: var(--bg);
+    border-color: var(--line);
+}
+
+// Status labels preserve their established meanings while using softer token tints.
+.badge {
+    padding: 0.35em 0.7em;
+    border-radius: 999px;
+    font-weight: 600;
+}
+.badge-success { color: var(--green-deep); background: var(--green-soft); }
+.badge-info { color: var(--blue-deep); background: var(--blue-soft); }
+.badge-warning { color: #80520d; background: var(--orange-soft); }
+.badge-danger { color: var(--red-deep); background: var(--red-soft); }
+.badge-secondary { color: var(--ink-2); background: var(--bg); }
+.badge-primary { color: var(--blue-deep); background: var(--blue-tint); }
+
+// Alerts use the same semantic palette as status labels.
+.alert {
+    border-radius: var(--r-md);
+    border-color: var(--line);
+}
+.alert-success { color: var(--green-deep); background: var(--green-tint); border-color: var(--green-soft); }
+.alert-info { color: var(--blue-deep); background: var(--blue-tint); border-color: var(--blue-soft); }
+.alert-warning { color: #80520d; background: var(--orange-tint); border-color: var(--orange-soft); }
+.alert-danger { color: var(--red-deep); background: var(--red-tint); border-color: var(--red-soft); }
+
+// Bootstrap modal and existing FPMS floating dialogs receive the same surface language.
+.modal-content,
+.fpms-dialog {
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+}
+.modal-header,
+.fpms-dialog-head {
+    border-bottom-color: var(--line);
+}
+.modal-footer,
+.fpms-dialog-foot {
+    border-top-color: var(--line);
+}
+.fpms-dialog-close {
+    color: var(--muted);
+    background: var(--paper);
+    border-color: var(--line);
+    border-radius: var(--r-sm);
+}
+.fpms-dialog-close:hover,
+.fpms-dialog-close:focus-visible {
+    color: var(--ink);
+    background: var(--bg);
+}
+
+// PrimeNG paginator is already installed and remains the existing pagination implementation.
+.p-paginator {
+    gap: var(--s1);
+    padding: var(--s3) var(--s4);
+    background: var(--paper);
+    border-color: var(--line);
+    color: var(--muted);
+}
+.p-paginator .p-paginator-element {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    border-radius: var(--r-sm);
+}
+.p-paginator .p-paginator-element:focus {
+    box-shadow: 0 0 0 3px var(--blue-soft);
+}
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+    color: var(--paper);
+    background: var(--ink);
+}
+
+// Consistent keyboard focus across shared controls.
+a:focus-visible,
+button:focus-visible,
+[role='button']:focus-visible,
+.form-control:focus-visible,
+.custom-select:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+}
