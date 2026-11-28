@@ -82,14 +82,14 @@ function daysBetween(a: string, b: string): number {
             </div>
             <div class="fpms-dr-toolbar no-print">
                 <div class="fpms-button-group" role="group" aria-label="Show">
-                    <button type="button" class="fpms-button" [class.btn-primary]="mode() === 'day'" [class.btn-outline-primary]="mode() !== 'day'" [attr.aria-pressed]="mode() === 'day'" (click)="mode.set('day')">Day</button>
-                    <button type="button" class="fpms-button" [class.btn-primary]="mode() === 'week'" [class.btn-outline-primary]="mode() !== 'week'" [attr.aria-pressed]="mode() === 'week'" (click)="mode.set('week')">Week</button>
+                    <button type="button" class="fpms-button" [class.fpms-button-primary]="mode() === 'day'" [class.fpms-button-outline]="mode() !== 'day'" [attr.aria-pressed]="mode() === 'day'" (click)="mode.set('day')">Day</button>
+                    <button type="button" class="fpms-button" [class.fpms-button-primary]="mode() === 'week'" [class.fpms-button-outline]="mode() !== 'week'" [attr.aria-pressed]="mode() === 'week'" (click)="mode.set('week')">Week</button>
                 </div>
                 @if (actionsOn() && mode() === 'day') {
                     <!-- View or Edit (DEC-126): the record read-only, or with Correct, Void and Record on its rows. -->
                     <div class="fpms-button-group" role="group" aria-label="Mode">
-                        <button type="button" class="fpms-button" [class.btn-primary]="!editing()" [class.btn-outline-primary]="editing()" [attr.aria-pressed]="!editing()" (click)="setEditing(false)">View</button>
-                        <button type="button" class="fpms-button" [class.btn-primary]="editing()" [class.btn-outline-primary]="!editing()" [attr.aria-pressed]="editing()" (click)="setEditing(true)"><i class="fas fa-pen fpms-icon-gap" aria-hidden="true"></i>Edit</button>
+                        <button type="button" class="fpms-button" [class.fpms-button-primary]="!editing()" [class.fpms-button-outline]="editing()" [attr.aria-pressed]="!editing()" (click)="setEditing(false)">View</button>
+                        <button type="button" class="fpms-button" [class.fpms-button-primary]="editing()" [class.fpms-button-outline]="!editing()" [attr.aria-pressed]="editing()" (click)="setEditing(true)"><i class="fas fa-pen fpms-icon-gap" aria-hidden="true"></i>Edit</button>
                     </div>
                 }
                 <div class="fpms-dr-steps">
@@ -122,7 +122,7 @@ function daysBetween(a: string, b: string): number {
                             {{ st.short }}
                             @if (st.water) {
                                 <i class="fas" [class.fa-tint]="st.waterIn" [class.fa-tint-slash]="!st.waterIn" [title]="st.water" aria-hidden="true"></i>
-                                <span class="sr-only">{{ st.water }}</span>
+                                <span class="fpms-visually-hidden">{{ st.water }}</span>
                             }
                         </span>
                     </button>
@@ -156,7 +156,7 @@ function daysBetween(a: string, b: string): number {
                             </div>
                             <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                                 <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
-                                    <thead><tr><th class="fpms-nowrap">Feeding</th><th class="fpms-align-end">Kg</th><th>Feed lot</th><th title="Who entered it, and when">Entered</th>@if (showActions()) {<th><span class="sr-only">Actions</span></th>}</tr></thead>
+                                    <thead><tr><th class="fpms-nowrap">Feeding</th><th class="fpms-align-end">Kg</th><th>Feed lot</th><th title="Who entered it, and when">Entered</th>@if (showActions()) {<th><span class="fpms-visually-hidden">Actions</span></th>}</tr></thead>
                                     <tbody>
                                         @for (n of slots(); track n) {
                                             @let s = sessionOf(day(), n);
@@ -208,7 +208,7 @@ function daysBetween(a: string, b: string): number {
                                     <span class="fpms-warning-text fpms-icon-gap"><i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>{{ outOfRange(ls).length }} out of range</span>
                                 }
                                 @if (canRecordDay()) {
-                                    <button type="button" class="fpms-button fpms-button-compact" [class.btn-outline-primary]="!byType(ls, WATER).length" [class.btn-outline-secondary]="byType(ls, WATER).length" (click)="openNew(WATER)">{{ byType(ls, WATER).length ? 'Add reading' : 'Record' }}</button>
+                                    <button type="button" class="fpms-button fpms-button-compact" [class.fpms-button-outline]="!byType(ls, WATER).length" [class.fpms-button-secondary]="byType(ls, WATER).length" (click)="openNew(WATER)">{{ byType(ls, WATER).length ? 'Add reading' : 'Record' }}</button>
                                 }
                             </div>
                             <div class="fpms-panel-body fpms-space-0">
@@ -288,7 +288,7 @@ function daysBetween(a: string, b: string): number {
                                 @for (d of weekDates(); track d) {
                                     @let ls = logsOn(d);
                                     @let fs = feedingsOn(d);
-                                    <tr [class.fpms-dr-today]="d === today" [class.text-muted]="!inRange(d)">
+                                    <tr [class.fpms-dr-today]="d === today" [class.fpms-muted]="!inRange(d)">
                                         <th scope="row">
                                             @if (inRange(d)) {
                                                 <a href="javascript:;" (click)="openDay(d)">Day {{ docOf(d) }}</a>
@@ -689,7 +689,7 @@ export class BatchDailyRecordComponent implements OnInit {
             case 'value':
                 return '';
             default:
-                return 'text-muted';
+                return 'fpms-muted';
         }
     }
 }
