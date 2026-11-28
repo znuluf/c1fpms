@@ -10,8 +10,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="Size grades" subtitle="Count grades (pieces per kg) used on harvests and sales."></fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 <div class="row">
                     <div class="col-xl-8">
                         <div class="card">
