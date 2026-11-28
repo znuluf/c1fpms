@@ -21,8 +21,8 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                 <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 <!-- Trace, report choice and filters on the page ground (DEC-115). -->
                 <form class="no-print fpms-list-filters" (ngSubmit)="traceLot()" aria-label="Trace a lot code">
                     <div class="form-row align-items-end">
