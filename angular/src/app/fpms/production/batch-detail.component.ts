@@ -34,21 +34,21 @@ interface CalMonth {
                 @if (can('Farm.Reports') || (canManage && (b.canClose || b.canReopen))) {
                     <fpms-more>
                         @if (can('Farm.Reports')) {
-                            <a class="dropdown-item" role="menuitem" [routerLink]="['/app/reports/trace', b.id]"><i class="fas fa-project-diagram mr-2" aria-hidden="true"></i>Trace report</a>
+                            <a class="fpms-dropdown-item" role="menuitem" [routerLink]="['/app/reports/trace', b.id]"><i class="fas fa-project-diagram fpms-icon-gap" aria-hidden="true"></i>Trace report</a>
                         }
                         @if (canManage && b.canClose) {
-                            <button type="button" class="dropdown-item" role="menuitem" (click)="startClose()"><i class="fas fa-lock mr-2" aria-hidden="true"></i>Close batch</button>
+                            <button type="button" class="fpms-dropdown-item" role="menuitem" (click)="startClose()"><i class="fas fa-lock fpms-icon-gap" aria-hidden="true"></i>Close batch</button>
                         }
                         @if (canManage && b.canReopen) {
-                            <button type="button" class="dropdown-item" role="menuitem" (click)="reopening = { reason: '' }"><i class="fas fa-undo mr-2" aria-hidden="true"></i>Reopen batch</button>
+                            <button type="button" class="fpms-dropdown-item" role="menuitem" (click)="reopening = { reason: '' }"><i class="fas fa-undo fpms-icon-gap" aria-hidden="true"></i>Reopen batch</button>
                         }
                     </fpms-more>
                 }
                 @if (b.canAddHarvest && can('Farm.Harvests.Create')) {
-                    <a class="btn btn-outline-primary" routerLink="/app/harvests/new" [queryParams]="{ batchId: b.id }"><i class="fas fa-shrimp mr-1" aria-hidden="true"></i>Record harvest</a>
+                    <a class="fpms-button fpms-button-outline" routerLink="/app/harvests/new" [queryParams]="{ batchId: b.id }"><i class="fas fa-shrimp fpms-icon-gap" aria-hidden="true"></i>Record harvest</a>
                 }
                 @if (b.allowedLogTypes.length && can('Farm.Logs.Create')) {
-                    <button type="button" class="btn btn-primary" (click)="drawer.open({ batchId: b.id })"><i class="fas fa-plus mr-1" aria-hidden="true"></i>Record operations</button>
+                    <button type="button" class="fpms-button fpms-button-primary" (click)="drawer.open({ batchId: b.id })"><i class="fas fa-plus fpms-icon-gap" aria-hidden="true"></i>Record operations</button>
                 }
             }
         </fpms-page-header>
@@ -58,16 +58,16 @@ interface CalMonth {
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (b.harvestReadinessReached) {
-                        <div class="alert alert-success border" role="status">
-                            <strong><i class="fas fa-check-circle mr-1" aria-hidden="true"></i>Ready for harvest</strong>
+                        <div class="fpms-alert fpms-alert-success fpms-border" role="status">
+                            <strong><i class="fas fa-check-circle fpms-icon-gap" aria-hidden="true"></i>Ready for harvest</strong>
                             <div>The latest sample ({{ b.harvestReadinessSampleDate | farmDate }}) shows ABW {{ b.indicators.latestSampleAbwG }} g, meeting this batch's target of {{ b.targetHarvestAbwG }} g at DOC {{ b.doc }}.</div>
                             @if (b.earliestSafeHarvestDate && b.earliestSafeHarvestDate > today) {
-                                <div class="mt-1"><i class="fas fa-hourglass-half mr-1" aria-hidden="true"></i>Withdrawal period is still active. Safe harvest date: {{ b.earliestSafeHarvestDate | farmDate }}.</div>
+                                <div class="fpms-space-top-1"><i class="fas fa-hourglass-half fpms-icon-gap" aria-hidden="true"></i>Withdrawal period is still active. Safe harvest date: {{ b.earliestSafeHarvestDate | farmDate }}.</div>
                             }
-                            <div class="small mt-1">This is guidance only. It does not change the batch status or prevent recording a harvest.</div>
+                            <div class="fpms-small fpms-space-top-1">This is guidance only. It does not change the batch status or prevent recording a harvest.</div>
                         </div>
                     } @else if (b.maxCultureDays && b.doc >= b.maxCultureDays) {
-                        <div class="alert alert-warning border" role="status">
+                        <div class="fpms-alert fpms-alert-warning fpms-border" role="status">
                             <strong>Maximum culture duration reached</strong>
                             @if (!b.targetHarvestAbwG) {
                                 <div>No target ABW is configured for this batch. Review the latest sampling results and confirm the harvest plan.</div>
@@ -79,127 +79,127 @@ interface CalMonth {
                         </div>
                     }
                     @if (assigning) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="batch-assign-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-primary mb-0 border-0">
-                            <div class="card-header"><h3 id="batch-assign-title" class="card-title"><i class="fas fa-user" aria-hidden="true"></i>Who looks after {{ b.pondCode }}</h3></div>
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="batch-assign-title"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-primary fpms-no-bottom fpms-no-border">
+                            <div class="fpms-panel-head"><h3 id="batch-assign-title" class="fpms-panel-title"><i class="fas fa-user" aria-hidden="true"></i>Who looks after {{ b.pondCode }}</h3></div>
                             <form #af="ngForm" (ngSubmit)="saveAssign()" fpmsReview="names" novalidate>
-                                <div class="card-body">
+                                <div class="fpms-panel-body">
                                     @if (!people) {
                                         <fpms-loading></fpms-loading>
                                     } @else {
                                         <!-- DEC-127: one or more people, as equals; a tick each. -->
-                                        <fieldset class="form-group" role="group" aria-labelledby="at-l" data-review-list="Looked after by">
+                                        <fieldset class="fpms-field" role="group" aria-labelledby="at-l" data-review-list="Looked after by">
                                             <legend id="at-l" class="fpms-group-label">Looked after by</legend>
                                             <div class="fpms-people">
                                                 @for (p of people; track p.id) {
-                                                    <div class="custom-control custom-checkbox">
-                                                        <input type="checkbox" class="custom-control-input" [id]="'at' + p.id" [checked]="assigning.technicianUserIds.includes(p.id)" (change)="toggleTech(p.id)"
+                                                    <div class="fpms-check fpms-check-box">
+                                                        <input type="checkbox" class="fpms-check-input" [id]="'at' + p.id" [checked]="assigning.technicianUserIds.includes(p.id)" (change)="toggleTech(p.id)"
                                                             [disabled]="!assigning.technicianUserIds.includes(p.id) && assigning.technicianUserIds.length >= maxTechnicians" />
-                                                        <label class="custom-control-label" [for]="'at' + p.id">{{ p.name }} <span class="text-muted">· {{ p.roleName }}</span></label>
+                                                        <label class="fpms-check-label" [for]="'at' + p.id">{{ p.name }} <span class="fpms-muted">· {{ p.roleName }}</span></label>
                                                     </div>
                                                 }
                                             </div>
-                                            <small class="form-text text-muted">Tick one person, or two who share the pond (up to {{ maxTechnicians }}). It opens first for each of them. Anyone with access can still record for it.</small>
+                                            <small class="fpms-help fpms-muted">Tick one person, or two who share the pond (up to {{ maxTechnicians }}). It opens first for each of them. Anyone with access can still record for it.</small>
                                         </fieldset>
-                                        <div class="form-row">
-                                            <div class="form-group col-sm-7">
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-sm-7">
                                                 <label for="ac">Cover for days off</label>
-                                                <select id="ac" name="cover" class="form-control" [(ngModel)]="assigning.coverUserId" [disabled]="!assigning.technicianUserIds.length">
+                                                <select id="ac" name="cover" class="fpms-control" [(ngModel)]="assigning.coverUserId" [disabled]="!assigning.technicianUserIds.length">
                                                     <option [ngValue]="null">No cover</option>
                                                     @for (p of people; track p.id) {
                                                         @if (!assigning.technicianUserIds.includes(p.id)) { <option [ngValue]="p.id">{{ p.name }} · {{ p.roleName }}</option> }
                                                     }
                                                 </select>
                                             </div>
-                                            <div class="form-group col-sm-5">
+                                            <div class="fpms-field fpms-col-sm-5">
                                                 <label for="au">Cover until</label>
-                                                <input id="au" type="date" name="coverUntil" class="form-control" [(ngModel)]="assigning.coverUntil" [min]="today" [disabled]="!assigning.coverUserId" />
+                                                <input id="au" type="date" name="coverUntil" class="fpms-control" [(ngModel)]="assigning.coverUntil" [min]="today" [disabled]="!assigning.coverUserId" />
                                             </div>
                                         </div>
-                                        <p class="small text-muted mb-0">The cover's last day is included. Leave the date empty to keep the cover until you change it.</p>
+                                        <p class="fpms-small fpms-muted fpms-no-bottom">The cover's last day is included. Leave the date empty to keep the cover until you change it.</p>
                                     }
                                 </div>
-                                <div class="card-footer">
-                                    <button class="btn btn-primary mr-2" type="submit" [disabled]="busy() || !people">Save</button>
-                                    <button class="btn btn-default" type="button" (click)="assigning = null">Cancel</button>
+                                <div class="fpms-panel-foot">
+                                    <button class="fpms-button fpms-button-primary fpms-icon-gap" type="submit" [disabled]="busy() || !people">Save</button>
+                                    <button class="fpms-button fpms-button-secondary" type="button" (click)="assigning = null">Cancel</button>
                                 </div>
                             </form>
                         </div></div></div></div>
                     }
 
                     @if (reopening) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="batch-reopen-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
-                            <div class="card-header"><h3 id="batch-reopen-title" class="card-title"><i class="fas fa-undo" aria-hidden="true"></i>Reopen batch {{ b.batchCode }}</h3></div>
-                            <div class="card-body">
-                                <p class="small">
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="batch-reopen-title"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-warning fpms-no-bottom fpms-no-border">
+                            <div class="fpms-panel-head"><h3 id="batch-reopen-title" class="fpms-panel-title"><i class="fas fa-undo" aria-hidden="true"></i>Reopen batch {{ b.batchCode }}</h3></div>
+                            <div class="fpms-panel-body">
+                                <p class="fpms-small">
                                     The batch returns to Harvested so its records can be corrected. Its final indicators are worked out again when you close it.
                                     The reason is kept in the batch's history and the activity log.
                                 </p>
-                                <label for="br">Reason <span class="text-danger">*</span></label>
-                                <input id="br" class="form-control" [(ngModel)]="reopening.reason" maxlength="500" placeholder="e.g. the final harvest kg was entered wrong" />
+                                <label for="br">Reason <span class="fpms-danger">*</span></label>
+                                <input id="br" class="fpms-control" [(ngModel)]="reopening.reason" maxlength="500" placeholder="e.g. the final harvest kg was entered wrong" />
                             </div>
-                            <div class="card-footer">
-                                <button class="btn btn-warning mr-2" [disabled]="busy() || reopening.reason.trim().length < 3" (click)="reopen()">Reopen batch</button>
-                                <button class="btn btn-default" (click)="reopening = null">Cancel</button>
+                            <div class="fpms-panel-foot">
+                                <button class="fpms-button fpms-button-warning fpms-icon-gap" [disabled]="busy() || reopening.reason.trim().length < 3" (click)="reopen()">Reopen batch</button>
+                                <button class="fpms-button fpms-button-secondary" (click)="reopening = null">Cancel</button>
                             </div>
                         </div></div></div></div>
                     }
 
                     @if (closing) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="batch-close-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
-                            <div class="card-header"><h3 id="batch-close-title" class="card-title"><i class="fas fa-lock" aria-hidden="true"></i>Close batch {{ b.batchCode }}</h3></div>
-                            <div class="card-body">
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="batch-close-title"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-warning fpms-no-bottom fpms-no-border">
+                            <div class="fpms-panel-head"><h3 id="batch-close-title" class="fpms-panel-title"><i class="fas fa-lock" aria-hidden="true"></i>Close batch {{ b.batchCode }}</h3></div>
+                            <div class="fpms-panel-body">
                                 <p>Final FCR, survival rate, ABW and days of culture are fixed. Logs, feeding and harvests become read-only for everyone, and pond {{ b.pondCode }} becomes Available (or stays in preparation if a new round has started). The Owner can reopen the batch later, with a reason, to correct a mistake.</p>
                                 @if (!closeCheck) {
-                                    <p class="small text-muted"><i class="fas fa-spinner fa-spin mr-1"></i>Checking daily records…</p>
+                                    <p class="fpms-small fpms-muted"><i class="fas fa-spinner fa-spin fpms-icon-gap"></i>Checking daily records…</p>
                                 } @else if (closeCheck.blankDaysTotal) {
-                                    <div class="alert alert-warning small">
+                                    <div class="fpms-alert fpms-alert-warning fpms-small">
                                         <strong>{{ closeCheck.blankDaysTotal }} day{{ closeCheck.blankDaysTotal === 1 ? '' : 's' }} with blank daily records</strong>
                                         between {{ closeCheck.from | farmDate }} and {{ closeCheck.to | farmDate }}:
                                         {{ closeCheck.blankFeedingSlots }} feeding{{ closeCheck.blankFeedingSlots === 1 ? '' : 's' }} and {{ closeCheck.blankWaterDays }} water-quality day{{ closeCheck.blankWaterDays === 1 ? '' : 's' }} not recorded
                                         ({{ closeCheck.notFedSlots }} feeding{{ closeCheck.notFedSlots === 1 ? '' : 's' }} marked Not fed).
                                         Review them before closing; the final indicators use only what was recorded.
-                                        <ul class="mb-0 mt-1 fpms-scroll-list">
+                                        <ul class="fpms-no-bottom fpms-space-top-1 fpms-scroll-list">
                                             @for (d of closeCheck.blankDays; track d.date) {
                                                 <li>{{ d.date | farmDate }}: {{ d.missing }}</li>
                                             }
                                             @if (closeCheck.blankDaysTotal > closeCheck.blankDays.length) {
-                                                <li class="text-muted">…and {{ closeCheck.blankDaysTotal - closeCheck.blankDays.length }} more</li>
+                                                <li class="fpms-muted">…and {{ closeCheck.blankDaysTotal - closeCheck.blankDays.length }} more</li>
                                             }
                                         </ul>
                                     </div>
                                 } @else {
-                                    <p class="small text-success"><i class="fas fa-check mr-1"></i>Every day has its feeding and water-quality records{{ closeCheck.notFedSlots ? ' (' + closeCheck.notFedSlots + ' sessions marked Not fed)' : '' }}.</p>
+                                    <p class="fpms-small fpms-success"><i class="fas fa-check fpms-icon-gap"></i>Every day has its feeding and water-quality records{{ closeCheck.notFedSlots ? ' (' + closeCheck.notFedSlots + ' sessions marked Not fed)' : '' }}.</p>
                                 }
                                 @if (closeCheck?.sfscMissing) {
-                                    <div class="alert alert-warning small">
+                                    <div class="fpms-alert fpms-alert-warning fpms-small">
                                         <strong>No Shrimp Fry Source Certificate number</strong> on fry delivery {{ closeCheck.fryDeliveryBatchNumber }}.
                                         BFAR FAO 225-1 requires it, and the harvest can be confiscated without it. Add it on the fry delivery. You can still close.
                                     </div>
                                 }
                                 @if (closeCheck?.flaggedLots?.length) {
-                                    <div class="alert alert-warning small">
+                                    <div class="fpms-alert fpms-alert-warning fpms-small">
                                         <strong>{{ closeCheck.flaggedLots.length }} stock lot{{ closeCheck.flaggedLots.length === 1 ? '' : 's' }} used by this batch {{ closeCheck.flaggedLots.length === 1 ? 'is' : 'are' }} flagged for reconciliation:</strong>
-                                        @for (l of closeCheck.flaggedLots; track $index) { <span class="d-block">{{ l.product }}, lot {{ l.lotNumber }}</span> }
+                                        @for (l of closeCheck.flaggedLots; track $index) { <span class="fpms-block">{{ l.product }}, lot {{ l.lotNumber }}</span> }
                                         The feed or chemical amounts for this batch may be off until the stock is reconciled on the Inventory page. You can still close.
                                     </div>
                                 }
                                 @if (closeCheck?.unaccountedKg > 0.0005) {
-                                    <div class="alert alert-warning small">
+                                    <div class="fpms-alert fpms-alert-warning fpms-small">
                                         <strong>{{ closeCheck.unaccountedKg | num: 3 }} kg harvested but still unsold, awaiting an outcome:</strong>
                                         harvested {{ closeCheck.harvestedKg | num: 3 }} kg, sold {{ closeCheck.soldKg | num: 3 }} kg, not sold (home use, given away, spoiled) {{ closeCheck.notSoldKg | num: 3 }} kg.
                                         Record the remaining sales or not-sold kg before closing this batch.
                                     </div>
                                 } @else if (closeCheck && closeCheck.harvestedKg > 0) {
-                                    <p class="small text-success"><i class="fas fa-check mr-1"></i>All {{ closeCheck.harvestedKg | num: 3 }} harvested kg are sold or recorded as not sold.</p>
+                                    <p class="fpms-small fpms-success"><i class="fas fa-check fpms-icon-gap"></i>All {{ closeCheck.harvestedKg | num: 3 }} harvested kg are sold or recorded as not sold.</p>
                                 }
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="ro" [(ngModel)]="closing.confirm" />
-                                    <label class="custom-control-label" for="ro">I understand this batch's records will become read-only.</label>
+                                <div class="fpms-check fpms-check-box">
+                                    <input type="checkbox" class="fpms-check-input" id="ro" [(ngModel)]="closing.confirm" />
+                                    <label class="fpms-check-label" for="ro">I understand this batch's records will become read-only.</label>
                                 </div>
                             </div>
-                            <div class="card-footer">
-                                <button class="btn btn-warning mr-2" [disabled]="busy() || !closing.confirm || closeCheck == null || closeCheck.unaccountedKg > 0.0005" (click)="close()">Close batch</button>
-                                <button class="btn btn-default" (click)="closing = null">Cancel</button>
+                            <div class="fpms-panel-foot">
+                                <button class="fpms-button fpms-button-warning fpms-icon-gap" [disabled]="busy() || !closing.confirm || closeCheck == null || closeCheck.unaccountedKg > 0.0005" (click)="close()">Close batch</button>
+                                <button class="fpms-button fpms-button-secondary" (click)="closing = null">Cancel</button>
                             </div>
                         </div></div></div></div>
                     }
@@ -213,16 +213,16 @@ interface CalMonth {
                             <fpms-batch-figures [indicators]="i" [closed]="b.status === 5" [stockingDate]="b.stockingDate"></fpms-batch-figures>
                             <dl class="fpms-figures-more" aria-label="More figures, computed from source records">
                                 <div [title]="i.populationBasis === 'Estimate' ? 'PL stocked × the latest survival estimate, less mortality and harvests after it' : 'PL stocked less recorded mortality and harvested pieces'">
-                                    <dt>Est. population</dt><dd>{{ i.estimatedPopulation | num: 0 }}</dd><dd class="font-weight-normal text-muted">{{ i.populationBasis === 'Estimate' ? 'from survival estimate' : 'from mortality' }}</dd>
+                                    <dt>Est. population</dt><dd>{{ i.estimatedPopulation | num: 0 }}</dd><dd class="fpms-weight-normal fpms-muted">{{ i.populationBasis === 'Estimate' ? 'from survival estimate' : 'from mortality' }}</dd>
                                 </div>
-                                <div [title]="i.biomassAbwSource === 'Harvest' ? 'Uses the partial-harvest ABW selected by staff' : 'Uses the latest growth-sampling ABW'"><dt>Est. biomass</dt><dd>{{ i.estimatedBiomassKg | num: 1 }} kg</dd><dd class="font-weight-normal text-muted">{{ i.biomassAbwG | num: 2 }} g ABW · {{ i.biomassAbwSource === 'Harvest' ? 'harvest sample' : i.biomassAbwSource === 'Sample' ? 'growth sample' : 'no ABW basis' }}{{ i.biomassAbwSourceDate ? ' · ' + (i.biomassAbwSourceDate | farmDate) : '' }}</dd></div>
+                                <div [title]="i.biomassAbwSource === 'Harvest' ? 'Uses the partial-harvest ABW selected by staff' : 'Uses the latest growth-sampling ABW'"><dt>Est. biomass</dt><dd>{{ i.estimatedBiomassKg | num: 1 }} kg</dd><dd class="fpms-weight-normal fpms-muted">{{ i.biomassAbwG | num: 2 }} g ABW · {{ i.biomassAbwSource === 'Harvest' ? 'harvest sample' : i.biomassAbwSource === 'Sample' ? 'growth sample' : 'no ABW basis' }}{{ i.biomassAbwSourceDate ? ' · ' + (i.biomassAbwSourceDate | farmDate) : '' }}</dd></div>
                                 <div><dt>Feed to date</dt><dd>{{ i.cumulativeFeedKg | num: 1 }} kg</dd></div>
                                 <div><dt>Mortality to date</dt><dd>{{ i.cumulativeMortality | num: 0 }}{{ i.cumulativeMortalityPct == null ? '' : ' · ' + (i.cumulativeMortalityPct | num: 2) + '%' }}</dd></div>
                                 <div><dt>Harvested</dt><dd>{{ i.totalHarvestKg | num: 1 }} kg · {{ i.harvestedPieces | num: 0 }} pcs</dd></div>
                                 @if (i.cultureDays != null) { <div><dt>Days of culture</dt><dd>{{ i.cultureDays }}</dd></div> }
                             </dl>
                             @if (b.status === 2 && i.estimatedPopulation === 0) {
-                                <div class="alert alert-warning mt-2 mb-0" role="status">
+                                <div class="fpms-alert fpms-alert-warning fpms-space-top-2 fpms-no-bottom" role="status">
                                     <strong>Estimated remaining population is zero.</strong>
                                     This is an estimate from recorded survival, mortality and harvest data, not confirmation that the pond is empty.
                                     Review the records and check the pond. The batch stays Stocked until a Final harvest is recorded or, for an Emergency harvest,
@@ -239,16 +239,16 @@ interface CalMonth {
                                         <span>
                                             @if (b.technicianName) {
                                                 Looked after by <strong>{{ b.technicianName }}</strong>
-                                                @if (b.isMine && !coverActive()) { <span class="badge badge-info ml-1">You</span> }
+                                                @if (b.isMine && !coverActive()) { <span class="fpms-label fpms-label-info fpms-icon-gap">You</span> }
                                                 @if (coverActive()) {
                                                     · <strong>{{ b.coverName }}</strong> covers{{ b.coverUntil ? ' until ' + (b.coverUntil | farmDate) : '' }}
-                                                    @if (b.isMine) { <span class="badge badge-info ml-1">You</span> }
+                                                    @if (b.isMine) { <span class="fpms-label fpms-label-info fpms-icon-gap">You</span> }
                                                 }
                                             } @else {
                                                 No one named to look after this batch yet.
                                             }
                                             @if (canManage && !b.isReadOnly) {
-                                                · <button type="button" class="btn btn-link p-0 align-baseline" (click)="startAssign()">{{ b.technicianName ? 'Change' : 'Name who looks after it' }}</button>
+                                                · <button type="button" class="fpms-button fpms-button-link fpms-space-0 fpms-align-baseline" (click)="startAssign()">{{ b.technicianName ? 'Change' : 'Name who looks after it' }}</button>
                                             }
                                         </span>
                                     </li>
@@ -282,13 +282,13 @@ interface CalMonth {
                         }
                     </div>
 
-                    <div class="row">
-                        <div class="col-12">
+                    <div class="fpms-grid-row">
+                        <div class="fpms-col-12">
                             @if (tab === 'sec-stocking') {
                             <!-- Stocking details as grouped facts, with the batch's record counts beside them (DEC-99). -->
                             <div class="fpms-split" id="sec-stocking">
-                                <div class="card">
-                                    <div class="card-body">
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-body">
                                         <h3 class="fpms-section-h">Fry</h3>
                                         <dl class="fpms-facts">
                                             <div><dt>Fry delivery</dt><dd><a [routerLink]="['/app/resources/fry-deliveries', b.fryDeliveryId]">{{ b.hatcheryBatchNumber }}</a> · {{ b.hatcheryName }}</dd></div>
@@ -306,7 +306,7 @@ interface CalMonth {
                                                 <dd>
                                                     {{ b.stockingDensityPerM2 | num: 2 }} PL/m²
                                                     @if (b.densityFlag) {
-                                                        <span class="badge ml-1" [class.badge-success]="b.densityFlag === 1" [class.badge-warning]="b.densityFlag !== 1">{{ b.densityFlag | label: L.DensityFlags }}</span>
+                                                        <span class="fpms-label fpms-icon-gap" [class.fpms-label-success]="b.densityFlag === 1" [class.fpms-label-warning]="b.densityFlag !== 1">{{ b.densityFlag | label: L.DensityFlags }}</span>
                                                     }
                                                 </dd>
                                             </div>
@@ -328,8 +328,8 @@ interface CalMonth {
                                     </div>
                                 </div>
                                 <aside>
-                                    <div class="card">
-                                        <div class="card-body">
+                                    <div class="fpms-panel">
+                                        <div class="fpms-panel-body">
                                             <h3 class="fpms-section-h">Records</h3>
                                             <dl class="fpms-counts">
                                                 <div><dt>Feedings</dt><dd>{{ feedPager.total | num: 0 }}</dd></div>
@@ -341,9 +341,9 @@ interface CalMonth {
                                             </dl>
                                             @if (b.reopenings?.length) {
                                                 <h3 class="fpms-section-h">Reopened</h3>
-                                                <ul class="list-unstyled mb-0">
+                                                <ul class="fpms-list-unstyled fpms-no-bottom">
                                                     @for (r of b.reopenings; track $index) {
-                                                        <li class="mb-2">{{ r.reopenedAtUtc | farmDateTime }} by {{ r.reopenedBy }}<div class="text-muted">{{ r.reason }}</div></li>
+                                                        <li class="fpms-space-bottom-2">{{ r.reopenedAtUtc | farmDateTime }} by {{ r.reopenedBy }}<div class="fpms-muted">{{ r.reason }}</div></li>
                                                     }
                                                 </ul>
                                             }
@@ -353,7 +353,7 @@ interface CalMonth {
                             </div>
                             }
                         </div>
-                        <div class="col-12">
+                        <div class="fpms-col-12">
                             @if (tab === 'sec-daily') {
                                 <div id="sec-daily">
                                     <fpms-batch-daily-record
@@ -365,14 +365,14 @@ interface CalMonth {
                                 </div>
                             }
                             @if (tab === 'sec-calendar' && calMonths.length) {
-                                <div class="card" id="sec-calendar">
-                                    <div class="card-header d-flex align-items-center flex-wrap">
-                                        <h3 class="card-title mr-auto">Log calendar</h3>
-                                        <span class="small text-muted">{{ calStats.days }} days of culture</span>
+                                <div class="fpms-panel" id="sec-calendar">
+                                    <div class="fpms-panel-head fpms-flex fpms-align-center-items fpms-wrap">
+                                        <h3 class="fpms-panel-title fpms-margin-auto-end">Log calendar</h3>
+                                        <span class="fpms-small fpms-muted">{{ calStats.days }} days of culture</span>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="fpms-panel-body">
                                         <div class="cal-stats">
-                                            <div class="cal-stat"><span class="cal-stat-n text-success">{{ calStats.full }}</span><span class="cal-stat-l">All fed</span></div>
+                                            <div class="cal-stat"><span class="cal-stat-n fpms-success">{{ calStats.full }}</span><span class="cal-stat-l">All fed</span></div>
                                             <div class="cal-stat"><span class="cal-stat-n cal-text-partial">{{ calStats.partial }}</span><span class="cal-stat-l">Partly fed</span></div>
                                             <div class="cal-stat"><span class="cal-stat-n cal-text-partial">{{ calStats.empty }}</span><span class="cal-stat-l">Nothing fed</span></div>
                                             <div class="cal-stat cal-stat-wide">
@@ -415,7 +415,7 @@ interface CalMonth {
                                                 </section>
                                             }
                                         </div>
-                                        <div class="cal-legend small text-muted mt-3">
+                                        <div class="cal-legend fpms-small fpms-muted fpms-space-top-3">
                                             <span><span class="cal-swatch cal-s3"></span>All feedings</span>
                                             <span><span class="cal-swatch cal-s1"></span>Some feedings</span>
                                             <span><span class="cal-swatch cal-s0"></span>No feedings</span>
@@ -425,35 +425,35 @@ interface CalMonth {
                                             <span><i class="cal-dot cal-c"></i>Chemical</span>
                                             <span><span class="cal-swatch cal-swatch-today"></span>Today</span>
                                         </div>
-                                        <div class="small text-muted mt-1">D is the day of culture. Each feeding in the farm's schedule has a bar ("Not fed" counts as entered); water has one only when the farm tests it every day.{{ b.isReadOnly ? '' : ' Click a day to open its log.' }}</div>
+                                        <div class="fpms-small fpms-muted fpms-space-top-1">D is the day of culture. Each feeding in the farm's schedule has a bar ("Not fed" counts as entered); water has one only when the farm tests it every day.{{ b.isReadOnly ? '' : ' Click a day to open its log.' }}</div>
                                     </div>
                                 </div>
                             }
                             @if (tab === 'sec-feeding') {
-                            <div class="card" id="sec-feeding">
-                                <div class="card-header d-flex align-items-center">
-                                    <h3 class="card-title mr-auto">Feeding</h3>
-                                    <span class="small text-muted">{{ b.indicators.cumulativeFeedKg | num: 1 }} kg in {{ feedPager.total }} feeding{{ feedPager.total === 1 ? '' : 's' }}</span>
+                            <div class="fpms-panel" id="sec-feeding">
+                                <div class="fpms-panel-head fpms-flex fpms-align-center-items">
+                                    <h3 class="fpms-panel-title fpms-margin-auto-end">Feeding</h3>
+                                    <span class="fpms-small fpms-muted">{{ b.indicators.cumulativeFeedKg | num: 1 }} kg in {{ feedPager.total }} feeding{{ feedPager.total === 1 ? '' : 's' }}</span>
                                 </div>
-                                <div class="card-body p-0 table-responsive fpms-scroll">
-                                    <table class="table table-sm mb-0">
-                                        <thead><tr><th fpmsSort="feedDate" [pager]="feedPager" (sorted)="loadFeeding()">Date</th><th fpmsSort="session" [pager]="feedPager" (sorted)="loadFeeding()">Feeding</th><th class="text-right">Kg</th><th>Feed lots</th><th>By</th></tr></thead>
+                                <div class="fpms-panel-body fpms-space-0 fpms-table-scroll fpms-scroll">
+                                    <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
+                                        <thead><tr><th fpmsSort="feedDate" [pager]="feedPager" (sorted)="loadFeeding()">Date</th><th fpmsSort="session" [pager]="feedPager" (sorted)="loadFeeding()">Feeding</th><th class="fpms-align-end">Kg</th><th>Feed lots</th><th>By</th></tr></thead>
                                         <tbody>
                                             @for (s of sessions; track s.id) {
                                                 <tr>
-                                                    <td class="text-nowrap">
+                                                    <td class="fpms-nowrap">
                                                         <a href="javascript:;" (click)="drawer.open({ kind: 'feeding', batchId: b.id, date: String(s.feedDate).substring(0, 10) })">{{ s.feedDate | farmDate }}</a>
-                                                        <div class="text-muted">Day {{ docOf(s.feedDate) }}</div>
+                                                        <div class="fpms-muted">Day {{ docOf(s.feedDate) }}</div>
                                                     </td>
                                                     <td>{{ s.session | label: L.FeedingSessions }}</td>
-                                                    <td class="text-right">@if (s.status === 2) { <span class="text-muted">Not fed</span> } @else { {{ s.kg | num: feedDecimals() }} }</td>
+                                                    <td class="fpms-align-end">@if (s.status === 2) { <span class="fpms-muted">Not fed</span> } @else { {{ s.kg | num: feedDecimals() }} }</td>
                                                     <td>
                                                         @for (l of s.lines; track l.lotId) { <div>{{ l.label }}{{ s.lines.length > 1 ? ': ' + (l.kg | num: 3 : true) + ' kg' : '' }}</div> }
                                                     </td>
-                                                    <td><span class="text-nowrap">{{ s.recordedBy }}</span><div class="text-muted">entered {{ entered(s.creationTime, s.feedDate) }}</div></td>
+                                                    <td><span class="fpms-nowrap">{{ s.recordedBy }}</span><div class="fpms-muted">entered {{ entered(s.creationTime, s.feedDate) }}</div></td>
                                                 </tr>
                                             } @empty {
-                                                <tr><td colspan="5" class="text-center text-muted py-3">No feeding recorded yet.</td></tr>
+                                                <tr><td colspan="5" class="fpms-align-center fpms-muted fpms-space-y-3">No feeding recorded yet.</td></tr>
                                             }
                                         </tbody>
                                     </table>
@@ -462,35 +462,35 @@ interface CalMonth {
                             </div>
                             }
                             @if (tab === 'sec-logs') {
-                            <div class="card" id="sec-logs">
-                                <div class="card-header d-flex align-items-center">
-                                    <h3 class="card-title mr-auto">Logs</h3>
-                                    <select class="form-control form-control-sm w-auto" aria-label="Filter log type" [(ngModel)]="logType" (ngModelChange)="logPager.reset(); loadLogs()">
+                            <div class="fpms-panel" id="sec-logs">
+                                <div class="fpms-panel-head fpms-flex fpms-align-center-items">
+                                    <h3 class="fpms-panel-title fpms-margin-auto-end">Logs</h3>
+                                    <select class="fpms-control fpms-control-compact fpms-width-auto" aria-label="Filter log type" [(ngModel)]="logType" (ngModelChange)="logPager.reset(); loadLogs()">
                                         <option [ngValue]="null">All types</option>
                                         @for (o of Options.logType; track o.value) {
                                             <option [ngValue]="o.value">{{ o.label }}</option>
                                         }
                                     </select>
                                 </div>
-                                <div class="card-body p-0 table-responsive fpms-scroll">
-                                    <table class="table table-sm mb-0">
+                                <div class="fpms-panel-body fpms-space-0 fpms-table-scroll fpms-scroll">
+                                    <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
                                         <thead><tr><th fpmsSort="observedAt" [pager]="logPager" (sorted)="loadLogs()">Observed</th><th fpmsSort="logType" [pager]="logPager" (sorted)="loadLogs()">Type</th><th>Details</th><th>By</th></tr></thead>
                                         <tbody>
                                             @for (l of logs; track l.id) {
                                                 <tr>
-                                                    <td class="text-nowrap">
+                                                    <td class="fpms-nowrap">
                                                         <a [routerLink]="['/app/logbook', l.id]">{{ l.observedAtUtc | farmDate }}</a>
-                                                        <div class="text-muted">{{ time(l.observedAtUtc) }} · Day {{ docOf(isoDateOf(l.observedAtUtc)) }}</div>
+                                                        <div class="fpms-muted">{{ time(l.observedAtUtc) }} · Day {{ docOf(isoDateOf(l.observedAtUtc)) }}</div>
                                                     </td>
                                                     <td>
                                                         {{ l.logType | label: L.LogTypes }}
-                                                        @if (l.hasOutOfRange) { <i class="fas fa-exclamation-triangle text-warning ml-1" title="Out of range"></i> }
+                                                        @if (l.hasOutOfRange) { <i class="fas fa-exclamation-triangle fpms-warning-text fpms-icon-gap" title="Out of range"></i> }
                                                     </td>
                                                     <td>{{ summary(l) }}</td>
-                                                    <td><span class="text-nowrap">{{ l.recordedBy }}</span><div class="text-muted">entered {{ entered(l.creationTime, isoDateOf(l.observedAtUtc)) }}</div></td>
+                                                    <td><span class="fpms-nowrap">{{ l.recordedBy }}</span><div class="fpms-muted">entered {{ entered(l.creationTime, isoDateOf(l.observedAtUtc)) }}</div></td>
                                                 </tr>
                                             } @empty {
-                                                <tr><td colspan="4" class="text-center text-muted py-3">No log entries yet.</td></tr>
+                                                <tr><td colspan="4" class="fpms-align-center fpms-muted fpms-space-y-3">No log entries yet.</td></tr>
                                             }
                                         </tbody>
                                     </table>
@@ -501,16 +501,16 @@ interface CalMonth {
                             @if (tab === 'sec-harvests') {
                             <!-- Harvests (DEC-104): the kg balance as one figures band with a one-line note, then a table that fits a
                                  1,000 px screen: sold, not sold and still to account for share one "Where it went" cell. -->
-                            <div class="card" id="sec-harvests">
-                                <div class="card-header d-flex align-items-center">
-                                    <h3 class="card-title mr-auto">Harvests</h3>
+                            <div class="fpms-panel" id="sec-harvests">
+                                <div class="fpms-panel-head fpms-flex fpms-align-center-items">
+                                    <h3 class="fpms-panel-title fpms-margin-auto-end">Harvests</h3>
                                     @if (b.canAddHarvest && can('Farm.Harvests.Create')) {
-                                        <a class="btn btn-sm btn-outline-primary" routerLink="/app/harvests/new" [queryParams]="{ batchId: b.id }"><i class="fas fa-plus mr-1" aria-hidden="true"></i>Record harvest</a>
+                                        <a class="fpms-button fpms-button-compact fpms-button-outline" routerLink="/app/harvests/new" [queryParams]="{ batchId: b.id }"><i class="fas fa-plus fpms-icon-gap" aria-hidden="true"></i>Record harvest</a>
                                     }
                                 </div>
                                 @if (harvests.length) {
                                     @let ht = hTotals();
-                                    <dl class="fpms-figures fpms-figures-sm mb-0">
+                                    <dl class="fpms-figures fpms-figures-sm fpms-no-bottom">
                                         <div class="fpms-figure"><dt class="l">Harvested ({{ harvests.length }})</dt><dd class="v">{{ ht.kg | num: 2 : true }}<span class="u">kg</span></dd></div>
                                         <div class="fpms-figure"><dt class="l">Sold</dt><dd class="v">{{ ht.sold | num: 2 : true }}<span class="u">kg</span></dd></div>
                                         <div class="fpms-figure"><dt class="l">Not sold</dt><dd class="v">{{ ht.notSold | num: 2 : true }}<span class="u">kg</span></dd><dd class="s">kept, given or spoiled</dd></div>
@@ -528,61 +528,61 @@ interface CalMonth {
                                                 </span>
                                             </li>
                                         } @else {
-                                            <li><i class="fas fa-check text-success" aria-hidden="true"></i><span>Every harvested kilogram is sold or recorded as not sold.</span></li>
+                                            <li><i class="fas fa-check fpms-success" aria-hidden="true"></i><span>Every harvested kilogram is sold or recorded as not sold.</span></li>
                                         }
                                     </ul>
                                 }
-                                <div class="card-body p-0 table-responsive">
-                                    <table class="table table-sm mb-0">
+                                <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
+                                    <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
                                         <thead>
                                             <tr>
-                                                <th>Harvested · lot</th><th>Type</th><th>Buyer</th><th class="text-right">Kg</th><th class="text-right">ABW (g)</th>
-                                                <th>Where it went</th><th><span class="sr-only">Actions</span></th>
+                                                <th>Harvested · lot</th><th>Type</th><th>Buyer</th><th class="fpms-align-end">Kg</th><th class="fpms-align-end">ABW (g)</th>
+                                                <th>Where it went</th><th><span class="fpms-visually-hidden">Actions</span></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @for (h of harvests; track h.id) {
                                                 <tr>
-                                                    <td class="text-nowrap">
+                                                    <td class="fpms-nowrap">
                                                         <a [routerLink]="['/app/harvests', h.id]">{{ h.harvestedAtUtc | farmDateTime }}</a>
                                                         @if (h.lotCode) {
-                                                            <div class="small text-monospace">
+                                                            <div class="fpms-small fpms-monospace">
                                                                 @if (can('Farm.Reports')) { <a [routerLink]="['/app/reports/trace/lot', h.lotCode]" title="Trace this lot">{{ h.lotCode }}</a> } @else { {{ h.lotCode }} }
                                                             </div>
                                                         }
                                                     </td>
                                                     <td>{{ h.harvestType | label: L.HarvestTypes }}</td>
                                                     <td>{{ h.buyerName || '—' }}</td>
-                                                    <td class="text-right font-weight-bold">{{ h.totalKg | num: 2 }}@if (h.crates?.length) { <div class="small text-muted font-weight-normal">{{ h.crates.length }} crates</div> }</td>
-                                                    <td class="text-right">{{ h.abwG != null ? (h.abwG | num: 2) : '—' }}</td>
+                                                    <td class="fpms-align-end fpms-weight-bold">{{ h.totalKg | num: 2 }}@if (h.crates?.length) { <div class="fpms-small fpms-muted fpms-weight-normal">{{ h.crates.length }} crates</div> }</td>
+                                                    <td class="fpms-align-end">{{ h.abwG != null ? (h.abwG | num: 2) : '—' }}</td>
                                                     <td style="min-width: 11rem">
                                                         <div class="fpms-balance" aria-hidden="true">
                                                             @if (h.soldKg > 0) { <div class="sold" [style.flex-grow]="h.soldKg"></div> }
                                                             @if (h.notSoldKg > 0) { <div class="notsold" [style.flex-grow]="h.notSoldKg"></div> }
                                                             @if (h.unaccountedKg > 0) { <div class="open" [style.flex-grow]="h.unaccountedKg"></div> }
                                                         </div>
-                                                        <div class="small text-muted mt-1">
+                                                        <div class="fpms-small fpms-muted fpms-space-top-1">
                                                             Sold {{ h.soldKg | num: 2 : true }} kg{{ h.notSoldKg > 0 ? ' · not sold ' + (h.notSoldKg | num: 2 : true) + ' kg' : '' }}
                                                             @if (h.unaccountedKg > 0) {
-                                                                <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg available to sell@if (h.followUpDue) { · follow-up due }</div>
+                                                                <div class="fpms-warning-text fpms-weight-bold"><i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg available to sell@if (h.followUpDue) { · follow-up due }</div>
                                                             } @else {
-                                                                <div class="text-success"><i class="fas fa-check mr-1" aria-hidden="true"></i>All accounted for</div>
+                                                                <div class="fpms-success"><i class="fas fa-check fpms-icon-gap" aria-hidden="true"></i>All accounted for</div>
                                                             }
                                                         </div>
                                                     </td>
-                                                    <td class="text-right text-nowrap">
+                                                    <td class="fpms-align-end fpms-nowrap">
                                                         @if (sellableOf(h) > 0 && can('Farm.Sales')) {
-                                                            <a class="btn btn-xs btn-outline-primary mr-1" routerLink="/app/sales/new" [queryParams]="{ harvestId: h.id }" [title]="'Sell the ' + (sellableOf(h) | num: 2) + ' kg left'">Sell</a>
+                                                            <a class="fpms-button fpms-button-compact fpms-button-outline fpms-icon-gap" routerLink="/app/sales/new" [queryParams]="{ harvestId: h.id }" [title]="'Sell the ' + (sellableOf(h) | num: 2) + ' kg left'">Sell</a>
                                                         }
-                                                        <a class="btn btn-xs btn-outline-secondary" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" aria-label="Tally sheet"><i class="fas fa-clipboard-list" aria-hidden="true"></i></a>
+                                                        <a class="fpms-button fpms-button-compact fpms-button-secondary" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" aria-label="Tally sheet"><i class="fas fa-clipboard-list" aria-hidden="true"></i></a>
                                                     </td>
                                                 </tr>
                                             } @empty {
                                                 <tr>
-                                                    <td colspan="7" class="text-center text-muted py-3">
+                                                    <td colspan="7" class="fpms-align-center fpms-muted fpms-space-y-3">
                                                         No harvests yet.
                                                         @if (b.canAddHarvest && can('Farm.Harvests.Create')) {
-                                                            <div class="small mt-1">Use <strong>Record harvest</strong>: a <em>Partial</em> harvest leaves shrimp in the pond; the <em>Final</em> harvest is the last one and marks the batch Harvested. An <em>Emergency</em> harvest is for an urgent situation; it is not a batch failure.</div>
+                                                            <div class="fpms-small fpms-space-top-1">Use <strong>Record harvest</strong>: a <em>Partial</em> harvest leaves shrimp in the pond; the <em>Final</em> harvest is the last one and marks the batch Harvested. An <em>Emergency</em> harvest is for an urgent situation; it is not a batch failure.</div>
                                                         }
                                                     </td>
                                                 </tr>
@@ -622,7 +622,7 @@ interface CalMonth {
                 color: var(--fpms-primary);
                 font-weight: 600;
             }
-            .card[id^='sec-'] {
+            .fpms-panel[id^='sec-'] {
                 scroll-margin-top: 1rem;
             }
         `,
