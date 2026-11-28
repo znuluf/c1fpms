@@ -16,19 +16,19 @@ import { ToolbarChip } from '@shared/fpms/ui';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="Harvests" subtitle="Partial, final and emergency harvests by batch.">
-            <a routerLink="/app/harvests/blank-tally" class="btn btn-outline-secondary mr-2"><i class="fas fa-clipboard-list mr-1" aria-hidden="true"></i>Blank tally sheet</a>
+            <a routerLink="/app/harvests/blank-tally" class="fpms-button fpms-button-secondary fpms-icon-gap"><i class="fas fa-clipboard-list fpms-icon-gap" aria-hidden="true"></i>Blank tally sheet</a>
             @if (can('Farm.Reports')) {
                 <button
-                    class="btn btn-outline-secondary"
+                    class="fpms-button fpms-button-secondary"
                     (click)="exportCsv('ExportList', { list: 'Harvests', harvestType: f.type, search: f.search || null })"
                     [disabled]="busy()">
-                    <i class="fas fa-file-csv mr-1"></i>
+                    <i class="fas fa-file-csv fpms-icon-gap"></i>
                     Export CSV
                 </button>
             }
             @if (can('Farm.Harvests.Create')) {
-                <a routerLink="/app/harvests/new" class="btn btn-primary ml-2">
-                    <i class="fas fa-plus mr-1" aria-hidden="true"></i>Record harvest
+                <a routerLink="/app/harvests/new" class="fpms-button fpms-button-primary fpms-space-start-2">
+                    <i class="fas fa-plus fpms-icon-gap" aria-hidden="true"></i>Record harvest
                 </a>
             }
         </fpms-page-header>
@@ -46,7 +46,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                             (chipChange)="onStatus($event)">
                             <label class="sl-field">
                                 <span>Type</span>
-                                <select class="form-control form-control-sm" [(ngModel)]="f.type" (ngModelChange)="apply()">
+                                <select class="fpms-control fpms-control-compact" [(ngModel)]="f.type" (ngModelChange)="apply()">
                                     <option [ngValue]="null">All types</option>
                                     @for (o of Options.harvestType; track o.value) {
                                         <option [ngValue]="o.value">{{ o.label }} ({{ typeCounts()[o.value] ?? 0 }})</option>
@@ -55,7 +55,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                             </label>
                             <label class="sl-field">
                                 <span>Buyer</span>
-                                <select class="form-control form-control-sm" [(ngModel)]="f.buyerId" (ngModelChange)="apply()">
+                                <select class="fpms-control fpms-control-compact" [(ngModel)]="f.buyerId" (ngModelChange)="apply()">
                                     <option [ngValue]="null">All buyers</option>
                                     @for (b of buyers(); track b.id) {
                                         <option [ngValue]="b.id">{{ b.name }}</option>
@@ -65,43 +65,43 @@ import { ToolbarChip } from '@shared/fpms/ui';
                             <span class="sl-range" role="group" aria-label="Dates">
                             <label class="sl-field">
                                 <span>From</span>
-                                <input type="date" class="form-control form-control-sm" [(ngModel)]="f.from" (ngModelChange)="apply()" />
+                                <input type="date" class="fpms-control fpms-control-compact" [(ngModel)]="f.from" (ngModelChange)="apply()" />
                             </label>
                             <label class="sl-field">
                                 <span>To</span>
-                                <input type="date" class="form-control form-control-sm" [(ngModel)]="f.to" (ngModelChange)="apply()" />
+                                <input type="date" class="fpms-control fpms-control-compact" [(ngModel)]="f.to" (ngModelChange)="apply()" />
                             </label>
                             </span>
                         </fpms-list-toolbar>
                         @if (filterTags().length) {
                             <div class="fpms-filter-tags" role="group" aria-label="Filters in use">
-                                <span class="small text-muted">Filters:</span>
+                                <span class="fpms-small fpms-muted">Filters:</span>
                                 @for (t of filterTags(); track t.label) {
                                     <button type="button" class="fpms-filter-tag" (click)="t.clear()" [attr.aria-label]="'Remove filter ' + t.label">{{ t.label }} <i class="fas fa-times" aria-hidden="true"></i></button>
                                 }
-                                <button type="button" class="btn btn-link btn-sm p-0 ml-1" (click)="clearFilters()">Clear all</button>
+                                <button type="button" class="fpms-button fpms-button-link fpms-button-compact fpms-space-0 fpms-icon-gap" (click)="clearFilters()">Clear all</button>
                             </div>
                         }
                 </div>
-                <div class="card">
-                    <div class="card-body p-0 table-responsive">
+                <div class="fpms-panel">
+                    <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!list()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!list().length) {
                             <fpms-empty [text]="filterTags().length ? 'No harvests match these filters.' : 'No harvests recorded yet.'" icon="fas fa-shrimp">
                                 @if (filterTags().length) {
-                                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="clearFilters()">Clear all filters</button>
+                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-outline" (click)="clearFilters()">Clear all filters</button>
                                 }
                             </fpms-empty>
                         } @else {
-                            <table class="table table-hover mb-0 fpms-harvest-table">
+                            <table class="fpms-data-table fpms-table-hover fpms-no-bottom fpms-harvest-table">
                                 <caption class="sr-only">Harvests, with where each one's kilograms went and its sale status</caption>
                                 <thead>
                                     <tr>
                                         <!-- The lot code sits under the date it was harvested (DEC-99). -->
                                         <th scope="col" fpmsSort="harvestedAt" [pager]="pager" (sorted)="load()">Harvested · lot</th>
                                         <th scope="col" fpmsSort="pondCode" [pager]="pager" (sorted)="load()">Pond · batch</th>
-                                        <th scope="col" class="text-right" fpmsSort="totalKg" [pager]="pager" (sorted)="load()">Total kg · type</th>
+                                        <th scope="col" class="fpms-align-end" fpmsSort="totalKg" [pager]="pager" (sorted)="load()">Total kg · type</th>
                                         @if (grading) { <th scope="col">Size grades</th> }
                                         <th scope="col" fpmsSort="unaccountedKg" [pager]="pager" (sorted)="load()">Sales · where it went</th>
                                         <th scope="col"><span class="sr-only">Actions</span></th>
@@ -117,22 +117,22 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                             (click)="openHarvestRow(h.id, $event)"
                                             (keydown.enter)="openHarvestRow(h.id, $event)"
                                             (keydown.space)="$event.preventDefault(); openHarvestRow(h.id, $event)">
-                                            <td class="text-nowrap">
+                                            <td class="fpms-nowrap">
                                                 <a [routerLink]="['/app/harvests', h.id]">{{ h.harvestedAtUtc | farmDate }}</a>
-                                                <div class="text-muted">{{ time(h.harvestedAtUtc) }}</div>
-                                                <div class="text-monospace small">
+                                                <div class="fpms-muted">{{ time(h.harvestedAtUtc) }}</div>
+                                                <div class="fpms-monospace fpms-small">
                                                     @if (h.lotCode && can('Farm.Reports')) {
                                                         <a [routerLink]="['/app/reports/trace/lot', h.lotCode]" [queryParams]="{ from: 'harvests' }" title="Trace this lot">{{ h.lotCode }}</a>
                                                     } @else {
-                                                        <span class="text-muted">{{ h.lotCode || 'No lot code' }}</span>
+                                                        <span class="fpms-muted">{{ h.lotCode || 'No lot code' }}</span>
                                                     }
                                                 </div>
                                             </td>
                                             <td>
-                                                <a class="text-nowrap" [routerLink]="['/app/production/batches', h.batchId]" [title]="h.batchCode"><span class="fpms-pond-tag">{{ h.pondCode }}</span> {{ batchShort(h.batchCode) }}</a>
-                                                <div class="small text-muted">Cycle {{ unbroken(h.cycleCode) }}</div>
+                                                <a class="fpms-nowrap" [routerLink]="['/app/production/batches', h.batchId]" [title]="h.batchCode"><span class="fpms-pond-tag">{{ h.pondCode }}</span> {{ batchShort(h.batchCode) }}</a>
+                                                <div class="fpms-small fpms-muted">Cycle {{ unbroken(h.cycleCode) }}</div>
                                             </td>
-                                            <td class="text-right"><strong>{{ h.totalKg | num: 2 }}</strong><div class="text-muted">{{ h.harvestType | label: L.HarvestTypes }}</div></td>
+                                            <td class="fpms-align-end"><strong>{{ h.totalKg | num: 2 }}</strong><div class="fpms-muted">{{ h.harvestType | label: L.HarvestTypes }}</div></td>
                                             @if (grading) {
                                             <td>
                                                 @if (h.gradeLines?.length) {
@@ -148,26 +148,26 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                             }
                                             <!-- The sale status heads the bar it sums up, instead of a column of its own (DEC-99). -->
                                             <td style="min-width: 10.5rem">
-                                                <fpms-badge class="d-inline-block mb-1" [text]="statusLabel(h)"></fpms-badge>
+                                                <fpms-badge class="d-inline-block fpms-space-bottom-1" [text]="statusLabel(h)"></fpms-badge>
                                                 <div class="fpms-balance" aria-hidden="true">
                                                     @if (h.soldKg > 0) { <div class="sold" [style.flex-grow]="h.soldKg"></div> }
                                                     @if (h.notSoldKg > 0) { <div class="notsold" [style.flex-grow]="h.notSoldKg"></div> }
                                                     @if (h.unaccountedKg > 0) { <div class="open" [style.flex-grow]="h.unaccountedKg"></div> }
                                                 </div>
-                                                <div class="small text-muted mt-1">
+                                                <div class="fpms-small fpms-muted fpms-space-top-1">
                                                     Sold {{ h.soldKg | num: 2 : true }} kg{{ h.notSoldKg > 0 ? ' · not sold ' + (h.notSoldKg | num: 2 : true) + ' kg' : '' }}
                                                     @if (h.unaccountedKg > 0) {
-                                                        <div class="text-warning-dark font-weight-bold"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg available to sell@if (h.followUpDue) { · follow-up due }</div>
+                                                        <div class="fpms-warning-text fpms-weight-bold"><i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>{{ h.unaccountedKg | num: 2 : true }} kg available to sell@if (h.followUpDue) { · follow-up due }</div>
                                                     }
                                                 </div>
                                             </td>
-                                            <td class="text-right text-nowrap">
-                                                <a class="btn btn-sm btn-outline-secondary" [class.mr-1]="can('Farm.Sales') && sellable(h) > 0" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" [attr.aria-label]="'Tally sheet of the ' + (h.harvestedAtUtc | farmDate) + ' harvest'">
+                                            <td class="fpms-align-end fpms-nowrap">
+                                                <a class="fpms-button fpms-button-compact fpms-button-secondary" [class.fpms-icon-gap]="can('Farm.Sales') && sellable(h) > 0" [routerLink]="['/app/harvests', h.id, 'tally']" title="Tally sheet" [attr.aria-label]="'Tally sheet of the ' + (h.harvestedAtUtc | farmDate) + ' harvest'">
                                                     <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                                                 </a>
                                                 @if (can('Farm.Sales') && sellable(h) > 0) {
                                                     <a
-                                                        class="btn btn-sm btn-outline-primary"
+                                                        class="fpms-button fpms-button-compact fpms-button-outline"
                                                         routerLink="/app/sales/new"
                                                         [queryParams]="{ harvestId: h.id }">
                                                         Record sale
@@ -180,9 +180,9 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 <tfoot>
                                     <tr>
                                         <td colspan="2">{{ list()!.length === total() ? 'All matching harvests' : 'This page' }}</td>
-                                        <td class="text-right">{{ pageTotals().kg | num: 2 }}</td>
+                                        <td class="fpms-align-end">{{ pageTotals().kg | num: 2 }}</td>
                                         @if (grading) { <td></td> }
-                                        <td class="small text-wrap">Sold {{ pageTotals().sold | num: 2 }} · not sold {{ pageTotals().notSold | num: 2 }} · available to sell {{ pageTotals().unaccounted | num: 2 }}</td>
+                                        <td class="fpms-small fpms-wrap-text">Sold {{ pageTotals().sold | num: 2 }} · not sold {{ pageTotals().notSold | num: 2 }} · available to sell {{ pageTotals().unaccounted | num: 2 }}</td>
                                         <td></td>
                                     </tr>
                                 </tfoot>
