@@ -51,7 +51,7 @@ import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR
             <small class="fpms-form-message fpms-form-message-error"><i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>Two {{ itemLabel().toLowerCase() }}s are at {{ dupeText() }}. Change or remove one.</small>
         }
         @if (hasEmpty()) {
-            <small class="form-text text-danger"><i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>Choose a time for every {{ itemLabel().toLowerCase() }}, or remove it.</small>
+            <small class="fpms-form-message fpms-form-message-error"><i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>Choose a time for every {{ itemLabel().toLowerCase() }}, or remove it.</small>
         }
     `,
 })

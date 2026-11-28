@@ -1,43 +1,41 @@
 <pagination-template #p="paginationApi" [id]="id" [maxSize]="maxSize" (pageChange)="pageChange.emit($event)">
     <nav class="fpms-pagination" [attr.aria-label]="screenReaderPaginationLabel">
         @if (!(autoHide && p.pages.length <= 1)) {
-            <ul class="pagination m-0">
+            <ul class="fpms-pagination-list">
                 @if (directionLinks) {
-                    <li class="page-item" [class.disabled]="p.isFirstPage()">
-                        @if (!p.isFirstPage()) {
-                            <a class="page-link" href="javascript:;" [attr.aria-label]="previousLabel" (click)="p.previous()">
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
-                        }
-                        @if (p.isFirstPage()) {
-                            <a class="page-link" href="javascript:;" [attr.aria-label]="previousLabel" aria-disabled="true">
-                                <i class="fas fa-chevron-left" aria-hidden="true"></i>
-                            </a>
-                        }
+                    <li class="fpms-pagination-item">
+                        <button
+                            type="button"
+                            class="fpms-pagination-link"
+                            [disabled]="p.isFirstPage()"
+                            [attr.aria-label]="previousLabel"
+                            (click)="p.previous()">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
                     </li>
                 }
                 @for (page of p.pages; track page.label) {
-                    <li
-                        class="page-item"
-                        [class.active]="p.getCurrent() === page.value"
-                        [style.z-index]="p.getCurrent() === page.value ? '0' : ''">
-                        <a class="page-link" href="javascript:;" (click)="p.setCurrent(page.value)">
+                    <li class="fpms-pagination-item" [class.active]="p.getCurrent() === page.value">
+                        <button
+                            type="button"
+                            class="fpms-pagination-link"
+                            [attr.aria-current]="p.getCurrent() === page.value ? 'page' : null"
+                            [attr.aria-label]="(p.getCurrent() === page.value ? screenReaderCurrentLabel + ' ' : '') + screenReaderPageLabel + ' ' + page.label"
+                            (click)="p.setCurrent(page.value)">
                             {{ page.label }}
-                        </a>
+                        </button>
                     </li>
                 }
                 @if (directionLinks) {
-                    <li class="page-item" [class.disabled]="p.isLastPage()">
-                        @if (!p.isLastPage()) {
-                            <a class="page-link" href="javascript:;" [attr.aria-label]="nextLabel" (click)="p.next()">
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        }
-                        @if (p.isLastPage()) {
-                            <a class="page-link" href="javascript:;" [attr.aria-label]="nextLabel" aria-disabled="true">
-                                <i class="fas fa-chevron-right" aria-hidden="true"></i>
-                            </a>
-                        }
+                    <li class="fpms-pagination-item">
+                        <button
+                            type="button"
+                            class="fpms-pagination-link"
+                            [disabled]="p.isLastPage()"
+                            [attr.aria-label]="nextLabel"
+                            (click)="p.next()">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
                     </li>
                 }
             </ul>
