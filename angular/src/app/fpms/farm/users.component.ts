@@ -29,7 +29,7 @@ const ROLES = [
                             <form #f="ngForm" (ngSubmit)="save()" (input)="keepDraft()" (change)="keepDraft()" fpmsReview="account" [fpmsReviewNew]="!form.id" novalidate autocomplete="off">
                                 <div class="fpms-panel-body">
                                     @if (restoredAt) {
-                                        <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                                        <div class="fpms-alert fpms-alert-info fpms-flex fpms-align-center-items" role="status">
                                             <i class="fas fa-history fpms-icon-gap" aria-hidden="true"></i>
                                             <span class="fpms-margin-auto-end">Your unsaved account from {{ restoredAt | farmDateTime }} was restored.{{ form.id ? '' : ' The temporary password is a new one.' }}</span>
                                             <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary fpms-space-start-2 fpms-nowrap" (click)="discardDraft()">Discard it</button>
@@ -68,9 +68,9 @@ const ROLES = [
                                         @if (!form.id) {
                                             <div class="fpms-field fpms-col-md-4">
                                                 <label for="pw">Temporary password <span class="fpms-danger">*</span></label>
-                                                <div class="input-group">
+                                                <div class="fpms-input-group">
                                                     <input id="pw" class="fpms-control" name="temporaryPassword" [(ngModel)]="form.temporaryPassword" required minlength="8" autocomplete="new-password" />
-                                                    <div class="input-group-append">
+                                                    <div class="fpms-input-group-append">
                                                         <button type="button" class="fpms-button fpms-button-secondary" (click)="form.temporaryPassword = generate()" title="Generate">
                                                             <i class="fas fa-dice"></i>
                                                         </button>
@@ -102,12 +102,12 @@ const ROLES = [
                                         </h3>
                                     </div>
                                     <div class="fpms-panel-body">
-                                        <div class="fpms-grid-row align-items-end">
+                                        <div class="fpms-grid-row fpms-align-end-items">
                                             <div class="fpms-field fpms-col-md-8">
                                                 <label for="rpw">New temporary password</label>
-                                                <div class="input-group">
+                                                <div class="fpms-input-group">
                                                     <input id="rpw" class="fpms-control" name="rpw" [(ngModel)]="reset.password" minlength="8" autocomplete="new-password" />
-                                                    <div class="input-group-append">
+                                                    <div class="fpms-input-group-append">
                                                         <button type="button" class="fpms-button fpms-button-secondary" (click)="reset.password = generate()" aria-label="Generate a password" title="Generate a password">
                                                             <i class="fas fa-dice" aria-hidden="true"></i>
                                                         </button>
@@ -148,13 +148,13 @@ const ROLES = [
                             <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
                                     <!-- Four columns: the person with their sign-in and email, role, status, actions (DEC-115). -->
-                                    <tr><th>Person</th><th>Role</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr>
+                                    <tr><th>Person</th><th>Role</th><th>Status</th><th><span class="fpms-visually-hidden">Actions</span></th></tr>
                                 </thead>
                                 <tbody>
                                     @for (u of f.visible(); track u.id) {
                                         <tr [class.fpms-muted]="!u.isActive">
                                             <td>
-                                                <strong>{{ u.name }} {{ u.surname }}</strong>@if (u.isCurrentUser) { <span class="fpms-label badge-light fpms-icon-gap">you</span> }
+                                                <strong>{{ u.name }} {{ u.surname }}</strong>@if (u.isCurrentUser) { <span class="fpms-label fpms-label-secondary fpms-icon-gap">you</span> }
                                                 <div class="fpms-muted">{{ u.userName }}{{ u.emailAddress ? ' · ' + u.emailAddress : ' · no email' }}</div>
                                             </td>
                                             <td>{{ roleLabel(u.roleName) }}</td>
