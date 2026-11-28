@@ -71,8 +71,8 @@ const SETUP_STEPS = ['profile', 'ponds'];
     standalone: true,
     imports: FPMS_IMPORTS,
     template: `
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (!d()) {
                     <fpms-loading></fpms-loading>
                 } @else {
