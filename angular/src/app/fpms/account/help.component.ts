@@ -29,7 +29,7 @@ export const HELP_CONTACT = {
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header [narrow]="true" title="Contact the developers" [subtitle]="intro"></fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 @if (hasBlanks) {
                     <div class="alert alert-light border small">Highlighted text is still to be filled in by the team. See docs/developer-contact-template.md.</div>
