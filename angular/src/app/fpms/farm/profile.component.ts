@@ -63,13 +63,13 @@ const PROFILE_DRAFT = 'farm-profile';
 
                     @if (canEdit) {
                         @if (restoredAt) {
-                            <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                            <div class="fpms-alert fpms-alert-info fpms-flex fpms-align-center-items" role="status">
                                 <i class="fas fa-history fpms-icon-gap" aria-hidden="true"></i>
                                 <span class="fpms-margin-auto-end">Your unsaved changes from {{ restoredAt | farmDateTime }} were restored. Save to keep them.</span>
                                 <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary fpms-space-start-2 fpms-nowrap" [disabled]="busy()" (click)="discardDraft()">Discard them</button>
                             </div>
                         } @else if (draftOutdated) {
-                            <div class="fpms-alert fpms-alert-warning fpms-flex align-items-center" role="status">
+                            <div class="fpms-alert fpms-alert-warning fpms-flex fpms-align-center-items" role="status">
                                 <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>
                                 <span class="fpms-margin-auto-end">Your unsaved changes were not restored: someone saved the farm profile after you. Make them again if they are still needed.</span>
                                 <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="draftOutdated = false">Close</button>
@@ -88,10 +88,10 @@ const PROFILE_DRAFT = 'farm-profile';
                                         </div>
                                         <div class="fpms-field">
                                             <label for="farmCode">Farm code</label>
-                                            <div class="input-group fpms-code-field-group">
+                                            <div class="fpms-input-group fpms-code-field-group">
                                                 <input id="farmCode" class="fpms-control fpms-code-field" name="farmCode" [ngModel]="p.farmCode" readonly aria-describedby="farmCodeHelp" />
                                                 @if (p.canChangeFarmCode) {
-                                                    <div class="input-group-append">
+                                                    <div class="fpms-input-group-append">
                                                         <button type="button" class="fpms-button fpms-button-secondary" [disabled]="!!p.nextFarmCodeChange" (click)="openCodeDlg()">
                                                             <i class="fas fa-key fpms-icon-gap" aria-hidden="true"></i>Change code
                                                         </button>
