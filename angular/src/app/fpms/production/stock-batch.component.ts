@@ -89,7 +89,7 @@ interface Allocation {
                         }
                         @case (1) {
                             <div class="fpms-panel">
-                                <div class="fpms-panel-head fpms-flex align-items-center">
+                                <div class="fpms-panel-head fpms-flex fpms-align-center-items">
                                     <h3 class="fpms-panel-title fpms-margin-auto-end">Ponds and PL allocation</h3>
                                     <span [class.fpms-danger]="remaining < 0">Remaining: <strong>{{ remaining | num: 0 }}</strong> of {{ delivery.plLeft | num: 0 }} PL</span>
                                 </div>
@@ -135,7 +135,7 @@ interface Allocation {
                                     }
                                 </div>
                                 @if (options.blockedPonds.length) {
-                                    <div class="fpms-panel-body border-top">
+                                    <div class="fpms-panel-body fpms-border-top">
                                         <strong>Prepared but not available:</strong>
                                         <ul class="fpms-no-bottom">
                                             @for (p of options.blockedPonds; track p.id) {
@@ -154,7 +154,7 @@ interface Allocation {
                         @case (2) {
                             @for (a of selected; track a.pond.id; let first = $first) {
                                 <div class="fpms-panel">
-                                    <div class="fpms-panel-head fpms-flex align-items-center">
+                                    <div class="fpms-panel-head fpms-flex fpms-align-center-items">
                                         <h3 class="fpms-panel-title fpms-margin-auto-end">{{ a.pond.pondCode }} · {{ a.plCount | num: 0 }} PL · {{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²</h3>
                                         <span class="fpms-muted">{{ a.pond.areaM2 | num: 0 }} m² · avg depth {{ a.pond.averageDepthM | num: 2 }} m · {{ a.pond.farmingSystem | label: L.FarmingSystems }}</span>
                                         @if (!first) {
@@ -172,9 +172,9 @@ interface Allocation {
                                             </div>
                                             <div class="fpms-field fpms-col-md-6">
                                                 <label [for]="'mc' + a.pond.id">Maximum culture duration (DOC)</label>
-                                                <div class="input-group">
+                                                <div class="fpms-input-group">
                                                     <input [id]="'mc' + a.pond.id" type="number" min="1" max="180" step="1" class="fpms-control" [(ngModel)]="a.maxCultureDays" required />
-                                                    <div class="input-group-append"><span class="input-group-text">days</span></div>
+                                                    <div class="fpms-input-group-append"><span class="fpms-input-group-addon">days</span></div>
                                                 </div>
                                                 <small class="fpms-help fpms-muted">Farm default: {{ options.defaultMaxCultureDays }} days. This does not prevent earlier harvest when target ABW is reached.</small>
                                             </div>
@@ -213,9 +213,9 @@ interface Allocation {
                                             @for (p of stockingParams; track p.code) {
                                                 <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                                     <label [for]="'wq' + p.code + a.pond.id">{{ p.name }} <span class="fpms-danger">*</span></label>
-                                                    <div class="input-group">
+                                                    <div class="fpms-input-group">
                                                         <input [id]="'wq' + p.code + a.pond.id" type="number" step="any" class="fpms-control" [(ngModel)]="a.readings[p.code]" required [min]="p.physicalMin" [max]="p.physicalMax" />
-                                                        <div class="input-group-append"><span class="input-group-text">{{ p.unitCode }}</span></div>
+                                                        <div class="fpms-input-group-append"><span class="fpms-input-group-addon">{{ p.unitCode }}</span></div>
                                                     </div>
                                                     <small class="fpms-help" [class.fpms-muted]="state(p, a) === 'ok' || state(p, a) === 'empty'" [class.fpms-warning-text]="state(p, a) === 'out'" [class.fpms-danger]="state(p, a) === 'invalid'">
                                                         @switch (state(p, a)) {
