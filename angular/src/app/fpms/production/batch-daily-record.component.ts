@@ -130,7 +130,7 @@ function daysBetween(a: string, b: string): number {
             </div>
 
             @if (error()) {
-                <div class="fpms-alert fpms-alert-warning fpms-flex align-items-center" role="alert">
+                <div class="fpms-alert fpms-alert-warning fpms-flex fpms-align-center-items" role="alert">
                     <span class="fpms-margin-auto-end"><i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>The records for these dates could not be loaded. {{ error() }}</span>
                     <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="reload()">Try again</button>
                 </div>
@@ -150,7 +150,7 @@ function daysBetween(a: string, b: string): number {
                 <div class="fpms-dr-columns">
                     <div class="fpms-dr-main">
                         <div class="fpms-panel">
-                            <div class="fpms-panel-head fpms-flex align-items-center">
+                            <div class="fpms-panel-head fpms-flex fpms-align-center-items">
                                 <h4 class="fpms-panel-title fpms-margin-auto-end">Feeding</h4>
                                 <span class="fpms-muted">{{ statusOf(day()).text }} · {{ feedKg(fs) | num: 1 }} kg</span>
                             </div>
@@ -202,7 +202,7 @@ function daysBetween(a: string, b: string): number {
                         </div>
 
                         <div class="fpms-panel">
-                            <div class="fpms-panel-head fpms-flex align-items-center">
+                            <div class="fpms-panel-head fpms-flex fpms-align-center-items">
                                 <h4 class="fpms-panel-title fpms-margin-auto-end">Water quality</h4>
                                 @if (outOfRange(ls).length) {
                                     <span class="fpms-warning-text fpms-icon-gap"><i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>{{ outOfRange(ls).length }} out of range</span>
@@ -240,7 +240,7 @@ function daysBetween(a: string, b: string): number {
 
                     <div class="fpms-dr-side">
                         <div class="fpms-panel">
-                            <div class="fpms-panel-head fpms-flex align-items-center">
+                            <div class="fpms-panel-head fpms-flex fpms-align-center-items">
                                 <h4 class="fpms-panel-title fpms-margin-auto-end">Other entries</h4>
                                 @if (deadOn(ls)) { <span class="fpms-muted">{{ deadOn(ls) | num: 0 }} dead</span> }
                             </div>
