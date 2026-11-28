@@ -53,7 +53,7 @@ function num(value: number | null | undefined, decimals: number): string {
                             [title]="'How ' + labelOf(f.key) + ' is worked out'"
                             (click)="toggle(f.key)">
                             <span class="fpms-figure-num">{{ f.value }}</span>@if (f.unit) {<span class="u">{{ f.unit }}</span>}
-                            @if (f.warn) { <i class="fas fa-exclamation-triangle ml-1" aria-hidden="true"></i> }
+                            @if (f.warn) { <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i> }
                             <i class="fas fa-chevron-down fpms-figure-chev" aria-hidden="true"></i>
                         </button>
                     </dd>
@@ -65,7 +65,7 @@ function num(value: number | null | undefined, decimals: number): string {
             <section class="fpms-working" [id]="panelId + key" [attr.aria-label]="'How ' + labelOf(key) + ' is worked out'">
                 <div class="fpms-working-head">
                     <h4>How {{ labelOf(key) }} is worked out</h4>
-                    <button type="button" class="btn btn-sm btn-link" (click)="open.set(null)">Close</button>
+                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link" (click)="open.set(null)">Close</button>
                 </div>
                 @for (line of working(); track $index) {
                     <p [class.fpms-working-total]="line.strong">
