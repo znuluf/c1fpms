@@ -26,7 +26,7 @@ import { BatchFiguresComponent } from './batch-figures.component';
                 @if (mine() === null) {
                     <fpms-loading></fpms-loading>
                 } @else if (failed()) {
-                    <div class="fpms-alert fpms-alert-danger fpms-flex align-items-center">
+                    <div class="fpms-alert fpms-alert-danger fpms-flex fpms-align-center-items">
                         <i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>
                         <span class="fpms-margin-auto-end">Your pond did not load. Check the connection, then try again.</span>
                         <button type="button" class="fpms-button fpms-button-compact fpms-button-danger" [disabled]="busy()" (click)="init()">Try again</button>
