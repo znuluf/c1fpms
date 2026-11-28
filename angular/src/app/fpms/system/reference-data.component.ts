@@ -8,8 +8,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="Reference data" subtitle="Water-quality parameters and their national-standard defaults (GAqP, PNS/BAFS 197:2017). System Administration."></fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 <p class="text-muted">Readings outside the optimal range are saved and flagged. Readings outside the physical limits are rejected as entry errors. Changes apply to new readings only.</p>
                 @if (edit) {
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="parameter-edit-title"><div class="fpms-dialog-body p-0">
