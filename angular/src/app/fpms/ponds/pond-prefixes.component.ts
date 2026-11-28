@@ -9,43 +9,43 @@ import { FPMS_IMPORTS } from '../shared-imports';
     template: `
         <fpms-page-header title="Pond name prefixes" subtitle="A pond's name is a prefix and a number (Grow-out Pond 3); its code uses the short code (GP-03)." backLink="/app/ponds" backLabel="Ponds">
             @if (canManage && !adding && !editingId) {
-                <button type="button" class="btn btn-primary" (click)="startAdd()"><i class="fas fa-plus mr-1" aria-hidden="true"></i>Add a prefix</button>
+                <button type="button" class="fpms-button fpms-button-primary" (click)="startAdd()"><i class="fas fa-plus fpms-icon-gap" aria-hidden="true"></i>Add a prefix</button>
             }
         </fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
+            <div class="fpms-page-inner fpms-narrow">
                 @if (adding) {
                     <!-- One form at a time (DEC-96): name, an optional short code, and what the ponds will be called. -->
-                    <form class="card" #af="ngForm" (ngSubmit)="create()" fpmsReview="prefix" [fpmsReviewNew]="true" novalidate>
-                        <div class="card-header"><h2 class="card-title">Add a prefix</h2></div>
-                        <div class="card-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-7">
-                                    <label for="pn">Name <span class="text-danger">*</span></label>
-                                    <input id="pn" class="form-control" name="name" [(ngModel)]="draft.name" required maxlength="60" placeholder="e.g. Settling Pond" />
+                    <form class="fpms-panel" #af="ngForm" (ngSubmit)="create()" fpmsReview="prefix" [fpmsReviewNew]="true" novalidate>
+                        <div class="fpms-panel-head"><h2 class="fpms-panel-title">Add a prefix</h2></div>
+                        <div class="fpms-panel-body">
+                            <div class="fpms-grid-row">
+                                <div class="fpms-field fpms-col-md-7">
+                                    <label for="pn">Name <span class="fpms-danger">*</span></label>
+                                    <input id="pn" class="fpms-control" name="name" [(ngModel)]="draft.name" required maxlength="60" placeholder="e.g. Settling Pond" />
                                 </div>
-                                <div class="form-group col-md-5">
+                                <div class="fpms-field fpms-col-md-5">
                                     <label for="sc">Short code</label>
-                                    <input id="sc" class="form-control text-uppercase" name="shortCode" [(ngModel)]="draft.shortCode" maxlength="6" pattern="[A-Za-z]{1,6}" [placeholder]="suggested || 'e.g. SP'" />
-                                    <small class="form-text text-muted">1 to 6 letters. Left empty, the initials are used. It cannot be changed later.</small>
+                                    <input id="sc" class="fpms-control fpms-uppercase" name="shortCode" [(ngModel)]="draft.shortCode" maxlength="6" pattern="[A-Za-z]{1,6}" [placeholder]="suggested || 'e.g. SP'" />
+                                    <small class="fpms-help fpms-muted">1 to 6 letters. Left empty, the initials are used. It cannot be changed later.</small>
                                 </div>
                             </div>
                             @if (draft.name?.trim()) {
-                                <p class="fpms-prefix-preview mb-0">
-                                    <i class="fas fa-eye mr-1" aria-hidden="true"></i>
+                                <p class="fpms-prefix-preview fpms-no-bottom">
+                                    <i class="fas fa-eye fpms-icon-gap" aria-hidden="true"></i>
                                     New ponds will read <strong>{{ draft.name.trim() }} 1</strong>, coded <strong>{{ example((draft.shortCode || suggested).toUpperCase(), 1) }}</strong>.
                                 </p>
                             }
                         </div>
-                        <div class="card-footer d-flex flex-wrap align-items-center">
-                            <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !af.form.valid">Save prefix</button>
-                            <button type="button" class="btn btn-default mr-3" (click)="adding = false">Cancel</button>
+                        <div class="fpms-panel-foot fpms-flex fpms-wrap fpms-align-center-items">
+                            <button type="submit" class="fpms-button fpms-button-primary fpms-icon-gap" [disabled]="busy() || !af.form.valid">Save prefix</button>
+                            <button type="button" class="fpms-button fpms-button-secondary fpms-space-end-3" (click)="adding = false">Cancel</button>
                             <fpms-form-hint [form]="af"></fpms-form-hint>
                         </div>
                     </form>
                 }
 
-                <div class="card">
+                <div class="fpms-panel">
                     @if (!prefixes()) {
                         <fpms-loading></fpms-loading>
                     } @else {
@@ -54,27 +54,27 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 <li [class.is-hidden]="!x.isActive">
                                     @if (editingId === x.id) {
                                         <form class="fpms-prefix-edit" #ef="ngForm" (ngSubmit)="saveEdit(x)" fpmsReview="prefix" novalidate>
-                                            <div class="form-row align-items-end">
-                                                <div class="form-group col-md-6 mb-2">
+                                            <div class="fpms-grid-row fpms-align-end-items">
+                                                <div class="fpms-field fpms-col-md-6 fpms-space-bottom-2">
                                                     <label [for]="'en' + x.id">Name</label>
-                                                    <input [id]="'en' + x.id" class="form-control" name="name" [(ngModel)]="edit.name" required maxlength="60" />
+                                                    <input [id]="'en' + x.id" class="fpms-control" name="name" [(ngModel)]="edit.name" required maxlength="60" />
                                                 </div>
-                                                <div class="form-group col-md-6 mb-2">
-                                                    <div class="custom-control custom-checkbox">
-                                                        <input type="checkbox" class="custom-control-input" [id]="'ea' + x.id" name="isActive" [(ngModel)]="edit.isActive" />
-                                                        <label class="custom-control-label" [for]="'ea' + x.id">Offer it when adding a pond</label>
+                                                <div class="fpms-field fpms-col-md-6 fpms-space-bottom-2">
+                                                    <div class="fpms-check fpms-check-box">
+                                                        <input type="checkbox" class="fpms-check-input" [id]="'ea' + x.id" name="isActive" [(ngModel)]="edit.isActive" />
+                                                        <label class="fpms-check-label" [for]="'ea' + x.id">Offer it when adding a pond</label>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <p class="small text-muted mb-2">The code {{ x.shortCode }} stays. Renaming changes how pond names read ("{{ edit.name || x.name }} {{ x.nextNumber }}"); codes never change. Hidden prefixes stay on the ponds that have them.</p>
-                                            <button type="submit" class="btn btn-primary btn-sm mr-2" [disabled]="busy() || !ef.form.valid">Save</button>
-                                            <button type="button" class="btn btn-default btn-sm" (click)="editingId = null">Cancel</button>
+                                            <p class="fpms-small fpms-muted fpms-space-bottom-2">The code {{ x.shortCode }} stays. Renaming changes how pond names read ("{{ edit.name || x.name }} {{ x.nextNumber }}"); codes never change. Hidden prefixes stay on the ponds that have them.</p>
+                                            <button type="submit" class="fpms-button fpms-button-primary fpms-button-compact fpms-icon-gap" [disabled]="busy() || !ef.form.valid">Save</button>
+                                            <button type="button" class="fpms-button fpms-button-secondary fpms-button-compact" (click)="editingId = null">Cancel</button>
                                         </form>
                                     } @else {
                                         <div class="fpms-prefix-main">
                                             <div class="fpms-prefix-name">
                                                 {{ x.name }} <code class="fpms-prefix-code">{{ x.shortCode }}</code>
-                                                @if (!x.isActive) { <span class="badge badge-secondary ml-1">Hidden when adding a pond</span> }
+                                                @if (!x.isActive) { <span class="fpms-label fpms-label-secondary fpms-icon-gap">Hidden when adding a pond</span> }
                                             </div>
                                             <div class="fpms-prefix-sub">
                                                 {{ x.pondCount }} {{ x.pondCount === 1 ? 'pond' : 'ponds' }} · next: {{ x.name }} {{ x.nextNumber }} ({{ example(x.shortCode, x.nextNumber) }})
@@ -82,9 +82,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                         </div>
                                         @if (canManage) {
                                             <div class="fpms-prefix-actions">
-                                                <button type="button" class="btn btn-sm btn-default" [disabled]="busy() || i === 0" (click)="move(i, -1)" [attr.aria-label]="'Move ' + x.name + ' up'" title="Move up"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
-                                                <button type="button" class="btn btn-sm btn-default" [disabled]="busy() || last" (click)="move(i, 1)" [attr.aria-label]="'Move ' + x.name + ' down'" title="Move down"><i class="fas fa-arrow-down" aria-hidden="true"></i></button>
-                                                <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="busy() || adding" (click)="startEdit(x)">Edit</button>
+                                                <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" [disabled]="busy() || i === 0" (click)="move(i, -1)" [attr.aria-label]="'Move ' + x.name + ' up'" title="Move up"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+                                                <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" [disabled]="busy() || last" (click)="move(i, 1)" [attr.aria-label]="'Move ' + x.name + ' down'" title="Move down"><i class="fas fa-arrow-down" aria-hidden="true"></i></button>
+                                                <button type="button" class="fpms-button fpms-button-compact fpms-button-outline" [disabled]="busy() || adding" (click)="startEdit(x)">Edit</button>
                                             </div>
                                         }
                                     }
@@ -95,7 +95,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         </ul>
                     }
                 </div>
-                <p class="small text-muted">The order here is the order of the prefix list when adding a pond.</p>
+                <p class="fpms-small fpms-muted">The order here is the order of the prefix list when adding a pond.</p>
             </div>
         </section>
     `,
