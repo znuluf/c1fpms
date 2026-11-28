@@ -16,7 +16,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
     template: `
         <fpms-page-header title="Buyer's tally sheet" [subtitle]="s ? s.buyerName + ' · ' + s.dispatchReceiptNo : ''" [backLink]="s ? ['/app/sales', s.id] : '/app/sales'" backLabel="Dispatch receipt">
             @if (s) {
-                <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
+                <button class="fpms-button fpms-button-primary" (click)="print()"><i class="fas fa-print fpms-icon-gap"></i>Print</button>
             }
         </fpms-page-header>
         <section class="fpms-page">
@@ -29,13 +29,13 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             <div class="fpms-doc-head">
                                 <div>
                                     <div class="fpms-doc-farm">{{ s.farmName }}</div>
-                                    <div class="small">{{ s.farmAddress }}</div>
-                                    @if (s.farmContact) { <div class="small">{{ s.farmContact }}</div> }
+                                    <div class="fpms-small">{{ s.farmAddress }}</div>
+                                    @if (s.farmContact) { <div class="fpms-small">{{ s.farmContact }}</div> }
                                 </div>
-                                <div class="text-right">
+                                <div class="fpms-align-end">
                                     <div class="fpms-doc-title">HARVEST TALLY SHEET</div>
-                                    <div class="small">Date: <strong>{{ g.harvestedAtUtc | farmDateTime }}</strong></div>
-                                    @if (g.harvestType) { <div class="small">{{ g.harvestType | label: L.HarvestTypes }} harvest</div> }
+                                    <div class="fpms-small">Date: <strong>{{ g.harvestedAtUtc | farmDateTime }}</strong></div>
+                                    @if (g.harvestType) { <div class="fpms-small">{{ g.harvestType | label: L.HarvestTypes }} harvest</div> }
                                     <div class="fpms-doc-copy">Buyer's copy</div>
                                 </div>
                             </div>
@@ -63,7 +63,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             @if (g.crates.length) {
                                 <fpms-crate-grid [crates]="g.crates" [gradeSummary]="true"></fpms-crate-grid>
                             } @else {
-                                <p class="small text-muted">No crates were marked for this sale, so only the kilos sold are listed. Mark them under "Crates for this buyer" when editing the sale.</p>
+                                <p class="fpms-small fpms-muted">No crates were marked for this sale, so only the kilos sold are listed. Mark them under "Crates for this buyer" when editing the sale.</p>
                             }
 
                             <div class="fpms-doc-summary">
@@ -102,15 +102,15 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 </tfoot>
                             </table>
                             @if (g.buyerKg !== null) {
-                                <p class="small">Amounts use the buyer's weight where one was recorded.</p>
+                                <p class="fpms-small">Amounts use the buyer's weight where one was recorded.</p>
                             }
 
-                            <div class="row mt-5 mb-3 small fpms-doc-signs">
-                                <div class="col-4"><div class="fpms-sign">Weighed by</div></div>
-                                <div class="col-4"><div class="fpms-sign">Checked by (farm)</div></div>
-                                <div class="col-4"><div class="fpms-sign">Customer / representative</div></div>
+                            <div class="fpms-grid-row fpms-space-top-7 fpms-space-bottom-3 fpms-small fpms-doc-signs">
+                                <div class="fpms-col-4"><div class="fpms-sign">Weighed by</div></div>
+                                <div class="fpms-col-4"><div class="fpms-sign">Checked by (farm)</div></div>
+                                <div class="fpms-col-4"><div class="fpms-sign">Customer / representative</div></div>
                             </div>
-                            <p class="small text-center text-muted mb-0">Tally sheet of dispatch receipt {{ s.dispatchReceiptNo }}, for the buyer. Not an official receipt.</p>
+                            <p class="fpms-small fpms-align-center fpms-muted fpms-no-bottom">Tally sheet of dispatch receipt {{ s.dispatchReceiptNo }}, for the buyer. Not an official receipt.</p>
                         </div>
                     }
                 }
