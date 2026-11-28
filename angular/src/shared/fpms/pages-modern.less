@@ -1,0 +1,184 @@
+// Cross-page presentation bridge for existing FPMS views.
+// Keeps existing Angular templates and Bootstrap/AdminLTE behavior intact while
+// bringing common page surfaces onto the shared design tokens. Page-specific
+// template cleanup remains incremental; no business logic or form rules belong here.
+
+.content-wrapper {
+    min-width: 0;
+    background: var(--bg);
+}
+
+.content {
+    min-width: 0;
+    padding: var(--s5) !important;
+    color: var(--ink);
+}
+
+.content-header {
+    padding: var(--s4) var(--s5) 0;
+    color: var(--ink);
+}
+
+.content-header h1,
+.content-header .breadcrumb,
+.content-header .breadcrumb a {
+    color: var(--ink);
+}
+
+.content-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.content-header .breadcrumb {
+    background: transparent;
+    font-size: 0.875rem;
+}
+
+.container-fluid {
+    min-width: 0;
+}
+
+.row {
+    row-gap: var(--s4);
+}
+
+.form-group {
+    margin-bottom: var(--s4);
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.control-label,
+label {
+    margin-bottom: var(--s2);
+}
+
+.help-block,
+.field-validation-error,
+.validation-summary-errors {
+    color: var(--red-deep);
+}
+
+.table-responsive {
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--paper);
+}
+
+.table-responsive > .table {
+    margin-bottom: 0;
+}
+
+.table-responsive > .table thead th {
+    white-space: nowrap;
+}
+
+.dropdown-menu {
+    padding: var(--s2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-md);
+}
+
+.dropdown-menu > li > a,
+.dropdown-item {
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    padding: var(--s2) var(--s3);
+    color: var(--ink-2);
+    border-radius: var(--r-sm);
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus,
+.dropdown-item:hover,
+.dropdown-item:focus {
+    color: var(--ink);
+    background: var(--bg);
+}
+
+.input-group .form-control:not(:first-child),
+.input-group .custom-select:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group .form-control:not(:last-child),
+.input-group .custom-select:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.btn-group > .btn,
+.btn-group-vertical > .btn {
+    min-height: 2.75rem;
+}
+
+.btn-toolbar {
+    gap: var(--s2);
+}
+
+.pagination {
+    gap: var(--s1);
+    flex-wrap: wrap;
+}
+
+.pagination .page-item {
+    margin: 0;
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
+    padding: var(--s4) var(--s5);
+}
+
+.modal-title {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.modal-backdrop {
+    background: var(--ink);
+}
+
+hr {
+    border-top-color: var(--line);
+}
+
+@media (max-width: 767px) {
+    .content {
+        padding: var(--s3) !important;
+    }
+
+    .content-header {
+        padding: var(--s3) var(--s3) 0;
+    }
+
+    .content-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .card-header,
+    .card-body,
+    .card-footer {
+        padding: var(--s3);
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: var(--s3);
+    }
+}
+
+@media (min-width: 1024px) {
+    .content {
+        overflow-x: clip;
+    }
+}
