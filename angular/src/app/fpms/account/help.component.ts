@@ -30,16 +30,16 @@ export const HELP_CONTACT = {
     template: `
         <fpms-page-header [narrow]="true" title="Contact the developers" [subtitle]="intro"></fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
+            <div class="fpms-page-inner fpms-narrow">
                 @if (hasBlanks) {
-                    <div class="alert alert-light border small">Highlighted text is still to be filled in by the team. See docs/developer-contact-template.md.</div>
+                    <div class="fpms-alert fpms-alert-neutral fpms-border fpms-small">Highlighted text is still to be filled in by the team. See docs/developer-contact-template.md.</div>
                 }
-                <div class="row">
-                    <div class="col-lg-7">
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">How to reach us</h3></div>
-                            <div class="card-body">
-                                <dl class="mb-0 help-dl">
+                <div class="fpms-grid-row">
+                    <div class="fpms-col-lg-7">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">How to reach us</h3></div>
+                            <div class="fpms-panel-body">
+                                <dl class="fpms-no-bottom help-dl">
                                     <dt>Phone or text</dt><dd><span [class.help-blank]="blank(c.phone)">{{ c.phone }}</span> · <span [class.help-blank]="blank(c.phoneHours)">{{ c.phoneHours }}</span></dd>
                                     <dt>Email</dt><dd><span [class.help-blank]="blank(c.email)">{{ c.email }}</span> · <span [class.help-blank]="blank(c.emailChecked)">{{ c.emailChecked }}</span></dd>
                                     <dt>Messaging app</dt><dd><span [class.help-blank]="blank(c.messaging)">{{ c.messaging }}</span></dd>
@@ -47,10 +47,10 @@ export const HELP_CONTACT = {
                                 </dl>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">What to tell us</h3></div>
-                            <div class="card-body">
-                                <ul class="mb-0 pl-3">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">What to tell us</h3></div>
+                            <div class="fpms-panel-body">
+                                <ul class="fpms-no-bottom pl-3">
                                     <li>Your name and the farm's name</li>
                                     <li>The page you were on, for example "Feeding" or "Logbooks"</li>
                                     <li>What you were doing and what you expected</li>
@@ -60,31 +60,31 @@ export const HELP_CONTACT = {
                                 </ul>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Locked out or urgent</h3></div>
-                            <div class="card-body">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Locked out or urgent</h3></div>
+                            <div class="fpms-panel-body">
                                 <p>If you cannot sign in, call <span [class.help-blank]="blank(c.phone)">{{ c.phone }}</span>. <span [class.help-blank]="blank(c.identityCheck)">{{ c.identityCheck }}</span> You will get a temporary password and set a new one when you sign in.</p>
                                 <p>If the system is down, <span [class.help-blank]="blank(c.systemDown)">{{ c.systemDown }}</span>.</p>
-                                <p class="mb-0 font-weight-bold">Never send your password to anyone, including us.</p>
+                                <p class="fpms-no-bottom fpms-weight-bold">Never send your password to anyone, including us.</p>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">What to expect</h3></div>
-                            <div class="card-body">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">What to expect</h3></div>
+                            <div class="fpms-panel-body">
                                 We reply within <span [class.help-blank]="blank(c.replyWithin)">{{ c.replyWithin }}</span> on <span [class.help-blank]="blank(c.replyDays)">{{ c.replyDays }}</span>. Urgent calls are answered <span [class.help-blank]="blank(c.urgentWhen)">{{ c.urgentWhen }}</span>.
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-5">
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Support details</h3></div>
-                            <div class="card-body">
+                    <div class="fpms-col-lg-5">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Support details</h3></div>
+                            <div class="fpms-panel-body">
                                 <dl class="help-dl">
                                     @for (d of details(); track d.label) {
                                         <dt>{{ d.label }}</dt><dd>{{ d.value }}</dd>
                                     }
                                 </dl>
-                                <button type="button" class="btn btn-default" (click)="copy()">Copy these details</button>
+                                <button type="button" class="fpms-button fpms-button-secondary" (click)="copy()">Copy these details</button>
                             </div>
                         </div>
                     </div>
