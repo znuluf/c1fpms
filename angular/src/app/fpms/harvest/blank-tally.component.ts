@@ -14,25 +14,25 @@ import { FPMS_IMPORTS } from '../shared-imports';
     imports: [...FPMS_IMPORTS, CrateGridComponent],
     template: `
         <fpms-page-header title="Blank tally sheet" subtitle="Print it, write each crate's weight in its box at the pond, then type the weights into the harvest's crate tally in the same order." backLink="/app/harvests" backLabel="Harvests">
-            <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
+            <button class="fpms-button fpms-button-primary" (click)="print()"><i class="fas fa-print fpms-icon-gap"></i>Print</button>
         </fpms-page-header>
         <section class="fpms-page">
             <div class="fpms-page-inner">
-                <div class="card no-print">
-                    <div class="card-body">
-                        <div class="form-row align-items-end">
-                            <div class="form-group col-md-5 mb-md-0">
+                <div class="fpms-panel no-print">
+                    <div class="fpms-panel-body">
+                        <div class="fpms-grid-row align-items-end">
+                            <div class="fpms-field fpms-col-md-5 fpms-space-bottom-md-0">
                                 <label for="pond">Pond</label>
-                                <select id="pond" class="form-control" [(ngModel)]="pond">
+                                <select id="pond" class="fpms-control" [(ngModel)]="pond">
                                     <option value="">Blank (write in)</option>
                                     @for (p of ponds; track p.id) {
                                         <option [value]="p.pondCode + (p.currentBatchCode ? ' · ' + p.currentBatchCode : '')">{{ p.pondCode }}{{ p.currentBatchCode ? ' · ' + p.currentBatchCode : '' }}</option>
                                     }
                                 </select>
                             </div>
-                            <div class="form-group col-md-3 mb-0">
+                            <div class="fpms-field fpms-col-md-3 fpms-no-bottom">
                                 <label for="boxes">Crate boxes</label>
-                                <select id="boxes" class="form-control" [(ngModel)]="boxes">
+                                <select id="boxes" class="fpms-control" [(ngModel)]="boxes">
                                     <option [ngValue]="100">100 (one page)</option>
                                     <option [ngValue]="150">150</option>
                                     <option [ngValue]="200">200</option>
@@ -46,12 +46,12 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <div class="fpms-doc-head">
                         <div>
                             <div class="fpms-doc-farm">{{ session.tenant?.name }}</div>
-                            @if (session.tenant?.farmId) { <div class="small">Farm ID {{ session.tenant?.farmId }}</div> }
-                            <div class="small">Fill in at the pond; enter into FPMS afterwards</div>
+                            @if (session.tenant?.farmId) { <div class="fpms-small">Farm ID {{ session.tenant?.farmId }}</div> }
+                            <div class="fpms-small">Fill in at the pond; enter into FPMS afterwards</div>
                         </div>
-                        <div class="text-right">
+                        <div class="fpms-align-end">
                             <div class="fpms-doc-title">HARVEST TALLY SHEET</div>
-                            <div class="small">Sheet no. <span class="fpms-blank short"></span></div>
+                            <div class="fpms-small">Sheet no. <span class="fpms-blank short"></span></div>
                         </div>
                     </div>
                     <div class="fpms-doc-meta">
@@ -77,7 +77,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
 
                     <fpms-crate-grid [blank]="boxes" heading="Crate no. — write the kg in each box"></fpms-crate-grid>
 
-                    <div class="fpms-doc-fields mb-3 mt-2" style="max-width: 30rem">
+                    <div class="fpms-doc-fields fpms-space-bottom-3 fpms-space-top-2" style="max-width: 30rem">
                         <span>Total kilos</span>
                         <div class="blank"></div>
                         <span>Price per kilo</span>
@@ -86,12 +86,12 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="blank"></div>
                     </div>
 
-                    <div class="row mt-5 mb-3 small fpms-doc-signs">
-                        <div class="col-4"><div class="fpms-sign">Weighed by</div></div>
-                        <div class="col-4"><div class="fpms-sign">Checked by (farm)</div></div>
-                        <div class="col-4"><div class="fpms-sign">Customer / representative</div></div>
+                    <div class="fpms-grid-row fpms-space-top-7 fpms-space-bottom-3 fpms-small fpms-doc-signs">
+                        <div class="fpms-col-4"><div class="fpms-sign">Weighed by</div></div>
+                        <div class="fpms-col-4"><div class="fpms-sign">Checked by (farm)</div></div>
+                        <div class="fpms-col-4"><div class="fpms-sign">Customer / representative</div></div>
                     </div>
-                    <p class="small text-center text-muted mb-0">Tally sheet for the farm's records; not an official receipt.</p>
+                    <p class="fpms-small fpms-align-center fpms-muted fpms-no-bottom">Tally sheet for the farm's records; not an official receipt.</p>
                 </div>
             </div>
         </section>
