@@ -25,7 +25,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
             <div class="fpms-page-inner">
                 <!-- Trace, report choice and filters on the page ground (DEC-115). -->
                 <form class="no-print fpms-list-filters" (ngSubmit)="traceLot()" aria-label="Trace a lot code">
-                    <div class="fpms-grid-row align-items-end">
+                    <div class="fpms-grid-row fpms-align-end-items">
                         <div class="fpms-field fpms-col-md-4 fpms-space-bottom-2">
                             <label for="lot">Trace a lot code</label>
                             <input id="lot" name="lot" class="fpms-control fpms-monospace" [(ngModel)]="lotCode" placeholder="e.g. 26-0-24-03-07-02" autocomplete="off" />
@@ -43,7 +43,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                                 <button type="button" class="fpms-chip" [attr.aria-pressed]="key === o.key" (click)="key = o.key; r = null">{{ o.label }}</button>
                             }
                         </div>
-                        <div class="fpms-grid-row align-items-end">
+                        <div class="fpms-grid-row fpms-align-end-items">
                             @if (key === 'cycle' || key === 'harvest' || key === 'failure') {
                                 <div class="fpms-field fpms-col-md-4">
                                     <label for="cy">Cycle</label>
@@ -150,7 +150,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                             @case ('cycle') {
                                 <div class="fpms-panel">
                                     <div class="fpms-panel-body">
-                                        <div class="fpms-flex flex-wrap justify-content-between">
+                                        <div class="fpms-flex flex-wrap fpms-justify-between">
                                             <div>
                                                 <strong>Cycle {{ r.cycleCode }}</strong> · <fpms-badge [text]="r.status | label: L.CycleStatuses"></fpms-badge>
                                                 <span class="fpms-label fpms-icon-gap" [class.badge-success]="r.isFinal" [class.badge-warning]="!r.isFinal">{{ r.isFinal ? 'Final' : 'Provisional (cycle not closed)' }}</span>
