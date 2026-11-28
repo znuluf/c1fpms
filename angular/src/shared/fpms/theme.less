@@ -37,6 +37,27 @@
     --fpms-blank-fill: #f0b84b; // calendar: a past day with nothing entered
     --fpms-chemical: #6b4c9a; // calendar dot for a chemical entry (a category, not a status)
     --fpms-highlight: #fff3c4; // a blank to fill in, in help text
+    // Badge and alert treatments retain their established contrast in both themes.
+    --fpms-badge-success-bg: #d5f3e6;
+    --fpms-badge-success-text: #11593a;
+    --fpms-badge-info-bg: #dbe7f3;
+    --fpms-badge-info-text: #16436e;
+    --fpms-badge-warning-bg: #fbeccb;
+    --fpms-badge-warning-text: #6b4500;
+    --fpms-badge-danger-bg: #fde3e4;
+    --fpms-badge-danger-text: #8c2b2b;
+    --fpms-badge-secondary-bg: #eef1f5;
+    --fpms-badge-secondary-text: #334155;
+    --fpms-alert-warning-text: #5c3d00;
+    --fpms-alert-danger-bg: #fbeeee;
+    --fpms-alert-danger-border: #e9b9b9;
+    --fpms-alert-danger-text: #7a2525;
+    --fpms-alert-success-bg: #eaf5ee;
+    --fpms-alert-success-border: #b9dbc6;
+    --fpms-alert-success-text: #1d5c38;
+    --fpms-alert-info-bg: #e9f2f8;
+    --fpms-alert-info-border: #b7d4e6;
+    --fpms-alert-info-text: #1e4f6e;
 
     // Shape: radius follows role, not one value for everything
     --fpms-r-control: 10px;
@@ -1208,24 +1229,24 @@ button.fpms-chip {
     padding: 0.32em 0.75em;
 }
 .badge.badge-success {
-    background-color: #d5f3e6;
-    color: #11593a;
+    background-color: var(--fpms-badge-success-bg);
+    color: var(--fpms-badge-success-text);
 }
 .badge.badge-info {
-    background-color: #dbe7f3;
-    color: #16436e;
+    background-color: var(--fpms-badge-info-bg);
+    color: var(--fpms-badge-info-text);
 }
 .badge.badge-warning {
-    background-color: #fbeccb;
-    color: #6b4500;
+    background-color: var(--fpms-badge-warning-bg);
+    color: var(--fpms-badge-warning-text);
 }
 .badge.badge-danger {
-    background-color: #fde3e4;
-    color: #8c2b2b;
+    background-color: var(--fpms-badge-danger-bg);
+    color: var(--fpms-badge-danger-text);
 }
 .badge.badge-secondary {
-    background-color: #eef1f5;
-    color: #334155;
+    background-color: var(--fpms-badge-secondary-bg);
+    color: var(--fpms-badge-secondary-text);
 }
 .badge.badge-primary {
     background-color: var(--fpms-tide-50);
@@ -1240,22 +1261,22 @@ button.fpms-chip {
 .alert-warning {
     background: var(--fpms-warn-bg);
     border-color: var(--fpms-warn-line);
-    color: #5c3d00;
+    color: var(--fpms-alert-warning-text);
 }
 .alert-danger {
-    background: #fbeeee;
-    border-color: #e9b9b9;
-    color: #7a2525;
+    background: var(--fpms-alert-danger-bg);
+    border-color: var(--fpms-alert-danger-border);
+    color: var(--fpms-alert-danger-text);
 }
 .alert-success {
-    background: #eaf5ee;
-    border-color: #b9dbc6;
-    color: #1d5c38;
+    background: var(--fpms-alert-success-bg);
+    border-color: var(--fpms-alert-success-border);
+    color: var(--fpms-alert-success-text);
 }
 .alert-info {
-    background: #e9f2f8;
-    border-color: #b7d4e6;
-    color: #1e4f6e;
+    background: var(--fpms-alert-info-bg);
+    border-color: var(--fpms-alert-info-border);
+    color: var(--fpms-alert-info-text);
 }
 
 // Buttons lift a hair on hover and settle when pressed
