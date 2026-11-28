@@ -31,19 +31,19 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <fpms-loading></fpms-loading>
                 } @else {
                     <div class="fpms-panel no-print">
-                        <div class="fpms-panel-body fpms-space-y-2 fpms-flex flex-wrap fpms-align-center-items">
+                        <div class="fpms-panel-body fpms-space-y-2 fpms-flex fpms-wrap fpms-align-center-items">
                             <span class="fpms-weight-bold fpms-icon-gap">Prepare as</span>
                             <button type="button" class="tr-chip" [attr.aria-pressed]="!buyerCopy()" (click)="buyerCopy.set(false)">Internal copy</button>
                             <button type="button" class="tr-chip" [attr.aria-pressed]="buyerCopy()" (click)="setBuyerCopy()" [disabled]="!buyers().length">Buyer copy</button>
                             @if (buyerCopy()) {
                                 <label class="fpms-no-bottom fpms-space-start-3 fpms-small fpms-muted">
                                     Prepared for
-                                    <select class="fpms-control fpms-control-compact d-inline-block w-auto fpms-icon-gap" [ngModel]="who()" (ngModelChange)="who.set($event)">
+                                    <select class="fpms-control fpms-control-compact fpms-inline-block fpms-width-auto fpms-icon-gap" [ngModel]="who()" (ngModelChange)="who.set($event)">
                                         @for (b of buyers(); track b) { <option [ngValue]="b">{{ b }}</option> }
                                     </select>
                                 </label>
                             }
-                            <div class="fpms-small fpms-muted w-100 fpms-space-top-1">
+                            <div class="fpms-small fpms-muted fpms-width-full fpms-space-top-1">
                                 @if (buyerCopy()) {
                                     For a buyer who asks where their shrimp came from. It shows only their own purchase and leaves out other buyers, unsold quantities and the list of missing items.
                                 } @else {

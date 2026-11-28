@@ -93,7 +93,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                 </div>
                 @if (detail(); as d) {
                     <div class="fpms-panel">
-                        <div class="fpms-panel-head fpms-flex align-items-center">
+                        <div class="fpms-panel-head fpms-flex fpms-align-center-items">
                             <h3 class="fpms-panel-title fpms-margin-auto-end">Sales to {{ d.name }}</h3>
                             <button class="fpms-button fpms-button-compact fpms-button-secondary" (click)="detail.set(null)">Close</button>
                         </div>
@@ -127,7 +127,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                         } @else {
                             <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
-                                    <tr><th scope="col">Buyer</th><th scope="col">Contact</th><th scope="col" class="fpms-align-end">Sales</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
+                                    <tr><th scope="col">Buyer</th><th scope="col">Contact</th><th scope="col" class="fpms-align-end">Sales</th><th scope="col">Status</th><th scope="col"><span class="fpms-visually-hidden">Actions</span></th></tr>
                                 </thead>
                                 <tbody>
                                     @for (b of f.visible(); track b.id) {

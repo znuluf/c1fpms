@@ -50,7 +50,7 @@ export const HELP_CONTACT = {
                         <div class="fpms-panel">
                             <div class="fpms-panel-head"><h3 class="fpms-panel-title">What to tell us</h3></div>
                             <div class="fpms-panel-body">
-                                <ul class="fpms-no-bottom pl-3">
+                                <ul class="fpms-no-bottom fpms-padding-start-3">
                                     <li>Your name and the farm's name</li>
                                     <li>The page you were on, for example "Feeding" or "Logbooks"</li>
                                     <li>What you were doing and what you expected</li>

@@ -143,7 +143,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                 <label>Planned destination ponds</label>
                                                 <p class="fpms-muted fpms-space-bottom-2">Record the ponds the farm has already chosen. These are reservations only; actual stocking is recorded separately.</p>
                                                 @for (allocation of form.pondAllocations; track $index) {
-                                                    <div class="fpms-grid-row align-items-end fpms-space-bottom-2">
+                                                    <div class="fpms-grid-row fpms-align-end-items fpms-space-bottom-2">
                                                         <div class="fpms-field fpms-col-md-6 fpms-space-bottom-1">
                                                             <label [for]="'alloc-pond-' + $index">Destination pond</label>
                                                             <select class="fpms-control" [id]="'alloc-pond-' + $index" [name]="'allocPond' + $index" [(ngModel)]="allocation.pondId" required>

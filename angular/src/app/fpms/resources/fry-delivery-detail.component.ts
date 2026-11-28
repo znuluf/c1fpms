@@ -11,7 +11,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
         <fpms-page-header [title]="d?.hatcheryBatchNumber ?? 'Fry delivery'" [subtitle]="d ? 'Post-larvae from ' + d.hatcheryName + (arrived() ? '. Arrived ' : '. Expected ') + (d.deliveryDate | farmDate) + '.' : ''" backLink="/app/resources/fry-deliveries" backLabel="Fry deliveries">
             @if (d) {
                 <fpms-badge [text]="d.isStocked ? 'Stocked' : (d.status | label: L.FryDeliveryStatuses)"></fpms-badge>
-                @if (d.isStockingFinished) { <span class="fpms-label badge-dark fpms-icon-gap">Stocking finished</span> }
+                @if (d.isStockingFinished) { <span class="fpms-label fpms-label-dark fpms-icon-gap">Stocking finished</span> }
             }
         </fpms-page-header>
         <section class="fpms-page">
@@ -21,7 +21,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 } @else {
                     @if (receiving) {
                         <!-- DEC-131: arrival is its own step: when, the farm's count, and the papers and trip that came with the fry. -->
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="rv-h"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-primary fpms-no-bottom border-0">
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="rv-h"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-primary fpms-no-bottom fpms-no-border">
                             <div class="fpms-panel-head"><h3 class="fpms-panel-title" id="rv-h"><i class="fas fa-box-open" aria-hidden="true"></i>Receive fry · {{ d.hatcheryBatchNumber }}</h3></div>
                             <form #rf="ngForm" (ngSubmit)="saveReceive()" fpmsReview="arrival" [fpmsReviewNew]="true" novalidate>
                                 <div class="fpms-panel-body">
@@ -171,7 +171,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     </form>
                                 }
                                 @if (d.canEdit && d.canUpdateStatus && d.history.length > 1 && !step) {
-                                    <button type="button" class="fpms-button fpms-button-link px-0 fpms-space-top-2" (click)="startStep(0)">Take back the last step</button>
+                                    <button type="button" class="fpms-button fpms-button-link fpms-padding-inline-0 fpms-space-top-2" (click)="startStep(0)">Take back the last step</button>
                                 }
                             </div>
                         </div>
@@ -261,7 +261,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                             <strong>{{ d.plReceived - d.plStocked | num: 0 }} PL</strong> to account for ({{ d.plReceived | num: 0 }} received − {{ d.plStocked | num: 0 }} stocked).
                                         </p>
                                         @for (s of shortfalls; track $index) {
-                                            <div class="fpms-grid-row align-items-end">
+                                            <div class="fpms-grid-row fpms-align-end-items">
                                                 <div class="fpms-field fpms-col-5">
                                                     <label class="fpms-small" [for]="'sr' + $index">Reason</label>
                                                     <select [id]="'sr' + $index" class="fpms-control fpms-control-compact" [(ngModel)]="s.reason">
@@ -277,11 +277,11 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     <input [id]="'sn' + $index" class="fpms-control fpms-control-compact" [(ngModel)]="s.note" maxlength="500" />
                                                 </div>
                                                 <div class="fpms-field fpms-col-1">
-                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger px-0" (click)="shortfalls.splice($index, 1)" aria-label="Remove line"><i class="fas fa-times"></i></button>
+                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger fpms-padding-inline-0" (click)="shortfalls.splice($index, 1)" aria-label="Remove line"><i class="fas fa-times"></i></button>
                                                 </div>
                                             </div>
                                         }
-                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-link px-0" (click)="addShortfall()"><i class="fas fa-plus fpms-icon-gap"></i>Add a reason</button>
+                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-padding-inline-0" (click)="addShortfall()"><i class="fas fa-plus fpms-icon-gap"></i>Add a reason</button>
                                         <div class="fpms-small fpms-space-top-1" [class.fpms-danger]="shortfallGap !== 0" [class.fpms-success]="shortfallGap === 0">
                                             Stocked {{ d.plStocked | num: 0 }} + not stocked {{ shortfallTotal | num: 0 }} = {{ d.plStocked + shortfallTotal | num: 0 }} of {{ d.plReceived | num: 0 }} received
                                             {{ shortfallGap === 0 ? '✓' : '(' + (shortfallGap | num: 0) + ' still to account for)' }}
@@ -298,9 +298,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="fpms-col-xl-4">
                             <div class="fpms-panel">
                                 <div class="fpms-panel-head"><h3 class="fpms-panel-title">History</h3></div>
-                                <ul class="list-group list-group-flush">
+                                <ul class="fpms-list-group fpms-list-group-flush">
                                     @for (h of d.history; track $index) {
-                                        <li class="list-group-item fpms-space-y-2">
+                                        <li class="fpms-list-group-item fpms-space-y-2">
                                             <div><fpms-badge [text]="h.status | label: L.FryDeliveryStatuses"></fpms-badge> <span class="fpms-small fpms-muted fpms-icon-gap">{{ h.changedAtUtc | farmDateTime }} · {{ h.changedBy }}</span></div>
                                             @if (h.note) { <div class="fpms-small">{{ h.note }}</div> }
                                         </li>

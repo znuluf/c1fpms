@@ -84,7 +84,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                 <div class="fpms-panel-head"><h3 class="fpms-panel-title">Certificates</h3></div>
                                 <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                                     <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
-                                        <thead><tr><th scope="col">Certificate</th><th scope="col">Valid</th><th scope="col">Status</th><th scope="col">Recorded by</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+                                        <thead><tr><th scope="col">Certificate</th><th scope="col">Valid</th><th scope="col">Status</th><th scope="col">Recorded by</th><th scope="col"><span class="fpms-visually-hidden">Actions</span></th></tr></thead>
                                         <tbody>
                                             @for (c of detail().certificates; track c.id) {
                                                 <tr>
@@ -133,7 +133,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                                             <input id="ce" type="date" class="fpms-control" name="expiryDate" [(ngModel)]="cert.expiryDate" />
                                         </div>
                                     </div>
-                                    <div class="fpms-flex flex-wrap align-items-center">
+                                    <div class="fpms-flex fpms-wrap fpms-align-center-items">
                                         <button type="submit" class="fpms-button fpms-button-primary fpms-space-end-3" [disabled]="busy() || !cf.form.valid">Add certificate</button>
                                         <span class="fpms-muted fpms-space-end-3">A renewal is a new certificate; earlier ones stay in the history.</span>
                                         <fpms-form-hint [form]="cf"></fpms-form-hint>
@@ -165,7 +165,7 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                         } @else {
                             <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
-                                    <tr><th scope="col">Hatchery · contact</th><th scope="col" title="BFAR accreditation and the current health certificate">Papers</th><th scope="col">Used in</th>@if (canManage) {<th scope="col"><span class="sr-only">Actions</span></th>}</tr>
+                                    <tr><th scope="col">Hatchery · contact</th><th scope="col" title="BFAR accreditation and the current health certificate">Papers</th><th scope="col">Used in</th>@if (canManage) {<th scope="col"><span class="fpms-visually-hidden">Actions</span></th>}</tr>
                                 </thead>
                                 <tbody>
                                     @for (h of f.visible(); track h.id) {

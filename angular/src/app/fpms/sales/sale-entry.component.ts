@@ -37,7 +37,7 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                 } @else {
                     <!-- One panel (DEC-107): the sale's parts are sections of it, with Review sale as its footer. -->
                     @if (restoredAt) {
-                        <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                        <div class="fpms-alert fpms-alert-info fpms-flex fpms-align-center-items" role="status">
                             <i class="fas fa-history fpms-icon-gap" aria-hidden="true"></i>
                             <span class="fpms-margin-auto-end">Your unsaved sale from {{ restoredAt | farmDateTime }} was restored.</span>
                             <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="discardDraft()">Discard it</button>
@@ -63,11 +63,11 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                         <!-- What was sold (DEC-107): a block per line, the harvest across the top so its name is never cut off, then
                              its kilograms, price and amount, each with its own label. -->
                         <div class="fpms-panel">
-                            <div class="fpms-panel-head fpms-flex align-items-center flex-wrap">
+                            <div class="fpms-panel-head fpms-flex fpms-align-center-items fpms-wrap">
                                 <h3 class="fpms-panel-title fpms-margin-auto-end">What was sold</h3>
                                 <span>{{ totalKg() | num: 3 : true }} kg · <strong>{{ total() | php }}</strong></span>
                             </div>
-                            <div class="fpms-panel-body pt-0">
+                            <div class="fpms-panel-body fpms-padding-top-0">
                                 @if (abwSchemes.length) {
                                     <div class="fpms-field fpms-space-top-3">
                                         <label for="saleAbwScheme">Base ABW pricing for this sale</label>
@@ -145,9 +145,9 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                     @for (h of crateHarvests(); track h.id) {
                                         <div class="fpms-field" [class.fpms-no-bottom]="$last">
                                             <label [for]="'cr' + $index">{{ h.harvestedAtUtc | farmDayOf }} · {{ h.pondCode }}{{ h.lotCode ? ' · lot ' + h.lotCode : '' }} <span class="fpms-muted fpms-weight-normal">· {{ h.crates.length }} crates, {{ freeCrates(h).length }} not on another sale</span></label>
-                                            <div class="input-group">
+                                            <div class="fpms-input-group">
                                                 <input [id]="'cr' + $index" class="fpms-control" [name]="'cr' + $index" [(ngModel)]="crateText[h.id]" placeholder="e.g. 1-10, 15" autocomplete="off" />
-                                                <div class="input-group-append">
+                                                <div class="fpms-input-group-append">
                                                     <button type="button" class="fpms-button fpms-button-secondary" (click)="takeAllCrates(h)" [disabled]="!freeCrates(h).length">All {{ freeCrates(h).length }} free crates</button>
                                                 </div>
                                             </div>

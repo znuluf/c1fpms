@@ -87,7 +87,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                         </h3>
                                     </div>
                                     <div class="fpms-panel-body">
-                                        <div class="fpms-grid-row align-items-end">
+                                        <div class="fpms-grid-row fpms-align-end-items">
                                             <div class="fpms-field fpms-col-md-3 fpms-no-bottom">
                                                 <label for="pon">Paid on</label>
                                                 <input
@@ -177,8 +177,8 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                 <!-- Payment status under the receipt; badges stack (DEC-107). -->
                                                 <div class="fpms-badge-stack fpms-space-top-1">
                                                     <fpms-badge [text]="s.paymentStatus | label: L.PaymentStatuses"></fpms-badge>
-                                                    @if (s.isOverdue) { <span class="fpms-label badge-danger" [title]="'Due ' + (s.dueDate | farmDate)">Overdue</span> }
-                                                    @if (s.overpaid > 0) { <span class="fpms-label badge-warning">Overpaid</span> }
+                                                    @if (s.isOverdue) { <span class="fpms-label fpms-label-danger" [title]="'Due ' + (s.dueDate | farmDate)">Overdue</span> }
+                                                    @if (s.overpaid > 0) { <span class="fpms-label fpms-label-warning">Overpaid</span> }
                                                 </div>
                                             </td>
                                             <td>
@@ -218,7 +218,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                         </td>
                                         <td class="fpms-align-end">
                                             {{ totals().totalBalance | php }}
-                                            @if (totals().overdueCount) { <div><span class="fpms-label badge-danger">{{ totals().overdueCount }} overdue</span></div> }
+                                            @if (totals().overdueCount) { <div><span class="fpms-label fpms-label-danger">{{ totals().overdueCount }} overdue</span></div> }
                                         </td>
                                     </tr>
                                 </tfoot>

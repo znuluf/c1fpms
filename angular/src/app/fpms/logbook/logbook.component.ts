@@ -109,7 +109,7 @@ import { batchShort } from '@shared/fpms/labels';
                                         <th fpmsSort="logType" [pager]="pager" (sorted)="load()" title="Pond, batch and record type">Record</th>
                                         <th>Details</th>
                                         <th fpmsSort="recordedAt" [pager]="pager" (sorted)="load()">Recorded by</th>
-                                        <th><span class="sr-only">Actions</span></th>
+                                        <th><span class="fpms-visually-hidden">Actions</span></th>
                                     </tr>
                                 </thead>
                                 @for (l of logs(); track l.id) {
@@ -270,7 +270,7 @@ import { batchShort } from '@shared/fpms/labels';
                         }
                     </div>
                     <fpms-pager [state]="pager" (changed)="load()"></fpms-pager>
-                    <div class="px-3 fpms-space-y-2 fpms-small fpms-muted border-top">
+                    <div class="fpms-padding-inline-3 fpms-space-y-2 fpms-small fpms-muted fpms-border-top">
                         @if (isOwner) {
                             As Owner you can correct and void any entry until its batch is closed.
                         } @else {

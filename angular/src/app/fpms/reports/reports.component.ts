@@ -150,10 +150,10 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                             @case ('cycle') {
                                 <div class="fpms-panel">
                                     <div class="fpms-panel-body">
-                                        <div class="fpms-flex flex-wrap fpms-justify-between">
+                                        <div class="fpms-flex fpms-wrap fpms-justify-between">
                                             <div>
                                                 <strong>Cycle {{ r.cycleCode }}</strong> · <fpms-badge [text]="r.status | label: L.CycleStatuses"></fpms-badge>
-                                                <span class="fpms-label fpms-icon-gap" [class.badge-success]="r.isFinal" [class.badge-warning]="!r.isFinal">{{ r.isFinal ? 'Final' : 'Provisional (cycle not closed)' }}</span>
+                                                <span class="fpms-label fpms-icon-gap" [class.fpms-label-success]="r.isFinal" [class.fpms-label-warning]="!r.isFinal">{{ r.isFinal ? 'Final' : 'Provisional (cycle not closed)' }}</span>
                                                 <div class="fpms-small">Planned {{ r.plannedStartDate | farmDate }} → {{ r.plannedEndDate | farmDate }} · Hatchery <span [title]="r.hatcheryName">{{ r.hatcheryShortCode || r.hatcheryName }}</span> · lot {{ r.hatcheryLotNumber || '—' }}</div>
                                                 @if (r.objectives) { <div class="fpms-small">Objectives: {{ r.objectives }}</div> }
 
@@ -356,9 +356,9 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                                                 <dt class="fpms-col-md-3">Inventory used (cost)</dt><dd class="fpms-col-md-3">{{ b.inventoryUsageCost | php }}</dd>
                                             </dl>
                                             <div class="fpms-grid-row">
-                                                <div class="fpms-col-xl-4"><h4 class="fpms-section-h">Mortality events</h4><ul class="pl-3">@for (x of b.mortalityEvents; track $index) { <li>{{ x }}</li> } @empty { <li class="fpms-muted">None recorded</li> }</ul></div>
-                                                <div class="fpms-col-xl-4"><h4 class="fpms-section-h">Treatments</h4><ul class="pl-3">@for (x of b.treatments; track $index) { <li>{{ x }}</li> } @empty { <li class="fpms-muted">None recorded</li> }</ul></div>
-                                                <div class="fpms-col-xl-4"><h4 class="fpms-section-h">Recent water quality</h4><ul class="pl-3">@for (x of b.recentWaterQuality; track $index) { <li>{{ x }}</li> } @empty { <li class="fpms-muted">None recorded</li> }</ul></div>
+                                                <div class="fpms-col-xl-4"><h4 class="fpms-section-h">Mortality events</h4><ul class="fpms-padding-start-3">@for (x of b.mortalityEvents; track $index) { <li>{{ x }}</li> } @empty { <li class="fpms-muted">None recorded</li> }</ul></div>
+                                                <div class="fpms-col-xl-4"><h4 class="fpms-section-h">Treatments</h4><ul class="fpms-padding-start-3">@for (x of b.treatments; track $index) { <li>{{ x }}</li> } @empty { <li class="fpms-muted">None recorded</li> }</ul></div>
+                                                <div class="fpms-col-xl-4"><h4 class="fpms-section-h">Recent water quality</h4><ul class="fpms-padding-start-3">@for (x of b.recentWaterQuality; track $index) { <li>{{ x }}</li> } @empty { <li class="fpms-muted">None recorded</li> }</ul></div>
                                             </div>
                                         </div>
                                     </div>
@@ -528,7 +528,7 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
 
                 <ng-template #financeTable let-x>
                     <div class="fpms-table-scroll">
-                    <table class="fpms-data-table fpms-table-compact fpms-table-bordered w-auto">
+                    <table class="fpms-data-table fpms-table-compact fpms-table-bordered fpms-width-auto">
                         <tbody>
                             <tr><th>Revenue (sales, buyer's kg when re-weighed)</th><td class="fpms-align-end">{{ x?.revenue | php }}</td></tr>
                             <tr><th>Feed and chemicals used (lot cost)</th><td class="fpms-align-end">{{ x?.inventoryUsageCost | php }}</td></tr>

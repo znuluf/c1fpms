@@ -66,7 +66,7 @@ const KINDS = [
                 <div class="fpms-filter-row">
                     <label class="sl-field">
                         <span>Job</span>
-                        <select class="fpms-control fpms-control-compact w-auto" [(ngModel)]="kind" (ngModelChange)="pager.reset(); loadRuns()">
+                        <select class="fpms-control fpms-control-compact fpms-width-auto" [(ngModel)]="kind" (ngModelChange)="pager.reset(); loadRuns()">
                             <option [ngValue]="null">All jobs</option>
                             @for (k of kinds; track k.value) {
                                 <option [ngValue]="k.value">{{ k.label }}</option>

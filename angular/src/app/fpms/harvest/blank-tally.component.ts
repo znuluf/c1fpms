@@ -20,7 +20,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
             <div class="fpms-page-inner">
                 <div class="fpms-panel no-print">
                     <div class="fpms-panel-body">
-                        <div class="fpms-grid-row align-items-end">
+                        <div class="fpms-grid-row fpms-align-end-items">
                             <div class="fpms-field fpms-col-md-5 fpms-space-bottom-md-0">
                                 <label for="pond">Pond</label>
                                 <select id="pond" class="fpms-control" [(ngModel)]="pond">

@@ -232,7 +232,7 @@ function daysBetween(a: string, b: string): number {
                                         </dl>
                                     </div>
                                 } @empty {
-                                    <p class="fpms-muted px-3 fpms-space-y-2 fpms-no-bottom">{{ isPast(day()) ? 'No water quality entered for this day.' : 'None entered yet.' }}</p>
+                                    <p class="fpms-muted fpms-padding-inline-3 fpms-space-y-2 fpms-no-bottom">{{ isPast(day()) ? 'No water quality entered for this day.' : 'None entered yet.' }}</p>
                                 }
                             </div>
                         </div>
@@ -255,7 +255,7 @@ function daysBetween(a: string, b: string): number {
                                         <div class="fpms-muted">{{ l.recordedBy }}</div>
                                     </div>
                                 } @empty {
-                                    <p class="fpms-muted px-3 fpms-space-y-2 fpms-no-bottom">No growth sample, mortality, chemical, pond activity or note this day.</p>
+                                    <p class="fpms-muted fpms-padding-inline-3 fpms-space-y-2 fpms-no-bottom">No growth sample, mortality, chemical, pond activity or note this day.</p>
                                 }
                             </div>
                             @if (canRecordDay()) {

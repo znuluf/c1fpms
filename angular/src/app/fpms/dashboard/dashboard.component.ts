@@ -85,10 +85,10 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                     <i class="fas fa-tasks" aria-hidden="true"></i>
                                     Set up your farm
                                 </h3>
-                                <span class="float-right fpms-muted">{{ doneSetup().length }} of {{ doneSetup().length + pendingSetup().length }} done</span>
+                                <span class="fpms-float-end fpms-muted">{{ doneSetup().length }} of {{ doneSetup().length + pendingSetup().length }} done</span>
                             </div>
                             <div class="fpms-panel-body fpms-space-y-2">
-                                <ul class="list-unstyled fpms-no-bottom fpms-setup">
+                                <ul class="fpms-list-unstyled fpms-no-bottom fpms-setup">
                                     @for (t of pendingSetup(); track t.key) {
                                         <li>
                                             <i class="far fa-circle fpms-icon-gap" aria-hidden="true"></i>
@@ -99,12 +99,12 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                 @if (doneSetup().length) {
                                     <details class="fpms-setup-done fpms-space-top-1">
                                         <summary class="fpms-muted">Show {{ doneSetup().length }} finished</summary>
-                                        <ul class="list-unstyled fpms-no-bottom fpms-setup">
+                                        <ul class="fpms-list-unstyled fpms-no-bottom fpms-setup">
                                             @for (t of doneSetup(); track t.key) {
                                                 <li>
                                                     <i class="far fa-check-circle fpms-success fpms-icon-gap" aria-hidden="true"></i>
                                                     <span class="fpms-muted">{{ t.label }}</span>
-                                                    <span class="sr-only">(done)</span>
+                                                    <span class="fpms-visually-hidden">(done)</span>
                                                 </li>
                                             }
                                         </ul>
@@ -302,7 +302,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                     </div>
                                 </div>
                                 @if (!visible().length) {
-                                    <p class="fpms-muted px-4 fpms-space-y-3 fpms-no-bottom">No pond matches. Clear the search or the filters.</p>
+                                    <p class="fpms-muted fpms-padding-inline-4 fpms-space-y-3 fpms-no-bottom">No pond matches. Clear the search or the filters.</p>
                                 }
                                 <div class="fpms-pcal-foot">
                                     <div class="fpms-legend">
@@ -344,7 +344,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                                     (click)="toggleGroup(g.key)">
                                                     <i class="fas fa-fw" [ngClass]="g.icon" aria-hidden="true"></i>
                                                     <span class="t">{{ g.title }}</span>
-                                                    <span class="c">{{ g.rows.length }}<span class="sr-only"> {{ g.rows.length === 1 ? 'item' : 'items' }}</span></span>
+                                                    <span class="c">{{ g.rows.length }}<span class="fpms-visually-hidden"> {{ g.rows.length === 1 ? 'item' : 'items' }}</span></span>
                                                     <i class="fas fa-chevron-down fpms-att-chev" aria-hidden="true"></i>
                                                 </button>
                                                 @if (openGroup() === g.key) {
@@ -353,7 +353,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                                             <li>
                                                                 <div class="what">
                                                                     <strong>{{ r.title }}</strong>
-                                                                    @if (r.ownerOnly) { <span class="fpms-label badge-secondary fpms-icon-gap">Owner</span> }
+                                                                    @if (r.ownerOnly) { <span class="fpms-label fpms-label-secondary fpms-icon-gap">Owner</span> }
                                                                     <div class="where">
                                                                         @if (r.whereLink) { <a [routerLink]="r.whereLink">{{ r.where }}</a> } @else { {{ r.where }} }
                                                                         @if (r.since) { · {{ r.since }} }

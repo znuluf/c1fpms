@@ -14,7 +14,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
             <div class="fpms-page-inner">
                 <!-- Filters on the page ground; each date box wide enough for its whole date (DEC-115). -->
                 <div class="fpms-list-filters">
-                        <div class="fpms-grid-row align-items-end">
+                        <div class="fpms-grid-row fpms-align-end-items">
                             <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                 <label for="from">From</label>
                                 <input id="from" type="date" class="fpms-control" [(ngModel)]="f.from" />
@@ -50,7 +50,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <button type="button" role="tab" class="fpms-tab" [class.active]="tab === 'changes'" [attr.aria-selected]="tab === 'changes'" (click)="tab = 'changes'">Data changes</button>
                     <button type="button" role="tab" class="fpms-tab" [class.active]="tab === 'actions'" [attr.aria-selected]="tab === 'actions'" (click)="tab = 'actions'">User actions</button>
                 </div>
-                <div class="fpms-panel card-tabs-body">
+                <div class="fpms-panel ">
                     <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!changes() || !actions()) {
                             <fpms-loading></fpms-loading>

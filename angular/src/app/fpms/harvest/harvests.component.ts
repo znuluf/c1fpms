@@ -95,7 +95,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                             </fpms-empty>
                         } @else {
                             <table class="fpms-data-table fpms-table-hover fpms-no-bottom fpms-harvest-table">
-                                <caption class="sr-only">Harvests, with where each one's kilograms went and its sale status</caption>
+                                <caption class="fpms-visually-hidden">Harvests, with where each one's kilograms went and its sale status</caption>
                                 <thead>
                                     <tr>
                                         <!-- The lot code sits under the date it was harvested (DEC-99). -->
@@ -104,7 +104,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                         <th scope="col" class="fpms-align-end" fpmsSort="totalKg" [pager]="pager" (sorted)="load()">Total kg · type</th>
                                         @if (grading) { <th scope="col">Size grades</th> }
                                         <th scope="col" fpmsSort="unaccountedKg" [pager]="pager" (sorted)="load()">Sales · where it went</th>
-                                        <th scope="col"><span class="sr-only">Actions</span></th>
+                                        <th scope="col"><span class="fpms-visually-hidden">Actions</span></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -148,7 +148,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                             }
                                             <!-- The sale status heads the bar it sums up, instead of a column of its own (DEC-99). -->
                                             <td style="min-width: 10.5rem">
-                                                <fpms-badge class="d-inline-block fpms-space-bottom-1" [text]="statusLabel(h)"></fpms-badge>
+                                                <fpms-badge class="fpms-inline-block fpms-space-bottom-1" [text]="statusLabel(h)"></fpms-badge>
                                                 <div class="fpms-balance" aria-hidden="true">
                                                     @if (h.soldKg > 0) { <div class="sold" [style.flex-grow]="h.soldKg"></div> }
                                                     @if (h.notSoldKg > 0) { <div class="notsold" [style.flex-grow]="h.notSoldKg"></div> }

@@ -39,7 +39,7 @@ const CUSTOM = 'custom';
                             @if (!s.requiredPermits.length) {
                                 <span class="fpms-muted fpms-small">No preset is marked "Required". Mark one under Categories &amp; presets to get reminders.</span>
                             }
-                            <div class="fpms-flex flex-wrap">
+                            <div class="fpms-flex fpms-wrap">
                                 @for (r of s.requiredPermits; track r.presetId) {
                                     <div class="fpms-space-end-5 fpms-space-bottom-1">
                                         <i class="fas fpms-icon-gap" [class.fa-check-circle]="r.isSatisfied" [class.fpms-success]="r.isSatisfied" [class.fa-exclamation-circle]="!r.isSatisfied" [class.fpms-warning-text]="!r.isSatisfied" aria-hidden="true"></i>
@@ -69,8 +69,8 @@ const CUSTOM = 'custom';
                         <div class="fpms-panel-head"><h3 class="fpms-panel-title">Categories and preset titles</h3></div>
                         <div class="fpms-panel-body fpms-space-0">
                             @for (c of categories(); track c.id) {
-                                <div class="border-bottom fpms-space-2">
-                                    <div class="fpms-grid-row align-items-center">
+                                <div class="fpms-border-bottom fpms-space-2">
+                                    <div class="fpms-grid-row fpms-align-center-items">
                                         <div class="fpms-col-md-5 fpms-space-bottom-1">
                                             <input class="fpms-control fpms-control-compact fpms-weight-bold" [(ngModel)]="c.name" maxlength="100" [attr.aria-label]="'Category name'" />
                                         </div>
@@ -87,14 +87,14 @@ const CUSTOM = 'custom';
                                             </div>
                                         </div>
                                         <div class="fpms-col-auto fpms-space-bottom-1 fpms-small fpms-muted">{{ c.documentCount }} current</div>
-                                        <div class="col fpms-align-end fpms-space-bottom-1">
+                                        <div class="fpms-grid-col fpms-align-end fpms-space-bottom-1">
                                             <button class="fpms-button fpms-button-compact fpms-button-outline" [disabled]="busy() || !c.name" (click)="saveCategory(c)">Save category</button>
                                         </div>
                                     </div>
                                     <div class="fpms-table-scroll">
                                     <table class="fpms-data-table fpms-table-compact fpms-no-bottom fpms-space-top-1">
                                         <thead class="fpms-small fpms-muted">
-                                            <tr><th>Preset title</th><th>Default issuing agency</th><th title="Show a reminder when there is no active record">Required</th><th>Active</th><th><span class="sr-only">Actions</span></th></tr>
+                                            <tr><th>Preset title</th><th>Default issuing agency</th><th title="Show a reminder when there is no active record">Required</th><th>Active</th><th><span class="fpms-visually-hidden">Actions</span></th></tr>
                                         </thead>
                                         <tbody>
                                             @for (p of c.presets; track p.id) {
@@ -118,7 +118,7 @@ const CUSTOM = 'custom';
                                     </div>
                                 </div>
                             }
-                            <div class="fpms-space-2 fpms-grid-row align-items-center">
+                            <div class="fpms-space-2 fpms-grid-row fpms-align-center-items">
                                 <div class="fpms-col-md-5 fpms-space-bottom-1"><input class="fpms-control fpms-control-compact" placeholder="New category name" aria-label="New category name" [(ngModel)]="newCategory.name" maxlength="100" /></div>
                                 <div class="fpms-col-auto fpms-space-bottom-1">
                                     <div class="fpms-check fpms-check-box">
@@ -126,7 +126,7 @@ const CUSTOM = 'custom';
                                         <label class="fpms-check-label fpms-small" for="rx-new">Requires expiry date</label>
                                     </div>
                                 </div>
-                                <div class="col fpms-align-end fpms-space-bottom-1"><button class="fpms-button fpms-button-compact fpms-button-primary" [disabled]="busy() || !newCategory.name" (click)="saveCategory(newCategory, true)">Add category</button></div>
+                                <div class="fpms-grid-col fpms-align-end fpms-space-bottom-1"><button class="fpms-button fpms-button-compact fpms-button-primary" [disabled]="busy() || !newCategory.name" (click)="saveCategory(newCategory, true)">Add category</button></div>
                             </div>
                         </div>
                         <div class="fpms-panel-foot fpms-small fpms-muted">"Requires expiry date" stops records in that category from being marked perpetual. "Required" presets show a reminder when no active record exists. Changes are recorded in the activity log.</div>
@@ -135,7 +135,7 @@ const CUSTOM = 'custom';
 
                 <!-- Filters on the page ground, the list in one panel; five columns so it fits 1,000 px (DEC-115). -->
                 <div class="fpms-list-filters">
-                        <div class="fpms-grid-row align-items-center">
+                        <div class="fpms-grid-row fpms-align-center-items">
                             <div class="fpms-col-md-6 fpms-space-bottom-2">
                                 <input type="search" class="fpms-control" placeholder="Search title, reference number or agency" aria-label="Search" [(ngModel)]="search" (ngModelChange)="searchChanged()" />
                             </div>
@@ -181,7 +181,7 @@ const CUSTOM = 'custom';
                         } @else {
                             <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
-                                    <tr><th>Document</th><th>Issued by</th><th>Status · expires</th><th><span class="sr-only">Actions</span></th></tr>
+                                    <tr><th>Document</th><th>Issued by</th><th>Status · expires</th><th><span class="fpms-visually-hidden">Actions</span></th></tr>
                                 </thead>
                                 <tbody>
                                     @for (d of documents(); track d.id) {

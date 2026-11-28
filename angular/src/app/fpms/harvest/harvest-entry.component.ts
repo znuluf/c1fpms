@@ -57,9 +57,9 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                 </div>
                             </div>
                             @if (whereRows().length) {
-                                <div class="fpms-panel-body fpms-space-0 fpms-table-scroll border-top">
+                                <div class="fpms-panel-body fpms-space-0 fpms-table-scroll fpms-border-top">
                                     <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
-                                        <caption class="sr-only">Where this harvest went</caption>
+                                        <caption class="fpms-visually-hidden">Where this harvest went</caption>
                                         <thead><tr><th>Went to</th><th>Dispatch receipt</th><th class="fpms-align-end">Crates</th><th class="fpms-align-end">Kg</th><th class="fpms-align-end">Amount</th></tr></thead>
                                         <tbody>
                                             @for (r of whereRows(); track $index) {
@@ -84,7 +84,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                         <div class="fpms-alert fpms-alert-neutral fpms-small"><i class="fas fa-lock fpms-icon-gap"></i>{{ batch?.isReadOnly ? 'The batch is Closed; this harvest is read-only.' : 'You can only edit harvests you recorded.' }}</div>
                     }
                     @if (restoredAt) {
-                        <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                        <div class="fpms-alert fpms-alert-info fpms-flex fpms-align-center-items" role="status">
                             <i class="fas fa-history fpms-icon-gap"></i>
                             <span class="fpms-margin-auto-end">Your unsaved harvest from {{ restoredAt | farmDateTime }} was restored.</span>
                             <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="discardDraft()">Discard it</button>
@@ -238,7 +238,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                 <div class="fpms-panel-head">
                                     <a href="javascript:;" class="fpms-panel-title fpms-text-reset" role="button" (click)="showCrates = !showCrates" [attr.aria-expanded]="showCrates">
                                         <i class="fas fpms-icon-gap" [class.fa-chevron-right]="!showCrates" [class.fa-chevron-down]="showCrates" aria-hidden="true"></i>Crate tally (optional)
-                                        @if (hasCrates()) { <span class="fpms-label badge-secondary fpms-icon-gap">{{ m.crates.length }} · {{ m.totalKg | num: 3 }} kg</span> }
+                                        @if (hasCrates()) { <span class="fpms-label fpms-label-secondary fpms-icon-gap">{{ m.crates.length }} · {{ m.totalKg | num: 3 }} kg</span> }
                                     </a>
                                 </div>
                                 @if (showCrates) {
@@ -265,7 +265,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                                 <th scope="col" class="fpms-align-end">Shrimp kg</th>
                                                             }
                                                             <th scope="col" class="fpms-align-end">Running total</th>
-                                                            <th scope="col"><span class="sr-only">Remove</span></th>
+                                                            <th scope="col"><span class="fpms-visually-hidden">Remove</span></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -327,7 +327,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             </div>
                                             <p class="fpms-small fpms-muted fpms-space-bottom-2">Press Enter after each weight to go to the next crate; on the last crate, Enter adds a new one of the same type and grade.</p>
                                         }
-                                        <div class="fpms-grid-row align-items-end">
+                                        <div class="fpms-grid-row fpms-align-end-items">
                                             <div class="fpms-field fpms-col-auto fpms-space-bottom-2">
                                                 <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="addOneCrate()" [disabled]="m.crates.length >= maxCrates"><i class="fas fa-plus fpms-icon-gap"></i>Add crate</button>
                                             </div>
@@ -372,7 +372,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                 <div class="fpms-panel-body fpms-space-0">
                                     <div class="fpms-table-scroll">
                                     <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
-                                        <thead><tr><th>Size grade</th><th style="width: 9rem">Kg</th>@if (!isNew) {<th class="fpms-align-end">Sold</th>}<th><span class="sr-only">Actions</span></th></tr></thead>
+                                        <thead><tr><th>Size grade</th><th style="width: 9rem">Kg</th>@if (!isNew) {<th class="fpms-align-end">Sold</th>}<th><span class="fpms-visually-hidden">Actions</span></th></tr></thead>
                                         <tbody>
                                             @for (g of m.gradeLines; track $index) {
                                                 <tr>
@@ -402,9 +402,9 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     </table>
                                     </div>
                                     @if (gradeOver()) {
-                                        <p class="fpms-danger fpms-small px-3 fpms-space-bottom-2">Graded kilograms cannot exceed the harvest total.</p>
+                                        <p class="fpms-danger fpms-small fpms-padding-inline-3 fpms-space-bottom-2">Graded kilograms cannot exceed the harvest total.</p>
                                     } @else if (m.totalKg > 0 && gradeKg() > 0 && gradeKg() < m.totalKg) {
-                                        <p class="fpms-warning-text fpms-small px-3 fpms-space-bottom-2">{{ m.totalKg - gradeKg() | num: 3 }} kg is not graded. Only graded kg can be sold; add it as "Ungraded / mixed" to sell it.</p>
+                                        <p class="fpms-warning-text fpms-small fpms-padding-inline-3 fpms-space-bottom-2">{{ m.totalKg - gradeKg() | num: 3 }} kg is not graded. Only graded kg can be sold; add it as "Ungraded / mixed" to sell it.</p>
                                     }
                                 </div>
                             </div>
@@ -427,7 +427,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     }
                                     @if (isNew) {
                                         @for (d of m.disposals; track $index) {
-                                            <div class="fpms-grid-row align-items-end">
+                                            <div class="fpms-grid-row fpms-align-end-items">
                                                 <div class="fpms-field fpms-col-4">
                                                     <label class="fpms-small" [for]="'dk' + $index">Kg</label>
                                                     <input [id]="'dk' + $index" type="number" min="0.001" step="0.001" class="fpms-control fpms-control-compact" [name]="'dk' + $index" [(ngModel)]="d.kg" (ngModelChange)="keepDraft()" required />
@@ -443,7 +443,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                     <input [id]="'dn' + $index" class="fpms-control fpms-control-compact" [name]="'dn' + $index" [(ngModel)]="d.note" (ngModelChange)="keepDraft()" maxlength="300" />
                                                 </div>
                                                 <div class="fpms-field fpms-col-1">
-                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger px-0" (click)="m.disposals.splice($index, 1); keepDraft()" aria-label="Remove"><i class="fas fa-times"></i></button>
+                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger fpms-padding-inline-0" (click)="m.disposals.splice($index, 1); keepDraft()" aria-label="Remove"><i class="fas fa-times"></i></button>
                                                 </div>
                                             </div>
                                         }
@@ -470,7 +470,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                             <p class="fpms-small fpms-muted">No not-sold outcomes have been recorded.</p>
                                         }
                                         @if (h.unaccountedKg > 0 && !readOnly) {
-                                            <div class="fpms-grid-row align-items-end">
+                                            <div class="fpms-grid-row fpms-align-end-items">
                                                 <div class="fpms-field fpms-col-md-3">
                                                     <label for="newDisposalKg">Kg to record</label>
                                                     <input id="newDisposalKg" name="newDisposalKg" type="number" min="0.001" [max]="h.unaccountedKg" step="0.001" class="fpms-control" [(ngModel)]="disposalKg" />

@@ -38,7 +38,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                     <input type="radio" class="fpms-check-input" name="user" [id]="'u' + u.userId" [checked]="selected?.userId === u.userId" (change)="select(u)" />
                                                     <label class="fpms-check-label" [for]="'u' + u.userId"><strong>{{ u.fullName }}</strong></label>
                                                 </div>
-                                                <div class="fpms-muted pl-4">{{ u.userName }}</div>
+                                                <div class="fpms-muted fpms-padding-start-4">{{ u.userName }}</div>
                                             </td>
                                             <td>{{ u.roleName }}</td>
                                             <td class="fpms-badge-stack">
