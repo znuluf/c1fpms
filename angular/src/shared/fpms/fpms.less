@@ -20,12 +20,7 @@ a:hover {
     color: var(--fpms-warning) !important;
 }
 
-.fpms-badge {
-    font-size: 0.875rem;
-    font-weight: 600;
-    padding: 0.3em 0.55em;
-    margin-right: 0.15rem;
-}
+
 
 
 @media (max-width: 1024px) {
@@ -132,27 +127,7 @@ a:hover {
         box-shadow: 0 2px 8px rgba(36, 74, 99, 0.18);
     }
 }
-.fpms-status-path {
-    display: flex;
-    flex-wrap: wrap;
-    span {
-        padding: 0.1rem 0.5rem;
-        margin-right: 2px;
-        background: var(--fpms-ground-muted);
-        color: var(--fpms-muted);
-        clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%, 6px 50%);
-        padding-left: 0.7rem;
-        &.done {
-            background: var(--fpms-soft-action-hover-bg);
-            color: var(--fpms-primary);
-        }
-        &.current {
-            background: var(--fpms-accent);
-            color: var(--paper);
-            font-weight: 600;
-        }
-    }
-}
+
 
 // ---- Registration steps
 .fpms-steps {
@@ -1763,40 +1738,7 @@ a.fpms-lw-tile:hover {
         font-variant-numeric: tabular-nums;
     }
 }
-// Notices: one line each, icon first, inside the band instead of a full-width alert per notice.
-.fpms-notices {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-top: 1px solid var(--fpms-line);
-    > li {
-        display: flex;
-        gap: 0.65rem;
-        align-items: baseline;
-        padding: 0.65rem 1.5rem;
-        & + li {
-            border-top: 1px solid var(--fpms-line);
-        }
-        > i {
-            width: 1rem;
-            text-align: center;
-            color: var(--fpms-muted);
-            flex: none;
-        }
-    }
-    > li.warn {
-        background: var(--fpms-warn-bg);
-        > i {
-            color: var(--fpms-warning);
-        }
-    }
-    > li.error {
-        background: var(--fpms-error-50);
-        > i {
-            color: var(--fpms-error);
-        }
-    }
-}
+
 
 // Section heading inside a panel or on the page ground: a label and a rule, not a card header.
 .fpms-section-h {
@@ -1925,17 +1867,7 @@ a.fpms-pond-tag:hover {
 .fpms-lt {
     row-gap: 0.5rem;
 }
-// Several status badges in one table cell stack, one per line, instead of widening the column.
-.fpms-badge-stack {
-    > fpms-badge,
-    > .badge {
-        display: table;
-        margin: 0 0 0.25rem;
-    }
-    > :last-child {
-        margin-bottom: 0;
-    }
-}
+
 
 // ---- A figure that opens how it is worked out (DEC-101): the number is a button with a dotted underline and a small
 // chevron, and its working opens in a panel under the figures.

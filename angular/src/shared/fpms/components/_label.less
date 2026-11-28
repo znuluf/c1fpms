@@ -1,0 +1,133 @@
+// FPMS-owned labels, badges, notices and status indicators.
+// Keep framework .badge/.alert compatibility styles in theme.less.
+
+// Shared badge base, followed by the existing compact badge dimensions.
+.fpms-badge {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.3em 0.55em;
+    margin-right: 0.15rem;
+}
+
+.fpms-badge {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    height: 1.5rem;
+    padding: 0 0.625rem;
+    font-size: 0.75rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.fpms-status-path {
+    display: flex;
+    flex-wrap: wrap;
+    span {
+        padding: 0.1rem 0.5rem;
+        margin-right: 2px;
+        background: var(--fpms-ground-muted);
+        color: var(--fpms-muted);
+        clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%, 6px 50%);
+        padding-left: 0.7rem;
+        &.done {
+            background: var(--fpms-soft-action-hover-bg);
+            color: var(--fpms-primary);
+        }
+        &.current {
+            background: var(--fpms-accent);
+            color: var(--paper);
+            font-weight: 600;
+        }
+    }
+}
+
+// Notices: one line each, icon first, inside the band instead of a full-width alert per notice.
+.fpms-notices {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--fpms-line);
+    > li {
+        display: flex;
+        gap: 0.65rem;
+        align-items: baseline;
+        padding: 0.65rem 1.5rem;
+        & + li {
+            border-top: 1px solid var(--fpms-line);
+        }
+        > i {
+            width: 1rem;
+            text-align: center;
+            color: var(--fpms-muted);
+            flex: none;
+        }
+    }
+    > li.warn {
+        background: var(--fpms-warn-bg);
+        > i {
+            color: var(--fpms-warning);
+        }
+    }
+    > li.error {
+        background: var(--fpms-error-50);
+        > i {
+            color: var(--fpms-error);
+        }
+    }
+}
+
+// Several status badges in one table cell stack, one per line, instead of widening the column.
+.fpms-badge-stack {
+    > fpms-badge,
+    > .badge {
+        display: table;
+        margin: 0 0 0.25rem;
+    }
+    > :last-child {
+        margin-bottom: 0;
+    }
+}
+
+// ---- Cycle status path
+.fpms-status-path span {
+    background: var(--fpms-control-disabled-bg);
+}
+.fpms-status-path span.done {
+    background: var(--fpms-tide-50);
+    color: var(--fpms-primary);
+}
+.fpms-status-path span.current {
+    background: var(--fpms-primary);
+    color: var(--paper);
+}
+
+.fpms-alert { padding: var(--s3) var(--s4); border: 1px solid var(--line); border-radius: var(--r-md); }
+
+.fpms-alert-warning { color: var(--orange-deep); background: var(--orange-tint); border-color: var(--orange-soft); }
+
+.fpms-alert-success { color: var(--green-deep); background: var(--green-tint); border-color: var(--green-soft); }
+
+.fpms-label { display: inline-flex; align-items: center; padding: var(--s1) var(--s2); border-radius: 999px; font-size: var(--fpms-text-sm); font-weight: 600; }
+
+.fpms-label-info { color: var(--blue-deep); background: var(--blue-soft); }
+
+.fpms-label-success { color: var(--green-deep); background: var(--green-soft); }
+
+.fpms-label-warning { color: var(--orange-deep); background: var(--orange-soft); }
+
+.fpms-alert-danger { color: var(--red-deep); background: var(--red-tint); border-color: var(--red-soft); }
+
+.fpms-alert-neutral { color: var(--ink-2); background: var(--bg); border-color: var(--line); }
+
+.fpms-alert-info { color: var(--blue-deep); background: var(--blue-tint); border-color: var(--blue-soft); }
+
+.fpms-label-secondary { color: var(--ink-2); background: var(--bg); }
+
+.fpms-label-dark { color: var(--paper); background: var(--ink-2); }
+
+.fpms-label-danger { color: var(--red-deep); background: var(--red-tint); }
+
+.fpms-label-warning { color: var(--ink-2); background: var(--orange-tint); }
+
+.fpms-label-success { color: var(--green-deep); background: var(--green-tint); }
