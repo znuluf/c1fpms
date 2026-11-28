@@ -17,8 +17,8 @@ const DRAFT = 'log-entry';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header [narrow]="!pondDay" [title]="isNew ? 'Record operations' : (log ? (log.logType | label: L.LogTypes) + ' log' : 'Log entry')" [subtitle]="subtitle" [backLink]="isNew && !cameFromBatch ? undefined : batch ? ['/app/production/batches', batch.id] : '/app/logbook'" [backLabel]="batch ? 'Batch ' + batch.batchCode : 'Logbooks'"></fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid" [class.fpms-narrow]="!pondDay">
+        <section class="fpms-page">
+            <div class="fpms-page-inner" [class.fpms-narrow]="!pondDay">
                 @if (loading) {
                     <fpms-loading></fpms-loading>
                 } @else {
