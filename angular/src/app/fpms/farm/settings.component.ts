@@ -14,138 +14,138 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
     template: `
         <fpms-page-header [narrow]="true" title="Farm settings" subtitle="Production defaults, monitoring practices and system preferences."></fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
+            <div class="fpms-page-inner fpms-narrow">
                 @if (!p) {
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (canEdit) {
                         <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="farm settings" novalidate>
                             <fieldset [disabled]="busy()">
-                                <div class="card">
-                                    <div class="card-header"><h3 class="card-title">Production settings</h3></div>
-                                    <div class="card-body">
-                                        <div class="form-group">
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title">Production settings</h3></div>
+                                    <div class="fpms-panel-body">
+                                        <div class="fpms-field">
                                             <label for="fsys">Default farming system</label>
-                                            <select id="fsys" class="form-control" name="farmingSystem" [(ngModel)]="p.farmingSystem">
+                                            <select id="fsys" class="fpms-control" name="farmingSystem" [(ngModel)]="p.farmingSystem">
                                                 @for (o of Options.farmingSystem; track o.value) {
                                                     <option [ngValue]="o.value">{{ o.label }}</option>
                                                 }
                                             </select>
-                                            <small class="form-text text-muted">Used by each pond unless that pond has its own farming system.</small>
+                                            <small class="fpms-help fpms-muted">Used by each pond unless that pond has its own farming system.</small>
                                         </div>
-                                        <div class="form-row mt-3">
-                                            <div class="form-group col-md-6">
+                                        <div class="fpms-grid-row fpms-space-top-3">
+                                            <div class="fpms-field fpms-col-md-6">
                                                 <label for="habw">Default target harvest ABW (g)</label>
-                                                <input id="habw" type="number" min="0.1" max="60" step="0.1" class="form-control" name="defaultHarvestTargetAbwG" [(ngModel)]="p.defaultHarvestTargetAbwG" />
-                                                <small class="form-text text-muted">Optional farm default. Farmers can adjust the target for each batch before stocking.</small>
+                                                <input id="habw" type="number" min="0.1" max="60" step="0.1" class="fpms-control" name="defaultHarvestTargetAbwG" [(ngModel)]="p.defaultHarvestTargetAbwG" />
+                                                <small class="fpms-help fpms-muted">Optional farm default. Farmers can adjust the target for each batch before stocking.</small>
                                             </div>
-                                            <div class="form-group col-md-6">
+                                            <div class="fpms-field fpms-col-md-6">
                                                 <label for="mcd">Maximum culture duration (DOC)</label>
                                                 <div class="input-group">
-                                                    <input id="mcd" type="number" min="1" max="180" step="1" class="form-control" name="defaultMaxCultureDays" [(ngModel)]="p.defaultMaxCultureDays" required />
+                                                    <input id="mcd" type="number" min="1" max="180" step="1" class="fpms-control" name="defaultMaxCultureDays" [(ngModel)]="p.defaultMaxCultureDays" required />
                                                     <div class="input-group-append"><span class="input-group-text">days</span></div>
                                                 </div>
-                                                <small class="form-text text-muted">Default is 90 days. This is a maximum time limit, not a minimum harvest age.</small>
+                                                <small class="fpms-help fpms-muted">Default is 90 days. This is a maximum time limit, not a minimum harvest age.</small>
                                             </div>
                                         </div>
-                                        <div class="form-group mb-0">
+                                        <div class="fpms-field fpms-no-bottom">
                                             <span class="fpms-group-label" id="ftimes-l">Default feeding schedule</span>
                                             <fpms-time-list name="feedingTimes" [(ngModel)]="p.feedingTimes"></fpms-time-list>
-                                            <small class="form-text text-muted">One feeding per day for each time, from 1 to 8. The feeding sheet uses this schedule.</small>
+                                            <small class="fpms-help fpms-muted">One feeding per day for each time, from 1 to 8. The feeding sheet uses this schedule.</small>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-header"><h3 class="card-title">Monitoring settings</h3></div>
-                                    <div class="card-body">
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title">Monitoring settings</h3></div>
+                                    <div class="fpms-panel-body">
                                         <div class="fpms-setting">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="wqd" name="waterQualityDaily" [(ngModel)]="p.waterQualityDaily" />
-                                                <label class="custom-control-label" for="wqd">Water quality is tested every day</label>
+                                            <div class="fpms-check fpms-check-box">
+                                                <input type="checkbox" class="fpms-check-input" id="wqd" name="waterQualityDaily" [(ngModel)]="p.waterQualityDaily" />
+                                                <label class="fpms-check-label" for="wqd">Water quality is tested every day</label>
                                             </div>
-                                            <small class="form-text text-muted">Turn this off if the farm tests water only on selected days. A day without a reading will not be counted as a missing daily test.</small>
+                                            <small class="fpms-help fpms-muted">Turn this off if the farm tests water only on selected days. A day without a reading will not be counted as a missing daily test.</small>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-header d-flex align-items-center">
-                                        <h3 class="card-title mr-auto">Base ABW pricing</h3>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAbwScheme()">Add scheme</button>
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-head fpms-flex align-items-center">
+                                        <h3 class="fpms-panel-title fpms-margin-auto-end">Base ABW pricing</h3>
+                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-outline" (click)="addAbwScheme()">Add scheme</button>
                                     </div>
-                                    <div class="card-body">
-                                        <p class="small text-muted">Create reusable pricing presets for sales. Each sale copies the selected terms, so later changes here do not alter saved sales. The base price applies at the stated ABW; the per-gram adjustment works above and below that ABW.</p>
+                                    <div class="fpms-panel-body">
+                                        <p class="fpms-small fpms-muted">Create reusable pricing presets for sales. Each sale copies the selected terms, so later changes here do not alter saved sales. The base price applies at the stated ABW; the per-gram adjustment works above and below that ABW.</p>
                                         @for (s of p.baseAbwPricingSchemes; track s.id; let i = $index) {
-                                            <div class="border rounded p-2 mb-2">
-                                                <div class="form-row align-items-end">
-                                                    <div class="form-group col-md-3">
+                                            <div class="fpms-border rounded fpms-space-2 fpms-space-bottom-2">
+                                                <div class="fpms-grid-row align-items-end">
+                                                    <div class="fpms-field fpms-col-md-3">
                                                         <label [for]="'abwn' + i">Scheme name</label>
-                                                        <input [id]="'abwn' + i" class="form-control" [name]="'abwn' + i" [(ngModel)]="s.name" required maxlength="60" placeholder="e.g. Base 10g" />
+                                                        <input [id]="'abwn' + i" class="fpms-control" [name]="'abwn' + i" [(ngModel)]="s.name" required maxlength="60" placeholder="e.g. Base 10g" />
                                                     </div>
-                                                    <div class="form-group col-md-3">
+                                                    <div class="fpms-field fpms-col-md-3">
                                                         <label [for]="'abwp' + i">Base price (₱/kg)</label>
-                                                        <input [id]="'abwp' + i" type="number" min="0" step="0.01" class="form-control" [name]="'abwp' + i" [(ngModel)]="s.basePricePerKg" required />
+                                                        <input [id]="'abwp' + i" type="number" min="0" step="0.01" class="fpms-control" [name]="'abwp' + i" [(ngModel)]="s.basePricePerKg" required />
                                                     </div>
-                                                    <div class="form-group col-md-2">
+                                                    <div class="fpms-field fpms-col-md-2">
                                                         <label [for]="'abwg' + i">Base ABW (g)</label>
-                                                        <input [id]="'abwg' + i" type="number" min="0.01" max="60" step="0.01" class="form-control" [name]="'abwg' + i" [(ngModel)]="s.baseAbwG" required />
+                                                        <input [id]="'abwg' + i" type="number" min="0.01" max="60" step="0.01" class="fpms-control" [name]="'abwg' + i" [(ngModel)]="s.baseAbwG" required />
                                                     </div>
-                                                    <div class="form-group col-md-2">
+                                                    <div class="fpms-field fpms-col-md-2">
                                                         <label [for]="'abws' + i">Adjustment (₱/g)</label>
-                                                        <input [id]="'abws' + i" type="number" min="0" step="0.01" class="form-control" [name]="'abws' + i" [(ngModel)]="s.stepPerG" required />
+                                                        <input [id]="'abws' + i" type="number" min="0" step="0.01" class="fpms-control" [name]="'abws' + i" [(ngModel)]="s.stepPerG" required />
                                                     </div>
-                                                    <div class="form-group col-md-1 fpms-check-cell">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" [id]="'abwa' + i" [name]="'abwa' + i" [(ngModel)]="s.isActive" />
-                                                            <label class="custom-control-label" [for]="'abwa' + i">Active</label>
+                                                    <div class="fpms-field fpms-col-md-1 fpms-check-cell">
+                                                        <div class="fpms-check fpms-check-box">
+                                                            <input type="checkbox" class="fpms-check-input" [id]="'abwa' + i" [name]="'abwa' + i" [(ngModel)]="s.isActive" />
+                                                            <label class="fpms-check-label" [for]="'abwa' + i">Active</label>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group col-md-1 text-right">
-                                                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeAbwScheme(i)" aria-label="Remove scheme"><i class="fas fa-times"></i></button>
+                                                    <div class="fpms-field fpms-col-md-1 fpms-align-end">
+                                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-danger" (click)="removeAbwScheme(i)" aria-label="Remove scheme"><i class="fas fa-times"></i></button>
                                                     </div>
                                                 </div>
-                                                <small class="text-muted">At {{ s.baseAbwG || '—' }}g: {{ (s.basePricePerKg || 0) | php }}/kg; {{ (s.stepPerG || 0) | php }} per gram above or below.</small>
+                                                <small class="fpms-muted">At {{ s.baseAbwG || '—' }}g: {{ (s.basePricePerKg || 0) | php }}/kg; {{ (s.stepPerG || 0) | php }} per gram above or below.</small>
                                             </div>
                                         } @empty {
-                                            <p class="text-muted mb-0">No Base ABW schemes configured yet. Add one to make it available when recording a sale.</p>
+                                            <p class="fpms-muted fpms-no-bottom">No Base ABW schemes configured yet. Add one to make it available when recording a sale.</p>
                                         }
-                                        <small class="form-text text-muted">Up to 20 schemes. You can add any base ABW, not only 5g, 10g or 15g. Deactivate a scheme to hide it from new sales without changing historical sales.</small>
+                                        <small class="fpms-help fpms-muted">Up to 20 schemes. You can add any base ABW, not only 5g, 10g or 15g. Deactivate a scheme to hide it from new sales without changing historical sales.</small>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-header"><h3 class="card-title">System preferences</h3></div>
-                                    <div class="card-body">
-                                        <div class="form-row">
-                                            <div class="form-group col-md-6">
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title">System preferences</h3></div>
+                                    <div class="fpms-panel-body">
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-md-6">
                                                 <label for="alert">Permit expiry reminder</label>
                                                 <div class="input-group">
-                                                    <input id="alert" type="number" min="1" max="365" class="form-control" name="documentExpiryAlertDays" [(ngModel)]="p.documentExpiryAlertDays" required />
+                                                    <input id="alert" type="number" min="1" max="365" class="fpms-control" name="documentExpiryAlertDays" [(ngModel)]="p.documentExpiryAlertDays" required />
                                                     <div class="input-group-append"><span class="input-group-text">days before expiry</span></div>
                                                 </div>
-                                                <small class="form-text text-muted">Permits expiring within this period are marked as expiring soon.</small>
+                                                <small class="fpms-help fpms-muted">Permits expiring within this period are marked as expiring soon.</small>
                                             </div>
-                                            <div class="form-group col-md-6">
+                                            <div class="fpms-field fpms-col-md-6">
                                                 <label for="ufu">Follow up unsold shrimp</label>
                                                 <div class="input-group">
-                                                    <input id="ufu" type="number" min="1" max="60" step="1" class="form-control" name="unsoldFollowUpDays" [(ngModel)]="p.unsoldFollowUpDays" required />
+                                                    <input id="ufu" type="number" min="1" max="60" step="1" class="fpms-control" name="unsoldFollowUpDays" [(ngModel)]="p.unsoldFollowUpDays" required />
                                                     <div class="input-group-append"><span class="input-group-text">days after harvest</span></div>
                                                 </div>
-                                                <small class="form-text text-muted">Shrimp not yet sold or accounted for are listed on the dashboard after this many days. Each harvest can use its own day.</small>
+                                                <small class="fpms-help fpms-muted">Shrimp not yet sold or accounted for are listed on the dashboard after this many days. Each harvest can use its own day.</small>
                                             </div>
-                                            <div class="form-group col-md-6">
+                                            <div class="fpms-field fpms-col-md-6">
                                                 <label for="tz">Farm time zone</label>
-                                                <input id="tz" type="text" class="form-control" name="timeZone" [(ngModel)]="p.timeZone" required maxlength="64" placeholder="Asia/Manila" />
-                                                <small class="form-text text-muted">IANA time zone used for farm dates and reports, for example Asia/Manila.</small>
+                                                <input id="tz" type="text" class="fpms-control" name="timeZone" [(ngModel)]="p.timeZone" required maxlength="64" placeholder="Asia/Manila" />
+                                                <small class="fpms-help fpms-muted">IANA time zone used for farm dates and reports, for example Asia/Manila.</small>
                                             </div>
-                                            <div class="form-group col-md-6">
+                                            <div class="fpms-field fpms-col-md-6">
                                                 <label for="dord">Date display</label>
-                                                <select id="dord" class="form-control" name="dateOrder" [(ngModel)]="p.dateOrder">
+                                                <select id="dord" class="fpms-control" name="dateOrder" [(ngModel)]="p.dateOrder">
                                                     <option [ngValue]="1">Month first (Oct 22, 2026)</option>
                                                     <option [ngValue]="2">Day first (22 Oct 2026)</option>
                                                 </select>
                                             </div>
-                                            <div class="form-group col-md-6 mb-0">
+                                            <div class="fpms-field fpms-col-md-6 fpms-no-bottom">
                                                 <label for="tfmt">Time display</label>
-                                                <select id="tfmt" class="form-control" name="use24HourTime" [(ngModel)]="p.use24HourTime">
+                                                <select id="tfmt" class="fpms-control" name="use24HourTime" [(ngModel)]="p.use24HourTime">
                                                     <option [ngValue]="false">12-hour (2:30 PM)</option>
                                                     <option [ngValue]="true">24-hour (14:30)</option>
                                                 </select>
@@ -155,58 +155,58 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                 </div>
                             </fieldset>
                             <div class="fpms-form-foot">
-                                <button type="submit" class="btn btn-primary" [disabled]="busy() || !f.form.valid">
-                                    @if (busy()) { <i class="fas fa-spinner fa-spin mr-1"></i> }
+                                <button type="submit" class="fpms-button fpms-button-primary" [disabled]="busy() || !f.form.valid">
+                                    @if (busy()) { <i class="fas fa-spinner fa-spin fpms-icon-gap"></i> }
                                     Save settings
                                 </button>
-                                <button type="button" class="btn btn-default" [disabled]="busy()" (click)="f.form.markAsPristine(); load()">Cancel</button>
+                                <button type="button" class="fpms-button fpms-button-secondary" [disabled]="busy()" (click)="f.form.markAsPristine(); load()">Cancel</button>
                                 <fpms-form-hint [form]="f"></fpms-form-hint>
                             </div>
                         </form>
                     } @else {
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Production settings</h3></div>
-                            <div class="card-body">
-                                <dl class="row mb-0 fpms-dl">
-                                    <dt class="col-sm-4">Farming system</dt><dd class="col-sm-8">{{ p.farmingSystem | label: L.FarmingSystems }}</dd>
-                                    <dt class="col-sm-4">Default harvest target</dt><dd class="col-sm-8">{{ p.defaultHarvestTargetAbwG != null ? p.defaultHarvestTargetAbwG + ' g ABW' : 'Not configured' }}</dd>
-                                    <dt class="col-sm-4">Maximum culture duration</dt><dd class="col-sm-8">{{ p.defaultMaxCultureDays }} DOC</dd>
-                                    <dt class="col-sm-4">Feeding schedule</dt><dd class="col-sm-8">{{ feedingCount() }} a day: {{ p.feedingTimes }}</dd>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Production settings</h3></div>
+                            <div class="fpms-panel-body">
+                                <dl class="fpms-grid-row fpms-no-bottom fpms-dl">
+                                    <dt class="fpms-col-sm-4">Farming system</dt><dd class="fpms-col-sm-8">{{ p.farmingSystem | label: L.FarmingSystems }}</dd>
+                                    <dt class="fpms-col-sm-4">Default harvest target</dt><dd class="fpms-col-sm-8">{{ p.defaultHarvestTargetAbwG != null ? p.defaultHarvestTargetAbwG + ' g ABW' : 'Not configured' }}</dd>
+                                    <dt class="fpms-col-sm-4">Maximum culture duration</dt><dd class="fpms-col-sm-8">{{ p.defaultMaxCultureDays }} DOC</dd>
+                                    <dt class="fpms-col-sm-4">Feeding schedule</dt><dd class="fpms-col-sm-8">{{ feedingCount() }} a day: {{ p.feedingTimes }}</dd>
                                 </dl>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Monitoring settings</h3></div>
-                            <div class="card-body">{{ p.waterQualityDaily === false ? 'Water is tested on selected days.' : 'Water is tested every day.' }}</div>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Monitoring settings</h3></div>
+                            <div class="fpms-panel-body">{{ p.waterQualityDaily === false ? 'Water is tested on selected days.' : 'Water is tested every day.' }}</div>
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Base ABW pricing</h3></div>
-                            <div class="card-body">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Base ABW pricing</h3></div>
+                            <div class="fpms-panel-body">
                                 @if (p.baseAbwPricingSchemes.length) {
                                     @for (s of p.baseAbwPricingSchemes; track s.id) {
-                                        <div class="d-flex justify-content-between border-bottom py-2">
+                                        <div class="fpms-flex justify-content-between border-bottom fpms-space-y-2">
                                             <span>{{ s.name }} · {{ s.baseAbwG }}g</span>
                                             <span>{{ s.basePricePerKg | php }}/kg + {{ s.stepPerG | php }}/g {{ s.isActive ? '' : '· inactive' }}</span>
                                         </div>
                                     }
                                 } @else {
-                                    <span class="text-muted">No Base ABW pricing schemes configured.</span>
+                                    <span class="fpms-muted">No Base ABW pricing schemes configured.</span>
                                 }
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">System preferences</h3></div>
-                            <div class="card-body">
-                                <dl class="row mb-0 fpms-dl">
-                                    <dt class="col-sm-4">Permit reminder</dt><dd class="col-sm-8">{{ p.documentExpiryAlertDays }} days before expiry</dd>
-                                    <dt class="col-sm-4">Unsold shrimp follow-up</dt><dd class="col-sm-8">{{ p.unsoldFollowUpDays }} days after harvest</dd>
-                                    <dt class="col-sm-4">Time zone</dt><dd class="col-sm-8">{{ p.timeZone }}</dd>
-                                    <dt class="col-sm-4">Date display</dt><dd class="col-sm-8">{{ p.dateOrder === 2 ? 'Day first' : 'Month first' }}</dd>
-                                    <dt class="col-sm-4">Time display</dt><dd class="col-sm-8">{{ p.use24HourTime ? '24-hour (14:30)' : '12-hour (2:30 PM)' }}</dd>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">System preferences</h3></div>
+                            <div class="fpms-panel-body">
+                                <dl class="fpms-grid-row fpms-no-bottom fpms-dl">
+                                    <dt class="fpms-col-sm-4">Permit reminder</dt><dd class="fpms-col-sm-8">{{ p.documentExpiryAlertDays }} days before expiry</dd>
+                                    <dt class="fpms-col-sm-4">Unsold shrimp follow-up</dt><dd class="fpms-col-sm-8">{{ p.unsoldFollowUpDays }} days after harvest</dd>
+                                    <dt class="fpms-col-sm-4">Time zone</dt><dd class="fpms-col-sm-8">{{ p.timeZone }}</dd>
+                                    <dt class="fpms-col-sm-4">Date display</dt><dd class="fpms-col-sm-8">{{ p.dateOrder === 2 ? 'Day first' : 'Month first' }}</dd>
+                                    <dt class="fpms-col-sm-4">Time display</dt><dd class="fpms-col-sm-8">{{ p.use24HourTime ? '24-hour (14:30)' : '12-hour (2:30 PM)' }}</dd>
                                 </dl>
                             </div>
                         </div>
-                        <p class="text-muted small"><i class="fas fa-lock mr-1"></i>Only a Farm Owner can change farm settings.</p>
+                        <p class="fpms-muted fpms-small"><i class="fas fa-lock fpms-icon-gap"></i>Only a Farm Owner can change farm settings.</p>
                     }
                 }
             </div>
