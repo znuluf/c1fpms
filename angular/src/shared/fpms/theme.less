@@ -13,14 +13,14 @@
     --fpms-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
 
     // Derived palette
-    --fpms-tide-900: #0d1b2a; // ink navy
-    --fpms-tide-50: #eef2f6; // hover and selected tint
-    --fpms-accent-50: #dbe7f3; // blue tint
-    --fpms-accent-text: #2a5582; // blue for text on light backgrounds
+    --fpms-tide-900: var(--ink); // ink navy
+    --fpms-tide-50: var(--blue-tint); // hover and selected tint
+    --fpms-accent-50: var(--blue-soft); // blue tint
+    --fpms-accent-text: var(--blue-deep); // blue for text on light backgrounds
     --fpms-glow: #ff921e; // the logo orange, for marks and active icons on dark only
-    --fpms-line: #e6ebf2;
+    --fpms-line: var(--line);
     --fpms-line-strong: #cbd5e1;
-    --fpms-surface: #ffffff;
+    --fpms-surface: var(--paper);
     --fpms-warn-bg: #fff8e8;
     --fpms-warn-line: #e3c27a;
     --fpms-warning-text: #8a5600; // gold for warning text; the brand orange is never used for warnings
@@ -46,14 +46,14 @@
     --fpms-field-h: 52px;
 
     // Surfaces and motion (shared by the app and the start page)
-    --fpms-ground: #fbfaf7;
+    --fpms-ground: var(--bg);
     --fpms-ground-muted: #f4f3ee;
     --fpms-gap: 24px;
     --fpms-motion: 160ms;
     --fpms-ease: ease-out;
 
     // Shadows are tinted with the primary color, kept small
-    --fpms-shadow-1: 0 1px 2px rgba(13, 27, 42, 0.04);
+    --fpms-shadow-1: var(--shadow-sm);
     --fpms-shadow-2: 0 12px 32px rgba(13, 27, 42, 0.16);
 }
 
