@@ -14,7 +14,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
             <div class="fpms-page-inner">
                 <!-- Filters on the page ground (DEC-122). -->
                 <div class="fpms-list-filters">
-                        <div class="fpms-grid-row align-items-end">
+                        <div class="fpms-grid-row fpms-align-end-items">
                             <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                 <label for="from">From</label>
                                 <input id="from" type="date" class="fpms-control" [(ngModel)]="from" />
@@ -43,10 +43,10 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </div>
                         </div>
                 </div>
-                <ul class="nav nav-tabs">
-                    <li class="nav-item"><a class="nav-link" href="javascript:;" [class.active]="tab === 'login'" (click)="tab = 'login'">Sign-in attempts</a></li>
-                    <li class="nav-item"><a class="nav-link" href="javascript:;" [class.active]="tab === 'events'" (click)="tab = 'events'">System events</a></li>
-                </ul>
+                <div class="fpms-tabs" role="tablist" aria-label="Security log type">
+                    <button type="button" role="tab" class="fpms-tab" [class.active]="tab === 'login'" [attr.aria-selected]="tab === 'login'" (click)="tab = 'login'">Sign-in attempts</button>
+                    <button type="button" role="tab" class="fpms-tab" [class.active]="tab === 'events'" [attr.aria-selected]="tab === 'events'" (click)="tab = 'events'">System events</button>
+                </div>
                 <div class="fpms-panel">
                     <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (tab === 'login') {
