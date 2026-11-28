@@ -24,8 +24,8 @@ import { batchShort } from '@shared/fpms/labels';
                 }
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (!c) {
                     <fpms-loading></fpms-loading>
                 } @else {
