@@ -67,11 +67,11 @@
     --fpms-soft-action-hover-bg: #c8ecec;
     --fpms-host-border: #f0b8b8;
 
-    // Shape: radius follows role, not one value for everything
-    --fpms-r-control: 10px;
-    --fpms-r-tile: 12px;
-    --fpms-r-card: 14px;
-    --fpms-r-field: 14px; // soft form style: roomier controls on sign-in and form pages
+    // Shape aliases: the public --r-* scale is the single source of truth.
+    --fpms-r-control: var(--r-sm);
+    --fpms-r-tile: var(--r-md);
+    --fpms-r-card: var(--r-lg);
+    --fpms-r-field: var(--r-lg); // soft form style: roomier controls on sign-in and form pages
     --fpms-field-h: 52px;
 
     // Surfaces and motion (shared by the app and the start page)
