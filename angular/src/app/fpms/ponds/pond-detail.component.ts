@@ -17,7 +17,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
             }
         </fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
+            <div class="fpms-page-inner fpms-narrow">
                 @if (!pond) {
                     <fpms-loading></fpms-loading>
                 } @else if (isNew) {
@@ -56,9 +56,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 @if (pond.isArchived) {
                                     <li role="status">
                                         <i class="fas fa-archive" aria-hidden="true"></i>
-                                        <span class="mr-auto">This pond is archived. It is hidden from the pond list and cannot be edited, prepared or stocked.</span>
+                                        <span class="fpms-margin-auto-end">This pond is archived. It is hidden from the pond list and cannot be edited, prepared or stocked.</span>
                                         @if (canManage) {
-                                            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy()" (click)="restore()"><i class="fas fa-undo mr-1" aria-hidden="true"></i>Restore pond</button>
+                                            <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" [disabled]="busy()" (click)="restore()"><i class="fas fa-undo fpms-icon-gap" aria-hidden="true"></i>Restore pond</button>
                                         }
                                     </li>
                                 }
@@ -76,13 +76,13 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     </div>
 
                     @if (tab === 'overview') {
-                        <div class="row">
-                            <div class="col-lg-7">
-                                <div class="card" [class.card-outline]="pond.openRound" [class.card-info]="pond.openRound">
-                                    <div class="card-header"><h3 class="card-title"><i class="fas fa-broom" aria-hidden="true"></i>Preparation</h3></div>
-                                    <div class="card-body">
+                        <div class="fpms-grid-row">
+                            <div class="fpms-col-lg-7">
+                                <div class="fpms-panel" [class.fpms-panel-outline]="pond.openRound" [class.fpms-panel-info]="pond.openRound">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title"><i class="fas fa-broom" aria-hidden="true"></i>Preparation</h3></div>
+                                    <div class="fpms-panel-body">
                                         @if (pond.openRound) {
-                                            <p class="small mb-2">
+                                            <p class="fpms-small fpms-space-bottom-2">
                                                 Started {{ pond.openRound.startedAtUtc | farmDateTime }}.
                                                 @if (pond.openRound.preparedAtUtc) {
                                                     <strong>Prepared</strong> {{ pond.openRound.preparedAtUtc | farmDateTime }} by {{ pond.openRound.preparedBy }}; ready to stock.
@@ -94,67 +94,67 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                                 @for (e of pond.openRound.entries; track e.id) {
                                                     <li>
                                                         @if (editEntry?.id === e.id) {
-                                                            <input type="datetime-local" class="form-control form-control-sm mb-1" [(ngModel)]="editEntry.observedAt" [max]="nowInput" aria-label="Date and time" />
-                                                            <textarea rows="2" class="form-control form-control-sm mb-1" [(ngModel)]="editEntry.description" maxlength="1000" aria-label="What was done"></textarea>
-                                                            <button class="btn btn-xs btn-primary mr-1" [disabled]="busy() || !editEntry.description?.trim() || !editEntry.observedAt" (click)="saveEntry()">Save</button>
-                                                            <button class="btn btn-xs btn-default" (click)="editEntry = null">Cancel</button>
+                                                            <input type="datetime-local" class="fpms-control fpms-control-compact fpms-space-bottom-1" [(ngModel)]="editEntry.observedAt" [max]="nowInput" aria-label="Date and time" />
+                                                            <textarea rows="2" class="fpms-control fpms-control-compact fpms-space-bottom-1" [(ngModel)]="editEntry.description" maxlength="1000" aria-label="What was done"></textarea>
+                                                            <button class="fpms-button fpms-button-compact fpms-button-primary fpms-icon-gap" [disabled]="busy() || !editEntry.description?.trim() || !editEntry.observedAt" (click)="saveEntry()">Save</button>
+                                                            <button class="fpms-button fpms-button-compact fpms-button-secondary" (click)="editEntry = null">Cancel</button>
                                                         } @else {
                                                             <span class="meta">{{ e.observedAtUtc | farmDateTime }} · {{ e.recordedBy }}</span>
                                                             <span class="what">{{ e.description }}</span>
                                                             @if (canEditEntries) {
-                                                                <span class="acts small"><a href="javascript:;" class="mr-3" (click)="startEdit(e)">Edit</a><a href="javascript:;" class="text-danger" (click)="startAction('void', e.id)">Remove</a></span>
+                                                                <span class="acts fpms-small"><a href="javascript:;" class="fpms-space-end-3" (click)="startEdit(e)">Edit</a><a href="javascript:;" class="fpms-danger" (click)="startAction('void', e.id)">Remove</a></span>
                                                             }
                                                         }
                                                     </li>
                                                 }
                                             </ul>
                                         } @else {
-                                            <p class="small text-muted">No preparation in progress. The first entry starts a preparation round and the pond becomes Under preparation.</p>
+                                            <p class="fpms-small fpms-muted">No preparation in progress. The first entry starts a preparation round and the pond becomes Under preparation.</p>
                                         }
                                         @if (pond.canAddPreparationEntry) {
                                             @if (prepRestored) {
-                                                <div class="small text-info mb-1"><i class="fas fa-history mr-1"></i>Your unsaved entry was restored. <a href="javascript:;" (click)="discardPrep()">Discard</a></div>
+                                                <div class="fpms-small fpms-info fpms-space-bottom-1"><i class="fas fa-history fpms-icon-gap"></i>Your unsaved entry was restored. <a href="javascript:;" (click)="discardPrep()">Discard</a></div>
                                             }
-                                            <div class="form-group mb-2">
-                                                <label for="pt" class="small mb-0">Date and time</label>
-                                                <input id="pt" type="datetime-local" class="form-control form-control-sm" [(ngModel)]="prep.observedAt" (ngModelChange)="keepPrepDraft()" [max]="nowInput" />
+                                            <div class="fpms-field fpms-space-bottom-2">
+                                                <label for="pt" class="fpms-small fpms-no-bottom">Date and time</label>
+                                                <input id="pt" type="datetime-local" class="fpms-control fpms-control-compact" [(ngModel)]="prep.observedAt" (ngModelChange)="keepPrepDraft()" [max]="nowInput" />
                                             </div>
-                                            <div class="form-group mb-2" role="group" aria-label="Common preparation steps">
-                                                <div class="small mb-1">Common steps</div>
+                                            <div class="fpms-field fpms-space-bottom-2" role="group" aria-label="Common preparation steps">
+                                                <div class="fpms-small fpms-space-bottom-1">Common steps</div>
                                                 @for (step of prepSteps; track step) {
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary mr-1 mb-1" (click)="addStep(step)">{{ step }}</button>
+                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary fpms-icon-gap fpms-space-bottom-1" (click)="addStep(step)">{{ step }}</button>
                                                 }
                                             </div>
-                                            <div class="form-group mb-2">
-                                                <label for="pdx" class="small mb-0">What was done</label>
-                                                <textarea id="pdx" rows="2" class="form-control form-control-sm" [(ngModel)]="prep.description" (ngModelChange)="keepPrepDraft()" maxlength="1000" placeholder="e.g. Drained pond, drying started"></textarea>
+                                            <div class="fpms-field fpms-space-bottom-2">
+                                                <label for="pdx" class="fpms-small fpms-no-bottom">What was done</label>
+                                                <textarea id="pdx" rows="2" class="fpms-control fpms-control-compact" [(ngModel)]="prep.description" (ngModelChange)="keepPrepDraft()" maxlength="1000" placeholder="e.g. Drained pond, drying started"></textarea>
                                             </div>
-                                            <button class="btn btn-sm btn-outline-primary mr-1" [disabled]="busy() || !prep.description?.trim() || !prep.observedAt" (click)="addPrep()">Add entry</button>
+                                            <button class="fpms-button fpms-button-compact fpms-button-outline fpms-icon-gap" [disabled]="busy() || !prep.description?.trim() || !prep.observedAt" (click)="addPrep()">Add entry</button>
                                         }
                                         @if (pond.canMarkPrepared) {
-                                            <button class="btn btn-sm btn-primary mr-1" [disabled]="busy()" (click)="markPrepared()"><i class="fas fa-check mr-1"></i>Mark prepared</button>
+                                            <button class="fpms-button fpms-button-compact fpms-button-primary fpms-icon-gap" [disabled]="busy()" (click)="markPrepared()"><i class="fas fa-check fpms-icon-gap"></i>Mark prepared</button>
                                         }
                                         @if (canManage && pond.openRound) {
-                                            <div class="mt-2">
+                                            <div class="fpms-space-top-2">
                                                 @if (pond.openRound.preparedAtUtc) {
-                                                    <button class="btn btn-sm btn-outline-secondary mr-1" [disabled]="busy()" (click)="startAction('reopen')">Reopen preparation</button>
+                                                    <button class="fpms-button fpms-button-compact fpms-button-secondary fpms-icon-gap" [disabled]="busy()" (click)="startAction('reopen')">Reopen preparation</button>
                                                 }
-                                                <button class="btn btn-sm btn-outline-danger" [disabled]="busy()" (click)="startAction('abandon')">Abandon round</button>
+                                                <button class="fpms-button fpms-button-compact fpms-button-danger" [disabled]="busy()" (click)="startAction('abandon')">Abandon round</button>
                                             </div>
                                         }
                                         @if (prepAction) {
-                                            <div class="border rounded p-2 mt-2 small" role="group" aria-label="Reason">
-                                                <label for="pr" class="mb-1">{{ actionTitle }}: reason <span class="text-danger">*</span></label>
-                                                <input id="pr" class="form-control form-control-sm mb-2" [(ngModel)]="prepAction.reason" maxlength="500" />
-                                                <button class="btn btn-xs btn-primary mr-1" [disabled]="busy() || !prepAction.reason?.trim()" (click)="confirmAction()">Confirm</button>
-                                                <button class="btn btn-xs btn-default" (click)="prepAction = null">Cancel</button>
+                                            <div class="fpms-border fpms-rounded fpms-space-2 fpms-space-top-2 fpms-small" role="group" aria-label="Reason">
+                                                <label for="pr" class="fpms-space-bottom-1">{{ actionTitle }}: reason <span class="fpms-danger">*</span></label>
+                                                <input id="pr" class="fpms-control fpms-control-compact fpms-space-bottom-2" [(ngModel)]="prepAction.reason" maxlength="500" />
+                                                <button class="fpms-button fpms-button-compact fpms-button-primary fpms-icon-gap" [disabled]="busy() || !prepAction.reason?.trim()" (click)="confirmAction()">Confirm</button>
+                                                <button class="fpms-button fpms-button-compact fpms-button-secondary" (click)="prepAction = null">Cancel</button>
                                             </div>
                                         }
                                         @if (pond.pastRounds.length) {
-                                            <details class="mt-2 small">
+                                            <details class="fpms-space-top-2 fpms-small">
                                                 <summary>Earlier rounds ({{ pond.pastRounds.length }})</summary>
                                                 @for (r of pond.pastRounds; track r.id) {
-                                                    <div class="mt-1"><strong>{{ r.startedAtUtc | farmDayOf }}</strong>{{ r.usedByBatchCode ? ' → batch ' + r.usedByBatchCode : ' (abandoned)' }}</div>
+                                                    <div class="fpms-space-top-1"><strong>{{ r.startedAtUtc | farmDayOf }}</strong>{{ r.usedByBatchCode ? ' → batch ' + r.usedByBatchCode : ' (abandoned)' }}</div>
                                                     <ul class="fpms-records">
                                                         @for (e of r.entries; track e.id) {
                                                             <li><span class="meta">{{ e.observedAtUtc | farmDayOf }}</span><span class="what">{{ e.description }}</span></li>
@@ -166,37 +166,37 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-5">
-                                <div class="card">
-                                    <div class="card-header"><h3 class="card-title"><i class="fas fa-flag" aria-hidden="true"></i>Status</h3></div>
-                                    <div class="card-body">
-                                        <p class="mb-3">
+                            <div class="fpms-col-lg-5">
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title"><i class="fas fa-flag" aria-hidden="true"></i>Status</h3></div>
+                                    <div class="fpms-panel-body">
+                                        <p class="fpms-space-bottom-3">
                                             Shown as <fpms-badge [text]="pond.status | label: L.PondDisplayStatuses"></fpms-badge>
                                             {{ pond.currentBatchId ? 'while its batch is open.' : '' }}
                                         </p>
                                         @if (canManage && !pond.isArchived) {
                                             <details class="fpms-fold" [open]="newStatus !== pond.manualStatus">
                                             <summary>Change status <span class="fpms-fold-hint">set it by hand, with a note</span></summary>
-                                            <div class="form-group mb-2">
+                                            <div class="fpms-field fpms-space-bottom-2">
                                                 <label for="ms">Manual status</label>
-                                                <select id="ms" class="form-control" [(ngModel)]="newStatus">
+                                                <select id="ms" class="fpms-control" [(ngModel)]="newStatus">
                                                     @for (o of Options.pondManualStatus; track o.value) {
                                                         <option [ngValue]="o.value">{{ o.label }}</option>
                                                     }
                                                 </select>
                                             </div>
-                                            <div class="form-group mb-2">
+                                            <div class="fpms-field fpms-space-bottom-2">
                                                 <label for="sn">Note</label>
-                                                <input id="sn" class="form-control" [(ngModel)]="statusNote" maxlength="500" />
+                                                <input id="sn" class="fpms-control" [(ngModel)]="statusNote" maxlength="500" />
                                             </div>
-                                            <button class="btn btn-outline-primary btn-sm" [disabled]="busy() || newStatus === pond.manualStatus" (click)="setStatus()">Change status</button>
+                                            <button class="fpms-button fpms-button-outline fpms-button-compact" [disabled]="busy() || newStatus === pond.manualStatus" (click)="setStatus()">Change status</button>
                                             </details>
                                         }
                                         @if (canManage && pond.canArchive) {
-                                            <div class="small text-muted mb-2">No longer used, or added by mistake? Archiving keeps the record but hides the pond from the list and from stocking. You can restore it later.</div>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="busy()" (click)="archive()"><i class="fas fa-archive mr-1"></i>Archive pond</button>
+                                            <div class="fpms-small fpms-muted fpms-space-bottom-2">No longer used, or added by mistake? Archiving keeps the record but hides the pond from the list and from stocking. You can restore it later.</div>
+                                            <button type="button" class="fpms-button fpms-button-secondary fpms-button-compact" [disabled]="busy()" (click)="archive()"><i class="fas fa-archive fpms-icon-gap"></i>Archive pond</button>
                                         } @else if (canManage && !pond.isArchived) {
-                                            <div class="small text-muted mb-0"><i class="fas fa-archive mr-1"></i>This pond can be archived once its batch is closed and no preparation is in progress.</div>
+                                            <div class="fpms-small fpms-muted fpms-no-bottom"><i class="fas fa-archive fpms-icon-gap"></i>This pond can be archived once its batch is closed and no preparation is in progress.</div>
                                         }
                                     </div>
                                 </div>
@@ -208,31 +208,31 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         @if (editing) {
                             <ng-container *ngTemplateOutlet="formTpl"></ng-container>
                         } @else {
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title"><i class="fas fa-water" aria-hidden="true"></i>Pond master data</h3>
+                            <div class="fpms-panel">
+                                <div class="fpms-panel-head">
+                                    <h3 class="fpms-panel-title"><i class="fas fa-water" aria-hidden="true"></i>Pond master data</h3>
                                     @if (canManage && !pond.isArchived) {
-                                        <div class="card-tools"><button type="button" class="btn btn-sm btn-outline-primary" (click)="editing = true"><i class="fas fa-pen mr-1"></i>Edit</button></div>
+                                        <div class="fpms-panel-tools"><button type="button" class="fpms-button fpms-button-compact fpms-button-outline" (click)="editing = true"><i class="fas fa-pen fpms-icon-gap"></i>Edit</button></div>
                                     }
                                 </div>
-                                <div class="card-body">
-                                    <dl class="row mb-0 fpms-dl">
-                                        <dt class="col-sm-4">Pond ID</dt><dd class="col-sm-8">{{ pond.pondCode }}</dd>
-                                        <dt class="col-sm-4">Name</dt><dd class="col-sm-8">{{ pond.name }}</dd>
-                                        <dt class="col-sm-4">Purpose</dt><dd class="col-sm-8">{{ pond.purpose | label: L.PondPurposes }}</dd>
-                                        <dt class="col-sm-4">Construction</dt><dd class="col-sm-8">{{ pond.constructionType | label: L.ConstructionTypes }}</dd>
-                                        <dt class="col-sm-4">Area</dt><dd class="col-sm-8">{{ pond.areaM2 | num: 2 }} m²</dd>
-                                        <dt class="col-sm-4">Depth</dt><dd class="col-sm-8">{{ pond.averageDepthM | num: 2 }} m average · {{ pond.maxDepthM | num: 2 }} m maximum</dd>
-                                        <dt class="col-sm-4">Farming system</dt>
-                                        <dd class="col-sm-8">{{ pond.farmingSystem | label: L.FarmingSystems }}{{ pond.farmingSystemOverride == null ? ' (farm setting)' : ' (this pond)' }}</dd>
-                                        <dt class="col-sm-4">Inlet</dt><dd class="col-sm-8">@if (pond.inletType) { {{ pond.inletType }} } @else { <span class="fpms-none">—</span> }</dd>
-                                        <dt class="col-sm-4">Outlet</dt><dd class="col-sm-8">@if (pond.outletType) { {{ pond.outletType }} } @else { <span class="fpms-none">—</span> }</dd>
-                                        <dt class="col-sm-4">Aeration</dt><dd class="col-sm-8">@if (pond.aerationSystem) { {{ pond.aerationSystem }} } @else { <span class="fpms-none">—</span> }</dd>
-                                        <dt class="col-sm-4">Location</dt><dd class="col-sm-8">@if (pond.latitude != null && pond.longitude != null) { {{ pond.latitude | num: 6 }}, {{ pond.longitude | num: 6 }} } @else { <span class="fpms-none">—</span> }</dd>
-                                        <dt class="col-sm-4">Notes</dt><dd class="col-sm-8 mb-0">@if (pond.notes) { <span class="fpms-notes">{{ pond.notes }}</span> } @else { <span class="fpms-none">—</span> }</dd>
+                                <div class="fpms-panel-body">
+                                    <dl class="fpms-grid-row fpms-no-bottom fpms-dl">
+                                        <dt class="fpms-col-sm-4">Pond ID</dt><dd class="fpms-col-sm-8">{{ pond.pondCode }}</dd>
+                                        <dt class="fpms-col-sm-4">Name</dt><dd class="fpms-col-sm-8">{{ pond.name }}</dd>
+                                        <dt class="fpms-col-sm-4">Purpose</dt><dd class="fpms-col-sm-8">{{ pond.purpose | label: L.PondPurposes }}</dd>
+                                        <dt class="fpms-col-sm-4">Construction</dt><dd class="fpms-col-sm-8">{{ pond.constructionType | label: L.ConstructionTypes }}</dd>
+                                        <dt class="fpms-col-sm-4">Area</dt><dd class="fpms-col-sm-8">{{ pond.areaM2 | num: 2 }} m²</dd>
+                                        <dt class="fpms-col-sm-4">Depth</dt><dd class="fpms-col-sm-8">{{ pond.averageDepthM | num: 2 }} m average · {{ pond.maxDepthM | num: 2 }} m maximum</dd>
+                                        <dt class="fpms-col-sm-4">Farming system</dt>
+                                        <dd class="fpms-col-sm-8">{{ pond.farmingSystem | label: L.FarmingSystems }}{{ pond.farmingSystemOverride == null ? ' (farm setting)' : ' (this pond)' }}</dd>
+                                        <dt class="fpms-col-sm-4">Inlet</dt><dd class="fpms-col-sm-8">@if (pond.inletType) { {{ pond.inletType }} } @else { <span class="fpms-none">—</span> }</dd>
+                                        <dt class="fpms-col-sm-4">Outlet</dt><dd class="fpms-col-sm-8">@if (pond.outletType) { {{ pond.outletType }} } @else { <span class="fpms-none">—</span> }</dd>
+                                        <dt class="fpms-col-sm-4">Aeration</dt><dd class="fpms-col-sm-8">@if (pond.aerationSystem) { {{ pond.aerationSystem }} } @else { <span class="fpms-none">—</span> }</dd>
+                                        <dt class="fpms-col-sm-4">Location</dt><dd class="fpms-col-sm-8">@if (pond.latitude != null && pond.longitude != null) { {{ pond.latitude | num: 6 }}, {{ pond.longitude | num: 6 }} } @else { <span class="fpms-none">—</span> }</dd>
+                                        <dt class="fpms-col-sm-4">Notes</dt><dd class="fpms-col-sm-8 fpms-no-bottom">@if (pond.notes) { <span class="fpms-notes">{{ pond.notes }}</span> } @else { <span class="fpms-none">—</span> }</dd>
                                     </dl>
                                     @if (lockedCount) {
-                                        <p class="small text-muted mt-3 mb-0"><i class="fas fa-lock mr-1"></i>Some fields are locked because of this pond's batches. Open Edit to see which and why.</p>
+                                        <p class="fpms-small fpms-muted fpms-space-top-3 fpms-no-bottom"><i class="fas fa-lock fpms-icon-gap"></i>Some fields are locked because of this pond's batches. Open Edit to see which and why.</p>
                                     }
                                 </div>
                             </div>
@@ -240,20 +240,20 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     }
 
                     @if (tab === 'batches') {
-                        <div class="card">
-                            <div class="card-body p-0 table-responsive">
-                                <table class="table table-sm mb-0">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
+                                <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
                                     <thead><tr><th>Batch</th><th>Cycle</th><th>Status</th><th>Stocked</th></tr></thead>
                                     <tbody>
                                         @for (b of pond.batches; track b.id) {
-                                            <tr [class.table-info]="b.id === pond.currentBatchId">
-                                                <td class="text-nowrap"><a [routerLink]="['/app/production/batches', b.id]">{{ b.batchCode }}</a></td>
-                                                <td class="small text-muted text-nowrap">{{ b.cycleCode }}</td>
+                                            <tr [class.fpms-row-info]="b.id === pond.currentBatchId">
+                                                <td class="fpms-nowrap"><a [routerLink]="['/app/production/batches', b.id]">{{ b.batchCode }}</a></td>
+                                                <td class="fpms-small fpms-muted fpms-nowrap">{{ b.cycleCode }}</td>
                                                 <td><fpms-badge [text]="b.status | label: L.BatchStatuses"></fpms-badge></td>
-                                                <td class="text-nowrap small">{{ b.stockingDate | farmDate }}</td>
+                                                <td class="fpms-nowrap fpms-small">{{ b.stockingDate | farmDate }}</td>
                                             </tr>
                                         } @empty {
-                                            <tr><td colspan="4" class="text-muted text-center py-3">No batches yet.</td></tr>
+                                            <tr><td colspan="4" class="fpms-muted fpms-align-center fpms-space-y-3">No batches yet.</td></tr>
                                         }
                                     </tbody>
                                 </table>
@@ -262,11 +262,11 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     }
 
                     @if (tab === 'history') {
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-history" aria-hidden="true"></i>History</h3>
-                                <div class="card-tools">
-                                    <select class="form-control form-control-sm" [(ngModel)]="historyType" aria-label="Show">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head">
+                                <h3 class="fpms-panel-title"><i class="fas fa-history" aria-hidden="true"></i>History</h3>
+                                <div class="fpms-panel-tools">
+                                    <select class="fpms-control fpms-control-compact" [(ngModel)]="historyType" aria-label="Show">
                                         <option [ngValue]="null">All changes</option>
                                         @for (o of historyTypes; track o.value) {
                                             <option [ngValue]="o.value">{{ o.label }}</option>
@@ -274,15 +274,15 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     </select>
                                 </div>
                             </div>
-                            <div class="card-body p-0">
-                                <ul class="list-group list-group-flush">
+                            <div class="fpms-panel-body fpms-space-0">
+                                <ul class="fpms-list-group fpms-list-group-flush">
                                     @for (h of filteredHistory; track $index) {
-                                        <li class="list-group-item py-2">
-                                            <span class="fpms-records"><span class="meta d-block">{{ h.changeDateUtc | farmDateTime }} · {{ h.changeType | label: L.PondChangeTypes }} · {{ h.recordedBy }}</span>
-                                            <span class="what d-block">{{ h.description }}</span></span>
+                                        <li class="fpms-list-item fpms-space-y-2">
+                                            <span class="fpms-records"><span class="meta fpms-block">{{ h.changeDateUtc | farmDateTime }} · {{ h.changeType | label: L.PondChangeTypes }} · {{ h.recordedBy }}</span>
+                                            <span class="what fpms-block">{{ h.description }}</span></span>
                                         </li>
                                     } @empty {
-                                        <li class="list-group-item text-muted text-center py-3">Nothing recorded.</li>
+                                        <li class="fpms-list-item fpms-muted fpms-align-center fpms-space-y-3">Nothing recorded.</li>
                                     }
                                 </ul>
                             </div>
@@ -295,156 +295,156 @@ import { FPMS_IMPORTS } from '../shared-imports';
         <ng-template #formTpl>
             <form #f="ngForm" (ngSubmit)="save()" fpmsReview="pond" [fpmsReviewNew]="isNew" novalidate>
                 <fieldset [disabled]="!canManage">
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-water" aria-hidden="true"></i>Pond master data</h3></div>
-                        <div class="card-body">
-                            <div class="form-row">
+                    <div class="fpms-panel">
+                        <div class="fpms-panel-head"><h3 class="fpms-panel-title"><i class="fas fa-water" aria-hidden="true"></i>Pond master data</h3></div>
+                        <div class="fpms-panel-body">
+                            <div class="fpms-grid-row">
                                 @if (isNew) {
-                                    <div class="form-group col-md-4">
-                                        <label for="ctype">Construction (pond type) <span class="text-danger">*</span></label>
-                                        <select id="ctype" class="form-control" name="constructionType" [(ngModel)]="pond.constructionType" required>
+                                    <div class="fpms-field fpms-col-md-4">
+                                        <label for="ctype">Construction (pond type) <span class="fpms-danger">*</span></label>
+                                        <select id="ctype" class="fpms-control" name="constructionType" [(ngModel)]="pond.constructionType" required>
                                             @for (o of Options.construction; track o.value) {
                                                 <option [ngValue]="o.value">{{ o.label }}</option>
                                             }
                                         </select>
-                                        <small class="form-text text-warning-dark"><i class="fas fa-exclamation-circle mr-1"></i>Check the type before saving. It names the pond and cannot be changed afterwards.</small>
+                                        <small class="fpms-help fpms-warning-text"><i class="fas fa-exclamation-circle fpms-icon-gap"></i>Check the type before saving. It names the pond and cannot be changed afterwards.</small>
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="fpms-field fpms-col-md-4">
                                         <label for="num">Number</label>
-                                        <input id="num" type="number" min="1" max="999" step="1" class="form-control" name="number" [(ngModel)]="pond.number" [placeholder]="nextNumber" />
+                                        <input id="num" type="number" min="1" max="999" step="1" class="fpms-control" name="number" [(ngModel)]="pond.number" [placeholder]="nextNumber" />
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="fpms-field fpms-col-md-4">
                                         <label>Pond ID and name</label>
-                                        <p class="form-control-plaintext font-weight-bold" aria-live="polite">{{ previewCode }} <span class="font-weight-normal text-muted">{{ previewName }}</span></p>
+                                        <p class="fpms-control-plain fpms-weight-bold" aria-live="polite">{{ previewCode }} <span class="fpms-weight-normal fpms-muted">{{ previewName }}</span></p>
                                     </div>
                                 } @else {
-                                    <div class="form-group col-md-4">
+                                    <div class="fpms-field fpms-col-md-4">
                                         <label>Pond ID</label>
-                                        <p class="form-control-plaintext font-weight-bold">{{ pond.pondCode }}</p>
+                                        <p class="fpms-control-plain fpms-weight-bold">{{ pond.pondCode }}</p>
                                     </div>
-                                    <div class="form-group col-md-8">
+                                    <div class="fpms-field fpms-col-md-8">
                                         <label>Name</label>
-                                        <p class="form-control-plaintext">{{ pond.name }}</p>
+                                        <p class="fpms-control-plain">{{ pond.name }}</p>
                                     </div>
                                 }
                             </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-4">
+                            <div class="fpms-grid-row">
+                                <div class="fpms-field fpms-col-md-4">
                                     <label for="len">Length (m)</label>
-                                    <input id="len" type="number" min="0.01" step="0.01" class="form-control" name="lengthM" [(ngModel)]="pond.lengthM" (ngModelChange)="recalcArea()" [disabled]="isLocked('areaM2')" />
+                                    <input id="len" type="number" min="0.01" step="0.01" class="fpms-control" name="lengthM" [(ngModel)]="pond.lengthM" (ngModelChange)="recalcArea()" [disabled]="isLocked('areaM2')" />
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="fpms-field fpms-col-md-4">
                                     <label for="wid">Width (m)</label>
-                                    <input id="wid" type="number" min="0.01" step="0.01" class="form-control" name="widthM" [(ngModel)]="pond.widthM" (ngModelChange)="recalcArea()" [disabled]="isLocked('areaM2')" />
+                                    <input id="wid" type="number" min="0.01" step="0.01" class="fpms-control" name="widthM" [(ngModel)]="pond.widthM" (ngModelChange)="recalcArea()" [disabled]="isLocked('areaM2')" />
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="fpms-field fpms-col-md-4">
                                     <label for="area">Area (m²)</label>
-                                    <input id="area" type="number" min="0.01" step="0.01" class="form-control" name="areaM2" [(ngModel)]="pond.areaM2" [readonly]="areaFromSides()" [disabled]="isLocked('areaM2')" required aria-describedby="areaHelp" />
-                                    <small id="areaHelp" class="form-text text-muted">
-                                        @if (isLocked('areaM2')) { <i class="fas fa-lock mr-1"></i>{{ lockReason('areaM2') }} } @else if (areaFromSides()) { Worked out from length × width. } @else { Enter length and width to work it out, or type the area. }
+                                    <input id="area" type="number" min="0.01" step="0.01" class="fpms-control" name="areaM2" [(ngModel)]="pond.areaM2" [readonly]="areaFromSides()" [disabled]="isLocked('areaM2')" required aria-describedby="areaHelp" />
+                                    <small id="areaHelp" class="fpms-help fpms-muted">
+                                        @if (isLocked('areaM2')) { <i class="fas fa-lock fpms-icon-gap"></i>{{ lockReason('areaM2') }} } @else if (areaFromSides()) { Worked out from length × width. } @else { Enter length and width to work it out, or type the area. }
                                     </small>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="avg">Average depth (m) <span class="text-danger">*</span></label>
-                                    <input id="avg" type="number" min="0.01" max="100" step="0.01" class="form-control" name="averageDepthM" [(ngModel)]="pond.averageDepthM" [disabled]="isLocked('averageDepthM')" required />
+                            <div class="fpms-grid-row">
+                                <div class="fpms-field fpms-col-md-6">
+                                    <label for="avg">Average depth (m) <span class="fpms-danger">*</span></label>
+                                    <input id="avg" type="number" min="0.01" max="100" step="0.01" class="fpms-control" name="averageDepthM" [(ngModel)]="pond.averageDepthM" [disabled]="isLocked('averageDepthM')" required />
                                     @if (isLocked('averageDepthM')) {
-                                        <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('averageDepthM') }}</small>
+                                        <small class="fpms-help fpms-muted"><i class="fas fa-lock fpms-icon-gap"></i>{{ lockReason('averageDepthM') }}</small>
                                     }
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label for="max">Maximum depth (m) <span class="text-danger">*</span></label>
-                                    <input id="max" type="number" min="0.01" max="100" step="0.01" class="form-control" name="maxDepthM" [(ngModel)]="pond.maxDepthM" [disabled]="isLocked('maxDepthM')" required />
+                                <div class="fpms-field fpms-col-md-6">
+                                    <label for="max">Maximum depth (m) <span class="fpms-danger">*</span></label>
+                                    <input id="max" type="number" min="0.01" max="100" step="0.01" class="fpms-control" name="maxDepthM" [(ngModel)]="pond.maxDepthM" [disabled]="isLocked('maxDepthM')" required />
                                     @if (depthError) {
-                                        <small class="text-danger">Maximum depth cannot be less than average depth.</small>
+                                        <small class="fpms-danger">Maximum depth cannot be less than average depth.</small>
                                     }
                                 </div>
                             </div>
-                            <div class="form-row">
+                            <div class="fpms-grid-row">
                                 @if (!isNew) {
-                                    <div class="form-group col-md-4">
+                                    <div class="fpms-field fpms-col-md-4">
                                         <label for="ctype2">Construction (pond type)</label>
-                                        <select id="ctype2" class="form-control" name="constructionType2" [(ngModel)]="pond.constructionType" [disabled]="isLocked('constructionType')">
+                                        <select id="ctype2" class="fpms-control" name="constructionType2" [(ngModel)]="pond.constructionType" [disabled]="isLocked('constructionType')">
                                             @for (o of Options.construction; track o.value) {
                                                 <option [ngValue]="o.value">{{ o.label }}</option>
                                             }
                                         </select>
                                         @if (isLocked('constructionType')) {
-                                            <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('constructionType') }}</small>
+                                            <small class="fpms-help fpms-muted"><i class="fas fa-lock fpms-icon-gap"></i>{{ lockReason('constructionType') }}</small>
                                         }
                                     </div>
                                 }
-                                <div class="form-group col-md-4">
+                                <div class="fpms-field fpms-col-md-4">
                                     <label>Purpose</label>
                                     @if (isNew) {
-                                        <p class="form-control-plaintext">Grow-out</p>
-                                        <small class="form-text text-muted">New ponds are created for grow-out production. Existing ponds keep their recorded purpose.</small>
+                                        <p class="fpms-control-plain">Grow-out</p>
+                                        <small class="fpms-help fpms-muted">New ponds are created for grow-out production. Existing ponds keep their recorded purpose.</small>
                                     } @else {
-                                        <select id="purpose" class="form-control" name="purpose" [(ngModel)]="pond.purpose" [disabled]="isLocked('purpose')">
+                                        <select id="purpose" class="fpms-control" name="purpose" [(ngModel)]="pond.purpose" [disabled]="isLocked('purpose')">
                                             @for (o of Options.pondPurpose; track o.value) {
                                                 <option [ngValue]="o.value">{{ o.label }}</option>
                                             }
                                         </select>
                                         @if (isLocked('purpose')) {
-                                            <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('purpose') }}</small>
+                                            <small class="fpms-help fpms-muted"><i class="fas fa-lock fpms-icon-gap"></i>{{ lockReason('purpose') }}</small>
                                         }
                                     }
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="fpms-field fpms-col-md-4">
                                     <label for="fs">Farming system</label>
-                                    <select id="fs" class="form-control" name="farmingSystemOverride" [(ngModel)]="pond.farmingSystemOverride" [disabled]="isLocked('farmingSystemOverride')">
+                                    <select id="fs" class="fpms-control" name="farmingSystemOverride" [(ngModel)]="pond.farmingSystemOverride" [disabled]="isLocked('farmingSystemOverride')">
                                         <option [ngValue]="null">Farm setting ({{ farmSystem | label: L.FarmingSystems }})</option>
                                         @for (o of Options.farmingSystem; track o.value) {
                                             <option [ngValue]="o.value">{{ o.label }}</option>
                                         }
                                     </select>
                                     @if (isLocked('farmingSystemOverride')) {
-                                        <small class="form-text text-muted"><i class="fas fa-lock mr-1"></i>{{ lockReason('farmingSystemOverride') }}</small>
+                                        <small class="fpms-help fpms-muted"><i class="fas fa-lock fpms-icon-gap"></i>{{ lockReason('farmingSystemOverride') }}</small>
                                     }
                                 </div>
                             </div>
                             @if (systemWarning) {
-                                <div class="alert alert-warning py-2 small" role="status">
-                                    <i class="fas fa-exclamation-triangle mr-1"></i>{{ systemWarning }} You can still save the pond.
+                                <div class="fpms-alert fpms-alert-warning fpms-space-y-2 fpms-small" role="status">
+                                    <i class="fas fa-exclamation-triangle fpms-icon-gap"></i>{{ systemWarning }} You can still save the pond.
                                 </div>
                             }
                             <details #morePond class="fpms-fold" [open]="morePond.open || hasPondExtras()">
                                 <summary>More details <span class="fpms-fold-hint">inlet, outlet, aeration, map location, notes</span></summary>
-                                <div class="form-row">
-                                    <div class="form-group col-md-4">
+                                <div class="fpms-grid-row">
+                                    <div class="fpms-field fpms-col-md-4">
                                         <label for="inlet">Inlet type</label>
-                                        <input id="inlet" class="form-control" name="inletType" [(ngModel)]="pond.inletType" maxlength="100" placeholder="e.g. PVC pipe with screen" />
+                                        <input id="inlet" class="fpms-control" name="inletType" [(ngModel)]="pond.inletType" maxlength="100" placeholder="e.g. PVC pipe with screen" />
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="fpms-field fpms-col-md-4">
                                         <label for="outlet">Outlet type</label>
-                                        <input id="outlet" class="form-control" name="outletType" [(ngModel)]="pond.outletType" maxlength="100" placeholder="e.g. Monk / central drain" />
+                                        <input id="outlet" class="fpms-control" name="outletType" [(ngModel)]="pond.outletType" maxlength="100" placeholder="e.g. Monk / central drain" />
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="fpms-field fpms-col-md-4">
                                         <label for="aer">Aeration system</label>
-                                        <input id="aer" class="form-control" name="aerationSystem" [(ngModel)]="pond.aerationSystem" maxlength="300" placeholder="Type, count, horsepower" />
+                                        <input id="aer" class="fpms-control" name="aerationSystem" [(ngModel)]="pond.aerationSystem" maxlength="300" placeholder="Type, count, horsepower" />
                                     </div>
                                 </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-4">
+                                <div class="fpms-grid-row">
+                                    <div class="fpms-field fpms-col-md-4">
                                         <label for="lat">Latitude</label>
-                                        <input id="lat" type="number" step="0.000001" min="-90" max="90" class="form-control" name="latitude" [(ngModel)]="pond.latitude" />
+                                        <input id="lat" type="number" step="0.000001" min="-90" max="90" class="fpms-control" name="latitude" [(ngModel)]="pond.latitude" />
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="fpms-field fpms-col-md-4">
                                         <label for="lng">Longitude</label>
-                                        <input id="lng" type="number" step="0.000001" min="-180" max="180" class="form-control" name="longitude" [(ngModel)]="pond.longitude" />
+                                        <input id="lng" type="number" step="0.000001" min="-180" max="180" class="fpms-control" name="longitude" [(ngModel)]="pond.longitude" />
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="fpms-field">
                                     <label for="notes">Notes</label>
-                                    <textarea id="notes" rows="2" class="form-control" name="notes" [(ngModel)]="pond.notes" maxlength="1000"></textarea>
+                                    <textarea id="notes" rows="2" class="fpms-control" name="notes" [(ngModel)]="pond.notes" maxlength="1000"></textarea>
                                 </div>
                             </details>
                             @if (!isNew) {
-                                <div class="form-group mb-0">
-                                    <label for="cn">Change note @if (noteRequired) { <span class="text-danger">*</span> } @else { (optional) }</label>
-                                    <input id="cn" class="form-control" name="changeNote" [(ngModel)]="pond.changeNote" maxlength="500" [required]="noteRequired" placeholder="Why the infrastructure changed, e.g. added 2 paddlewheels" />
-                                    <small class="form-text text-muted">
+                                <div class="fpms-field fpms-no-bottom">
+                                    <label for="cn">Change note @if (noteRequired) { <span class="fpms-danger">*</span> } @else { (optional) }</label>
+                                    <input id="cn" class="fpms-control" name="changeNote" [(ngModel)]="pond.changeNote" maxlength="500" [required]="noteRequired" placeholder="Why the infrastructure changed, e.g. added 2 paddlewheels" />
+                                    <small class="fpms-help fpms-muted">
                                         @if (noteRequired) {
                                             Required because area or depth changed. Earlier batches keep the area they were stocked with.
                                         } @else {
@@ -455,12 +455,12 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             }
                         </div>
                         @if (canManage) {
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !f.form.valid || depthError">Save pond</button>
+                            <div class="fpms-panel-foot">
+                                <button type="submit" class="fpms-button fpms-button-primary fpms-icon-gap" [disabled]="busy() || !f.form.valid || depthError">Save pond</button>
                                 @if (isNew) {
-                                    <a routerLink="/app/ponds" class="btn btn-default">Cancel</a>
+                                    <a routerLink="/app/ponds" class="fpms-button fpms-button-secondary">Cancel</a>
                                 } @else {
-                                    <button type="button" class="btn btn-default" (click)="cancelEdit()">Cancel</button>
+                                    <button type="button" class="fpms-button fpms-button-secondary" (click)="cancelEdit()">Cancel</button>
                                 }
                                 <fpms-form-hint [form]="f"></fpms-form-hint>
                             </div>
