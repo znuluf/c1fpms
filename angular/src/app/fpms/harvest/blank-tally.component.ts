@@ -16,8 +16,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
         <fpms-page-header title="Blank tally sheet" subtitle="Print it, write each crate's weight in its box at the pond, then type the weights into the harvest's crate tally in the same order." backLink="/app/harvests" backLabel="Harvests">
             <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 <div class="card no-print">
                     <div class="card-body">
                         <div class="form-row align-items-end">
