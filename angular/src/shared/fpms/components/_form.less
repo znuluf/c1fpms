@@ -1,0 +1,140 @@
+// Shared FPMS form controls, field helpers, validation messages and input groups.
+// Bootstrap/AdminLTE form compatibility rules remain in theme.less and the legacy framework styles.
+
+.fpms-step-form {
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--fpms-line);
+}
+
+// ---- Form rows (DEC-130): the heading of a group of controls (a list of times, a checklist) looks and spaces like a
+// label, so the fields beside it line up.
+.fpms-group-label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+// Why a save button is disabled (FormHintComponent)
+.fpms-form-hint {
+    display: inline-block;
+    margin: 0.5rem 0 0 0.75rem;
+    font-size: var(--fpms-text-sm);
+    color: var(--fpms-muted);
+    vertical-align: middle;
+}
+.fpms-form-hint .fpms-form-hint-link {
+    background: transparent;
+    border: 0;
+    font-size: inherit;
+    font-weight: 600;
+    min-height: 0;
+    color: var(--fpms-primary);
+    text-decoration: underline;
+}
+@media (max-width: 575.98px) {
+    .fpms-form-hint {
+        display: block;
+        margin-left: 0;
+    }
+}
+
+.fpms-validation-message {
+    display: none;
+    margin-top: var(--s1);
+    color: var(--red-deep);
+    font-size: var(--fpms-text-sm);
+    font-weight: 500;
+}
+
+.fpms-validation-message.fpms-validation-visible {
+    display: block;
+}
+
+// Semantic equivalents for controls used by standalone FPMS widgets.
+.fpms-input {
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    box-shadow: none;
+}
+
+.fpms-input:focus-visible {
+    border-color: var(--blue);
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--blue-soft);
+}
+
+.fpms-input:disabled {
+    color: var(--muted);
+    background: var(--bg);
+}
+
+.fpms-input.fpms-input-invalid {
+    border-color: var(--red);
+}
+
+.fpms-form-message {
+    display: block;
+    margin-top: var(--s1);
+    font-size: var(--fpms-text-sm);
+}
+
+.fpms-form-message-error {
+    color: var(--red-deep);
+}
+
+// Semantic field controls and shared field spacing.
+.fpms-control { display: block; width: 100%; min-height: 2.75rem; padding: var(--s2) var(--s3); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-sm); }
+.fpms-control:focus { border-color: var(--blue); outline: 2px solid var(--blue-soft); outline-offset: 1px; }
+.fpms-control-compact { min-height: 2.5rem; }
+.fpms-control-plain { padding-inline: 0; border-color: transparent; background: transparent; }
+.fpms-field { min-width: 0; margin-bottom: var(--s4); }
+.fpms-field:last-child { margin-bottom: 0; }
+.fpms-help { display: block; margin-top: var(--s1); color: var(--muted); font-size: var(--fpms-text-sm); }
+
+.fpms-check { display: flex; align-items: flex-start; gap: var(--s2); }
+.fpms-check-input { margin-top: var(--s1); accent-color: var(--blue); }
+.fpms-check-label { color: var(--ink-2); }
+
+.fpms-check-inline { display: inline-flex; align-items: center; gap: var(--s2); margin-inline-end: var(--s3); }
+
+.fpms-check-switch { display: flex; align-items: center; gap: var(--s2); }
+
+// Semantic input groups used for numeric values with visible units and suffixes.
+.fpms-input-group {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+}
+.fpms-input-group > .fpms-control {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+    border-radius: var(--r-sm) 0 0 var(--r-sm);
+}
+.fpms-input-group-append {
+    display: flex;
+    flex: 0 0 auto;
+}
+.fpms-input-group-addon {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--s2) var(--s3);
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-left: 0;
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    white-space: nowrap;
+}
+.fpms-input-group-compact > .fpms-control,
+.fpms-input-group-compact .fpms-input-group-addon {
+    min-height: 2.5rem;
+    padding-block: var(--s1);
+}
