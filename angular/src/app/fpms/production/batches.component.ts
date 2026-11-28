@@ -85,7 +85,7 @@ const CLOSED = 5;
                                             <td class="fpms-align-end">{{ b.doc ?? '—' }}</td>
                                             <td class="fpms-align-end">{{ b.currentAbwG | num: 2 }}</td>
                                             <td class="fpms-align-end">{{ b.fcrToDate | num: 2 }}</td>
-                                            <td class="fpms-align-end" [class.text-warning-dark]="b.estimatedSurvivalPct > 100">
+                                            <td class="fpms-align-end" [class.fpms-warning-text]="b.estimatedSurvivalPct > 100">
                                                 @if (b.estimatedSurvivalPct !== null && b.estimatedSurvivalPct !== undefined) {
                                                     <span class="fpms-nowrap">{{ b.estimatedSurvivalPct | num: 1 }}%@if (b.estimatedSurvivalPct > 100) { <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i> }</span>
                                                     @if (b.estimatedSurvivalPct > 100) { <div title="Check the stocking count and the latest survival estimate">Above 100%</div> }
