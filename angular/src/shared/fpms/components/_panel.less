@@ -1,0 +1,20 @@
+// FPMS panel primitives and semantic variants.
+// Declarations are kept in their original cascade order; Bootstrap/AdminLTE .card rules
+// remain in their existing files until the later framework migration phase.
+
+.fpms-panel { min-width: 0; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); }
+.fpms-panel-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); padding: var(--s4) var(--s5); border-bottom: 1px solid var(--line); }
+.fpms-panel-title { margin: 0; color: var(--ink); font-size: var(--fpms-text-base); font-weight: 650; }
+.fpms-panel-body { min-width: 0; padding: var(--s5); }
+.fpms-panel-foot { padding: var(--s4) var(--s5); border-top: 1px solid var(--line); background: var(--bg); }
+.fpms-panel-tools { margin-inline-start: auto; }
+.fpms-panel-outline { border-color: var(--line); }
+.fpms-panel-warning { border-color: var(--orange-soft); }
+
+@media (max-width: 767px) {
+    .fpms-panel-head,.fpms-panel-body,.fpms-panel-foot { padding: var(--s3); }
+}
+
+.fpms-panel-info,.fpms-panel-primary { border-color: var(--line); }
+.fpms-panel-success { border-color: var(--green-soft); }
+.fpms-panel-danger { border-color: var(--red-soft); }
