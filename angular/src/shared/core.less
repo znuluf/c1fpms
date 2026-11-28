@@ -1,8 +1,8 @@
 @media (min-width: 576px) {
     .nav-user-menu .user-image {
         float: none;
-        line-height: 10px;
-        margin-top: -8px;
+        line-height: 0.625rem;
+        margin-top: -0.5rem;
     }
 }
 
@@ -10,7 +10,7 @@
     border-radius: 50%;
     float: left;
     height: 2rem;
-    margin-top: -4px;
+    margin-top: calc(-1 * var(--s1));
     width: 2rem;
 }
 
@@ -18,7 +18,7 @@
     color: var(--red-deep);
     content: '*';
     position: absolute;
-    margin-left: 3px;
+    margin-left: 0.25rem;
 }
 
 /* Sweet alert */
@@ -31,7 +31,7 @@ body.swal2-height-auto {
 }
 
 .swal2-popup.swal2-toast {
-    padding: 10px 12px !important;
+    padding: 0.625rem 0.75rem !important;
     display: block !important;
 }
 
@@ -43,7 +43,7 @@ body.swal2-height-auto {
 }
 
 .swal2-popup.swal2-toast .swal2-title {
-    margin-bottom: 4px !important;
+    margin-bottom: var(--s1) !important;
 }
 
 div.wrapper,
@@ -78,7 +78,7 @@ table.table.table-sm {
 }
 
 .table-wrapper * {
-    font-size: 14px !important;
+    font-size: 0.875rem !important;
 }
 
 .p-paginator .p-paginator-first,
