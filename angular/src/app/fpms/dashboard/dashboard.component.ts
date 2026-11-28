@@ -388,16 +388,16 @@ const SETUP_STEPS = ['profile', 'ponds'];
                 margin: 0;
                 font-size: 1.15rem;
                 font-weight: 600;
-                color: var(--fpms-primary);
+                color: var(--ink);
             }
             .fpms-chip {
-                min-height: 36px;
-                padding: 0 0.9rem;
-                margin-left: 0.4rem;
-                border-radius: 18px;
-                border: 1px solid var(--fpms-line-strong);
-                background: var(--fpms-ground-muted);
-                color: var(--fpms-text);
+                min-height: 2.75rem;
+                padding: 0 var(--s4);
+                margin-left: var(--s2);
+                border-radius: 999px;
+                border: 1px solid var(--line);
+                background: var(--bg);
+                color: var(--ink);
                 transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease), color var(--fpms-motion) var(--fpms-ease);
                 font-size: 0.9rem;
                 cursor: pointer;
@@ -405,38 +405,38 @@ const SETUP_STEPS = ['profile', 'ponds'];
 
             .fpms-chip:hover,
             .fpms-chip:focus-visible {
-                background: var(--fpms-tide-50);
-                border-color: var(--fpms-primary);
-                color: var(--fpms-primary-dark);
+                background: var(--blue-tint);
+                border-color: var(--ink);
+                color: var(--ink-2);
             }
             .fpms-chip:focus-visible {
-                outline: 2px solid var(--fpms-primary);
+                outline: 2px solid var(--ink);
                 outline-offset: 2px;
             }            .fpms-chip[aria-pressed='true'] {
-                background: var(--fpms-primary);
-                border-color: var(--fpms-primary);
-                color: var(--fpms-surface);
+                background: var(--ink);
+                border-color: var(--ink);
+                color: var(--paper);
             }
             .fpms-toolbar {
                 display: flex;
                 flex-wrap: wrap;
                 align-items: center;
-                gap: 0.6rem 1rem;
+                gap: var(--s2) var(--s4);
                 margin-bottom: 0.9rem;
             }
             .fpms-search {
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
-                min-height: 38px;
-                padding: 0 0.7rem;
+                gap: var(--s2);
+                min-height: 2.75rem;
+                padding: 0 var(--s3);
                 margin: 0;
-                border: 1px solid var(--fpms-line-strong);
-                border-radius: 8px;
-                background: var(--fpms-surface);
+                border: 1px solid var(--line);
+                border-radius: var(--r-sm);
+                background: var(--paper);
                 flex: 1 1 220px;
                 max-width: 320px;
-                color: var(--fpms-muted);
+                color: var(--muted);
             }
             .fpms-search input {
                 border: 0;
@@ -444,39 +444,39 @@ const SETUP_STEPS = ['profile', 'ponds'];
                 flex: 1;
                 min-width: 0;
                 background: transparent;
-                color: var(--fpms-text);
+                color: var(--ink);
             }
             .fpms-sort {
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
+                gap: var(--s2);
                 margin: 0;
                 font-weight: 400;
                 font-size: 0.9rem;
             }
             .fpms-sort select {
-                height: 38px;
+                height: 2.75rem;
                 width: auto;
             }
             .fpms-upcoming {
-                margin: 0 0 1.25rem;
-                padding: 1rem;
-                border: 1px solid var(--fpms-line, #d9dee5);
-                border-radius: var(--fpms-r-card, 0.75rem);
-                background: var(--fpms-surface, #fff);
+                margin: 0 0 var(--s5);
+                padding: var(--s4);
+                border: 1px solid var(--line);
+                border-radius: var(--r-lg);
+                background: var(--paper);
             }
-            .fpms-upcoming-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:.75rem; }
-            .fpms-upcoming-count { color:var(--fpms-muted); font-size:.85rem; white-space:nowrap; }
-            .fpms-upcoming-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; padding:.75rem; margin-bottom:.75rem; background:var(--fpms-subtle, #f7f8fa); border-radius:.5rem; }
+            .fpms-upcoming-head { display:flex; align-items:flex-start; justify-content:space-between; gap:var(--s4); margin-bottom:var(--s3); }
+            .fpms-upcoming-count { color:var(--muted); font-size:.85rem; white-space:nowrap; }
+            .fpms-upcoming-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--s3); padding:var(--s3); margin-bottom:var(--s3); background:var(--bg); border-radius:var(--r-sm); }
             .fpms-upcoming-summary div { display:flex; flex-direction:column; gap:.15rem; min-width:0; }
-            .fpms-upcoming-summary span { color:var(--fpms-muted); font-size:.78rem; }
-            .fpms-upcoming-summary strong { color:var(--fpms-text); font-size:1.05rem; }
+            .fpms-upcoming-summary span { color:var(--muted); font-size:.78rem; }
+            .fpms-upcoming-summary strong { color:var(--ink); font-size:1.05rem; }
             .fpms-upcoming-table { min-width:600px; }
-            .fpms-upcoming-table th { color:var(--fpms-muted); font-size:.78rem; font-weight:600; white-space:nowrap; }
+            .fpms-upcoming-table th { color:var(--muted); font-size:.78rem; font-weight:600; white-space:nowrap; }
             .fpms-upcoming-table td { vertical-align:middle; }
             .fpms-upcoming-empty { padding:1rem; }
             @media (max-width: 575.98px) {
-                .fpms-upcoming { padding:.75rem; }
+                .fpms-upcoming { padding:var(--s3); }
                 .fpms-upcoming-summary { grid-template-columns:1fr 1fr; }
                 .fpms-upcoming-summary div:last-child { grid-column:1 / -1; }
             }
