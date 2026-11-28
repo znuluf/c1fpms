@@ -559,7 +559,7 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
             /^[0-9.]$/.test(event.key)) {
             return;
         }
-        if (allowNegative && event.key === '-' && (event.target as HTMLInputElement).selectionStart === 0) {
+        if (allowNegative && event.key === '-') {
             return;
         }
         if (event.key.length === 1) {
