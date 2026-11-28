@@ -16,7 +16,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 <fpms-badge [text]="pond.status | label: L.PondDisplayStatuses"></fpms-badge>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 @if (!pond) {
                     <fpms-loading></fpms-loading>
