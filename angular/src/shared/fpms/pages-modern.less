@@ -393,3 +393,27 @@ hr {
 .fpms-align-end-items { align-items: flex-end; }
 .fpms-label-secondary { color: var(--ink-2); background: var(--bg); }
 @media (max-width: 767px) { .fpms-col-md-7 { flex-basis: 100%; max-width: 100%; } }
+
+
+// Semantic tabs for page-level view switching.
+.fpms-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s1);
+    margin-bottom: var(--s4);
+    border-bottom: 1px solid var(--line);
+}
+.fpms-tab {
+    min-height: 2.75rem;
+    padding: var(--s2) var(--s4);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    background: transparent;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+.fpms-tab:hover { color: var(--ink); background: var(--bg); }
+.fpms-tab.active { color: var(--ink); border-bottom-color: var(--orange); }
+.fpms-tab:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
