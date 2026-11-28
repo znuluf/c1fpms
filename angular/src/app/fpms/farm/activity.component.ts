@@ -14,77 +14,77 @@ import { FPMS_IMPORTS } from '../shared-imports';
             <div class="fpms-page-inner">
                 <!-- Filters on the page ground; each date box wide enough for its whole date (DEC-115). -->
                 <div class="fpms-list-filters">
-                        <div class="form-row align-items-end">
-                            <div class="form-group col-6 col-md-3">
+                        <div class="fpms-grid-row align-items-end">
+                            <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                 <label for="from">From</label>
-                                <input id="from" type="date" class="form-control" [(ngModel)]="f.from" />
+                                <input id="from" type="date" class="fpms-control" [(ngModel)]="f.from" />
                             </div>
-                            <div class="form-group col-6 col-md-3">
+                            <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                 <label for="to">To</label>
-                                <input id="to" type="date" class="form-control" [(ngModel)]="f.to" />
+                                <input id="to" type="date" class="fpms-control" [(ngModel)]="f.to" />
                             </div>
-                            <div class="form-group col-6 col-md-3">
+                            <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                 <label for="user">User</label>
-                                <select id="user" class="form-control" [(ngModel)]="f.userId">
+                                <select id="user" class="fpms-control" [(ngModel)]="f.userId">
                                     <option [ngValue]="null">All users</option>
                                     @for (u of users(); track u.id) {
                                         <option [ngValue]="u.id">{{ u.name }} {{ u.surname }}</option>
                                     }
                                 </select>
                             </div>
-                            <div class="form-group col-6 col-md-3">
+                            <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                 <label for="rt">Record type</label>
-                                <select id="rt" class="form-control" [(ngModel)]="f.recordType">
+                                <select id="rt" class="fpms-control" [(ngModel)]="f.recordType">
                                     <option [ngValue]="null">All record types</option>
                                     @for (t of recordTypes(); track t) {
                                         <option [ngValue]="t">{{ t }}</option>
                                     }
                                 </select>
                             </div>
-                            <div class="form-group col-auto">
-                                <button class="btn btn-primary" (click)="apply()" [disabled]="busy()">Apply</button>
+                            <div class="fpms-field fpms-col-auto">
+                                <button class="fpms-button fpms-button-primary" (click)="apply()" [disabled]="busy()">Apply</button>
                             </div>
                         </div>
                 </div>
-                <ul class="nav nav-tabs mb-0">
+                <ul class="nav nav-tabs fpms-no-bottom">
                     <li class="nav-item"><a class="nav-link" href="javascript:;" [class.active]="tab === 'changes'" (click)="tab = 'changes'">Data changes</a></li>
                     <li class="nav-item"><a class="nav-link" href="javascript:;" [class.active]="tab === 'actions'" (click)="tab = 'actions'">User actions</a></li>
                 </ul>
-                <div class="card card-tabs-body">
-                    <div class="card-body p-0 table-responsive">
+                <div class="fpms-panel card-tabs-body">
+                    <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!changes() || !actions()) {
                             <fpms-loading></fpms-loading>
                         } @else if (tab === 'changes') {
-                            <table class="table table-sm mb-0">
+                            <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
                                 <thead><tr><th>Time</th><th>User</th><th>Record</th><th>Change</th><th>Values</th></tr></thead>
                                 <tbody>
                                     @for (c of changes(); track $index) {
                                         <tr>
-                                            <td class="text-nowrap">{{ c.changeTime | farmDateTime }}</td>
+                                            <td class="fpms-nowrap">{{ c.changeTime | farmDateTime }}</td>
                                             <td>{{ c.userName }}</td>
                                             <td>{{ c.recordType }}</td>
                                             <td>{{ c.changeType }}</td>
-                                            <td class="small text-muted">{{ c.changes.join('; ') }}</td>
+                                            <td class="fpms-small fpms-muted">{{ c.changes.join('; ') }}</td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="5" class="text-center text-muted py-3">No data changes in this range.</td></tr>
+                                        <tr><td colspan="5" class="fpms-align-center fpms-muted fpms-space-y-3">No data changes in this range.</td></tr>
                                     }
                                 </tbody>
                             </table>
                         } @else {
-                            <table class="table table-sm mb-0">
+                            <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
                                 <thead><tr><th>Time</th><th>User</th><th>Area</th><th>Action</th><th>Result</th></tr></thead>
                                 <tbody>
                                     @for (a of actions(); track $index) {
                                         <tr>
-                                            <td class="text-nowrap">{{ a.executionTime | farmDateTime }}</td>
+                                            <td class="fpms-nowrap">{{ a.executionTime | farmDateTime }}</td>
                                             <td>{{ a.userName }}</td>
                                             <td>{{ a.area }}</td>
                                             <td>{{ a.action }}</td>
                                             <td><fpms-badge [text]="a.failed ? 'Failed' : 'OK'" [tone]="a.failed ? 'danger' : 'success'"></fpms-badge></td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="5" class="text-center text-muted py-3">No user actions in this range.</td></tr>
+                                        <tr><td colspan="5" class="fpms-align-center fpms-muted fpms-space-y-3">No user actions in this range.</td></tr>
                                     }
                                 </tbody>
                             </table>
