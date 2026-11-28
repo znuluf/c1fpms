@@ -13,10 +13,10 @@ import { ToolbarChip } from '@shared/fpms/ui';
         <fpms-page-header title="Sales" subtitle="Dispatch receipts, payments and balances.">
             @if (can('Farm.Reports')) {
                 <button
-                    class="btn btn-outline-secondary"
+                    class="fpms-button fpms-button-secondary"
                     (click)="exportCsv('ExportList', exportBody())"
                     [disabled]="busy()">
-                    <i class="fas fa-file-csv mr-1"></i>
+                    <i class="fas fa-file-csv fpms-icon-gap"></i>
                     Export CSV
                 </button>
             }
@@ -36,7 +36,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                             <label class="sl-field">
                                 <span>Buyer</span>
                                 <select
-                                    class="form-control form-control-sm"
+                                    class="fpms-control fpms-control-compact"
                                     [(ngModel)]="f.buyerId"
                                     (ngModelChange)="apply()">
                                     <option [ngValue]="null">All buyers</option>
@@ -50,7 +50,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 <span>From</span>
                                 <input
                                     type="date"
-                                    class="form-control form-control-sm"
+                                    class="fpms-control fpms-control-compact"
                                     [(ngModel)]="f.from"
                                     (ngModelChange)="apply()" />
                             </label>
@@ -58,7 +58,7 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 <span>To</span>
                                 <input
                                     type="date"
-                                    class="form-control form-control-sm"
+                                    class="fpms-control fpms-control-compact"
                                     [(ngModel)]="f.to"
                                     (ngModelChange)="apply()" />
                             </label>
@@ -66,104 +66,104 @@ import { ToolbarChip } from '@shared/fpms/ui';
                         </fpms-list-toolbar>
                         @if (filterTags().length) {
                             <div class="fpms-filter-tags" role="group" aria-label="Filters in use">
-                                <span class="small text-muted">Filters:</span>
+                                <span class="fpms-small fpms-muted">Filters:</span>
                                 @for (t of filterTags(); track t.label) {
                                     <button type="button" class="fpms-filter-tag" (click)="t.clear()" [attr.aria-label]="'Remove filter ' + t.label">{{ t.label }} <i class="fas fa-times" aria-hidden="true"></i></button>
                                 }
-                                <button type="button" class="btn btn-link btn-sm p-0 ml-1" (click)="clearFilters()">Clear all</button>
+                                <button type="button" class="fpms-button fpms-button-link fpms-button-compact fpms-space-0 fpms-icon-gap" (click)="clearFilters()">Clear all</button>
                             </div>
                         }
                 </div>
                 @if (payment) {
                     <div class="fpms-dialog-backdrop">
                         <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="payment-dialog-title">
-                            <div class="fpms-dialog-body p-0">
-                                <div class="card card-outline card-primary">
-                                    <div class="card-header">
-                                        <h3 id="payment-dialog-title" class="card-title">
+                            <div class="fpms-dialog-body fpms-space-0">
+                                <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
+                                    <div class="fpms-panel-head">
+                                        <h3 id="payment-dialog-title" class="fpms-panel-title">
                                             <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
                                             Add payment: {{ payment.sale.dispatchReceiptNo }}, {{ payment.sale.buyerName }} (balance
                                             {{ payment.sale.balance | php }})
                                         </h3>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="form-row align-items-end">
-                                            <div class="form-group col-md-3 mb-0">
+                                    <div class="fpms-panel-body">
+                                        <div class="fpms-grid-row align-items-end">
+                                            <div class="fpms-field fpms-col-md-3 fpms-no-bottom">
                                                 <label for="pon">Paid on</label>
                                                 <input
                                                     id="pon"
                                                     type="date"
-                                                    class="form-control"
+                                                    class="fpms-control"
                                                     [(ngModel)]="payment.paidOn"
                                                     [min]="payment.sale.saleDate"
                                                     [max]="today" />
                                             </div>
-                                            <div class="form-group col-md-3 mb-0">
+                                            <div class="fpms-field fpms-col-md-3 fpms-no-bottom">
                                                 <label for="amt">Amount (₱)</label>
                                                 <input
                                                     id="amt"
                                                     type="number"
                                                     min="0.01"
                                                     step="0.01"
-                                                    class="form-control"
+                                                    class="fpms-control"
                                                     [(ngModel)]="payment.amount" />
                                             </div>
-                                            <div class="form-group col-md-3 mb-0">
+                                            <div class="fpms-field fpms-col-md-3 fpms-no-bottom">
                                                 <label for="mth">Method</label>
                                                 <input
                                                     id="mth"
-                                                    class="form-control"
+                                                    class="fpms-control"
                                                     [(ngModel)]="payment.method"
                                                     maxlength="50"
                                                     placeholder="cash, bank transfer, GCash" />
                                             </div>
-                                            <div class="form-group col-md-3 mb-0">
+                                            <div class="fpms-field fpms-col-md-3 fpms-no-bottom">
                                                 <button
                                                     type="button"
-                                                    class="btn btn-outline-secondary btn-sm"
+                                                    class="fpms-button fpms-button-secondary fpms-button-compact"
                                                     (click)="payment.amount = payment.sale.balance">
                                                     Pay the balance
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card-footer">
+                                    <div class="fpms-panel-foot">
                                         <button
                                             type="button"
-                                            class="btn btn-primary mr-2"
+                                            class="fpms-button fpms-button-primary fpms-icon-gap"
                                             [disabled]="busy() || !(payment.amount > 0) || !payment.paidOn"
                                             (click)="savePayment()">
                                             Save payment
                                         </button>
-                                        <button type="button" class="btn btn-default" (click)="payment = null">Cancel</button>
+                                        <button type="button" class="fpms-button fpms-button-secondary" (click)="payment = null">Cancel</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 }
-                <div class="card">
-                    <div class="card-body p-0 table-responsive">
+                <div class="fpms-panel">
+                    <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!sales()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!sales().length) {
                             <fpms-empty [text]="emptyText()" icon="fas fa-cash-register">
                                 @if (f.from || f.to) {
-                                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="allDates()">Show sales of all dates</button>
+                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-outline" (click)="allDates()">Show sales of all dates</button>
                                 }
                             </fpms-empty>
                         } @else {
-                            <table class="table table-hover mb-0">
+                            <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
                                     <tr>
                                         <!-- Columns that belong together share a cell, so the list fits a 1,000 px screen (DEC-99, DEC-107):
                                              date and receipt; buyer, batch and lot; total, kg and paid; balance and due date. -->
                                         <th scope="col" fpmsSort="saleDate" [pager]="pager" (sorted)="load()">Date · receipt · payment</th>
                                         <th scope="col" fpmsSort="buyerName" [pager]="pager" (sorted)="load()">Buyer · batch · lot</th>
-                                        <th scope="col" class="text-right" fpmsSort="total" [pager]="pager" (sorted)="load()">
+                                        <th scope="col" class="fpms-align-end" fpmsSort="total" [pager]="pager" (sorted)="load()">
                                             Total · kg
                                         </th>
-                                        <th scope="col" class="text-right" fpmsSort="balance" [pager]="pager" (sorted)="load()">
+                                        <th scope="col" class="fpms-align-end" fpmsSort="balance" [pager]="pager" (sorted)="load()">
                                             Balance
                                         </th>
                                     </tr>
@@ -171,21 +171,21 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                 <tbody>
                                     @for (s of sales(); track s.id) {
                                         <tr>
-                                            <td class="text-nowrap">
+                                            <td class="fpms-nowrap">
                                                 {{ s.saleDate | farmDate }}
                                                 <div><a [routerLink]="['/app/sales', s.id]" title="Open the dispatch receipt">{{ s.dispatchReceiptNo }}</a></div>
                                                 <!-- Payment status under the receipt; badges stack (DEC-107). -->
-                                                <div class="fpms-badge-stack mt-1">
+                                                <div class="fpms-badge-stack fpms-space-top-1">
                                                     <fpms-badge [text]="s.paymentStatus | label: L.PaymentStatuses"></fpms-badge>
-                                                    @if (s.isOverdue) { <span class="badge badge-danger" [title]="'Due ' + (s.dueDate | farmDate)">Overdue</span> }
-                                                    @if (s.overpaid > 0) { <span class="badge badge-warning">Overpaid</span> }
+                                                    @if (s.isOverdue) { <span class="fpms-label badge-danger" [title]="'Due ' + (s.dueDate | farmDate)">Overdue</span> }
+                                                    @if (s.overpaid > 0) { <span class="fpms-label badge-warning">Overpaid</span> }
                                                 </div>
                                             </td>
                                             <td>
                                                 {{ s.buyerName }}
-                                                @if (s.batches) { <div class="text-muted">{{ s.batches }}</div> }
+                                                @if (s.batches) { <div class="fpms-muted">{{ s.batches }}</div> }
                                                 @for (c of lotCodes(s); track c) {
-                                                    <div class="small text-monospace">
+                                                    <div class="fpms-small fpms-monospace">
                                                         @if (can('Farm.Reports')) {
                                                             <a [routerLink]="['/app/reports/trace/lot', c]" [queryParams]="{ from: 'sales' }" title="Trace this lot">{{ c }}</a>
                                                         } @else {
@@ -194,31 +194,31 @@ import { ToolbarChip } from '@shared/fpms/ui';
                                                     </div>
                                                 }
                                             </td>
-                                            <td class="text-right">
+                                            <td class="fpms-align-end">
                                                 {{ s.total | php }}
-                                                <div class="text-muted">{{ s.totalKg | num: 2 : true }} kg</div>
-                                                @if (s.paid > 0 && s.paid !== s.total) { <div class="text-muted">paid {{ s.paid | php }}</div> }
+                                                <div class="fpms-muted">{{ s.totalKg | num: 2 : true }} kg</div>
+                                                @if (s.paid > 0 && s.paid !== s.total) { <div class="fpms-muted">paid {{ s.paid | php }}</div> }
                                             </td>
-                                            <td class="text-right">
+                                            <td class="fpms-align-end">
                                                 {{ s.balance | php }}
-                                                @if (s.dueDate && s.balance > 0) { <div class="text-muted" [class.text-danger]="s.isOverdue">due {{ s.dueDate | farmDate }}</div> }
+                                                @if (s.dueDate && s.balance > 0) { <div class="fpms-muted" [class.fpms-danger]="s.isOverdue">due {{ s.dueDate | farmDate }}</div> }
                                                 @if (s.balance > 0) {
-                                                    <button type="button" class="btn btn-sm btn-outline-primary mt-1" (click)="startPayment(s)">Payment</button>
+                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-outline fpms-space-top-1" (click)="startPayment(s)">Payment</button>
                                                 }
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
                                 <tfoot>
-                                    <tr class="font-weight-bold">
+                                    <tr class="fpms-weight-bold">
                                         <td colspan="2">All {{ pager.total }} matching sales</td>
-                                        <td class="text-right">
+                                        <td class="fpms-align-end">
                                             {{ totals().totalAmount | php }}
-                                            <div class="font-weight-normal text-muted">{{ totals().totalKg | num: 2 : true }} kg · paid {{ totals().totalPaid | php }}</div>
+                                            <div class="fpms-weight-normal fpms-muted">{{ totals().totalKg | num: 2 : true }} kg · paid {{ totals().totalPaid | php }}</div>
                                         </td>
-                                        <td class="text-right">
+                                        <td class="fpms-align-end">
                                             {{ totals().totalBalance | php }}
-                                            @if (totals().overdueCount) { <div><span class="badge badge-danger">{{ totals().overdueCount }} overdue</span></div> }
+                                            @if (totals().overdueCount) { <div><span class="fpms-label badge-danger">{{ totals().overdueCount }} overdue</span></div> }
                                         </td>
                                     </tr>
                                 </tfoot>
