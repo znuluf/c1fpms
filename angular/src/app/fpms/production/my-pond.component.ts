@@ -21,8 +21,8 @@ import { BatchFiguresComponent } from './batch-figures.component';
                 <a class="btn btn-outline-primary" [routerLink]="['/app/production/batches', x.id]"><i class="fas fa-seedling mr-1" aria-hidden="true"></i>Batch page</a>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (mine() === null) {
                     <fpms-loading></fpms-loading>
                 } @else if (failed()) {
