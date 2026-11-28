@@ -78,6 +78,11 @@ const SETUP_STEPS = ['profile', 'ponds'];
                 } @else {
                     @let x = d();
 
+                    <fpms-page-header
+                        title="Farm overview"
+                        subtitle="Your farm at a glance: pond activity, upcoming harvests and items needing attention.">
+                    </fpms-page-header>
+
                     @if (x.isOwner && pendingSetup().length) {
                         <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
                             <div class="fpms-panel-head">
