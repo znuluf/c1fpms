@@ -14,7 +14,7 @@ const PROFILE_DRAFT = 'farm-profile';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header [narrow]="true" title="Farm profile" subtitle="Farm identity, location and contact information."></fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 @if (!p) {
                     <fpms-loading></fpms-loading>
