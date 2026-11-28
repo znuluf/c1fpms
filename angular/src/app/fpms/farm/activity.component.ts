@@ -46,10 +46,10 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </div>
                         </div>
                 </div>
-                <ul class="nav nav-tabs fpms-no-bottom">
-                    <li class="nav-item"><a class="nav-link" href="javascript:;" [class.active]="tab === 'changes'" (click)="tab = 'changes'">Data changes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="javascript:;" [class.active]="tab === 'actions'" (click)="tab = 'actions'">User actions</a></li>
-                </ul>
+                <div class="fpms-tabs" role="tablist" aria-label="Activity type">
+                    <button type="button" role="tab" class="fpms-tab" [class.active]="tab === 'changes'" [attr.aria-selected]="tab === 'changes'" (click)="tab = 'changes'">Data changes</button>
+                    <button type="button" role="tab" class="fpms-tab" [class.active]="tab === 'actions'" [attr.aria-selected]="tab === 'actions'" (click)="tab = 'actions'">User actions</button>
+                </div>
                 <div class="fpms-panel card-tabs-body">
                     <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!changes() || !actions()) {
