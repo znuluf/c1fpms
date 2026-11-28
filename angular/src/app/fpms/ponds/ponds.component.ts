@@ -53,8 +53,8 @@ interface PondCard {
                 <a routerLink="/app/ponds/new" class="btn btn-primary">Add pond</a>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (pondSummary(); as summary) {
                     <div class="row mb-3" aria-label="Pond summary">
                         <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.total }}</div><div class="small text-muted">Ponds on record</div></div></div></div>
