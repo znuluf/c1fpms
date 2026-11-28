@@ -14,8 +14,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 @if (d.isStockingFinished) { <span class="badge badge-dark ml-1">Stocking finished</span> }
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (!d) {
                     <fpms-loading></fpms-loading>
                 } @else {
