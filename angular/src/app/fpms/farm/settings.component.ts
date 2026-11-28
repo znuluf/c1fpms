@@ -184,7 +184,7 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                             <div class="fpms-panel-body">
                                 @if (p.baseAbwPricingSchemes.length) {
                                     @for (s of p.baseAbwPricingSchemes; track s.id) {
-                                        <div class="fpms-flex fpms-justify-between border-bottom fpms-space-y-2">
+                                        <div class="fpms-flex fpms-justify-between fpms-border-bottom fpms-space-y-2">
                                             <span>{{ s.name }} · {{ s.baseAbwG }}g</span>
                                             <span>{{ s.basePricePerKg | php }}/kg + {{ s.stepPerG | php }}/g {{ s.isActive ? '' : '· inactive' }}</span>
                                         </div>

@@ -224,7 +224,7 @@ const MINE = 'mine';
                                                             </div>
                                                             <div class="rm">
                                                                 @if (e.lines.length > 1) {
-                                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger px-0" (click)="removeLine(e, l)" aria-label="Remove lot"><i class="fas fa-times"></i></button>
+                                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger fpms-padding-inline-0" (click)="removeLine(e, l)" aria-label="Remove lot"><i class="fas fa-times"></i></button>
                                                                 }
                                                             </div>
                                                         </div>
@@ -233,7 +233,7 @@ const MINE = 'mine';
                                                         }
                                                     }
                                                     @if (e.status === 1) {
-                                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-link px-0" (click)="addLine(e)"><i class="fas fa-plus fpms-icon-gap"></i>Another lot</button>
+                                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-padding-inline-0" (click)="addLine(e)"><i class="fas fa-plus fpms-icon-gap"></i>Another lot</button>
                                                     }
                                                     @if (e.status === 1) {
                                                         <div class="fpms-grid-row fpms-align-center-items fpms-space-top-1">
@@ -246,13 +246,13 @@ const MINE = 'mine';
                                                     @if (e.status === 2) {
                                                         <div class="fpms-space-top-1" role="group" aria-label="Common reasons">
                                                             @for (r of notFedReasons; track r) {
-                                                                <button type="button" class="fpms-button fpms-button-compact fpms-button-compact fpms-space-y-0 px-2 fpms-icon-gap fpms-space-bottom-1" [class.fpms-button-secondary]="e.notes === r" [class.fpms-button-secondary]="e.notes !== r" [attr.aria-pressed]="e.notes === r" (click)="e.notes = r; keepDraft()">{{ r }}</button>
+                                                                <button type="button" class="fpms-button fpms-button-compact fpms-button-compact fpms-space-y-0 fpms-padding-inline-2 fpms-icon-gap fpms-space-bottom-1" [class.fpms-button-secondary]="e.notes === r" [class.fpms-button-secondary]="e.notes !== r" [attr.aria-pressed]="e.notes === r" (click)="e.notes = r; keepDraft()">{{ r }}</button>
                                                             }
                                                         </div>
                                                     }
                                                     <input class="fpms-control fpms-control-compact fpms-space-top-1" [(ngModel)]="e.notes" (ngModelChange)="keepDraft()" maxlength="500" [placeholder]="e.status === 2 ? 'Reason (optional): pick one above or type your own' : 'Notes (optional)'" aria-label="Notes" />
                                                     @if (existing) {
-                                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-link px-0" (click)="cancelEdit(row.batchId, s)">Cancel correction</button>
+                                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-padding-inline-0" (click)="cancelEdit(row.batchId, s)">Cancel correction</button>
                                                     }
                                                     @if (e.status === 1 && total(e) > 1000) {
                                                         <small class="fpms-block fpms-danger">More than 1,000 kg in one feeding is not allowed.</small>

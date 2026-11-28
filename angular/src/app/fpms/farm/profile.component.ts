@@ -271,7 +271,7 @@ const PROFILE_DRAFT = 'farm-profile';
                                 <div class="fpms-alert fpms-alert-warning fpms-small">
                                     <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>
                                     The farm code is what staff type, with their username, to sign in. After the change:
-                                    <ul class="fpms-no-bottom pl-3 fpms-space-top-1">
+                                    <ul class="fpms-no-bottom fpms-padding-start-3 fpms-space-top-1">
                                         <li>everyone must sign in with the new code, and saved links or bookmarks that use the old one stop working;</li>
                                         <li>exports and reports made earlier keep the old code;</li>
                                         <li>the old code can never be used again, by this farm or any other;</li>

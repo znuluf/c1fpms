@@ -179,7 +179,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             <div class="fpms-col-4"><div class="fpms-sign">Driver</div></div>
                             <div class="fpms-col-4"><div class="fpms-sign">Received by (buyer)</div></div>
                         </div>
-                        <p class="fpms-small fpms-align-center fpms-border-top pt-2 fpms-no-bottom"><strong>{{ s.documentNotice }}</strong></p>
+                        <p class="fpms-small fpms-align-center fpms-border-top fpms-padding-top-2 fpms-no-bottom"><strong>{{ s.documentNotice }}</strong></p>
                         <p class="fpms-small fpms-align-center fpms-muted fpms-no-bottom">Recorded by {{ s.recordedBy }} on {{ s.creationTime | farmDateTime }}</p>
                     </div>
                 }
