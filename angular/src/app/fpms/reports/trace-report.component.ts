@@ -31,7 +31,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <fpms-loading></fpms-loading>
                 } @else {
                     <div class="fpms-panel no-print">
-                        <div class="fpms-panel-body fpms-space-y-2 fpms-flex flex-wrap align-items-center">
+                        <div class="fpms-panel-body fpms-space-y-2 fpms-flex flex-wrap fpms-align-center-items">
                             <span class="fpms-weight-bold fpms-icon-gap">Prepare as</span>
                             <button type="button" class="tr-chip" [attr.aria-pressed]="!buyerCopy()" (click)="buyerCopy.set(false)">Internal copy</button>
                             <button type="button" class="tr-chip" [attr.aria-pressed]="buyerCopy()" (click)="setBuyerCopy()" [disabled]="!buyers().length">Buyer copy</button>
