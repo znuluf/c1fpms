@@ -9,6 +9,14 @@
     // Type: system fonts only (kept on purpose). The farm network has no Internet, so a web font would
     // never load there. To adopt a bundled font later, change this one variable.
     --fpms-font: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+    // Shared typography scale. Use these semantic sizes across modern page and component styles.
+    --fpms-text-xs: 0.75rem;
+    --fpms-text-sm: 0.875rem;
+    --fpms-text-base: 1rem;
+    --fpms-text-md: 1.125rem;
+    --fpms-text-lg: 1.25rem;
+    --fpms-text-xl: 1.5rem;
+    --fpms-text-2xl: 2rem;
     // Monospace for codes and IDs (the .mono class). System fonts only, as above.
     --fpms-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
 
@@ -102,7 +110,7 @@ body,
     font-family: var(--fpms-font);
 }
 body {
-    font-size: 1rem;
+    font-size: var(--fpms-text-base);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
 }
@@ -117,14 +125,14 @@ h6,
     letter-spacing: -0.005em;
 }
 .fpms-page-header h1 {
-    font-size: 2rem;
+    font-size: var(--fpms-text-2xl);
     font-weight: 700;
     letter-spacing: -0.022em;
     line-height: 1.2;
     color: var(--fpms-text);
 }
 .fpms-page-header .text-muted {
-    font-size: 0.95rem;
+    font-size: var(--fpms-text-base);
     margin-top: 0.15rem;
 }
 // Weights: 400 for text, 600 for labels and card titles, 700 for page titles and key numbers.
@@ -143,7 +151,7 @@ small,
 .small,
 .form-text,
 .text-sm {
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
 }
 
 // Prose keeps a comfortable line length even on wide screens
@@ -200,7 +208,7 @@ small,
     margin: 0;
     padding: 0 0.5rem;
     list-style: none;
-    font-size: 0.95rem;
+    font-size: var(--fpms-text-base);
     color: var(--fpms-muted);
 }
 .fpms-crumbs li + li::before {
@@ -231,12 +239,12 @@ small,
     white-space: nowrap;
 }
 .fpms-clock-date {
-    font-size: 0.95rem;
+    font-size: var(--fpms-text-base);
     font-weight: 600;
     color: var(--fpms-text);
 }
 .fpms-clock-time {
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     color: var(--fpms-muted);
     font-variant-numeric: tabular-nums;
 }
@@ -339,11 +347,11 @@ html body.sidebar-mini .wrapper .main-footer {
     border-radius: 50%;
     background: var(--fpms-tide-50);
     color: var(--fpms-primary-dark);
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     font-weight: 700;
 }
 .fpms-user-role {
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     line-height: 1.2;
     color: var(--fpms-muted);
 }
@@ -357,7 +365,7 @@ html body.sidebar-mini .wrapper .main-footer {
 // Section labels: sentence case and never below 14px.
 .main-sidebar.fpms-sidebar .nav-sidebar > .fpms-nav-label {
     padding: 1.1rem 0.75rem 0.3rem;
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     font-weight: 600;
     color: var(--fpms-muted);
 }
@@ -372,7 +380,7 @@ html body.sidebar-mini .wrapper .main-footer {
     padding: 0.6rem 0.75rem;
     border-radius: var(--fpms-r-control);
     color: var(--fpms-text);
-    font-size: 0.9375rem;
+    font-size: var(--fpms-text-base);
     font-weight: 400;
     transition: background-color 0.12s ease, color 0.12s ease;
 }
@@ -555,7 +563,7 @@ html body.sidebar-mini .wrapper .main-footer {
     border: 1px solid var(--fpms-line);
     border-radius: var(--fpms-r-control);
     color: var(--fpms-muted);
-    font-size: 1.5rem;
+    font-size: var(--fpms-text-xl);
     line-height: 1;
     background: var(--fpms-surface);
 }
@@ -704,7 +712,7 @@ html body.sidebar-mini .wrapper .main-footer {
     padding: 0 1rem;
     border-radius: var(--fpms-r-control);
     color: var(--fpms-muted);
-    font-size: 0.95rem;
+    font-size: var(--fpms-text-base);
     font-weight: 600;
     white-space: nowrap;
     text-decoration: none;
@@ -730,7 +738,7 @@ html body.sidebar-mini .wrapper .main-footer {
     .fpms-section-tab {
         min-height: 2.25rem;
         padding: 0 0.85rem;
-        font-size: 0.875rem;
+        font-size: var(--fpms-text-sm);
     }
 }
 .fpms-tab-count {
@@ -740,7 +748,7 @@ html body.sidebar-mini .wrapper .main-footer {
     background: var(--fpms-surface);
     border: 1px solid var(--fpms-line);
     color: var(--fpms-muted);
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     font-weight: 400;
     line-height: 1.4;
 }
@@ -1095,7 +1103,7 @@ label,
     border: 1px solid var(--fpms-line);
     border-radius: 999px;
     background: var(--fpms-ground);
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
     b {
@@ -1213,7 +1221,7 @@ button.fpms-chip {
 .fpms-records .meta {
     display: block;
     color: var(--fpms-muted);
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     font-variant-numeric: tabular-nums;
 }
 .fpms-records .what {
@@ -1380,7 +1388,7 @@ a.fpms-kpi:focus {
     white-space: nowrap;
 }
 .fpms-stat .l {
-    font-size: 0.9375rem;
+    font-size: var(--fpms-text-base);
     color: var(--fpms-muted);
     margin-top: 0.1rem;
 }
@@ -1496,7 +1504,7 @@ body.fpms-account .login-box:has(.fpms-register) .login-card-body {
     height: auto;
 }
 .fpms-account .fpms-tagline {
-    font-size: 0.95rem;
+    font-size: var(--fpms-text-base);
     font-weight: 400;
     letter-spacing: 0;
     color: var(--fpms-muted);
@@ -1639,14 +1647,14 @@ body.fpms-welcome-page {
 }
 .fw-cta-note {
     margin: 1rem 0 0;
-    font-size: 0.95rem;
+    font-size: var(--fpms-text-base);
     color: var(--fpms-muted);
 }
 .fw-foot {
     padding: 1.25rem 1rem;
     border-top: 1px solid var(--fpms-line);
     color: var(--fpms-muted);
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     text-align: center;
 }
 // Phones: a slightly smaller wordmark; buttons stack at full width
@@ -1737,7 +1745,7 @@ body.fpms-welcome-page {
     border-radius: var(--fpms-r-control);
     background: transparent;
     color: var(--fpms-text);
-    font-size: 1rem;
+    font-size: var(--fpms-text-base);
     font-weight: 400;
     text-align: left;
     white-space: nowrap;
@@ -1881,7 +1889,7 @@ label .text-danger {
 .fpms-form-hint {
     display: inline-block;
     margin: 0.5rem 0 0 0.75rem;
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     color: var(--fpms-muted);
     vertical-align: middle;
 }
@@ -2318,13 +2326,13 @@ button.fpms-filter-tag:focus-visible {
 
 // Page title and subtitle
 .fpms-page-header h1 {
-    font-size: 1.5rem;
+    font-size: var(--fpms-text-xl);
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1.15;
 }
 .fpms-page-header .text-muted {
-    font-size: 1rem;
+    font-size: var(--fpms-text-base);
 }
 @media (min-width: 768px) {
     .fpms-page-header h1 {
@@ -2337,13 +2345,13 @@ button.fpms-filter-tag:focus-visible {
 
 // Cards
 .card-title {
-    font-size: 1rem;
+    font-size: var(--fpms-text-base);
     font-weight: 700;
 }
 
 // Buttons: one dark primary, quiet outline, soft red for destructive
 .btn {
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
 }
 .btn.btn-primary:not(:disabled):not(.disabled) {
     box-shadow: none;
@@ -2395,7 +2403,7 @@ button.fpms-filter-tag:focus-visible {
 .custom-select {
     border-color: var(--fpms-line);
     background-color: var(--fpms-surface);
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     padding-left: 0.75rem;
     padding-right: 0.75rem;
 }
@@ -2440,7 +2448,7 @@ textarea.form-control {
 @media (max-width: 767.98px) {
     .form-control,
     .custom-select {
-        font-size: 1rem;
+        font-size: var(--fpms-text-base);
     }
 }
 label:not(.custom-control-label),
@@ -2448,7 +2456,7 @@ label:not(.custom-control-label),
     font-size: 0.8125rem;
 }
 .custom-control-label {
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
 }
 .form-text,
 .invalid-feedback {
@@ -2475,7 +2483,7 @@ table.table .badge {
 
 // Tables: 14 px cells, 12 px column titles, gray hover
 table.table {
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
 }
 table.table thead th {
     font-size: 0.75rem;
@@ -2494,7 +2502,7 @@ table.table thead th {
     padding-left: 0.625rem;
     padding-right: 0.625rem;
     gap: 0.625rem;
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
     font-weight: 500;
 }
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item:hover > .nav-link:not(.active),
@@ -2505,7 +2513,7 @@ table.table thead th {
 
 // Page tabs: segmented control, 32 px items; the second row is the compact one
 .fpms-section-tab {
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
 }
 .fpms-section-subtabs .fpms-section-tab {
     font-size: 0.75rem;
@@ -2523,7 +2531,7 @@ table.table thead th {
 }
 .fpms-dialog-head h1,
 .fpms-dialog-head h2 {
-    font-size: 1.25rem;
+    font-size: var(--fpms-text-lg);
     font-weight: 700;
     line-height: 1.25;
     color: var(--fpms-text);
@@ -2533,7 +2541,7 @@ table.table thead th {
     height: 1.75rem;
     border: 0;
     background: transparent;
-    font-size: 1.25rem;
+    font-size: var(--fpms-text-lg);
 }
 .fpms-dialog-close:hover {
     background: var(--fpms-gray-tint);
@@ -2559,7 +2567,7 @@ table.table thead th {
     .btn.btn-lg {
         min-height: 2.5rem;
         padding: 0.4375rem 1rem;
-        font-size: 0.875rem;
+        font-size: var(--fpms-text-sm);
         line-height: 1.25rem;
     }
     .form-control,
