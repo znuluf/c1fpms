@@ -19,8 +19,8 @@ const CUSTOM = 'custom';
             <button class="btn btn-primary mr-1" (click)="startCreate()"><i class="fas fa-plus mr-1"></i>Add permit</button>
             <button class="btn btn-outline-secondary" [class.active]="showConfig" (click)="showConfig = !showConfig"><i class="fas fa-tags mr-1"></i>Presets</button>
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (status(); as s) {
                     <div class="row">
                         @for (t of tiles; track t.value) {
