@@ -37,13 +37,13 @@
 }
 
 .content-header h1 {
-    font-size: 1.5rem;
+    font-size: var(--fpms-text-xl);
     font-weight: 700;
 }
 
 .content-header .breadcrumb {
     background: transparent;
-    font-size: 0.875rem;
+    font-size: var(--fpms-text-sm);
 }
 
 .container-fluid {
@@ -173,7 +173,7 @@ hr {
     }
 
     .content-header h1 {
-        font-size: 1.25rem;
+        font-size: var(--fpms-text-lg);
     }
 
     .card-header,
@@ -213,7 +213,7 @@ hr {
 .fpms-button:disabled { opacity: .58; cursor: not-allowed; }
 .fpms-panel { min-width: 0; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); }
 .fpms-panel-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); padding: var(--s4) var(--s5); border-bottom: 1px solid var(--line); }
-.fpms-panel-title { margin: 0; color: var(--ink); font-size: 1rem; font-weight: 650; }
+.fpms-panel-title { margin: 0; color: var(--ink); font-size: var(--fpms-text-base); font-weight: 650; }
 .fpms-panel-body { min-width: 0; padding: var(--s5); }
 .fpms-panel-foot { padding: var(--s4) var(--s5); border-top: 1px solid var(--line); background: var(--bg); }
 .fpms-panel-tools { margin-inline-start: auto; }
@@ -225,7 +225,7 @@ hr {
 .fpms-control-plain { padding-inline: 0; border-color: transparent; background: transparent; }
 .fpms-field { min-width: 0; margin-bottom: var(--s4); }
 .fpms-field:last-child { margin-bottom: 0; }
-.fpms-help { display: block; margin-top: var(--s1); color: var(--muted); font-size: .875rem; }
+.fpms-help { display: block; margin-top: var(--s1); color: var(--muted); font-size: var(--fpms-text-sm); }
 .fpms-grid-row { display: flex; flex-wrap: wrap; row-gap: var(--s3); margin-inline: calc(-1 * var(--s2)); }
 .fpms-grid-row > [class*="fpms-col-"] { min-width: 0; padding-inline: var(--s2); }
 .fpms-col-lg-7 { flex: 0 0 58.333%; max-width: 58.333%; }
@@ -240,7 +240,7 @@ hr {
 .fpms-col-12 { flex: 0 0 100%; max-width: 100%; }
 .fpms-table-scroll { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--paper); }
 .fpms-data-table { width: 100%; border-collapse: collapse; color: var(--ink-2); background: var(--paper); }
-.fpms-data-table th { padding: var(--s3) var(--s4); color: var(--muted); text-align: start; white-space: nowrap; font-size: .875rem; font-weight: 600; border-bottom: 1px solid var(--line); }
+.fpms-data-table th { padding: var(--s3) var(--s4); color: var(--muted); text-align: start; white-space: nowrap; font-size: var(--fpms-text-sm); font-weight: 600; border-bottom: 1px solid var(--line); }
 .fpms-data-table td { padding: var(--s3) var(--s4); border-top: 1px solid var(--line); vertical-align: middle; }
 .fpms-table-compact th,.fpms-table-compact td { padding: var(--s2) var(--s3); }
 .fpms-table-hover tbody tr:hover { background: var(--bg); }
@@ -250,7 +250,7 @@ hr {
 .fpms-alert { padding: var(--s3) var(--s4); border: 1px solid var(--line); border-radius: var(--r-md); }
 .fpms-alert-warning { color: var(--orange-deep); background: var(--orange-tint); border-color: var(--orange-soft); }
 .fpms-alert-success { color: var(--green-deep); background: var(--green-tint); border-color: var(--green-soft); }
-.fpms-label { display: inline-flex; align-items: center; padding: var(--s1) var(--s2); border-radius: 999px; font-size: .875rem; font-weight: 600; }
+.fpms-label { display: inline-flex; align-items: center; padding: var(--s1) var(--s2); border-radius: 999px; font-size: var(--fpms-text-sm); font-weight: 600; }
 .fpms-label-info { color: var(--blue-deep); background: var(--blue-soft); }
 .fpms-label-success { color: var(--green-deep); background: var(--green-soft); }
 .fpms-label-warning { color: var(--orange-deep); background: var(--orange-soft); }
@@ -259,7 +259,7 @@ hr {
 .fpms-info { color: var(--blue-deep); }
 .fpms-success { color: var(--green-deep); }
 .fpms-warning-text { color: var(--orange-deep); }
-.fpms-small { font-size: .875rem; }
+.fpms-small { font-size: var(--fpms-text-sm); }
 .fpms-weight-bold { font-weight: 700; }
 .fpms-weight-normal { font-weight: 400; }
 .fpms-flex { display: flex; }
