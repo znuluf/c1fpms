@@ -61,10 +61,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 }
                                 <span>Pond · batch</span>
                                 <div><strong>{{ h.pondCode }}</strong> · {{ h.batchCode }}</div>
-                                @if (h.weighedBy) {
-                                    <span>Weighed on</span>
-                                    <div>The {{ h.weighedBy === 2 ? "buyer's" : "farm's" }} scale</div>
-                                }
                             </div>
                             <div class="fpms-lot-box">
                                 <span>Lot code</span>

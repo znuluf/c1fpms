@@ -49,10 +49,6 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <div><strong>{{ g.pondCode }}</strong> · {{ g.batchCode }}</div>
                                     <span>Dispatch receipt</span>
                                     <div>{{ s.dispatchReceiptNo }} · {{ s.saleDate | farmDate }}</div>
-                                    @if (g.weighedBy) {
-                                        <span>Weighed on</span>
-                                        <div>The {{ g.weighedBy === 2 ? "buyer's" : "farm's" }} scale</div>
-                                    }
                                 </div>
                                 <div class="fpms-lot-box">
                                     <span>Lot code</span>
@@ -152,7 +148,6 @@ export class BuyerTallyComponent extends FpmsPage implements OnInit {
                 lotCode: first.lotCode,
                 harvestedAtUtc: first.harvestedAtUtc,
                 harvestType: first.harvestType,
-                weighedBy: first.harvestWeighedBy,
                 abwG: first.harvestAbwG,
                 pondCode: first.pondCode,
                 batchCode: first.batchCode,

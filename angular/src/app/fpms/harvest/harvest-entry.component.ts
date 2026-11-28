@@ -6,6 +6,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
 import { PRICE_METHODS, countFromAbw, num, pricingBody, referencePrice } from '@shared/fpms/pricing';
 import { PriceTermsComponent, SalePaymentComponent, initialPaymentOf } from '@shared/fpms/pricing-ui';
 import { whereItWent, WhereRow } from '@shared/fpms/crates';
+import { estimatedPieces } from '@shared/fpms/pieces';
 import { DisposalReasons } from '@shared/fpms/labels';
 
 /**
@@ -212,6 +213,20 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                 <small class="fpms-help fpms-muted">Worked out from the sample weight and pieces.</small>
                                             }
                                         </div>
+                                    </div>
+                                    <div class="fpms-field" role="status">
+                                        <span class="fpms-block">Estimated pieces</span>
+                                        @let pieces = piecesEstimate();
+                                        <strong>{{ pieces == null ? '—' : (pieces | num: 0) }}</strong>
+                                        <small class="fpms-help fpms-muted">
+                                            @if (pieces == null) {
+                                                Worked out from the total weight and the ABW.
+                                            } @else if (m.finalCount != null && m.finalCount !== '') {
+                                                Estimate only. Your counted {{ m.finalCount | num: 0 }} pieces are used instead.
+                                            } @else {
+                                                About this many shrimp, worked out from the weight. It is not a physical count.
+                                            }
+                                        </small>
                                     </div>
                                     <details #moreHarvest class="fpms-fold" [open]="moreHarvest.open || hasHarvestExtras()">
                                         <summary>More details <span class="fpms-fold-hint">counted shrimp</span></summary>
@@ -1041,6 +1056,20 @@ export class HarvestEntryComponent extends FpmsPage implements OnInit {
     /** Graded kg, or the whole total when nothing is graded (it is sold as "Ungraded / mixed"). */
     sellKg(): number {
         return this.gradeKg() > 0 ? this.gradeKg() : Number(this.m.totalKg) || 0;
+    }
+
+    /** DEC-140: shrimp in this harvest, estimated from its weight and ABW (graded lines by their grade's middle count). */
+    piecesEstimate(): number | null {
+        const lines = (this.m.gradeLines ?? []).map((l: any) => {
+            const grade = this.grades.find((g) => g.id === l.sizeGradeId);
+            const saved = this.h?.gradeLines?.find((g: any) => g.sizeGradeId === l.sizeGradeId);
+            return {
+                kg: l.kg,
+                minCountPerKg: grade?.minCountPerKg ?? saved?.minCountPerKg,
+                maxCountPerKg: grade?.maxCountPerKg ?? saved?.maxCountPerKg,
+            };
+        });
+        return estimatedPieces(this.m.totalKg, this.m.abwG, lines);
     }
 
     /** The harvest's count from its ABW (whole pieces per kg), used by count and table pricing. */

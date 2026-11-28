@@ -509,7 +509,6 @@ interface CalMonth {
                                     }
                                 </div>
                                 @let remainingIndicators = b.indicators;
-                                @let remainingBiomass = remainingBiomassKg();
                                 <div class="fpms-panel-body fpms-space-y-2">
                                     <dl class="fpms-figures fpms-figures-sm fpms-no-bottom" aria-label="Estimated shrimp remaining in pond">
                                         <div class="fpms-figure">
@@ -525,22 +524,22 @@ interface CalMonth {
                                         <div class="fpms-figure">
                                             <dt class="l">Estimated remaining biomass</dt>
                                             <dd class="v">
-                                                @if (remainingBiomass != null) {
-                                                    {{ remainingBiomass | num: 1 }}<span class="u">kg</span>
+                                                @if (remainingIndicators?.estimatedBiomassKg != null) {
+                                                    {{ remainingIndicators.estimatedBiomassKg | num: 1 }}<span class="u">kg</span>
                                                 } @else {
                                                     Not available
                                                 }
                                             </dd>
                                         </div>
                                     </dl>
-                                    @if (remainingIndicators?.latestSampleAbwG != null) {
+                                    @if (remainingIndicators?.estimatedBiomassKg != null) {
                                         <p class="fpms-small fpms-muted fpms-no-bottom">
-                                            Biomass uses the latest growth sample: ABW {{ remainingIndicators.latestSampleAbwG | num: 2 }} g
-                                            @if (b.harvestReadinessSampleDate) { · sampled {{ b.harvestReadinessSampleDate | farmDate }}. }
+                                            Biomass uses {{ remainingIndicators.biomassAbwSource === 'Harvest' ? 'the selected partial-harvest ABW' : 'the latest growth sample' }}: ABW {{ remainingIndicators.biomassAbwG | num: 2 }} g
+                                            @if (remainingIndicators.biomassAbwSourceDate) { · {{ remainingIndicators.biomassAbwSource === 'Harvest' ? 'harvested' : 'sampled' }} {{ remainingIndicators.biomassAbwSourceDate | farmDate }} }.
                                             This is an estimate, not a physical count.
                                         </p>
                                     } @else {
-                                        <p class="fpms-small fpms-muted fpms-no-bottom">No valid growth-sampling ABW is available yet, so remaining biomass cannot be estimated.</p>
+                                        <p class="fpms-small fpms-muted fpms-no-bottom">Remaining biomass needs a stocking count and an ABW from a growth sample or a selected partial harvest.</p>
                                     }
                                 </div>
                                 @if (harvests.length) {
@@ -851,17 +850,6 @@ export class BatchDetailComponent extends FpmsPage implements OnInit {
     entered(value: string, onDate: string): string {
         const day = FarmTime.isoDateOf(value);
         return day === String(onDate ?? '').substring(0, 10) ? FarmTime.time(value) : `${shortDate(day)}, ${FarmTime.time(value)}`;
-    }
-
-    /** Remaining biomass shown in the Harvest tab: estimated population multiplied by the latest growth-sampling ABW. */
-    remainingBiomassKg(): number | null {
-        const indicators = this.b?.indicators;
-        const population = indicators?.estimatedPopulation;
-        const abw = indicators?.latestSampleAbwG;
-        if (population == null || abw == null || !Number.isFinite(Number(population)) || !Number.isFinite(Number(abw)) || Number(population) < 0 || Number(abw) <= 0) {
-            return null;
-        }
-        return Number(population) * Number(abw) / 1000;
     }
 
     /** Kg of a harvest on grade lines and not yet sold: what a sale can still take. */

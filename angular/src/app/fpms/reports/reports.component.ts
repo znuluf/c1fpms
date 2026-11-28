@@ -130,7 +130,6 @@ type ReportKey = 'cycle' | 'harvest' | 'sales' | 'wq' | 'inventory' | 'failure';
                                     <div class="fpms-doc-title">{{ title() }}</div>
                                     <div class="fpms-small"><strong>{{ r.header.scope }}</strong></div>
                                     <div class="fpms-small">Generated {{ r.header.generatedAtUtc | farmDateTime }} by {{ r.header.generatedBy }}</div>
-                                    <div class="fpms-small">Time zone {{ r.header.timeZone }}</div>
                                 </div>
                             </div>
                         } @else {

@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed (consultation follow-up, DEC-139, DEC-140, DEC-142)
+- **One remaining-biomass figure.** The batch's Harvests tab now shows the same biomass as the summary and FCR, including a selected partial-harvest ABW, and names the ABW used.
+- **Estimated pieces** are shown on the harvest form, worked out from the weight and ABW. A counted number is still used in place of the estimate.
+- **Time zone** is no longer shown in Farm settings or on report headings. The saved value is kept and still used for farm dates.
+- **"Weighed on"** is off the harvest tally sheet, the buyer tally sheet and the blank tally sheet. Saved values are kept.
+
 ### Changed (reference sizes and shapes, DEC-146)
 - **Sizes from the reference app.** On screens 1025 px wide and up, buttons and fields are 32 px tall (28 px small, 40 px large), with 14 px text in fields and buttons, 13 px labels, and 12 px hints, badges and column titles. Page titles are 24 px (36 px from 768 px wide) and bold. Cards have 18 px corners and no shadow, badges are 24 px pills, sidebar rows are 36 px, and dialogs have a warm surface with one soft shadow.
 - **Fields and buttons.** A hairline border that darkens on hover, an ink border with a soft ring on focus, a red border when invalid. Outline buttons are quiet, and Delete is a soft red that turns solid on hover.

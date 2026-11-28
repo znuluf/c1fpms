@@ -132,11 +132,6 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                                 <small class="fpms-help fpms-muted">Shrimp not yet sold or accounted for are listed on the dashboard after this many days. Each harvest can use its own day.</small>
                                             </div>
                                             <div class="fpms-field fpms-col-md-6">
-                                                <label for="tz">Farm time zone</label>
-                                                <input id="tz" type="text" class="fpms-control" name="timeZone" [(ngModel)]="p.timeZone" required maxlength="64" placeholder="Asia/Manila" />
-                                                <small class="fpms-help fpms-muted">IANA time zone used for farm dates and reports, for example Asia/Manila.</small>
-                                            </div>
-                                            <div class="fpms-field fpms-col-md-6">
                                                 <label for="dord">Date display</label>
                                                 <select id="dord" class="fpms-control" name="dateOrder" [(ngModel)]="p.dateOrder">
                                                     <option [ngValue]="1">Month first (Oct 22, 2026)</option>
@@ -200,7 +195,6 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                 <dl class="fpms-grid-row fpms-no-bottom fpms-dl">
                                     <dt class="fpms-col-sm-4">Permit reminder</dt><dd class="fpms-col-sm-8">{{ p.documentExpiryAlertDays }} days before expiry</dd>
                                     <dt class="fpms-col-sm-4">Unsold shrimp follow-up</dt><dd class="fpms-col-sm-8">{{ p.unsoldFollowUpDays }} days after harvest</dd>
-                                    <dt class="fpms-col-sm-4">Time zone</dt><dd class="fpms-col-sm-8">{{ p.timeZone }}</dd>
                                     <dt class="fpms-col-sm-4">Date display</dt><dd class="fpms-col-sm-8">{{ p.dateOrder === 2 ? 'Day first' : 'Month first' }}</dd>
                                     <dt class="fpms-col-sm-4">Time display</dt><dd class="fpms-col-sm-8">{{ p.use24HourTime ? '24-hour (14:30)' : '12-hour (2:30 PM)' }}</dd>
                                 </dl>
