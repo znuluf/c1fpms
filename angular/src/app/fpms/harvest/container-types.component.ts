@@ -14,8 +14,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="Crate types" subtitle="Name the crates you weigh with (banyera, tub, box). A crate with no type is just called a crate."></fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 <div class="row">
                     <div class="col-xl-8">
                         <div class="card">
