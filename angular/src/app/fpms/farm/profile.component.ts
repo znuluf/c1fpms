@@ -15,90 +15,90 @@ const PROFILE_DRAFT = 'farm-profile';
     template: `
         <fpms-page-header [narrow]="true" title="Farm profile" subtitle="Farm identity, location and contact information."></fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
+            <div class="fpms-page-inner fpms-narrow">
                 @if (!p) {
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (!canEdit) {
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Farm details</h3></div>
-                            <div class="card-body">
-                                <dl class="row mb-0 fpms-dl">
-                                    <dt class="col-sm-4">Farm ID</dt><dd class="col-sm-8">
-                                        @if (p.farmId) { <code>{{ p.farmId }}</code><span class="fpms-none ml-2">{{ p.cityMunicipality }}{{ p.addressLine2 ? ', ' + p.addressLine2 : '' }}</span> } @else { <span class="fpms-none">—</span> }
-                                        <div class="small fpms-none">{{ p.lotCodeNote }}</div>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Farm details</h3></div>
+                            <div class="fpms-panel-body">
+                                <dl class="fpms-grid-row fpms-no-bottom fpms-dl">
+                                    <dt class="fpms-col-sm-4">Farm ID</dt><dd class="fpms-col-sm-8">
+                                        @if (p.farmId) { <code>{{ p.farmId }}</code><span class="fpms-none fpms-space-start-2">{{ p.cityMunicipality }}{{ p.addressLine2 ? ', ' + p.addressLine2 : '' }}</span> } @else { <span class="fpms-none">—</span> }
+                                        <div class="fpms-small fpms-none">{{ p.lotCodeNote }}</div>
                                     </dd>
-                                    <dt class="col-sm-4">Farm code</dt><dd class="col-sm-8"><code>{{ p.farmCode }}</code><span class="fpms-none ml-2">used with your username to sign in</span></dd>
-                                    <dt class="col-sm-4">Farm name</dt><dd class="col-sm-8">{{ p.farmName }}</dd>
-                                    <dt class="col-sm-4">Total farm area</dt>
-                                    <dd class="col-sm-8">
+                                    <dt class="fpms-col-sm-4">Farm code</dt><dd class="fpms-col-sm-8"><code>{{ p.farmCode }}</code><span class="fpms-none fpms-space-start-2">used with your username to sign in</span></dd>
+                                    <dt class="fpms-col-sm-4">Farm name</dt><dd class="fpms-col-sm-8">{{ p.farmName }}</dd>
+                                    <dt class="fpms-col-sm-4">Total farm area</dt>
+                                    <dd class="fpms-col-sm-8">
                                         @if (p.totalAreaHectares) { {{ p.totalAreaHectares | num: 2 }} ha } @else { <span class="fpms-none">—</span> }
-                                        <span class="fpms-none ml-1">· ponds on record {{ p.pondAreaHectares | num: 2 }} ha</span>
+                                        <span class="fpms-none fpms-icon-gap">· ponds on record {{ p.pondAreaHectares | num: 2 }} ha</span>
                                     </dd>
-                                    <dt class="col-sm-4">Address</dt><dd class="col-sm-8">{{ p.fullAddress || '—' }}</dd>
-                                    <dt class="col-sm-4">Harvest lot code</dt>
-                                    <dd class="col-sm-8">
+                                    <dt class="fpms-col-sm-4">Address</dt><dd class="fpms-col-sm-8">{{ p.fullAddress || '—' }}</dd>
+                                    <dt class="fpms-col-sm-4">Harvest lot code</dt>
+                                    <dd class="fpms-col-sm-8">
                                         @if (p.lotCodeParts) { <code>YY-{{ p.lotCodeParts }}-PP-HH</code> }
-                                        <div class="small" [class.text-warning-dark]="!p.lotCodeParts" [class.fpms-none]="p.lotCodeParts">{{ p.lotCodeNote }}</div>
+                                        <div class="fpms-small" [class.fpms-warning-text]="!p.lotCodeParts" [class.fpms-none]="p.lotCodeParts">{{ p.lotCodeNote }}</div>
                                     </dd>
-                                    <dt class="col-sm-4">Coordinates</dt>
-                                    <dd class="col-sm-8">
+                                    <dt class="fpms-col-sm-4">Coordinates</dt>
+                                    <dd class="fpms-col-sm-8">
                                         @if (p.latitude != null && p.longitude != null) { {{ p.latitude | num: 6 }}, {{ p.longitude | num: 6 }} } @else { <span class="fpms-none">—</span> }
                                     </dd>
                                 </dl>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Contact</h3></div>
-                            <div class="card-body">
-                                <dl class="row mb-0 fpms-dl">
-                                    <dt class="col-sm-4">Contact person</dt><dd class="col-sm-8">{{ p.contactName || '—' }}</dd>
-                                    <dt class="col-sm-4">Phone</dt><dd class="col-sm-8">{{ p.contactPhone || '—' }}</dd>
-                                    <dt class="col-sm-4">Email</dt><dd class="col-sm-8">{{ p.contactEmail || '—' }}</dd>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Contact</h3></div>
+                            <div class="fpms-panel-body">
+                                <dl class="fpms-grid-row fpms-no-bottom fpms-dl">
+                                    <dt class="fpms-col-sm-4">Contact person</dt><dd class="fpms-col-sm-8">{{ p.contactName || '—' }}</dd>
+                                    <dt class="fpms-col-sm-4">Phone</dt><dd class="fpms-col-sm-8">{{ p.contactPhone || '—' }}</dd>
+                                    <dt class="fpms-col-sm-4">Email</dt><dd class="fpms-col-sm-8">{{ p.contactEmail || '—' }}</dd>
                                 </dl>
                             </div>
                         </div>
-                        <p class="text-muted small"><i class="fas fa-lock mr-1"></i>Only a Farm Owner can change the farm profile.</p>
+                        <p class="fpms-muted fpms-small"><i class="fas fa-lock fpms-icon-gap"></i>Only a Farm Owner can change the farm profile.</p>
                     }
 
                     @if (canEdit) {
                         @if (restoredAt) {
-                            <div class="alert alert-info d-flex align-items-center" role="status">
-                                <i class="fas fa-history mr-2" aria-hidden="true"></i>
-                                <span class="mr-auto">Your unsaved changes from {{ restoredAt | farmDateTime }} were restored. Save to keep them.</span>
-                                <button type="button" class="btn btn-sm btn-outline-secondary ml-2 text-nowrap" [disabled]="busy()" (click)="discardDraft()">Discard them</button>
+                            <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                                <i class="fas fa-history fpms-icon-gap" aria-hidden="true"></i>
+                                <span class="fpms-margin-auto-end">Your unsaved changes from {{ restoredAt | farmDateTime }} were restored. Save to keep them.</span>
+                                <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary fpms-space-start-2 fpms-nowrap" [disabled]="busy()" (click)="discardDraft()">Discard them</button>
                             </div>
                         } @else if (draftOutdated) {
-                            <div class="alert alert-warning d-flex align-items-center" role="status">
-                                <i class="fas fa-exclamation-triangle mr-2" aria-hidden="true"></i>
-                                <span class="mr-auto">Your unsaved changes were not restored: someone saved the farm profile after you. Make them again if they are still needed.</span>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="draftOutdated = false">Close</button>
+                            <div class="fpms-alert fpms-alert-warning fpms-flex align-items-center" role="status">
+                                <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>
+                                <span class="fpms-margin-auto-end">Your unsaved changes were not restored: someone saved the farm profile after you. Make them again if they are still needed.</span>
+                                <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="draftOutdated = false">Close</button>
                             </div>
                         }
                         <!-- One panel (DEC-109): the profile's parts are sections of it, with Save as its footer. -->
                         <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" (input)="keepDraft()" (change)="keepDraft()" fpmsReview="farm profile" novalidate>
                             <fieldset [disabled]="!canEdit">
-                                <div class="card">
-                                    <div class="card-header"><h3 class="card-title">Farm details</h3></div>
-                                    <div class="card-body">
-                                        <div class="form-group">
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title">Farm details</h3></div>
+                                    <div class="fpms-panel-body">
+                                        <div class="fpms-field">
                                             <label for="farmId">Farm ID</label>
-                                            <input id="farmId" class="form-control fpms-code-field" name="farmId" [ngModel]="p.farmId || '—'" readonly aria-describedby="farmIdHelp" />
-                                            <small id="farmIdHelp" class="form-text text-muted">Area, place and farm number, like 0-24-03. It comes from the farm address and is given by the system. Once a lot code uses it, it never changes.</small>
+                                            <input id="farmId" class="fpms-control fpms-code-field" name="farmId" [ngModel]="p.farmId || '—'" readonly aria-describedby="farmIdHelp" />
+                                            <small id="farmIdHelp" class="fpms-help fpms-muted">Area, place and farm number, like 0-24-03. It comes from the farm address and is given by the system. Once a lot code uses it, it never changes.</small>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="fpms-field">
                                             <label for="farmCode">Farm code</label>
                                             <div class="input-group fpms-code-field-group">
-                                                <input id="farmCode" class="form-control fpms-code-field" name="farmCode" [ngModel]="p.farmCode" readonly aria-describedby="farmCodeHelp" />
+                                                <input id="farmCode" class="fpms-control fpms-code-field" name="farmCode" [ngModel]="p.farmCode" readonly aria-describedby="farmCodeHelp" />
                                                 @if (p.canChangeFarmCode) {
                                                     <div class="input-group-append">
-                                                        <button type="button" class="btn btn-outline-secondary" [disabled]="!!p.nextFarmCodeChange" (click)="openCodeDlg()">
-                                                            <i class="fas fa-key mr-1" aria-hidden="true"></i>Change code
+                                                        <button type="button" class="fpms-button fpms-button-secondary" [disabled]="!!p.nextFarmCodeChange" (click)="openCodeDlg()">
+                                                            <i class="fas fa-key fpms-icon-gap" aria-hidden="true"></i>Change code
                                                         </button>
                                                     </div>
                                                 }
                                             </div>
-                                            <small id="farmCodeHelp" class="form-text text-muted">
+                                            <small id="farmCodeHelp" class="fpms-help fpms-muted">
                                                 Staff enter this with their username to sign in, and it appears on exports and reports.
                                                 @if (!p.canChangeFarmCode) {
                                                     Only the Farm Owner can change it.
@@ -109,115 +109,115 @@ const PROFILE_DRAFT = 'farm-profile';
                                                 }
                                             </small>
                                         </div>
-                                        <div class="form-row">
-                                            <div class="form-group col-md-8">
-                                                <label for="farmName">Farm name <span class="text-danger">*</span></label>
-                                                <input id="farmName" class="form-control" name="farmName" [(ngModel)]="p.farmName" required maxlength="150" />
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-md-8">
+                                                <label for="farmName">Farm name <span class="fpms-danger">*</span></label>
+                                                <input id="farmName" class="fpms-control" name="farmName" [(ngModel)]="p.farmName" required maxlength="150" />
                                             </div>
-                                            <div class="form-group col-md-4">
+                                            <div class="fpms-field fpms-col-md-4">
                                                 <label for="area">Total farm area (hectares)</label>
-                                                <input id="area" type="number" min="0.01" max="100000" step="0.01" class="form-control" name="totalAreaHectares" [(ngModel)]="p.totalAreaHectares" />
-                                                <small class="form-text text-muted">Ponds on record: {{ p.pondAreaHectares | num: 2 }} ha.</small>
+                                                <input id="area" type="number" min="0.01" max="100000" step="0.01" class="fpms-control" name="totalAreaHectares" [(ngModel)]="p.totalAreaHectares" />
+                                                <small class="fpms-help fpms-muted">Ponds on record: {{ p.pondAreaHectares | num: 2 }} ha.</small>
                                             </div>
                                         </div>
                                         @if (areaExceeded) {
-                                            <div class="alert alert-warning py-2 small" role="status">
-                                                <i class="fas fa-exclamation-triangle mr-1"></i>The ponds add up to {{ p.pondAreaHectares | num: 2 }} ha, more than the total farm area.
+                                            <div class="fpms-alert fpms-alert-warning fpms-space-y-2 fpms-small" role="status">
+                                                <i class="fas fa-exclamation-triangle fpms-icon-gap"></i>The ponds add up to {{ p.pondAreaHectares | num: 2 }} ha, more than the total farm area.
                                                 Check the total area or the pond areas. You can still save.
                                             </div>
                                         }
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-header"><h3 class="card-title">Address</h3></div>
-                                    <div class="card-body">
-                                        <p class="small mb-2" [class.text-warning-dark]="!p.lotCodeParts" [class.text-muted]="p.lotCodeParts">
-                                            <i class="fas fa-barcode mr-1" aria-hidden="true"></i>Harvest lot codes use this address{{ p.lotCodeParts ? ' (' + p.lotCodeParts + ')' : '' }}: {{ p.lotCodeNote }}
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title">Address</h3></div>
+                                    <div class="fpms-panel-body">
+                                        <p class="fpms-small fpms-space-bottom-2" [class.fpms-warning-text]="!p.lotCodeParts" [class.fpms-muted]="p.lotCodeParts">
+                                            <i class="fas fa-barcode fpms-icon-gap" aria-hidden="true"></i>Harvest lot codes use this address{{ p.lotCodeParts ? ' (' + p.lotCodeParts + ')' : '' }}: {{ p.lotCodeNote }}
                                         </p>
-                                        <div class="form-row">
-                                            <div class="form-group col-md-8">
-                                                <label for="line1">Street, purok or sitio <span class="text-danger">*</span></label>
-                                                <input id="line1" class="form-control" name="addressLine1" [(ngModel)]="p.addressLine1" required maxlength="200" />
-                                                <small class="form-text text-muted">House number, street, purok or sitio.</small>
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-md-8">
+                                                <label for="line1">Street, purok or sitio <span class="fpms-danger">*</span></label>
+                                                <input id="line1" class="fpms-control" name="addressLine1" [(ngModel)]="p.addressLine1" required maxlength="200" />
+                                                <small class="fpms-help fpms-muted">House number, street, purok or sitio.</small>
                                             </div>
-                                            <div class="form-group col-md-4">
+                                            <div class="fpms-field fpms-col-md-4">
                                                 <label for="barangay">Barangay</label>
                                                 @if (barangays().length) {
-                                                    <select id="barangay" class="form-control" name="addressLine2" [(ngModel)]="p.addressLine2" [disabled]="!p.cityMunicipality">
+                                                    <select id="barangay" class="fpms-control" name="addressLine2" [(ngModel)]="p.addressLine2" [disabled]="!p.cityMunicipality">
                                                         <option value="">{{ p.cityMunicipality ? 'Choose a barangay' : 'Choose the city or municipality first' }}</option>
                                                         @for (name of barangays(); track name) {
                                                             <option [value]="name">{{ name }}</option>
                                                         }
                                                     </select>
                                                 } @else {
-                                                    <input id="barangay" class="form-control" name="addressLine2" [(ngModel)]="p.addressLine2" maxlength="200" />
-                                                    <small class="form-text text-muted">Type the barangay (no list for this city or municipality).</small>
+                                                    <input id="barangay" class="fpms-control" name="addressLine2" [(ngModel)]="p.addressLine2" maxlength="200" />
+                                                    <small class="fpms-help fpms-muted">Type the barangay (no list for this city or municipality).</small>
                                                 }
                                             </div>
                                         </div>
-                                        <div class="form-row">
-                                            <div class="form-group col-md-4">
-                                                <label for="province">Province <span class="text-danger">*</span></label>
-                                                <select id="province" class="form-control" name="province" [(ngModel)]="p.province" (ngModelChange)="onProvinceChange()" required>
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-md-4">
+                                                <label for="province">Province <span class="fpms-danger">*</span></label>
+                                                <select id="province" class="fpms-control" name="province" [(ngModel)]="p.province" (ngModelChange)="onProvinceChange()" required>
                                                     <option value="" disabled>Choose a province</option>
                                                     @for (name of provinces(); track name) {
                                                         <option [value]="name">{{ name }}</option>
                                                     }
                                                 </select>
                                             </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="city">City or municipality <span class="text-danger">*</span></label>
-                                                <select id="city" class="form-control" name="cityMunicipality" [(ngModel)]="p.cityMunicipality" (ngModelChange)="onCityChange()" [disabled]="!p.province" required>
+                                            <div class="fpms-field fpms-col-md-4">
+                                                <label for="city">City or municipality <span class="fpms-danger">*</span></label>
+                                                <select id="city" class="fpms-control" name="cityMunicipality" [(ngModel)]="p.cityMunicipality" (ngModelChange)="onCityChange()" [disabled]="!p.province" required>
                                                     <option value="" disabled>{{ p.province ? 'Choose a city or municipality' : 'Choose the province first' }}</option>
                                                     @for (name of cities(); track name) {
                                                         <option [value]="name">{{ name }}</option>
                                                     }
                                                 </select>
-                                                <small class="form-text text-muted">Covered: General Santos City and Sarangani.</small>
+                                                <small class="fpms-help fpms-muted">Covered: General Santos City and Sarangani.</small>
                                             </div>
-                                            <div class="form-group col-md-4">
+                                            <div class="fpms-field fpms-col-md-4">
                                                 <label for="postal">Postal code</label>
-                                                <input id="postal" class="form-control" name="postalCode" [(ngModel)]="p.postalCode" maxlength="10" inputmode="numeric" />
+                                                <input id="postal" class="fpms-control" name="postalCode" [(ngModel)]="p.postalCode" maxlength="10" inputmode="numeric" />
                                                 @if (!postalOk) {
-                                                    <small class="text-danger">4 digits, e.g. 9502.</small>
+                                                    <small class="fpms-danger">4 digits, e.g. 9502.</small>
                                                 }
                                             </div>
                                         </div>
-                                        <div class="form-row">
-                                            <div class="form-group col-md-4">
-                                                <label for="country">Country <span class="text-danger">*</span></label>
-                                                <input id="country" class="form-control" name="country" [(ngModel)]="p.country" required maxlength="100" />
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-md-4">
+                                                <label for="country">Country <span class="fpms-danger">*</span></label>
+                                                <input id="country" class="fpms-control" name="country" [(ngModel)]="p.country" required maxlength="100" />
                                             </div>
-                                            <div class="form-group col-md-4">
+                                            <div class="fpms-field fpms-col-md-4">
                                                 <label for="lat">Latitude</label>
-                                                <input id="lat" type="number" step="0.000001" min="-90" max="90" class="form-control" name="latitude" [(ngModel)]="p.latitude" />
+                                                <input id="lat" type="number" step="0.000001" min="-90" max="90" class="fpms-control" name="latitude" [(ngModel)]="p.latitude" />
                                             </div>
-                                            <div class="form-group col-md-4">
+                                            <div class="fpms-field fpms-col-md-4">
                                                 <label for="lng">Longitude</label>
-                                                <input id="lng" type="number" step="0.000001" min="-180" max="180" class="form-control" name="longitude" [(ngModel)]="p.longitude" />
+                                                <input id="lng" type="number" step="0.000001" min="-180" max="180" class="fpms-control" name="longitude" [(ngModel)]="p.longitude" />
                                             </div>
                                         </div>
                                         @if (p.fullAddress) {
-                                            <p class="small text-muted mb-0">Printed on reports and sales records as: <span class="text-body">{{ p.fullAddress }}</span></p>
+                                            <p class="fpms-small fpms-muted fpms-no-bottom">Printed on reports and sales records as: <span class="fpms-body-text">{{ p.fullAddress }}</span></p>
                                         }
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-header"><h3 class="card-title">Contact</h3></div>
-                                    <div class="card-body">
-                                        <div class="form-row">
-                                            <div class="form-group col-md-4">
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title">Contact</h3></div>
+                                    <div class="fpms-panel-body">
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-md-4">
                                                 <label for="cname">Contact person</label>
-                                                <input id="cname" class="form-control" name="contactName" [(ngModel)]="p.contactName" maxlength="100" />
+                                                <input id="cname" class="fpms-control" name="contactName" [(ngModel)]="p.contactName" maxlength="100" />
                                             </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="cphone">Phone <span class="text-danger">*</span></label>
-                                                <input id="cphone" fpmsPhone class="form-control" [class.is-invalid]="cph.invalid && cph.touched" name="contactPhone" [(ngModel)]="p.contactPhone" required #cph="ngModel" aria-describedby="cphoneHelp" />
-                                                <small id="cphoneHelp" class="form-text" [class.text-danger]="cph.invalid && cph.touched" [class.text-muted]="!(cph.invalid && cph.touched)">{{ cph.invalid && cph.touched ? PHONE_MESSAGE : 'Mobile 0917 123 4567 or landline (083) 552 1234.' }}</small>
+                                            <div class="fpms-field fpms-col-md-4">
+                                                <label for="cphone">Phone <span class="fpms-danger">*</span></label>
+                                                <input id="cphone" fpmsPhone class="fpms-control" [class.is-invalid]="cph.invalid && cph.touched" name="contactPhone" [(ngModel)]="p.contactPhone" required #cph="ngModel" aria-describedby="cphoneHelp" />
+                                                <small id="cphoneHelp" class="fpms-help" [class.fpms-danger]="cph.invalid && cph.touched" [class.fpms-muted]="!(cph.invalid && cph.touched)">{{ cph.invalid && cph.touched ? PHONE_MESSAGE : 'Mobile 0917 123 4567 or landline (083) 552 1234.' }}</small>
                                             </div>
-                                            <div class="form-group col-md-4">
+                                            <div class="fpms-field fpms-col-md-4">
                                                 <label for="cemail">Email</label>
-                                                <input id="cemail" type="email" email class="form-control" name="contactEmail" [(ngModel)]="p.contactEmail" maxlength="256" />
+                                                <input id="cemail" type="email" email class="fpms-control" name="contactEmail" [(ngModel)]="p.contactEmail" maxlength="256" />
                                             </div>
                                         </div>
                                     </div>
@@ -225,17 +225,17 @@ const PROFILE_DRAFT = 'farm-profile';
                             </fieldset>
                             @if (canEdit) {
                                 <div class="fpms-form-foot">
-                                    <button type="submit" class="btn btn-primary" [disabled]="busy() || !f.form.valid || !postalOk">
+                                    <button type="submit" class="fpms-button fpms-button-primary" [disabled]="busy() || !f.form.valid || !postalOk">
                                         @if (busy()) {
-                                            <i class="fas fa-spinner fa-spin mr-1"></i>
+                                            <i class="fas fa-spinner fa-spin fpms-icon-gap"></i>
                                         }
                                         Save profile
                                     </button>
-                                    <button type="button" class="btn btn-default" (click)="f.form.markAsPristine(); load()">Cancel</button>
+                                    <button type="button" class="fpms-button fpms-button-secondary" (click)="f.form.markAsPristine(); load()">Cancel</button>
                                     <fpms-form-hint [form]="f"></fpms-form-hint>
                                 </div>
                             } @else {
-                                <p class="text-muted small"><i class="fas fa-lock mr-1"></i>Only a Farm Owner can change the farm profile.</p>
+                                <p class="fpms-muted fpms-small"><i class="fas fa-lock fpms-icon-gap"></i>Only a Farm Owner can change the farm profile.</p>
                             }
                         </form>
                     }
@@ -248,45 +248,45 @@ const PROFILE_DRAFT = 'farm-profile';
             <div class="fpms-dialog-backdrop">
                 <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="codeDlgTitle">
                     <div class="fpms-dialog-head">
-                        <h2 id="codeDlgTitle" class="mr-auto">{{ d.done ? 'Farm code changed' : 'Change farm code' }}</h2>
+                        <h2 id="codeDlgTitle" class="fpms-margin-auto-end">{{ d.done ? 'Farm code changed' : 'Change farm code' }}</h2>
                         <button type="button" class="fpms-dialog-close" aria-label="Close" (click)="closeCodeDlg()"><span aria-hidden="true">&times;</span></button>
                     </div>
                     @if (d.done) {
                         <div class="fpms-dialog-body">
-                            <p class="mb-2">The new farm code is</p>
-                            <p class="h3 mb-3"><code>{{ d.done.farmCode }}</code></p>
-                            <div class="alert alert-info small mb-0">
-                                <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
+                            <p class="fpms-space-bottom-2">The new farm code is</p>
+                            <p class="h3 fpms-space-bottom-3"><code>{{ d.done.farmCode }}</code></p>
+                            <div class="fpms-alert fpms-alert-info fpms-small fpms-no-bottom">
+                                <i class="fas fa-info-circle fpms-icon-gap" aria-hidden="true"></i>
                                 Tell your staff to sign in with the new code. Anyone who types <code>{{ d.done.oldCode }}</code> is shown the new code instead.
                                 People who are signed in now stay signed in.
                             </div>
                         </div>
                         <div class="fpms-dialog-foot">
-                            <button type="button" class="btn btn-outline-secondary" (click)="copyCode()"><i class="far fa-copy mr-1" aria-hidden="true"></i>Copy code</button>
-                            <button type="button" class="btn btn-primary" (click)="closeCodeDlg()">Done</button>
+                            <button type="button" class="fpms-button fpms-button-secondary" (click)="copyCode()"><i class="far fa-copy fpms-icon-gap" aria-hidden="true"></i>Copy code</button>
+                            <button type="button" class="fpms-button fpms-button-primary" (click)="closeCodeDlg()">Done</button>
                         </div>
                     } @else {
                         <form (ngSubmit)="saveCode()" fpmsReview="farm code" novalidate autocomplete="off">
                             <div class="fpms-dialog-body">
-                                <div class="alert alert-warning small">
-                                    <i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>
+                                <div class="fpms-alert fpms-alert-warning fpms-small">
+                                    <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>
                                     The farm code is what staff type, with their username, to sign in. After the change:
-                                    <ul class="mb-0 pl-3 mt-1">
+                                    <ul class="fpms-no-bottom pl-3 fpms-space-top-1">
                                         <li>everyone must sign in with the new code, and saved links or bookmarks that use the old one stop working;</li>
                                         <li>exports and reports made earlier keep the old code;</li>
                                         <li>the old code can never be used again, by this farm or any other;</li>
                                         <li>the code can be changed again only after {{ cooldownDays }} days.</li>
                                     </ul>
                                 </div>
-                                <div class="form-group">
+                                <div class="fpms-field">
                                     <label for="oldCode">Current code</label>
-                                    <input id="oldCode" class="form-control fpms-code-field" [value]="p.farmCode" readonly />
+                                    <input id="oldCode" class="fpms-control fpms-code-field" [value]="p.farmCode" readonly />
                                 </div>
-                                <div class="form-group">
-                                    <label for="newCode">New code <span class="text-danger">*</span></label>
-                                    <input id="newCode" class="form-control fpms-code-field" name="newCode" [(ngModel)]="d.newCode" (ngModelChange)="codeInput()" maxlength="64" autocomplete="off" spellcheck="false" aria-describedby="newCodeHelp"
+                                <div class="fpms-field">
+                                    <label for="newCode">New code <span class="fpms-danger">*</span></label>
+                                    <input id="newCode" class="fpms-control fpms-code-field" name="newCode" [(ngModel)]="d.newCode" (ngModelChange)="codeInput()" maxlength="64" autocomplete="off" spellcheck="false" aria-describedby="newCodeHelp"
                                         [class.is-valid]="d.check?.available && d.checkedFor === d.newCode.trim()" [class.is-invalid]="d.check && !d.check.available && d.checkedFor === d.newCode.trim()" />
-                                    <small id="newCodeHelp" class="form-text" [class.text-muted]="!d.check || d.check.available" [class.text-danger]="d.check && !d.check.available" role="status">
+                                    <small id="newCodeHelp" class="fpms-help" [class.fpms-muted]="!d.check || d.check.available" [class.fpms-danger]="d.check && !d.check.available" role="status">
                                         @if (d.checking) {
                                             Checking…
                                         } @else if (d.check && d.checkedFor === d.newCode.trim()) {
@@ -296,18 +296,18 @@ const PROFILE_DRAFT = 'farm-profile';
                                         }
                                     </small>
                                 </div>
-                                <div class="form-group mb-0">
-                                    <label for="confirmCode">Type the new code again <span class="text-danger">*</span></label>
-                                    <input id="confirmCode" class="form-control fpms-code-field" name="confirmCode" [(ngModel)]="d.confirm" maxlength="64" autocomplete="off" spellcheck="false" />
+                                <div class="fpms-field fpms-no-bottom">
+                                    <label for="confirmCode">Type the new code again <span class="fpms-danger">*</span></label>
+                                    <input id="confirmCode" class="fpms-control fpms-code-field" name="confirmCode" [(ngModel)]="d.confirm" maxlength="64" autocomplete="off" spellcheck="false" />
                                     @if (d.confirm && d.confirm.trim() !== d.newCode.trim()) {
-                                        <small class="text-danger">The two codes do not match.</small>
+                                        <small class="fpms-danger">The two codes do not match.</small>
                                     }
                                 </div>
                             </div>
                             <div class="fpms-dialog-foot">
-                                <button type="button" class="btn btn-default" (click)="closeCodeDlg()">Cancel</button>
-                                <button type="submit" class="btn btn-primary" [disabled]="!canSaveCode || busy()">
-                                    @if (busy()) { <i class="fas fa-spinner fa-spin mr-1"></i> }
+                                <button type="button" class="fpms-button fpms-button-secondary" (click)="closeCodeDlg()">Cancel</button>
+                                <button type="submit" class="fpms-button fpms-button-primary" [disabled]="!canSaveCode || busy()">
+                                    @if (busy()) { <i class="fas fa-spinner fa-spin fpms-icon-gap"></i> }
                                     Change farm code
                                 </button>
                             </div>
