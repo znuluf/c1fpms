@@ -62,7 +62,7 @@ import { batchShort } from '@shared/fpms/labels';
                                         Pre-selected as {{ c.suggestedOutcome | label: L.CycleOutcomes }}{{ c.suggestedOutcome === 2 ? ' because every batch has a historical incident record' : '' }}. Change it if that is not right.
                                     </small>
                                 </div>
-                                <div class="fpms-check custom-checkbox">
+                                <div class="fpms-check fpms-check-box">
                                     <input type="checkbox" class="fpms-check-input" id="cc" [(ngModel)]="closing.confirm" />
                                     <label class="fpms-check-label" for="cc">I understand every record of this cycle will become read-only.</label>
                                 </div>
