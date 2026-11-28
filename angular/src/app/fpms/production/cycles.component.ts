@@ -15,10 +15,10 @@ import { unbroken } from '@shared/fpms/labels';
             subtitle="Each cycle holds the batches stocked from one fry delivery.">
             @if (can('Farm.Reports')) {
                 <button
-                    class="btn btn-outline-secondary"
+                    class="fpms-button fpms-button-secondary"
                     (click)="exportCsv('ExportList', { list: 'Cycles', cycleStatus: status, search: search || null })"
                     [disabled]="busy()">
-                    <i class="fas fa-file-csv mr-1"></i>
+                    <i class="fas fa-file-csv fpms-icon-gap"></i>
                     Export CSV
                 </button>
             }
@@ -36,8 +36,8 @@ import { unbroken } from '@shared/fpms/labels';
                         (searchChange)="onSearch($event)"
                         (chipChange)="onStatus($event)"></fpms-list-toolbar>
                 </div>
-                <div class="card">
-                    <div class="card-body p-0 table-responsive">
+                <div class="fpms-panel">
+                    <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!cycles()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!cycles().length) {
@@ -49,13 +49,13 @@ import { unbroken } from '@shared/fpms/labels';
                                 "
                                 icon="fas fa-sync"></fpms-empty>
                         } @else {
-                            <table class="table table-hover mb-0">
+                            <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
                                     <tr>
                                         <th scope="col" fpmsSort="cycleCode" [pager]="pager" (sorted)="load()" title="The cycle, and the hatchery and delivery it was stocked from">Cycle</th>
                                         <th scope="col" fpmsSort="startDate" [pager]="pager" (sorted)="load()">Started</th>
-                                        <th scope="col" class="text-right" fpmsSort="plStocked" [pager]="pager" (sorted)="load()">PL stocked</th>
-                                        <th scope="col" class="text-right">Batches</th>
+                                        <th scope="col" class="fpms-align-end" fpmsSort="plStocked" [pager]="pager" (sorted)="load()">PL stocked</th>
+                                        <th scope="col" class="fpms-align-end">Batches</th>
                                         <th scope="col" fpmsSort="status" [pager]="pager" (sorted)="load()">Status</th>
                                     </tr>
                                 </thead>
@@ -63,19 +63,19 @@ import { unbroken } from '@shared/fpms/labels';
                                     @for (c of cycles(); track c.id) {
                                         <tr>
                                             <td>
-                                                <a class="text-nowrap" [routerLink]="['/app/production/cycles', c.id]">{{ unbroken(c.cycleCode) }}</a>
-                                                <div class="text-muted"><span [title]="c.hatcheryName">{{ c.hatcheryShortCode || c.hatcheryName }}</span> · {{ c.hatcheryBatchNumber }}</div>
+                                                <a class="fpms-nowrap" [routerLink]="['/app/production/cycles', c.id]">{{ unbroken(c.cycleCode) }}</a>
+                                                <div class="fpms-muted"><span [title]="c.hatcheryName">{{ c.hatcheryShortCode || c.hatcheryName }}</span> · {{ c.hatcheryBatchNumber }}</div>
                                             </td>
-                                            <td class="text-nowrap">
-                                                @if (c.startDate) { {{ c.startDate | farmDate }} } @else { <span class="text-muted">Not stocked yet</span> }
+                                            <td class="fpms-nowrap">
+                                                @if (c.startDate) { {{ c.startDate | farmDate }} } @else { <span class="fpms-muted">Not stocked yet</span> }
                                             </td>
-                                            <td class="text-right">
+                                            <td class="fpms-align-end">
                                                 {{ c.plStocked | num: 0 }}
-                                                <div class="text-muted text-nowrap">of {{ c.plReceived | num: 0 }} received</div>
+                                                <div class="fpms-muted fpms-nowrap">of {{ c.plReceived | num: 0 }} received</div>
                                             </td>
-                                            <td class="text-right text-nowrap">
+                                            <td class="fpms-align-end fpms-nowrap">
                                                 {{ c.batchCount }}
-                                                <div class="text-muted">{{ c.openBatchCount }} open</div>
+                                                <div class="fpms-muted">{{ c.openBatchCount }} open</div>
                                             </td>
                                             <td><fpms-badge [text]="c.status | label: L.CycleStatuses"></fpms-badge></td>
                                         </tr>
