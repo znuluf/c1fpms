@@ -32,8 +32,34 @@ import { RootRoutingModule } from './root-routing.module';
 import { RootComponent } from './root.component';
 import { TitleStrategy } from '@angular/router';
 import { FpmsTitleStrategy } from '@shared/fpms/title-strategy';
-import { providePrimeNG } from 'primeng/config';
+import { definePreset } from '@primeng/themes';
 import Lara from '@primeng/themes/lara';
+import { providePrimeNG } from 'primeng/config';
+
+// Keep PrimeNG controls aligned with the FPMS blue palette and interaction states.
+const FpmsPreset = definePreset(Lara, {
+    semantic: {
+        primary: {
+            50: '#f2f6fb',
+            100: '#e3ecf6',
+            200: '#c4d6ea',
+            300: '#9ab9d8',
+            400: '#6f97c3',
+            500: '#3d6ca8',
+            600: '#345f95',
+            700: '#2d5488',
+            800: '#24436d',
+            900: '#1c3557',
+            950: '#14253d',
+        },
+        focusRing: {
+            width: '2px',
+            style: 'solid',
+            color: '{primary.500}',
+            offset: '2px',
+        },
+    },
+});
 
 if (environment.production) {
     enableProdMode();
@@ -74,7 +100,7 @@ const bootstrap = () => {
             provideHttpClient(withInterceptorsFromDi()),
             providePrimeNG({
                 theme: {
-                    preset: Lara,
+                    preset: FpmsPreset,
                 },
             }),
         ],
