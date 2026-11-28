@@ -23,7 +23,6 @@ interface PondCard {
     batchCode: string | null;
     doc: number | null;
     abwG: number | null;
-    adgGPerDay: number | null;
     fcr: number | null;
     survival: number | null;
     biomassKg: number | null;
@@ -109,11 +108,10 @@ interface PondCard {
                                             <tr>
                                                 <th scope="col" rowspan="2" class="pd-col-pond fpms-cell-middle">Pond</th>
                                                 <th scope="col" rowspan="2" class="pd-col-status fpms-cell-middle">Status · batch</th>
-                                                <th scope="colgroup" colspan="3" class="fpms-align-center">Production indicators</th>
+                                                <th scope="colgroup" colspan="2" class="fpms-align-center">Production indicators</th>
                                             </tr>
                                             <tr>
                                                 <th scope="col" class="pd-indicator-heading">ABW (g)</th>
-                                                <th scope="col" class="pd-indicator-heading">ADG (g/day)</th>
                                                 <th scope="col" class="pd-indicator-heading">FCR</th>
                                             </tr>
                                         </thead>
@@ -160,11 +158,6 @@ interface PondCard {
                                                         @if (p.batchId) {
                                                             {{ p.abwG === null ? '—' : (p.abwG | num: 1) }}
                                                             <small class="fpms-block fpms-muted" [class.fpms-warning-text]="p.sampleDays === null || p.sampleDays > 14">{{ sampleText(p.sampleDays) }}</small>
-                                                        } @else { <span class="fpms-muted">—</span> }
-                                                    </td>
-                                                    <td class="pd-indicator-value">
-                                                        @if (p.batchId) {
-                                                            {{ p.adgGPerDay === null ? '—' : (p.adgGPerDay | num: 3) }}
                                                         } @else { <span class="fpms-muted">—</span> }
                                                     </td>
                                                     <td class="pd-indicator-value">
@@ -684,7 +677,6 @@ export class PondsComponent extends FpmsPage implements OnInit {
                     batchCode: t?.batchCode ?? null,
                     doc: t?.doc ?? null,
                     abwG: t?.abwG ?? null,
-                    adgGPerDay: t?.adgGPerDay ?? null,
                     fcr: t?.fcrToDate ?? null,
                     survival: t?.estimatedSurvivalPct ?? null,
                     biomassKg: t?.estimatedBiomassKg ?? null,
