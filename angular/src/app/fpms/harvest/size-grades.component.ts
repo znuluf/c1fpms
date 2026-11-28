@@ -12,32 +12,32 @@ import { FPMS_IMPORTS } from '../shared-imports';
         <fpms-page-header title="Size grades" subtitle="Count grades (pieces per kg) used on harvests and sales."></fpms-page-header>
         <section class="fpms-page">
             <div class="fpms-page-inner">
-                <div class="row">
-                    <div class="col-xl-8">
-                        <div class="card">
-                            <div class="card-body p-0 table-responsive">
+                <div class="fpms-grid-row">
+                    <div class="fpms-col-xl-8">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                                 @if (!grades()) {
                                     <fpms-loading></fpms-loading>
                                 } @else {
-                                    <table class="table mb-0">
+                                    <table class="fpms-data-table fpms-no-bottom">
                                         <thead>
-                                            <tr><th>Label</th><th class="text-right">Min pcs/kg</th><th class="text-right">Max pcs/kg</th><th class="text-right">Order</th><th>Active</th><th></th></tr>
+                                            <tr><th>Label</th><th class="fpms-align-end">Min pcs/kg</th><th class="fpms-align-end">Max pcs/kg</th><th class="fpms-align-end">Order</th><th>Active</th><th></th></tr>
                                         </thead>
                                         <tbody>
                                             @for (g of grades(); track g.id) {
-                                                <tr [class.text-muted]="!g.isActive">
+                                                <tr [class.fpms-muted]="!g.isActive">
                                                     @if (canManage) {
-                                                        <td><input class="form-control form-control-sm" [(ngModel)]="g.label" maxlength="20" [attr.aria-label]="'Label ' + g.label" /></td>
-                                                        <td><input type="number" min="1" max="1000" class="form-control form-control-sm text-right" [(ngModel)]="g.minCountPerKg" aria-label="Minimum pieces per kg" /></td>
-                                                        <td><input type="number" min="1" max="1000" class="form-control form-control-sm text-right" [(ngModel)]="g.maxCountPerKg" aria-label="Maximum pieces per kg" /></td>
-                                                        <td style="width: 6rem"><input type="number" min="0" max="999" class="form-control form-control-sm text-right" [(ngModel)]="g.sortOrder" aria-label="Order" /></td>
+                                                        <td><input class="fpms-control fpms-control-compact" [(ngModel)]="g.label" maxlength="20" [attr.aria-label]="'Label ' + g.label" /></td>
+                                                        <td><input type="number" min="1" max="1000" class="fpms-control fpms-control-compact fpms-align-end" [(ngModel)]="g.minCountPerKg" aria-label="Minimum pieces per kg" /></td>
+                                                        <td><input type="number" min="1" max="1000" class="fpms-control fpms-control-compact fpms-align-end" [(ngModel)]="g.maxCountPerKg" aria-label="Maximum pieces per kg" /></td>
+                                                        <td style="width: 6rem"><input type="number" min="0" max="999" class="fpms-control fpms-control-compact fpms-align-end" [(ngModel)]="g.sortOrder" aria-label="Order" /></td>
                                                         <td><input type="checkbox" [(ngModel)]="g.isActive" [attr.aria-label]="'Active: ' + g.label" /></td>
-                                                        <td class="text-right"><button class="btn btn-sm btn-outline-primary" [disabled]="busy() || !g.label?.trim()" (click)="save(g)">Save</button></td>
+                                                        <td class="fpms-align-end"><button class="fpms-button fpms-button-compact fpms-button-outline" [disabled]="busy() || !g.label?.trim()" (click)="save(g)">Save</button></td>
                                                     } @else {
                                                         <td>{{ g.label }}</td>
-                                                        <td class="text-right">{{ g.minCountPerKg ?? '—' }}</td>
-                                                        <td class="text-right">{{ g.maxCountPerKg ?? '—' }}</td>
-                                                        <td class="text-right">{{ g.sortOrder }}</td>
+                                                        <td class="fpms-align-end">{{ g.minCountPerKg ?? '—' }}</td>
+                                                        <td class="fpms-align-end">{{ g.maxCountPerKg ?? '—' }}</td>
+                                                        <td class="fpms-align-end">{{ g.sortOrder }}</td>
                                                         <td>{{ g.isActive ? 'Yes' : 'No' }}</td>
                                                         <td></td>
                                                     }
@@ -48,28 +48,28 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 }
                             </div>
                         </div>
-                        <p class="small text-muted">Deactivate a grade you no longer use; harvests that already use it keep it.</p>
+                        <p class="fpms-small fpms-muted">Deactivate a grade you no longer use; harvests that already use it keep it.</p>
                     </div>
                     @if (canManage) {
-                        <div class="col-xl-4">
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">Add a size grade</h3></div>
-                                <form class="card-body" #f="ngForm" (ngSubmit)="save(draft, true)" fpmsReview="size grade" [fpmsReviewNew]="true" novalidate>
-                                    <div class="form-group">
-                                        <label for="gl">Label <span class="text-danger">*</span></label>
-                                        <input id="gl" class="form-control" name="label" [(ngModel)]="draft.label" required maxlength="20" placeholder="e.g. 20/30" />
+                        <div class="fpms-col-xl-4">
+                            <div class="fpms-panel">
+                                <div class="fpms-panel-head"><h3 class="fpms-panel-title">Add a size grade</h3></div>
+                                <form class="fpms-panel-body" #f="ngForm" (ngSubmit)="save(draft, true)" fpmsReview="size grade" [fpmsReviewNew]="true" novalidate>
+                                    <div class="fpms-field">
+                                        <label for="gl">Label <span class="fpms-danger">*</span></label>
+                                        <input id="gl" class="fpms-control" name="label" [(ngModel)]="draft.label" required maxlength="20" placeholder="e.g. 20/30" />
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-6">
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-6">
                                             <label for="gmin">Min pcs/kg</label>
-                                            <input id="gmin" type="number" min="1" max="1000" class="form-control" name="min" [(ngModel)]="draft.minCountPerKg" />
+                                            <input id="gmin" type="number" min="1" max="1000" class="fpms-control" name="min" [(ngModel)]="draft.minCountPerKg" />
                                         </div>
-                                        <div class="form-group col-6">
+                                        <div class="fpms-field fpms-col-6">
                                             <label for="gmax">Max pcs/kg</label>
-                                            <input id="gmax" type="number" min="1" max="1000" class="form-control" name="max" [(ngModel)]="draft.maxCountPerKg" />
+                                            <input id="gmax" type="number" min="1" max="1000" class="fpms-control" name="max" [(ngModel)]="draft.maxCountPerKg" />
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary" [disabled]="busy() || !f.form.valid">Add grade</button>
+                                    <button type="submit" class="fpms-button fpms-button-primary" [disabled]="busy() || !f.form.valid">Add grade</button>
                                     <fpms-form-hint [form]="f"></fpms-form-hint>
                                 </form>
                             </div>
