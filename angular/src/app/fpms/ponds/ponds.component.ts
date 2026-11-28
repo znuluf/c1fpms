@@ -50,23 +50,23 @@ interface PondCard {
             title="Ponds"
             subtitle="Every pond with its batch, production indicators and latest water reading. The dashboard shows the short version.">
             @if (can('Farm.Ponds.Manage')) {
-                <a routerLink="/app/ponds/new" class="btn btn-primary">Add pond</a>
+                <a routerLink="/app/ponds/new" class="fpms-button fpms-button-primary">Add pond</a>
             }
         </fpms-page-header>
         <section class="fpms-page">
             <div class="fpms-page-inner">
                 @if (pondSummary(); as summary) {
-                    <div class="row mb-3" aria-label="Pond summary">
-                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.total }}</div><div class="small text-muted">Ponds on record</div></div></div></div>
-                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.growOut }}</div><div class="small text-muted">Grow-out ponds</div></div></div></div>
-                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.inProduction }}</div><div class="small text-muted">In production</div></div></div></div>
-                        <div class="col-6 col-lg-3 mb-2"><div class="card mb-0 h-100"><div class="card-body py-2"><div class="h4 mb-0">{{ summary.areaHa | num: 2 }} ha</div><div class="small text-muted">Total pond area</div></div></div></div>
+                    <div class="row fpms-space-bottom-3" aria-label="Pond summary">
+                        <div class="col-6 col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.total }}</div><div class="fpms-small fpms-muted">Ponds on record</div></div></div></div>
+                        <div class="col-6 col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.growOut }}</div><div class="fpms-small fpms-muted">Grow-out ponds</div></div></div></div>
+                        <div class="col-6 col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.inProduction }}</div><div class="fpms-small fpms-muted">In production</div></div></div></div>
+                        <div class="col-6 col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.areaHa | num: 2 }} ha</div><div class="fpms-small fpms-muted">Total pond area</div></div></div></div>
                     </div>
                 }
-                <section class="card" aria-labelledby="pond-h">
-                    <div class="card-header">
-                        <h2 id="pond-h" class="card-title pd-h2">All ponds</h2>
-                        <div class="small text-muted w-100 mb-2">
+                <section class="fpms-panel" aria-labelledby="pond-h">
+                    <div class="fpms-panel-head">
+                        <h2 id="pond-h" class="fpms-panel-title pd-h2">All ponds</h2>
+                        <div class="fpms-small fpms-muted fpms-full-width fpms-space-bottom-2">
                             Latest values from the sheets entered so far. Each value shows the day it was observed.
                         </div>
                         <fpms-list-toolbar
@@ -77,14 +77,14 @@ interface PondCard {
                             [chip]="f.chip()"
                             (searchChange)="onSearch($event)"
                             (chipChange)="onChip($event)"></fpms-list-toolbar>
-                        <div class="d-flex justify-content-end mt-2" role="group" aria-label="Pond display">
-                            <div class="btn-group btn-group-sm">
-                                <button type="button" class="btn" [class.btn-primary]="viewMode() === 'table'" [class.btn-outline-secondary]="viewMode() !== 'table'" [attr.aria-pressed]="viewMode() === 'table'" (click)="setViewMode('table')">Table</button>
-                                <button type="button" class="btn" [class.btn-primary]="viewMode() === 'tiles'" [class.btn-outline-secondary]="viewMode() !== 'tiles'" [attr.aria-pressed]="viewMode() === 'tiles'" (click)="setViewMode('tiles')">Tiles</button>
+                        <div class="fpms-flex fpms-justify-end fpms-space-top-2" role="group" aria-label="Pond display">
+                            <div class="fpms-button-group fpms-button-group-compact">
+                                <button type="button" class="fpms-button" [class.fpms-button-primary]="viewMode() === 'table'" [class.fpms-button-secondary]="viewMode() !== 'table'" [attr.aria-pressed]="viewMode() === 'table'" (click)="setViewMode('table')">Table</button>
+                                <button type="button" class="fpms-button" [class.fpms-button-primary]="viewMode() === 'tiles'" [class.fpms-button-secondary]="viewMode() !== 'tiles'" [attr.aria-pressed]="viewMode() === 'tiles'" (click)="setViewMode('tiles')">Tiles</button>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="fpms-panel-body">
                         @if (!cards()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!cards()!.length) {
@@ -92,7 +92,7 @@ interface PondCard {
                                 text="No ponds yet. Add your ponds before planning a production cycle."
                                 icon="fas fa-water">
                                 @if (can('Farm.Ponds.Manage')) {
-                                    <a routerLink="/app/ponds/new" class="btn btn-sm btn-primary">Add a pond</a>
+                                    <a routerLink="/app/ponds/new" class="fpms-button fpms-button-compact fpms-button-primary">Add a pond</a>
                                 }
                             </fpms-empty>
                         } @else if (f.noMatch()) {
@@ -101,13 +101,13 @@ interface PondCard {
                                 icon="fas fa-water"></fpms-empty>
                         } @else {
                             @if (viewMode() === 'table') {
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-hover align-middle mb-0 pd-table">
+                                <div class="fpms-table-scroll">
+                                    <table class="fpms-data-table fpms-table-compact fpms-table-hover fpms-cell-middle fpms-no-bottom pd-table">
                                         <thead>
                                             <tr>
-                                                <th scope="col" rowspan="2" class="pd-col-pond align-middle">Pond</th>
-                                                <th scope="col" rowspan="2" class="pd-col-status align-middle">Status · batch</th>
-                                                <th scope="colgroup" colspan="3" class="text-center">Production indicators</th>
+                                                <th scope="col" rowspan="2" class="pd-col-pond fpms-cell-middle">Pond</th>
+                                                <th scope="col" rowspan="2" class="pd-col-status fpms-cell-middle">Status · batch</th>
+                                                <th scope="colgroup" colspan="3" class="fpms-align-center">Production indicators</th>
                                             </tr>
                                             <tr>
                                                 <th scope="col" class="pd-indicator-heading">ABW (g)</th>
@@ -119,8 +119,8 @@ interface PondCard {
                                             @for (p of shownCards(); track p.id) {
                                                 <tr
                                                     class="fpms-clickable-row"
-                                                    [class.table-warning]="!!p.alert"
-                                                    [class.text-muted]="p.archived"
+                                                    [class.fpms-row-warning]="!!p.alert"
+                                                    [class.fpms-muted]="p.archived"
                                                     tabindex="0"
                                                     role="link"
                                                     [attr.aria-label]="'Open pond ' + p.code"
@@ -130,24 +130,24 @@ interface PondCard {
                                                     <td class="pd-pond-cell">
                                                         <a [routerLink]="['/app/ponds', p.id]"><strong>{{ p.code }}</strong></a>
                                                         <div>{{ p.name }} · {{ p.areaM2 | num: 0 }} m²</div>
-                                                        <div class="small text-muted">
+                                                        <div class="fpms-small fpms-muted">
                                                             {{ p.purpose | label: L.PondPurposes }} · {{ p.constructionType | label: L.ConstructionTypes }}
                                                             · {{ p.averageDepthM | num: 2 }} / {{ p.maxDepthM | num: 2 }} m
                                                         </div>
                                                         @if (p.isReserved) {
-                                                            <div class="small text-warning-dark">Reserved for {{ p.reservedByDelivery }}</div>
+                                                            <div class="fpms-small fpms-warning-text">Reserved for {{ p.reservedByDelivery }}</div>
                                                         }
                                                     </td>
                                                     <td class="pd-status-cell">
                                                         <fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge>
                                                         @if (p.batchId) {
-                                                            <div class="mt-1"><a [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a></div>
+                                                            <div class="fpms-space-top-1"><a [routerLink]="['/app/production/batches', p.batchId]">{{ p.batchCode }}</a></div>
                                                         } @else {
-                                                            <div class="small text-muted mt-1">No active batch</div>
+                                                            <div class="fpms-small fpms-muted fpms-space-top-1">No active batch</div>
                                                         }
                                                         @if (p.alert) {
-                                                            <div class="small text-warning-dark mt-1">
-                                                                <i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ p.alert }}
+                                                            <div class="fpms-small fpms-warning-text fpms-space-top-1">
+                                                                <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>{{ p.alert }}
                                                                 @if (p.alertLog) {
                                                                     <div><a [routerLink]="['/app/logbook', p.alertLog]">Open record</a></div>
                                                                 }
@@ -157,18 +157,18 @@ interface PondCard {
                                                     <td class="pd-indicator-value">
                                                         @if (p.batchId) {
                                                             {{ p.abwG === null ? '—' : (p.abwG | num: 1) }}
-                                                            <small class="d-block text-muted" [class.text-warning-dark]="p.sampleDays === null || p.sampleDays > 14">{{ sampleText(p.sampleDays) }}</small>
-                                                        } @else { <span class="text-muted">—</span> }
+                                                            <small class="fpms-block fpms-muted" [class.fpms-warning-text]="p.sampleDays === null || p.sampleDays > 14">{{ sampleText(p.sampleDays) }}</small>
+                                                        } @else { <span class="fpms-muted">—</span> }
                                                     </td>
                                                     <td class="pd-indicator-value">
                                                         @if (p.batchId) {
                                                             {{ p.adgGPerDay === null ? '—' : (p.adgGPerDay | num: 3) }}
-                                                        } @else { <span class="text-muted">—</span> }
+                                                        } @else { <span class="fpms-muted">—</span> }
                                                     </td>
                                                     <td class="pd-indicator-value">
                                                         @if (p.batchId) {
                                                             {{ p.fcr === null ? '—' : (p.fcr | num: 2) }}
-                                                        } @else { <span class="text-muted">—</span> }
+                                                        } @else { <span class="fpms-muted">—</span> }
                                                     </td>
                                                 </tr>
                                             }
@@ -179,22 +179,22 @@ interface PondCard {
                             <div class="pd-grid">
                                 @for (p of shownCards(); track p.id) {
                                     <article class="pd-card" [class.pd-alert]="!!p.alert" [class.pd-archived]="p.archived">
-                                        <div class="d-flex justify-content-between align-items-start">
+                                        <div class="fpms-flex fpms-justify-between fpms-align-start">
                                             <div>
                                                 <a class="pd-code" [routerLink]="['/app/ponds', p.id]">{{ p.code }}</a>
-                                                <div class="small text-muted">
+                                                <div class="fpms-small fpms-muted">
                                                     {{ p.name }} · {{ p.areaM2 | num: 0 }} m²
-                                                    <span class="d-block">{{ p.purpose | label: L.PondPurposes }} · {{ p.constructionType | label: L.ConstructionTypes }}</span>
+                                                    <span class="fpms-block">{{ p.purpose | label: L.PondPurposes }} · {{ p.constructionType | label: L.ConstructionTypes }}</span>
                                                 </div>
                                             </div>
-                                            <div class="text-right"><fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge>@if (p.isReserved) { <div class="small text-warning-dark mt-1">Reserved for {{ p.reservedByDelivery }}</div> }</div>
+                                            <div class="fpms-align-end"><fpms-badge [text]="p.status | label: L.PondDisplayStatuses"></fpms-badge>@if (p.isReserved) { <div class="fpms-small fpms-warning-text fpms-space-top-1">Reserved for {{ p.reservedByDelivery }}</div> }</div>
                                         </div>
 
                                         @if (p.batchId) {
-                                            <div class="d-flex justify-content-between align-items-baseline mt-2">
+                                            <div class="fpms-flex fpms-justify-between fpms-align-baseline fpms-space-top-2">
                                                 <strong>{{ p.batchCode }}</strong>
                                                 @if (p.doc !== null) {
-                                                    <span class="small text-muted">DOC {{ p.doc }}</span>
+                                                    <span class="fpms-small fpms-muted">DOC {{ p.doc }}</span>
                                                 }
                                             </div>
                                             <div class="pd-stats">
@@ -226,7 +226,7 @@ interface PondCard {
                                                     <div class="l">Last sample</div>
                                                     <div
                                                         class="v"
-                                                        [class.text-warning-dark]="
+                                                        [class.fpms-warning-text]="
                                                             p.sampleDays === null || p.sampleDays > 14
                                                         ">
                                                         {{ sampleText(p.sampleDays) }}
@@ -260,13 +260,13 @@ interface PondCard {
                                                         }
                                                     </div>
                                                 } @else {
-                                                    <div class="small text-muted">None entered yet.</div>
+                                                    <div class="fpms-small fpms-muted">None entered yet.</div>
                                                 }
                                             </div>
 
                                             @if (p.strip.length) {
                                                 <div class="pd-section">
-                                                    <div class="l d-flex justify-content-between">
+                                                    <div class="l fpms-flex fpms-justify-between">
                                                         <span>Log, last 7 days</span>
                                                         <span>{{ rangeText() }}</span>
                                                     </div>
@@ -284,13 +284,13 @@ interface PondCard {
                                                         }
                                                     </div>
                                                     @if (p.today) {
-                                                        <div class="mt-1">
+                                                        <div class="fpms-space-top-1">
                                                             @for (t of p.today; track t.label) {
                                                                 <span class="pd-chip" [class.done]="t.done">
                                                                     {{ t.label }} {{ t.done ? '✓' : '–' }}
                                                                 </span>
                                                             }
-                                                            <span class="small text-muted">today</span>
+                                                            <span class="fpms-small fpms-muted">today</span>
                                                         </div>
                                                     }
                                                 </div>
@@ -298,10 +298,10 @@ interface PondCard {
 
                                             @if (p.alert) {
                                                 <div class="pd-alertbox">
-                                                    <div class="font-weight-bold">{{ p.alert }}</div>
+                                                    <div class="fpms-weight-bold">{{ p.alert }}</div>
                                                     @if (p.alertLog) {
                                                         <a
-                                                            class="btn btn-sm btn-outline-secondary mt-1"
+                                                            class="fpms-button fpms-button-compact fpms-button-secondary fpms-space-top-1"
                                                             [routerLink]="['/app/logbook', p.alertLog]">
                                                             Open log
                                                         </a>
@@ -314,14 +314,14 @@ interface PondCard {
                                             </div>
                                         } @else {
                                             <div class="pd-note">
-                                                <div class="font-weight-bold">{{ note(p).title }}</div>
-                                                <div class="small text-muted">{{ note(p).body }}</div>
+                                                <div class="fpms-weight-bold">{{ note(p).title }}</div>
+                                                <div class="fpms-small fpms-muted">{{ note(p).body }}</div>
                                             </div>
                                             <div class="pd-foot">
                                                 <a [routerLink]="['/app/ponds', p.id]">Open pond</a>
                                                 @if (p.status === 7 && can('Farm.Production.Stock')) {
                                                     <a
-                                                        class="btn btn-sm btn-primary"
+                                                        class="fpms-button fpms-button-compact fpms-button-primary"
                                                         routerLink="/app/production/create-batch">
                                                         Stock a batch
                                                     </a>
@@ -333,8 +333,8 @@ interface PondCard {
                             </div>
                             }
                             @if (f.visible().length > shownCards().length) {
-                                <div class="text-center mt-3">
-                                    <button type="button" class="btn btn-outline-secondary" (click)="showMore()">
+                                <div class="fpms-align-center fpms-space-top-3">
+                                    <button type="button" class="fpms-button fpms-button-secondary" (click)="showMore()">
                                         Show {{ pageSize }} more ({{ f.visible().length - shownCards().length | num: 0 }} not shown)
                                     </button>
                                 </div>
@@ -347,6 +347,50 @@ interface PondCard {
     `,
     styles: [
         LOG_CALENDAR_STYLES,
+        `
+        .fpms-button { display:inline-flex; align-items:center; justify-content:center; min-height:2.75rem; padding:var(--s2) var(--s4); border:1px solid var(--line); border-radius:var(--r-sm); font-weight:600; text-decoration:none; cursor:pointer; }
+        .fpms-button-primary { color:var(--paper); background:var(--ink); border-color:var(--ink); }
+        .fpms-button-secondary { color:var(--ink-2); background:var(--paper); border-color:var(--line); }
+        .fpms-button-compact { min-height:2.5rem; padding:var(--s2) var(--s3); }
+        .fpms-button-group { display:inline-flex; gap:var(--s1); }
+        .fpms-button-group > button { border-radius:var(--r-sm); }
+        .fpms-panel { min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:var(--r-lg); box-shadow:var(--shadow-sm); }
+        .fpms-panel-head { padding:var(--s4) var(--s5); border-bottom:1px solid var(--line); }
+        .fpms-panel-title { margin:0; color:var(--ink); font-size:1.15rem; font-weight:650; }
+        .fpms-panel-body { padding:var(--s4) var(--s5); }
+        .fpms-table-scroll { width:100%; overflow-x:auto; border:1px solid var(--line); border-radius:var(--r-md); background:var(--paper); }
+        .fpms-data-table { width:100%; border-collapse:collapse; color:var(--ink-2); background:var(--paper); }
+        .fpms-data-table th { padding:var(--s3) var(--s4); color:var(--muted); font-size:.82rem; font-weight:600; border-bottom:1px solid var(--line); }
+        .fpms-data-table td { padding:var(--s3) var(--s4); border-top:1px solid var(--line); }
+        .fpms-table-compact th,.fpms-table-compact td { padding:var(--s2) var(--s3); }
+        .fpms-table-hover tbody tr:hover { background:var(--bg); }
+        .fpms-row-warning { background:var(--orange-tint); }
+        .fpms-cell-middle { vertical-align:middle; }
+        .fpms-align-center { text-align:center; }
+        .fpms-align-end { text-align:end; }
+        .fpms-align-baseline { align-items:baseline; }
+        .fpms-align-start { align-items:flex-start; }
+        .fpms-justify-end { justify-content:flex-end; }
+        .fpms-justify-between { justify-content:space-between; }
+        .fpms-flex { display:flex; }
+        .fpms-block { display:block; }
+        .fpms-full-width { width:100%; }
+        .fpms-nowrap { white-space:nowrap; }
+        .fpms-muted { color:var(--muted); }
+        .fpms-warning-text { color:var(--orange-deep); }
+        .fpms-small { font-size:.875rem; }
+        .fpms-stat-value { margin:0; font-size:1.5rem; line-height:1.25; font-weight:650; }
+        .fpms-weight-bold { font-weight:700; }
+        .fpms-icon-gap { margin-inline-end:var(--s1); }
+        .fpms-space-top-1 { margin-top:var(--s1); }
+        .fpms-space-top-2 { margin-top:var(--s2); }
+        .fpms-space-top-3 { margin-top:var(--s3); }
+        .fpms-space-bottom-2 { margin-bottom:var(--s2); }
+        .fpms-space-bottom-3 { margin-bottom:var(--s3); }
+        .fpms-space-y-2 { padding-block:var(--s2); }
+        .fpms-no-bottom { margin-bottom:0; }
+        @media (max-width:767px) { .fpms-panel-head,.fpms-panel-body { padding:var(--s3); } .fpms-data-table { min-width:47rem; } }
+
         `
             .pd-h2 {
                 float: none;
