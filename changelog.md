@@ -5,7 +5,7 @@ All notable changes to this project are documented here.
 ## Unreleased
 
 ### Changed (look from the reference screenshots, DEC-145)
-- **Theme.** Warm off-white background, white cards with thin borders, ink navy for primary buttons and the current page, larger page titles, softer status pills, and section tabs drawn as a segmented control. The neutral theme keeps its own colours and gets the same shapes.
+- **Theme.** Warm off-white background, white cards with thin borders, ink navy for primary buttons and the current page, larger page titles, softer status pills, and section tabs drawn as a segmented control. The neutral theme keeps its own colours and gets the same shapes. Link blue, success green, error red, the line colour and the hover tint now use the reference app's values (checked for AA contrast); a `.mono` class gives codes and IDs a system monospace font.
 
 ### Changed (harvest ABW sample, DEC-144)
 - **The sample is required.** Every harvest, of any type, needs the sample weight and the shrimp counted. The ABW is worked out from them and can no longer be typed. An older harvest without a sample needs one before a correction can be saved.

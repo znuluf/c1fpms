@@ -9,14 +9,16 @@
     // Type: system fonts only (kept on purpose). The farm network has no Internet, so a web font would
     // never load there. To adopt a bundled font later, change this one variable.
     --fpms-font: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+    // Monospace for codes and IDs (the .mono class). System fonts only, as above.
+    --fpms-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
 
     // Derived palette
     --fpms-tide-900: #0d1b2a; // ink navy
-    --fpms-tide-50: #eef1f5; // hover and selected tint
+    --fpms-tide-50: #eef2f6; // hover and selected tint
     --fpms-accent-50: #dbe7f3; // blue tint
-    --fpms-accent-text: #16436e; // blue for text on light backgrounds
+    --fpms-accent-text: #2a5582; // blue for text on light backgrounds
     --fpms-glow: #ff921e; // the logo orange, for marks and active icons on dark only
-    --fpms-line: #e2e8f0;
+    --fpms-line: #e6ebf2;
     --fpms-line-strong: #cbd5e1;
     --fpms-surface: #ffffff;
     --fpms-warn-bg: #fff8e8;
@@ -56,6 +58,9 @@
 }
 
 // ---- Typography
+.mono {
+    font-family: var(--fpms-mono);
+}
 html {
     -webkit-text-size-adjust: 100%;
 }
