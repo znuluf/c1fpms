@@ -21,14 +21,14 @@ import { batchShort } from '@shared/fpms/labels';
             subtitle="Daily production records by pond. Feeding has its own page.">
             @if (can('Farm.Reports')) {
                 <button
-                    class="btn btn-outline-secondary mr-1"
+                    class="fpms-button fpms-button-secondary fpms-icon-gap"
                     (click)="exportCsv('ExportList', exportBody())"
                     [disabled]="busy()">
                     Export CSV
                 </button>
             }
             @if (can('Farm.Logs.Create')) {
-                <a routerLink="/app/logbook/new" class="btn btn-primary">Record operations</a>
+                <a routerLink="/app/logbook/new" class="fpms-button fpms-button-primary">Record operations</a>
             }
         </fpms-page-header>
         <section class="fpms-page">
@@ -46,7 +46,7 @@ import { batchShort } from '@shared/fpms/labels';
                             <label class="lb-field">
                                 <span>Pond</span>
                                 <select
-                                    class="form-control form-control-sm"
+                                    class="fpms-control fpms-control-compact"
                                     [(ngModel)]="f.batchId"
                                     (ngModelChange)="apply()">
                                     <option [ngValue]="null">All ponds</option>
@@ -59,7 +59,7 @@ import { batchShort } from '@shared/fpms/labels';
                                 <span>From</span>
                                 <input
                                     type="date"
-                                    class="form-control form-control-sm"
+                                    class="fpms-control fpms-control-compact"
                                     [(ngModel)]="f.from"
                                     (ngModelChange)="apply()" />
                             </label>
@@ -67,34 +67,34 @@ import { batchShort } from '@shared/fpms/labels';
                                 <span>To</span>
                                 <input
                                     type="date"
-                                    class="form-control form-control-sm"
+                                    class="fpms-control fpms-control-compact"
                                     [(ngModel)]="f.to"
                                     (ngModelChange)="apply()" />
                             </label>
                         </fpms-list-toolbar>
-                        <div class="mt-1">
-                            <div class="custom-control custom-checkbox custom-control-inline">
+                        <div class="fpms-space-top-1">
+                            <div class="fpms-check fpms-check-box fpms-check-inline">
                                 <input
                                     type="checkbox"
-                                    class="custom-control-input"
+                                    class="fpms-check-input"
                                     id="oor"
                                     [(ngModel)]="f.outOfRangeOnly"
                                     (ngModelChange)="apply()" />
-                                <label class="custom-control-label" for="oor">Out of range only</label>
+                                <label class="fpms-check-label" for="oor">Out of range only</label>
                             </div>
-                            <div class="custom-control custom-checkbox custom-control-inline">
+                            <div class="fpms-check fpms-check-box fpms-check-inline">
                                 <input
                                     type="checkbox"
-                                    class="custom-control-input"
+                                    class="fpms-check-input"
                                     id="sv"
                                     [(ngModel)]="f.includeVoided"
                                     (ngModelChange)="apply()" />
-                                <label class="custom-control-label" for="sv">Show voided</label>
+                                <label class="fpms-check-label" for="sv">Show voided</label>
                             </div>
                         </div>
                 </div>
-                <section class="card" aria-label="Logbook">
-                    <div class="card-body p-0 table-responsive">
+                <section class="fpms-panel" aria-label="Logbook">
+                    <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!logs()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!logs().length) {
@@ -102,7 +102,7 @@ import { batchShort } from '@shared/fpms/labels';
                                 text="No log entries match. Clear the search or the filters."
                                 icon="fas fa-book"></fpms-empty>
                         } @else {
-                            <table class="table table-sm mb-0 lb-table">
+                            <table class="fpms-data-table fpms-table-compact fpms-no-bottom lb-table">
                                 <thead>
                                     <tr>
                                         <th fpmsSort="observedAt" [pager]="pager" (sorted)="load()">Observed</th>
@@ -123,17 +123,17 @@ import { batchShort } from '@shared/fpms/labels';
                                             (click)="openLogRow(l.id, $event)"
                                             (keydown.enter)="openLogRow(l.id, $event)"
                                             (keydown.space)="$event.preventDefault(); openLogRow(l.id, $event)">
-                                            <td class="text-nowrap">
+                                            <td class="fpms-nowrap">
                                                 <a [routerLink]="['/app/logbook', l.id]">
                                                     {{ l.observedAtUtc | farmDate }}
                                                 </a>
-                                                <div class="text-muted">{{ timeOf(l.observedAtUtc) }}</div>
+                                                <div class="fpms-muted">{{ timeOf(l.observedAtUtc) }}</div>
                                             </td>
                                             <td>
-                                                <a class="text-nowrap" [routerLink]="['/app/production/batches', l.batchId]" [title]="l.batchCode"><span class="fpms-pond-tag">{{ l.pondCode }}</span> {{ batchShort(l.batchCode) }}</a>
+                                                <a class="fpms-nowrap" [routerLink]="['/app/production/batches', l.batchId]" [title]="l.batchCode"><span class="fpms-pond-tag">{{ l.pondCode }}</span> {{ batchShort(l.batchCode) }}</a>
                                                 <div>{{ l.logType | label: L.LogTypes }}</div>
                                                 @if (l.hasOutOfRange || l.isHighMortality) {
-                                                    <div class="fpms-badge-stack mt-1">
+                                                    <div class="fpms-badge-stack fpms-space-top-1">
                                                         @if (l.hasOutOfRange) { <fpms-badge text="Out of range" tone="warning"></fpms-badge> }
                                                         @if (l.isHighMortality) { <fpms-badge text="High mortality" tone="danger"></fpms-badge> }
                                                     </div>
@@ -144,8 +144,8 @@ import { batchShort } from '@shared/fpms/labels';
                                                     <div class="fpms-readings">
                                                     @for (m of l.measurements; track m.parameterCode) {
                                                         <span
-                                                            [class.text-danger]="m.isOutOfRange"
-                                                            [class.font-weight-bold]="m.isOutOfRange">
+                                                            [class.fpms-danger]="m.isOutOfRange"
+                                                            [class.fpms-weight-bold]="m.isOutOfRange">
                                                             {{ m.parameterName }} {{ m.value }} {{ m.unitCode
                                                             }}{{
                                                                 m.isOutOfRange
@@ -163,26 +163,26 @@ import { batchShort } from '@shared/fpms/labels';
                                                     {{ summary(l) }}
                                                 }
                                                 @if (l.notes && l.logType !== 9 && summary(l) !== l.notes) {
-                                                    <div class="text-muted">{{ l.notes }}</div>
+                                                    <div class="fpms-muted">{{ l.notes }}</div>
                                                 }
                                             </td>
                                             <td>
                                                 {{ l.recordedBy }}
-                                                <div class="text-muted">
+                                                <div class="fpms-muted">
                                                     {{ l.creationTime | farmDateTime }}
                                                 </div>
                                                 @if (lateText(l); as late) {
-                                                    <div class="text-warning-dark">{{ late }}</div>
+                                                    <div class="fpms-warning-text">{{ late }}</div>
                                                 }
                                             </td>
-                                            <td class="text-right">
+                                            <td class="fpms-align-end">
                                                 @if (l.isVoided) {
                                                     <fpms-badge text="Voided" tone="secondary"></fpms-badge>
                                                 } @else {
                                                     <div class="fpms-actions-stack">
                                                     @if (l.canEdit) {
                                                         <a
-                                                            class="btn btn-sm btn-outline-secondary"
+                                                            class="fpms-button fpms-button-compact fpms-button-secondary"
                                                             [routerLink]="['/app/logbook', l.id]">
                                                             Correct
                                                         </a>
@@ -190,7 +190,7 @@ import { batchShort } from '@shared/fpms/labels';
                                                     @if (l.canVoid) {
                                                         <button
                                                             type="button"
-                                                            class="btn btn-sm btn-outline-secondary"
+                                                            class="fpms-button fpms-button-compact fpms-button-secondary"
                                                             (click)="startVoid(l)">
                                                             Void
                                                         </button>
@@ -198,18 +198,18 @@ import { batchShort } from '@shared/fpms/labels';
                                                     </div>
                                                     @if (!l.canEdit && !l.canVoid) {
                                                         @if (l.isBatchClosed) {
-                                                            <span class="small text-muted">
+                                                            <span class="fpms-small fpms-muted">
                                                                 Locked: batch is closed.
                                                                 <br />
                                                                 The Owner can reopen it.
                                                             </span>
                                                         } @else {
                                                             <a
-                                                                class="btn btn-sm btn-outline-secondary"
+                                                                class="fpms-button fpms-button-compact fpms-button-secondary"
                                                                 [routerLink]="['/app/logbook', l.id]">
                                                                 View
                                                             </a>
-                                                            <div class="small text-muted">Recorded by someone else</div>
+                                                            <div class="fpms-small fpms-muted">Recorded by someone else</div>
                                                         }
                                                     }
                                                 }
@@ -217,7 +217,7 @@ import { batchShort } from '@shared/fpms/labels';
                                         </tr>
                                         @if (l.isVoided) {
                                             <tr class="lb-note">
-                                                <td colspan="6" class="small text-muted">
+                                                <td colspan="6" class="fpms-small fpms-muted">
                                                     Voided: {{ l.voidReason }}
                                                     @if (l.voidedBy) {
                                                         · by {{ l.voidedBy }}
@@ -231,33 +231,33 @@ import { batchShort } from '@shared/fpms/labels';
                                         @if (voiding()?.id === l.id) {
                                             <tr class="lb-note">
                                                 <td colspan="6">
-                                                    <label [attr.for]="'vr-' + l.id" class="mb-1">
+                                                    <label [attr.for]="'vr-' + l.id" class="fpms-space-bottom-1">
                                                         Reason for voiding
-                                                        <span class="text-danger">*</span>
+                                                        <span class="fpms-danger">*</span>
                                                     </label>
                                                     <input
                                                         [id]="'vr-' + l.id"
-                                                        class="form-control form-control-sm mb-1"
+                                                        class="fpms-control fpms-control-compact fpms-space-bottom-1"
                                                         maxlength="500"
                                                         placeholder="e.g. entered on the wrong pond"
                                                         [(ngModel)]="voidReason" />
                                                     @if (voidError()) {
-                                                        <div class="small text-danger mb-1">Enter a reason first.</div>
+                                                        <div class="fpms-small fpms-danger fpms-space-bottom-1">Enter a reason first.</div>
                                                     }
-                                                    <div class="small text-muted mb-2">
+                                                    <div class="fpms-small fpms-muted fpms-space-bottom-2">
                                                         The record stays in the history and drops out of totals. A
                                                         voided water reading no longer counts as an alert.
                                                     </div>
                                                     <button
                                                         type="button"
-                                                        class="btn btn-sm btn-danger mr-1"
+                                                        class="fpms-button fpms-button-compact fpms-button-danger-solid fpms-icon-gap"
                                                         (click)="confirmVoid(l)"
                                                         [disabled]="busy()">
                                                         Void log
                                                     </button>
                                                     <button
                                                         type="button"
-                                                        class="btn btn-sm btn-outline-secondary"
+                                                        class="fpms-button fpms-button-compact fpms-button-secondary"
                                                         (click)="cancelVoid()">
                                                         Cancel
                                                     </button>
@@ -270,7 +270,7 @@ import { batchShort } from '@shared/fpms/labels';
                         }
                     </div>
                     <fpms-pager [state]="pager" (changed)="load()"></fpms-pager>
-                    <div class="px-3 py-2 small text-muted border-top">
+                    <div class="px-3 fpms-space-y-2 fpms-small fpms-muted border-top">
                         @if (isOwner) {
                             As Owner you can correct and void any entry until its batch is closed.
                         } @else {
