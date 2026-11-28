@@ -40,6 +40,8 @@ const routes: Routes = [
             { path: 'my-pond', title: 'My pond', loadComponent: () => import('./fpms/production/my-pond.component').then((m) => m.MyPondComponent), ...page('Farm.Logs') },
             { path: 'production/batches/:id', title: 'Batch', loadComponent: () => import('./fpms/production/batch-detail.component').then((m) => m.BatchDetailComponent), ...page('Farm.Production') },
             { path: 'production/create-batch', title: 'Stock a batch', loadComponent: () => import('./fpms/production/stock-batch.component').then((m) => m.CreateBatchComponent), ...page('Farm.Production.Stock') },
+            // Keep the current page mounted behind the normal Stock a Batch wizard.
+            { path: 'create-batch', outlet: 'modal', title: 'Stock a batch', loadComponent: () => import('./fpms/production/stock-batch.component').then((m) => m.CreateBatchComponent), ...page('Farm.Production.Stock') },
 
             { path: 'logbook', title: 'Logbooks', loadComponent: () => import('./fpms/logbook/logbook.component').then((m) => m.LogbookComponent), ...page('Farm.Logs') },
             { path: 'logbook/new', title: 'Record operations', loadComponent: () => import('./fpms/logbook/log-entry.component').then((m) => m.LogEntryComponent), ...page('Farm.Logs.Create') },

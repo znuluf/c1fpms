@@ -14,7 +14,7 @@ import { batchShort } from '@shared/fpms/labels';
                 <fpms-badge [text]="c.status | label: L.CycleStatuses"></fpms-badge>
                 @if (c.outcome) { <span class="fpms-label fpms-icon-gap" [class.fpms-label-success]="c.outcome === 1" [class.fpms-label-warning]="c.outcome === 2">{{ c.outcome | label: L.CycleOutcomes }}</span> }
                 @if (c.canCreateBatch) {
-                    <a class="fpms-button fpms-button-primary" routerLink="/app/production/create-batch" [queryParams]="{ cycleId: c.id }"><i class="fas fa-shrimp fpms-icon-gap"></i>Add batch to this cycle</a>
+                    <button type="button" class="fpms-button fpms-button-primary" (click)="openStockingWizard(c.id)"><i class="fas fa-shrimp fpms-icon-gap"></i>Add batch to this cycle</button>
                 }
                 @if (c.canClose) {
                     <button class="fpms-button fpms-button-secondary" (click)="closing = { confirm: false, outcome: c.suggestedOutcome }">Close production cycle</button>
@@ -173,6 +173,10 @@ export class CycleDetailComponent extends FpmsPage implements OnInit {
     readonly batchShort = batchShort;
     closing: any = null;
     reopening: { reason: string } | null = null;
+
+    openStockingWizard(cycleId: string): void {
+        void this.router.navigate([{ outlets: { modal: ['create-batch'] } }], { relativeTo: this.route.parent, queryParams: { cycleId } });
+    }
 
     ngOnInit(): void {
         // Detail routes reuse this component when only the :id changes, so reload on every change.

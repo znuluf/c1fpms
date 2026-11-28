@@ -53,9 +53,9 @@ const CLOSED = 5;
                                 text="No batches match. Clear the search, or choose another status."
                                 icon="fas fa-seedling">
                                 @if (can('Farm.Production.Stock')) {
-                                    <a routerLink="/app/production/create-batch" class="fpms-button fpms-button-compact fpms-button-primary">
+                                    <button type="button" (click)="openStockingWizard()" class="fpms-button fpms-button-compact fpms-button-primary">
                                         Stock a batch
-                                    </a>
+                                    </button>
                                 }
                             </fpms-empty>
                         } @else {
@@ -174,6 +174,10 @@ export class BatchesComponent extends FpmsPage implements OnInit {
     ngOnInit(): void {
         this.restoreList(this.pager, this, { status: 'number', openOnly: 'boolean', search: 'string' });
         this.load();
+    }
+
+    openStockingWizard(): void {
+        void this.router.navigate([{ outlets: { modal: ['create-batch'] } }], { relativeTo: this.route.parent });
     }
 
     onSearch(value: string): void {

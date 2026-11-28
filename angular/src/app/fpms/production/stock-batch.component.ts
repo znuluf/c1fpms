@@ -36,7 +36,7 @@ interface Allocation {
                         <h1 id="cb-h">{{ cycleCode ? 'Stock a batch · ' + cycleCode : 'Stock a batch' }}</h1>
                         <p class="fpms-muted fpms-no-bottom">Stock fry from one delivery into prepared ponds. Nothing is saved until the last step.</p>
                     </div>
-                    <a class="fpms-dialog-close" [routerLink]="closeLink" aria-label="Close" title="Close">&times;</a>
+                    <button type="button" class="fpms-dialog-close" (click)="close()" aria-label="Close" title="Close">&times;</button>
                 </div>
                 <div class="fpms-dialog-body">
                 <ol class="fpms-steps fpms-stepper fpms-space-bottom-4" aria-label="Progress">
@@ -339,7 +339,16 @@ export class CreateBatchComponent extends FpmsPage implements OnInit {
     options: any = null;
     cycleId: string | null = null;
 
-    /** Closing the dialog goes back to where it was opened from. */
+    /** Close the modal outlet without navigating away from the page behind it. */
+    close(): void {
+        if (this.route.outlet === 'modal') {
+            void this.router.navigate([{ outlets: { modal: null } }], { relativeTo: this.route.parent });
+            return;
+        }
+        void this.router.navigate(this.closeLink);
+    }
+
+    /** Closing the direct wizard URL returns to the relevant list or cycle. */
     get closeLink(): any[] {
         return this.cycleId ? ['/app/production/cycles', this.cycleId] : ['/app/production/batches'];
     }
