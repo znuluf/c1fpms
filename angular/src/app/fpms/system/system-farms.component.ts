@@ -13,7 +13,7 @@ import { unbroken } from '@shared/fpms/labels';
             <div class="fpms-page-inner">
                 <div class="fpms-panel">
                     <div class="fpms-panel-head"><h3 class="fpms-panel-title">Farm registration</h3></div>
-                    <div class="fpms-panel-body fpms-flex align-items-center flex-wrap">
+                    <div class="fpms-panel-body fpms-flex fpms-align-center-items flex-wrap">
                         @if (registration() !== null) {
                             <span class="fpms-space-end-3">
                                 Registration is <fpms-badge [text]="registration() ? 'Open' : 'Closed'" [tone]="registration() ? 'success' : 'secondary'"></fpms-badge>
@@ -74,7 +74,7 @@ import { unbroken } from '@shared/fpms/labels';
                         } @else {
                             <!-- Six columns (DEC-122): the farm as its code tag and name; actions stack. -->
                             <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
-                                <thead><tr><th>Farm</th><th>Farm ID</th><th>Registered</th><th class="fpms-align-end">Accounts</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                                <thead><tr><th>Farm</th><th>Farm ID</th><th>Registered</th><th class="fpms-align-end">Accounts</th><th>Status</th><th><span class="fpms-visually-hidden">Actions</span></th></tr></thead>
                                 <tbody>
                                     @for (x of farms(); track x.tenantId) {
                                         <tr [class.fpms-muted]="!x.isActive">
