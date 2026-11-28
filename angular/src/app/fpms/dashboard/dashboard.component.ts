@@ -228,7 +228,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                 </label>
                             }
                             <div class="fpms-button-group-toggle fpms-margin-auto-start" role="group" aria-label="Show">
-                                <button type="button" class="fpms-chip" [attr.aria-pressed]="group() === 'all'" (click)="group.set('all')">All batches · {{ rows().length }}</button>
+                                <button type="button" class="fpms-chip" [attr.aria-pressed]="group() === 'all'" (click)="group.set('all')">Active batches · {{ rows().length }}</button>
                                 <button type="button" class="fpms-chip" [attr.aria-pressed]="group() === 'alert'" (click)="group.set('alert')">Alerts · {{ alertRows() }}</button>
                             </div>
                         </div>
