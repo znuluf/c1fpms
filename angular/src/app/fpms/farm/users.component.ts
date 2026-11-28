@@ -18,72 +18,72 @@ const ROLES = [
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="Farm users" subtitle="Farm Owner and Farm Technician accounts of this farm.">
-            <button class="btn btn-primary" (click)="startCreate()" [disabled]="!!form"><i class="fas fa-user-plus mr-1"></i>Add user</button>
+            <button class="fpms-button fpms-button-primary" (click)="startCreate()" [disabled]="!!form"><i class="fas fa-user-plus fpms-icon-gap"></i>Add user</button>
         </fpms-page-header>
         <section class="fpms-page">
             <div class="fpms-page-inner">
                 @if (form) {
-                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="account-dialog-title"><div class="fpms-dialog-body p-0">
-                        <div class="card card-outline card-primary">
-                            <div class="card-header"><h3 id="account-dialog-title" class="card-title">{{ form.id ? 'Edit account' : 'New account' }}</h3></div>
+                    <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="account-dialog-title"><div class="fpms-dialog-body fpms-space-0">
+                        <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
+                            <div class="fpms-panel-head"><h3 id="account-dialog-title" class="fpms-panel-title">{{ form.id ? 'Edit account' : 'New account' }}</h3></div>
                             <form #f="ngForm" (ngSubmit)="save()" (input)="keepDraft()" (change)="keepDraft()" fpmsReview="account" [fpmsReviewNew]="!form.id" novalidate autocomplete="off">
-                                <div class="card-body">
+                                <div class="fpms-panel-body">
                                     @if (restoredAt) {
-                                        <div class="alert alert-info d-flex align-items-center" role="status">
-                                            <i class="fas fa-history mr-2" aria-hidden="true"></i>
-                                            <span class="mr-auto">Your unsaved account from {{ restoredAt | farmDateTime }} was restored.{{ form.id ? '' : ' The temporary password is a new one.' }}</span>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary ml-2 text-nowrap" (click)="discardDraft()">Discard it</button>
+                                        <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                                            <i class="fas fa-history fpms-icon-gap" aria-hidden="true"></i>
+                                            <span class="fpms-margin-auto-end">Your unsaved account from {{ restoredAt | farmDateTime }} was restored.{{ form.id ? '' : ' The temporary password is a new one.' }}</span>
+                                            <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary fpms-space-start-2 fpms-nowrap" (click)="discardDraft()">Discard it</button>
                                         </div>
                                     }
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
-                                            <label for="name">First name <span class="text-danger">*</span></label>
-                                            <input id="name" class="form-control" name="name" [(ngModel)]="form.name" (blur)="suggestUserName()" required maxlength="64" />
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="name">First name <span class="fpms-danger">*</span></label>
+                                            <input id="name" class="fpms-control" name="name" [(ngModel)]="form.name" (blur)="suggestUserName()" required maxlength="64" />
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="surname">Surname <span class="text-danger">*</span></label>
-                                            <input id="surname" class="form-control" name="surname" [(ngModel)]="form.surname" (blur)="suggestUserName()" required maxlength="64" />
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="surname">Surname <span class="fpms-danger">*</span></label>
+                                            <input id="surname" class="fpms-control" name="surname" [(ngModel)]="form.surname" (blur)="suggestUserName()" required maxlength="64" />
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="role">Role <span class="text-danger">*</span></label>
-                                            <select id="role" class="form-control" name="roleName" [(ngModel)]="form.roleName" required>
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="role">Role <span class="fpms-danger">*</span></label>
+                                            <select id="role" class="fpms-control" name="roleName" [(ngModel)]="form.roleName" required>
                                                 @for (r of roles; track r.value) {
                                                     <option [value]="r.value">{{ r.label }}</option>
                                                 }
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
-                                            <label for="userName">Username <span class="text-danger">*</span></label>
-                                            <input id="userName" class="form-control" name="userName" [(ngModel)]="form.userName" (ngModelChange)="userNameEdited = !!$event" required maxlength="256" autocapitalize="off" [disabled]="!!form.id" />
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="userName">Username <span class="fpms-danger">*</span></label>
+                                            <input id="userName" class="fpms-control" name="userName" [(ngModel)]="form.userName" (ngModelChange)="userNameEdited = !!$event" required maxlength="256" autocapitalize="off" [disabled]="!!form.id" />
                                             @if (!form.id) {
-                                                <small class="form-text text-muted">Filled in from the name; you can change it. Fixed once saved.</small>
+                                                <small class="fpms-help fpms-muted">Filled in from the name; you can change it. Fixed once saved.</small>
                                             }
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="email">Email <span class="text-danger">*</span></label>
-                                            <input id="email" type="email" email class="form-control" name="emailAddress" [(ngModel)]="form.emailAddress" required maxlength="256" />
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="email">Email <span class="fpms-danger">*</span></label>
+                                            <input id="email" type="email" email class="fpms-control" name="emailAddress" [(ngModel)]="form.emailAddress" required maxlength="256" />
                                         </div>
                                         @if (!form.id) {
-                                            <div class="form-group col-md-4">
-                                                <label for="pw">Temporary password <span class="text-danger">*</span></label>
+                                            <div class="fpms-field fpms-col-md-4">
+                                                <label for="pw">Temporary password <span class="fpms-danger">*</span></label>
                                                 <div class="input-group">
-                                                    <input id="pw" class="form-control" name="temporaryPassword" [(ngModel)]="form.temporaryPassword" required minlength="8" autocomplete="new-password" />
+                                                    <input id="pw" class="fpms-control" name="temporaryPassword" [(ngModel)]="form.temporaryPassword" required minlength="8" autocomplete="new-password" />
                                                     <div class="input-group-append">
-                                                        <button type="button" class="btn btn-outline-secondary" (click)="form.temporaryPassword = generate()" title="Generate">
+                                                        <button type="button" class="fpms-button fpms-button-secondary" (click)="form.temporaryPassword = generate()" title="Generate">
                                                             <i class="fas fa-dice"></i>
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <small class="form-text text-muted">Give it to the person; they must change it at first sign-in.</small>
+                                                <small class="fpms-help fpms-muted">Give it to the person; they must change it at first sign-in.</small>
                                             </div>
                                         }
                                     </div>
                                 </div>
-                                <div class="card-footer">
-                                    <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !f.form.valid">Save</button>
-                                    <button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
+                                <div class="fpms-panel-foot">
+                                    <button type="submit" class="fpms-button fpms-button-primary fpms-icon-gap" [disabled]="busy() || !f.form.valid">Save</button>
+                                    <button type="button" class="fpms-button fpms-button-secondary" (click)="cancel()">Cancel</button>
                                     <fpms-form-hint [form]="f"></fpms-form-hint>
                                 </div>
                             </form>
@@ -94,32 +94,32 @@ const ROLES = [
                 @if (reset) {
                     <div class="fpms-dialog-backdrop">
                         <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="reset-password-title">
-                            <div class="fpms-dialog-body p-0">
-                                <div class="card card-outline card-warning">
-                                    <div class="card-header">
-                                        <h3 id="reset-password-title" class="card-title">
+                            <div class="fpms-dialog-body fpms-space-0">
+                                <div class="fpms-panel fpms-panel-outline fpms-panel-warning">
+                                    <div class="fpms-panel-head">
+                                        <h3 id="reset-password-title" class="fpms-panel-title">
                                             Reset password for {{ reset.user.name }} {{ reset.user.surname }}
                                         </h3>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="form-row align-items-end">
-                                            <div class="form-group col-md-8">
+                                    <div class="fpms-panel-body">
+                                        <div class="fpms-grid-row align-items-end">
+                                            <div class="fpms-field fpms-col-md-8">
                                                 <label for="rpw">New temporary password</label>
                                                 <div class="input-group">
-                                                    <input id="rpw" class="form-control" name="rpw" [(ngModel)]="reset.password" minlength="8" autocomplete="new-password" />
+                                                    <input id="rpw" class="fpms-control" name="rpw" [(ngModel)]="reset.password" minlength="8" autocomplete="new-password" />
                                                     <div class="input-group-append">
-                                                        <button type="button" class="btn btn-outline-secondary" (click)="reset.password = generate()" aria-label="Generate a password" title="Generate a password">
+                                                        <button type="button" class="fpms-button fpms-button-secondary" (click)="reset.password = generate()" aria-label="Generate a password" title="Generate a password">
                                                             <i class="fas fa-dice" aria-hidden="true"></i>
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <p class="small text-muted mb-0">The account is unlocked and must set a new password at next sign-in.</p>
+                                        <p class="fpms-small fpms-muted fpms-no-bottom">The account is unlocked and must set a new password at next sign-in.</p>
                                     </div>
-                                    <div class="card-footer">
-                                        <button type="button" class="btn btn-warning mr-2" [disabled]="busy() || (reset.password?.length ?? 0) < 8" (click)="doReset()">Reset password</button>
-                                        <button type="button" class="btn btn-default" (click)="reset = null">Cancel</button>
+                                    <div class="fpms-panel-foot">
+                                        <button type="button" class="fpms-button fpms-button-warning fpms-icon-gap" [disabled]="busy() || (reset.password?.length ?? 0) < 8" (click)="doReset()">Reset password</button>
+                                        <button type="button" class="fpms-button fpms-button-secondary" (click)="reset = null">Cancel</button>
                                     </div>
                                 </div>
                             </div>
@@ -138,24 +138,24 @@ const ROLES = [
                             (searchChange)="f.search.set($event)"
                             (chipChange)="f.chip.set($event)"></fpms-list-toolbar>
                 </div>
-                <div class="card">
-                    <div class="card-body p-0 table-responsive">
+                <div class="fpms-panel">
+                    <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!users()) {
                             <fpms-loading></fpms-loading>
                         } @else if (f.noMatch()) {
                             <fpms-empty text="No accounts match. Clear the search or the filter." icon="fas fa-users"></fpms-empty>
                         } @else {
-                            <table class="table table-hover mb-0">
+                            <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
                                     <!-- Four columns: the person with their sign-in and email, role, status, actions (DEC-115). -->
                                     <tr><th>Person</th><th>Role</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr>
                                 </thead>
                                 <tbody>
                                     @for (u of f.visible(); track u.id) {
-                                        <tr [class.text-muted]="!u.isActive">
+                                        <tr [class.fpms-muted]="!u.isActive">
                                             <td>
-                                                <strong>{{ u.name }} {{ u.surname }}</strong>@if (u.isCurrentUser) { <span class="badge badge-light ml-1">you</span> }
-                                                <div class="text-muted">{{ u.userName }}{{ u.emailAddress ? ' · ' + u.emailAddress : ' · no email' }}</div>
+                                                <strong>{{ u.name }} {{ u.surname }}</strong>@if (u.isCurrentUser) { <span class="fpms-label badge-light fpms-icon-gap">you</span> }
+                                                <div class="fpms-muted">{{ u.userName }}{{ u.emailAddress ? ' · ' + u.emailAddress : ' · no email' }}</div>
                                             </td>
                                             <td>{{ roleLabel(u.roleName) }}</td>
                                             <td class="fpms-badge-stack">
@@ -163,12 +163,12 @@ const ROLES = [
                                                 @if (u.isLockedOut) { <fpms-badge text="Locked out" tone="danger"></fpms-badge> }
                                                 @if (u.mustChangePassword) { <fpms-badge text="Must change password" tone="warning"></fpms-badge> }
                                             </td>
-                                            <td class="text-right">
+                                            <td class="fpms-align-end">
                                                 <div class="fpms-actions-stack">
-                                                    <button class="btn btn-sm btn-outline-primary" (click)="startEdit(u)" [attr.aria-label]="'Edit ' + u.name + ' ' + u.surname">Edit</button>
+                                                    <button class="fpms-button fpms-button-compact fpms-button-outline" (click)="startEdit(u)" [attr.aria-label]="'Edit ' + u.name + ' ' + u.surname">Edit</button>
                                                     @if (!u.isCurrentUser) {
-                                                        <button class="btn btn-sm btn-outline-secondary" (click)="reset = { user: u, password: generate() }">Reset password</button>
-                                                        <button class="btn btn-sm" [class.btn-outline-danger]="u.isActive" [class.btn-outline-success]="!u.isActive" [disabled]="busy()" (click)="toggle(u)">
+                                                        <button class="fpms-button fpms-button-compact fpms-button-secondary" (click)="reset = { user: u, password: generate() }">Reset password</button>
+                                                        <button class="fpms-button fpms-button-compact" [class.fpms-button-danger]="u.isActive" [class.fpms-button-success]="!u.isActive" [disabled]="busy()" (click)="toggle(u)">
                                                             {{ u.isActive ? 'Deactivate' : 'Reactivate' }}
                                                         </button>
                                                     }
