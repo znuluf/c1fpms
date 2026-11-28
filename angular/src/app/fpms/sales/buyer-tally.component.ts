@@ -83,7 +83,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </div>
 
                             <table class="fpms-doc-table">
-                                <caption class="sr-only">Grades, kilos, price and amount</caption>
+                                <caption class="fpms-visually-hidden">Grades, kilos, price and amount</caption>
                                 <thead>
                                     <tr><th scope="col">Size grade</th><th scope="col" class="num">Kg</th><th scope="col" class="num">Price per kilo</th><th scope="col" class="num">Amount</th></tr>
                                 </thead>
