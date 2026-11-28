@@ -88,7 +88,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         } @else {
                             <!-- Five columns (DEC-122): the parameter with its code and unit; limits; how often, and whether stocking needs it. -->
                             <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
-                                <thead><tr><th>Parameter</th><th>Optimal range</th><th title="Readings outside these are rejected as entry errors">Physical limits</th><th title="Monitoring frequency (guidance)">Frequency</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                                <thead><tr><th>Parameter</th><th>Optimal range</th><th title="Readings outside these are rejected as entry errors">Physical limits</th><th title="Monitoring frequency (guidance)">Frequency</th><th>Status</th><th><span class="fpms-visually-hidden">Actions</span></th></tr></thead>
                                 <tbody>
                                     @for (p of list(); track p.code) {
                                         <tr [class.fpms-muted]="!p.isActive">
