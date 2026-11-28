@@ -24,51 +24,51 @@ import { DisposalReasons } from '@shared/fpms/labels';
     template: `
         <fpms-page-header [narrow]="true" [title]="isNew ? 'Record harvest' : 'Harvest' + (batch ? ' · ' + batch.pondCode + ' ' + (batch.letter ? 'Batch ' + batch.letter : batch.batchCode) : '')" [subtitle]="isNew ? (batch ? batch.pondCode + ' · ' + (batch.letter ? 'Batch ' + batch.letter : batch.batchCode) : '') : (h ? (h.lotCode ? 'Lot ' + h.lotCode + ' · ' : '') + (h.harvestType | label: L.HarvestTypes) + ' harvest on ' + (h.harvestedAtUtc | farmDate) + '. Edit it here until the batch is closed.' : '')" backLink="/app/harvests" backLabel="Harvests">
             @if (!isNew && h) {
-                <a class="btn btn-outline-primary mr-1" [routerLink]="['/app/harvests', h.id, 'tally']"><i class="fas fa-clipboard-list mr-1" aria-hidden="true"></i>Tally sheet</a>
+                <a class="fpms-button fpms-button-outline fpms-icon-gap" [routerLink]="['/app/harvests', h.id, 'tally']"><i class="fas fa-clipboard-list fpms-icon-gap" aria-hidden="true"></i>Tally sheet</a>
             }
             @if (!isNew && h?.lotCode && can('Farm.Reports')) {
-                <a class="btn btn-outline-secondary mr-1" [routerLink]="['/app/reports/trace/lot', h.lotCode]" [queryParams]="{ from: 'harvests' }"><i class="fas fa-project-diagram mr-1"></i>Trace this lot</a>
+                <a class="fpms-button fpms-button-secondary fpms-icon-gap" [routerLink]="['/app/reports/trace/lot', h.lotCode]" [queryParams]="{ from: 'harvests' }"><i class="fas fa-project-diagram fpms-icon-gap"></i>Trace this lot</a>
             }
             @if (!isNew && h && can('Farm.Sales') && sellableKg() > 0) {
-                <a class="btn btn-outline-primary" routerLink="/app/sales/new" [queryParams]="{ harvestId: h.id }"><i class="fas fa-cash-register mr-1"></i>Sell this harvest</a>
+                <a class="fpms-button fpms-button-outline" routerLink="/app/sales/new" [queryParams]="{ harvestId: h.id }"><i class="fas fa-cash-register fpms-icon-gap"></i>Sell this harvest</a>
             }
         </fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
+            <div class="fpms-page-inner fpms-narrow">
                 @if (loading) {
                     <fpms-loading></fpms-loading>
                 } @else if (isNew && !batches.length) {
-                    <div class="card"><div class="card-body"><fpms-empty text="No batch can take a harvest. Harvests are recorded for Stocked batches, or Failed batches as a salvage harvest." icon="fas fa-shrimp"></fpms-empty></div></div>
+                    <div class="fpms-panel"><div class="fpms-panel-body"><fpms-empty text="No batch can take a harvest. Harvests are recorded for Stocked batches, or Failed batches as a salvage harvest." icon="fas fa-shrimp"></fpms-empty></div></div>
                 } @else {
                     @if (!isNew && h) {
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Where it went</h3></div>
-                            <div class="card-body">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Where it went</h3></div>
+                            <div class="fpms-panel-body">
                                 <div class="fpms-balance" role="img" [attr.aria-label]="'Sold ' + (h.soldKg | num: 2) + ' kg, not sold ' + (h.notSoldKg | num: 2) + ' kg, available to sell ' + (h.unaccountedKg | num: 2) + ' kg, of ' + (h.totalKg | num: 2) + ' kg harvested'">
                                     @if (h.soldKg > 0) { <div class="sold" [style.flex-grow]="h.soldKg"></div> }
                                     @if (h.notSoldKg > 0) { <div class="notsold" [style.flex-grow]="h.notSoldKg"></div> }
                                     @if (h.unaccountedKg > 0) { <div class="open" [style.flex-grow]="h.unaccountedKg"></div> }
                                 </div>
-                                <div class="fpms-balance-key small">
+                                <div class="fpms-balance-key fpms-small">
                                     <span><i class="sold" aria-hidden="true"></i>Sold {{ h.soldKg | num: 2 }} kg</span>
                                     <span><i class="notsold" aria-hidden="true"></i>Not sold {{ h.notSoldKg | num: 2 }} kg</span>
                                     <span><i class="open" aria-hidden="true"></i>Available to sell {{ h.unaccountedKg | num: 2 }} kg</span>
-                                    <span class="ml-auto">of <strong>{{ h.totalKg | num: 2 }} kg</strong> harvested</span>
+                                    <span class="fpms-margin-auto-start">of <strong>{{ h.totalKg | num: 2 }} kg</strong> harvested</span>
                                 </div>
                             </div>
                             @if (whereRows().length) {
-                                <div class="card-body p-0 table-responsive border-top">
-                                    <table class="table table-sm mb-0">
+                                <div class="fpms-panel-body fpms-space-0 fpms-table-scroll border-top">
+                                    <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
                                         <caption class="sr-only">Where this harvest went</caption>
-                                        <thead><tr><th>Went to</th><th>Dispatch receipt</th><th class="text-right">Crates</th><th class="text-right">Kg</th><th class="text-right">Amount</th></tr></thead>
+                                        <thead><tr><th>Went to</th><th>Dispatch receipt</th><th class="fpms-align-end">Crates</th><th class="fpms-align-end">Kg</th><th class="fpms-align-end">Amount</th></tr></thead>
                                         <tbody>
                                             @for (r of whereRows(); track $index) {
                                                 <tr>
                                                     <td>{{ r.to }}</td>
-                                                    <td class="text-nowrap">@if (r.saleId) { <a [routerLink]="['/app/sales', r.saleId]">{{ r.receipt }}</a> <a class="small ml-2" [routerLink]="['/app/sales', r.saleId, 'tally']" [attr.aria-label]="'Tally sheet for ' + r.receipt">Tally sheet</a> }</td>
-                                                    <td class="text-right">{{ r.crates }}</td>
-                                                    <td class="text-right">{{ r.kg | num: 2 }}</td>
-                                                    <td class="text-right">{{ r.amount != null ? (r.amount | php) : '' }}</td>
+                                                    <td class="fpms-nowrap">@if (r.saleId) { <a [routerLink]="['/app/sales', r.saleId]">{{ r.receipt }}</a> <a class="fpms-small fpms-space-start-2" [routerLink]="['/app/sales', r.saleId, 'tally']" [attr.aria-label]="'Tally sheet for ' + r.receipt">Tally sheet</a> }</td>
+                                                    <td class="fpms-align-end">{{ r.crates }}</td>
+                                                    <td class="fpms-align-end">{{ r.kg | num: 2 }}</td>
+                                                    <td class="fpms-align-end">{{ r.amount != null ? (r.amount | php) : '' }}</td>
                                                 </tr>
                                             }
                                         </tbody>
@@ -76,46 +76,46 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                 </div>
                             }
                             @if (h.crates?.length) {
-                                <div class="card-footer small text-muted">{{ h.crates.length }} crates on the tally: {{ dispatchedCrates() }} on a dispatch receipt, {{ h.crates.length - dispatchedCrates() }} on none. Open "Crate tally" below to see or edit them.</div>
+                                <div class="fpms-panel-foot fpms-small fpms-muted">{{ h.crates.length }} crates on the tally: {{ dispatchedCrates() }} on a dispatch receipt, {{ h.crates.length - dispatchedCrates() }} on none. Open "Crate tally" below to see or edit them.</div>
                             }
                         </div>
                     }
                     @if (readOnly) {
-                        <div class="alert alert-secondary small"><i class="fas fa-lock mr-1"></i>{{ batch?.isReadOnly ? 'The batch is Closed; this harvest is read-only.' : 'You can only edit harvests you recorded.' }}</div>
+                        <div class="fpms-alert fpms-alert-neutral fpms-small"><i class="fas fa-lock fpms-icon-gap"></i>{{ batch?.isReadOnly ? 'The batch is Closed; this harvest is read-only.' : 'You can only edit harvests you recorded.' }}</div>
                     }
                     @if (restoredAt) {
-                        <div class="alert alert-info d-flex align-items-center" role="status">
-                            <i class="fas fa-history mr-2"></i>
-                            <span class="mr-auto">Your unsaved harvest from {{ restoredAt | farmDateTime }} was restored.</span>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="discardDraft()">Discard it</button>
+                        <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                            <i class="fas fa-history fpms-icon-gap"></i>
+                            <span class="fpms-margin-auto-end">Your unsaved harvest from {{ restoredAt | farmDateTime }} was restored.</span>
+                            <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="discardDraft()">Discard it</button>
                         </div>
                     }
                     @if (batch?.earliestSafeHarvestDate && isNew) {
-                        <div class="alert alert-warning small"><i class="fas fa-prescription-bottle-alt mr-1"></i>Earliest safe harvest date from treatment withdrawal periods: <strong>{{ batch.earliestSafeHarvestDate | farmDate }}</strong>.</div>
+                        <div class="fpms-alert fpms-alert-warning fpms-small"><i class="fas fa-prescription-bottle-alt fpms-icon-gap"></i>Earliest safe harvest date from treatment withdrawal periods: <strong>{{ batch.earliestSafeHarvestDate | farmDate }}</strong>.</div>
                     }
                     <!-- One panel (DEC-107): the harvest's parts are sections of it, with Save as its footer. -->
                     <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="save()" fpmsReview="harvest" [fpmsReviewNew]="isNew" novalidate>
                         <fieldset [disabled]="readOnly">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="form-row">
-                                        <div class="form-group col-md-8">
-                                            <label for="b">Batch <span class="text-danger">*</span></label>
-                                            <select id="b" class="form-control" name="batchId" [(ngModel)]="m.batchId" (ngModelChange)="onBatch()" required [disabled]="!isNew">
+                            <div class="fpms-panel">
+                                <div class="fpms-panel-body">
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-md-8">
+                                            <label for="b">Batch <span class="fpms-danger">*</span></label>
+                                            <select id="b" class="fpms-control" name="batchId" [(ngModel)]="m.batchId" (ngModelChange)="onBatch()" required [disabled]="!isNew">
                                                 @for (x of batches; track x.id) {
                                                     <option [value]="x.id">{{ x.pondCode }} · {{ x.letter ? 'Batch ' + x.letter : x.batchCode }} ({{ x.status | label: L.BatchStatuses }})</option>
                                                 }
                                             </select>
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <label class="d-block">Harvest type <span class="text-danger">*</span></label>
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label class="fpms-block">Harvest type <span class="fpms-danger">*</span></label>
                                             @for (o of Options.harvestType; track o.value) {
-                                                <div class="custom-control custom-radio custom-control-inline">
-                                                    <input type="radio" class="custom-control-input" [id]="'ht' + o.value" name="harvestType" [value]="o.value" [(ngModel)]="m.harvestType" (ngModelChange)="keepDraft()" />
-                                                    <label class="custom-control-label" [for]="'ht' + o.value">{{ o.label }}</label>
+                                                <div class="fpms-check fpms-check-radio fpms-check-inline">
+                                                    <input type="radio" class="fpms-check-input" [id]="'ht' + o.value" name="harvestType" [value]="o.value" [(ngModel)]="m.harvestType" (ngModelChange)="keepDraft()" />
+                                                    <label class="fpms-check-label" [for]="'ht' + o.value">{{ o.label }}</label>
                                                 </div>
                                             }
-                                            <small class="form-text text-muted">
+                                            <small class="fpms-help fpms-muted">
                                                 @if (m.harvestType === 2) {
                                                     The last harvest: the batch becomes Harvested. No harvest or log can be dated after it.
                                                 } @else if (m.harvestType === 3) {
@@ -127,151 +127,151 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                         </div>
                                     </div>
                                     @if (m.harvestType === 2) {
-                                        <div class="form-group mt-2 mb-3">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="pc" name="pondEmptiedConfirmed" [(ngModel)]="m.pondEmptiedConfirmed" (ngModelChange)="keepDraft()" required />
-                                                <label class="custom-control-label" for="pc">I confirm that no shrimp remain in the pond after this Final harvest. <span class="text-danger">*</span></label>
+                                        <div class="fpms-field fpms-space-top-2 fpms-space-bottom-3">
+                                            <div class="fpms-check fpms-check-box">
+                                                <input type="checkbox" class="fpms-check-input" id="pc" name="pondEmptiedConfirmed" [(ngModel)]="m.pondEmptiedConfirmed" (ngModelChange)="keepDraft()" required />
+                                                <label class="fpms-check-label" for="pc">I confirm that no shrimp remain in the pond after this Final harvest. <span class="fpms-danger">*</span></label>
                                             </div>
-                                            <small class="form-text text-muted">The batch will be marked Harvested only after this confirmation and the Final harvest are saved. Do not rely on the estimated remaining population alone.</small>
+                                            <small class="fpms-help fpms-muted">The batch will be marked Harvested only after this confirmation and the Final harvest are saved. Do not rely on the estimated remaining population alone.</small>
                                         </div>
                                     }
                                     @if (m.harvestType === 3) {
-                                        <div class="form-row">
-                                            <div class="form-group col-md-4">
-                                                <label for="er">Reason <span class="text-danger">*</span></label>
-                                                <select id="er" class="form-control" name="emergencyReason" [(ngModel)]="m.emergencyReason" (ngModelChange)="keepDraft()" required>
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-md-4">
+                                                <label for="er">Reason <span class="fpms-danger">*</span></label>
+                                                <select id="er" class="fpms-control" name="emergencyReason" [(ngModel)]="m.emergencyReason" (ngModelChange)="keepDraft()" required>
                                                     <option [ngValue]="null">Choose a reason</option>
                                                     @for (o of Options.emergencyReason; track o.value) {
                                                         <option [ngValue]="o.value">{{ o.label }}</option>
                                                     }
                                                 </select>
                                             </div>
-                                            <div class="form-group col-md-4">
-                                                <label class="d-block">Shrimp still in the pond afterwards? <span class="text-danger">*</span></label>
-                                                <div class="custom-control custom-radio custom-control-inline">
-                                                    <input type="radio" class="custom-control-input" id="sl1" name="shrimpLeft" [value]="true" [(ngModel)]="m.shrimpLeft" (ngModelChange)="keepDraft()" required />
-                                                    <label class="custom-control-label" for="sl1">Yes</label>
+                                            <div class="fpms-field fpms-col-md-4">
+                                                <label class="fpms-block">Shrimp still in the pond afterwards? <span class="fpms-danger">*</span></label>
+                                                <div class="fpms-check fpms-check-radio fpms-check-inline">
+                                                    <input type="radio" class="fpms-check-input" id="sl1" name="shrimpLeft" [value]="true" [(ngModel)]="m.shrimpLeft" (ngModelChange)="keepDraft()" required />
+                                                    <label class="fpms-check-label" for="sl1">Yes</label>
                                                 </div>
-                                                <div class="custom-control custom-radio custom-control-inline">
-                                                    <input type="radio" class="custom-control-input" id="sl0" name="shrimpLeft" [value]="false" [(ngModel)]="m.shrimpLeft" (ngModelChange)="keepDraft()" required />
-                                                    <label class="custom-control-label" for="sl0">No</label>
+                                                <div class="fpms-check fpms-check-radio fpms-check-inline">
+                                                    <input type="radio" class="fpms-check-input" id="sl0" name="shrimpLeft" [value]="false" [(ngModel)]="m.shrimpLeft" (ngModelChange)="keepDraft()" required />
+                                                    <label class="fpms-check-label" for="sl0">No</label>
                                                 </div>
-                                                <small class="form-text text-muted">
+                                                <small class="fpms-help fpms-muted">
                                                     {{ m.shrimpLeft === false ? 'No shrimp left: the batch becomes Harvested and no harvest or log can be dated after it.' : 'The batch stays active.' }}
                                                 </small>
                                             </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="en">Short explanation @if (m.emergencyReason === 5) { <span class="text-danger">*</span> }</label>
-                                                <input id="en" type="text" class="form-control" name="emergencyNote" [(ngModel)]="m.emergencyNote" (ngModelChange)="keepDraft()" maxlength="300" [required]="m.emergencyReason === 5" />
+                                            <div class="fpms-field fpms-col-md-4">
+                                                <label for="en">Short explanation @if (m.emergencyReason === 5) { <span class="fpms-danger">*</span> }</label>
+                                                <input id="en" type="text" class="fpms-control" name="emergencyNote" [(ngModel)]="m.emergencyNote" (ngModelChange)="keepDraft()" maxlength="300" [required]="m.emergencyReason === 5" />
                                             </div>
                                         </div>
                                     }
-                                    <div class="form-row">
-                                        <div class="form-group col-md-8">
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-md-8">
                                             <label for="buyer">Buyer</label>
-                                            <select id="buyer" class="form-control" name="buyerId" [(ngModel)]="m.buyerId" (ngModelChange)="onBuyer()">
+                                            <select id="buyer" class="fpms-control" name="buyerId" [(ngModel)]="m.buyerId" (ngModelChange)="onBuyer()">
                                                 <option value="">Not one buyer / not decided</option>
                                                 @for (b of buyers; track b.id) {
                                                     <option [value]="b.id" [disabled]="!b.isActive && b.id !== h?.buyerId">{{ b.name }}{{ b.isActive ? '' : ' (inactive)' }}</option>
                                                 }
                                             </select>
-                                            <small class="form-text text-muted">When one buyer harvests or orders it. Their usual crate and price terms are filled in.</small>
+                                            <small class="fpms-help fpms-muted">When one buyer harvests or orders it. Their usual crate and price terms are filled in.</small>
                                         </div>
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
-                                            <label for="at">Harvest date and time <span class="text-danger">*</span></label>
-                                            <input id="at" type="datetime-local" class="form-control" name="harvestedAt" [(ngModel)]="m.harvestedAt" (ngModelChange)="keepDraft()" required [max]="nowInput" />
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="at">Harvest date and time <span class="fpms-danger">*</span></label>
+                                            <input id="at" type="datetime-local" class="fpms-control" name="harvestedAt" [(ngModel)]="m.harvestedAt" (ngModelChange)="keepDraft()" required [max]="nowInput" />
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="kg">Total weight (kg) <span class="text-danger">*</span></label>
-                                            <input id="kg" type="number" min="0.001" step="0.001" class="form-control" name="totalKg" [(ngModel)]="m.totalKg" (ngModelChange)="keepDraft()" required [readonly]="hasCrates()" />
-                                            <small class="form-text text-muted">{{ hasCrates() ? 'Added up from the crate tally.' : 'Weight of all the shrimp harvested.' }}</small>
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="kg">Total weight (kg) <span class="fpms-danger">*</span></label>
+                                            <input id="kg" type="number" min="0.001" step="0.001" class="fpms-control" name="totalKg" [(ngModel)]="m.totalKg" (ngModelChange)="keepDraft()" required [readonly]="hasCrates()" />
+                                            <small class="fpms-help fpms-muted">{{ hasCrates() ? 'Added up from the crate tally.' : 'Weight of all the shrimp harvested.' }}</small>
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="fpms-field fpms-col-md-4">
                                             <label for="bx">Number of crates</label>
-                                            <input id="bx" type="number" min="0" step="1" class="form-control" name="boxes" [(ngModel)]="m.boxes" (ngModelChange)="keepDraft()" [readonly]="hasCrates()" />
+                                            <input id="bx" type="number" min="0" step="1" class="fpms-control" name="boxes" [(ngModel)]="m.boxes" (ngModelChange)="keepDraft()" [readonly]="hasCrates()" />
                                         </div>
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
-                                            <label for="sw">Sample weight (g) <span class="text-danger">*</span></label>
-                                            <input id="sw" type="number" min="0.01" step="0.01" class="form-control" name="abwSampleWeightG" [(ngModel)]="m.abwSampleWeightG" (ngModelChange)="onSample()" required placeholder="e.g. 5002" />
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="sw">Sample weight (g) <span class="fpms-danger">*</span></label>
+                                            <input id="sw" type="number" min="0.01" step="0.01" class="fpms-control" name="abwSampleWeightG" [(ngModel)]="m.abwSampleWeightG" (ngModelChange)="onSample()" required placeholder="e.g. 5002" />
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="sp">Shrimp counted in the sample (pieces) <span class="text-danger">*</span></label>
-                                            <input id="sp" type="number" min="1" step="1" class="form-control" name="abwSamplePieces" [(ngModel)]="m.abwSamplePieces" (ngModelChange)="onSample()" required placeholder="e.g. 414" />
-                                            @if (sampleHalf()) { <small class="form-text text-danger">Enter both the weight and the pieces.</small> }
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="sp">Shrimp counted in the sample (pieces) <span class="fpms-danger">*</span></label>
+                                            <input id="sp" type="number" min="1" step="1" class="fpms-control" name="abwSamplePieces" [(ngModel)]="m.abwSamplePieces" (ngModelChange)="onSample()" required placeholder="e.g. 414" />
+                                            @if (sampleHalf()) { <small class="fpms-help fpms-danger">Enter both the weight and the pieces.</small> }
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="fpms-field fpms-col-md-4">
                                             <label for="abw">Average body weight, ABW (g per shrimp)</label>
-                                            <input id="abw" type="number" min="0.01" max="60" step="0.01" class="form-control" name="abwG" [(ngModel)]="m.abwG" (ngModelChange)="keepDraft()" readonly />
+                                            <input id="abw" type="number" min="0.01" max="60" step="0.01" class="fpms-control" name="abwG" [(ngModel)]="m.abwG" (ngModelChange)="keepDraft()" readonly />
                                             @if (sampleComplete()) {
-                                                <small class="form-text text-muted">Worked out: {{ m.abwSampleWeightG | num: 2 }} g ÷ {{ m.abwSamplePieces | num: 0 }} pieces</small>
+                                                <small class="fpms-help fpms-muted">Worked out: {{ m.abwSampleWeightG | num: 2 }} g ÷ {{ m.abwSamplePieces | num: 0 }} pieces</small>
                                             } @else {
-                                                <small class="form-text text-muted">Worked out from the sample weight and pieces.</small>
+                                                <small class="fpms-help fpms-muted">Worked out from the sample weight and pieces.</small>
                                             }
                                         </div>
                                     </div>
                                     <details #moreHarvest class="fpms-fold" [open]="moreHarvest.open || hasHarvestExtras()">
                                         <summary>More details <span class="fpms-fold-hint">counted shrimp</span></summary>
-                                        <div class="form-row">
-                                            <div class="form-group col-md-4">
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-md-4">
                                                 <label for="fc">Counted shrimp (pieces)</label>
-                                                <input id="fc" type="number" min="0" step="1" class="form-control" name="finalCount" [(ngModel)]="m.finalCount" (ngModelChange)="keepDraft()" placeholder="only if you counted them all" />
-                                                <small class="form-text text-muted">Leave empty to use the estimate from the ABW. A real count replaces the estimate.</small>
+                                                <input id="fc" type="number" min="0" step="1" class="fpms-control" name="finalCount" [(ngModel)]="m.finalCount" (ngModelChange)="keepDraft()" placeholder="only if you counted them all" />
+                                                <small class="fpms-help fpms-muted">Leave empty to use the estimate from the ABW. A real count replaces the estimate.</small>
                                             </div>
                                         </div>
                                         @if (m.harvestType === 1 && m.abwG > 0) {
-                                            <div class="form-group mt-2 mb-3">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input" id="useHarvestAbwForBiomass" name="useHarvestAbwForBiomass" [(ngModel)]="m.useHarvestAbwForBiomass" (ngModelChange)="keepDraft()" />
-                                                    <label class="custom-control-label" for="useHarvestAbwForBiomass">Use this harvest ABW for the pond's remaining-biomass estimate</label>
+                                            <div class="fpms-field fpms-space-top-2 fpms-space-bottom-3">
+                                                <div class="fpms-check fpms-check-box">
+                                                    <input type="checkbox" class="fpms-check-input" id="useHarvestAbwForBiomass" name="useHarvestAbwForBiomass" [(ngModel)]="m.useHarvestAbwForBiomass" (ngModelChange)="keepDraft()" />
+                                                    <label class="fpms-check-label" for="useHarvestAbwForBiomass">Use this harvest ABW for the pond's remaining-biomass estimate</label>
                                                 </div>
-                                                <small class="form-text text-muted">Yes is selected by default. Clear it if the shrimp harvested may be larger than those left in the pond. A later growth sample will replace this ABW basis.</small>
+                                                <small class="fpms-help fpms-muted">Yes is selected by default. Clear it if the shrimp harvested may be larger than those left in the pond. A later growth sample will replace this ABW basis.</small>
                                             </div>
                                         }
                                     </details>
                                 </div>
                             </div>
-                            <div class="card">
-                                <div class="card-header">
-                                    <a href="javascript:;" class="card-title text-reset" role="button" (click)="showCrates = !showCrates" [attr.aria-expanded]="showCrates">
-                                        <i class="fas mr-1" [class.fa-chevron-right]="!showCrates" [class.fa-chevron-down]="showCrates" aria-hidden="true"></i>Crate tally (optional)
-                                        @if (hasCrates()) { <span class="badge badge-secondary ml-1">{{ m.crates.length }} · {{ m.totalKg | num: 3 }} kg</span> }
+                            <div class="fpms-panel">
+                                <div class="fpms-panel-head">
+                                    <a href="javascript:;" class="fpms-panel-title fpms-text-reset" role="button" (click)="showCrates = !showCrates" [attr.aria-expanded]="showCrates">
+                                        <i class="fas fpms-icon-gap" [class.fa-chevron-right]="!showCrates" [class.fa-chevron-down]="showCrates" aria-hidden="true"></i>Crate tally (optional)
+                                        @if (hasCrates()) { <span class="fpms-label badge-secondary fpms-icon-gap">{{ m.crates.length }} · {{ m.totalKg | num: 3 }} kg</span> }
                                     </a>
                                 </div>
                                 @if (showCrates) {
-                                    <div class="card-body">
+                                    <div class="fpms-panel-body">
                                         @if (showGrades()) {
-                                        <div class="custom-control custom-switch mb-2">
-                                            <input type="checkbox" class="custom-control-input" id="gradeCrates" name="gradeCrates" [(ngModel)]="m.gradeCrates" (ngModelChange)="syncCrates()" />
-                                            <label class="custom-control-label" for="gradeCrates">Grade each crate</label>
-                                            <small class="form-text text-muted mt-0">The size grading below then adds up the crates of each grade; ungraded crates go to "Ungraded / mixed".</small>
+                                        <div class="fpms-check custom-switch fpms-space-bottom-2">
+                                            <input type="checkbox" class="fpms-check-input" id="gradeCrates" name="gradeCrates" [(ngModel)]="m.gradeCrates" (ngModelChange)="syncCrates()" />
+                                            <label class="fpms-check-label" for="gradeCrates">Grade each crate</label>
+                                            <small class="fpms-help fpms-muted fpms-space-top-0">The size grading below then adds up the crates of each grade; ungraded crates go to "Ungraded / mixed".</small>
                                         </div>
                                         }
-                                        <p class="small text-muted">Weigh crate by crate, as on the harvest tally sheet. The total kg and boxes then come from the crates. Leave empty to enter only the total. A crate with no type is just "Crate"; a crate type with an empty weight is weighed with the crate, and the crate's weight is subtracted.</p>
+                                        <p class="fpms-small fpms-muted">Weigh crate by crate, as on the harvest tally sheet. The total kg and boxes then come from the crates. Leave empty to enter only the total. A crate with no type is just "Crate"; a crate type with an empty weight is weighed with the crate, and the crate's weight is subtracted.</p>
                                         @if (hasCrates()) {
-                                            <div class="table-responsive tally-scroll mb-2" [class.tally-long]="m.crates.length > 12">
-                                                <table class="table table-sm table-hover mb-0 tally-table">
+                                            <div class="fpms-table-scroll tally-scroll fpms-space-bottom-2" [class.tally-long]="m.crates.length > 12">
+                                                <table class="fpms-data-table fpms-table-compact fpms-table-hover fpms-no-bottom tally-table">
                                                     <thead>
                                                         <tr>
-                                                            <th scope="col" class="text-right">#</th>
+                                                            <th scope="col" class="fpms-align-end">#</th>
                                                             @if (showCrateType()) { <th scope="col">Crate type</th> }
                                                             @if (m.gradeCrates) { <th scope="col">Grade</th> }
-                                                            <th scope="col" class="text-right">{{ crateTare() > 0 ? 'Scale kg' : 'Kg' }}</th>
+                                                            <th scope="col" class="fpms-align-end">{{ crateTare() > 0 ? 'Scale kg' : 'Kg' }}</th>
                                                             @if (crateTare() > 0) {
-                                                                <th scope="col" class="text-right">Crate kg</th>
-                                                                <th scope="col" class="text-right">Shrimp kg</th>
+                                                                <th scope="col" class="fpms-align-end">Crate kg</th>
+                                                                <th scope="col" class="fpms-align-end">Shrimp kg</th>
                                                             }
-                                                            <th scope="col" class="text-right">Running total</th>
+                                                            <th scope="col" class="fpms-align-end">Running total</th>
                                                             <th scope="col"><span class="sr-only">Remove</span></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         @for (c of m.crates; track $index; let i = $index) {
-                                                            <tr [class.table-danger]="c.kg > 0 && netOf(c) <= 0">
-                                                                <td class="text-right text-muted align-middle">{{ i + 1 }}</td>
+                                                            <tr [class.fpms-row-danger]="c.kg > 0 && netOf(c) <= 0">
+                                                                <td class="fpms-align-end fpms-muted align-middle">{{ i + 1 }}</td>
                                                                 @if (showCrateType()) {
                                                                     <td>
                                                                         <select class="custom-select custom-select-sm" [name]="'ct' + i" [(ngModel)]="c.containerTypeId" (ngModelChange)="setCrateType(c)" [attr.aria-label]="'Crate type of crate ' + (i + 1)">
@@ -290,76 +290,76 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                                     </td>
                                                                 }
                                                                 <td class="tally-kg">
-                                                                    <input [id]="'cr' + i" type="number" inputmode="decimal" min="0.001" step="0.001" class="form-control form-control-sm text-right" [name]="'cr' + i" [(ngModel)]="c.kg" (ngModelChange)="syncCrates()" (keydown.enter)="nextCrate($event, i)" required [attr.aria-label]="'Kg of crate ' + (i + 1)" />
+                                                                    <input [id]="'cr' + i" type="number" inputmode="decimal" min="0.001" step="0.001" class="fpms-control fpms-control-compact fpms-align-end" [name]="'cr' + i" [(ngModel)]="c.kg" (ngModelChange)="syncCrates()" (keydown.enter)="nextCrate($event, i)" required [attr.aria-label]="'Kg of crate ' + (i + 1)" />
                                                                 </td>
                                                                 @if (crateTare() > 0) {
-                                                                    <td class="text-right text-muted align-middle">{{ c.tareKg > 0 ? '− ' + (c.tareKg | num: 3) : '' }}</td>
-                                                                    <td class="text-right align-middle" [class.text-danger]="c.kg > 0 && netOf(c) <= 0">{{ c.kg > 0 ? (netOf(c) | num: 3) : '' }}</td>
+                                                                    <td class="fpms-align-end fpms-muted align-middle">{{ c.tareKg > 0 ? '− ' + (c.tareKg | num: 3) : '' }}</td>
+                                                                    <td class="fpms-align-end align-middle" [class.fpms-danger]="c.kg > 0 && netOf(c) <= 0">{{ c.kg > 0 ? (netOf(c) | num: 3) : '' }}</td>
                                                                 }
-                                                                <td class="text-right text-muted align-middle">{{ runningKg(i) | num: 3 }}</td>
-                                                                <td class="text-right">
-                                                                    <button type="button" class="btn btn-sm btn-link text-danger" (click)="removeCrate(i)" [attr.aria-label]="'Remove crate ' + (i + 1)"><i class="fas fa-times"></i></button>
+                                                                <td class="fpms-align-end fpms-muted align-middle">{{ runningKg(i) | num: 3 }}</td>
+                                                                <td class="fpms-align-end">
+                                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger" (click)="removeCrate(i)" [attr.aria-label]="'Remove crate ' + (i + 1)"><i class="fas fa-times"></i></button>
                                                                 </td>
                                                             </tr>
                                                         }
                                                     </tbody>
                                                     <tfoot>
-                                                        <tr class="font-weight-bold">
-                                                            <td class="text-right">{{ m.crates.length }}</td>
-                                                            <td [attr.colspan]="(showCrateType() ? 1 : 0) + (m.gradeCrates ? 1 : 0) + 1" class="text-right">{{ m.crates.length === 1 ? 'crate' : 'crates' }}{{ crateTare() > 0 ? ' · ' + (scaleTotalKg() | num: 3) + ' kg on the scale' : '' }}</td>
+                                                        <tr class="fpms-weight-bold">
+                                                            <td class="fpms-align-end">{{ m.crates.length }}</td>
+                                                            <td [attr.colspan]="(showCrateType() ? 1 : 0) + (m.gradeCrates ? 1 : 0) + 1" class="fpms-align-end">{{ m.crates.length === 1 ? 'crate' : 'crates' }}{{ crateTare() > 0 ? ' · ' + (scaleTotalKg() | num: 3) + ' kg on the scale' : '' }}</td>
                                                             @if (crateTare() > 0) {
-                                                                <td class="text-right text-muted">− {{ crateTare() | num: 3 }}</td>
-                                                                <td class="text-right">{{ crateKg() | num: 3 }}</td>
+                                                                <td class="fpms-align-end fpms-muted">− {{ crateTare() | num: 3 }}</td>
+                                                                <td class="fpms-align-end">{{ crateKg() | num: 3 }}</td>
                                                             }
-                                                            <td class="text-right">{{ crateKg() | num: 3 }} kg</td>
+                                                            <td class="fpms-align-end">{{ crateKg() | num: 3 }} kg</td>
                                                             <td></td>
                                                         </tr>
                                                         @if (m.gradeCrates && crateGradeSums().length > 1) {
-                                                            <tr class="small text-muted">
+                                                            <tr class="fpms-small fpms-muted">
                                                                 <td></td>
                                                                 <td [attr.colspan]="(showCrateType() ? 1 : 0) + 1 + 1 + (crateTare() > 0 ? 2 : 0) + 2">
-                                                                    @for (g of crateGradeSums(); track g.label) { <span class="mr-3">{{ g.label }}: {{ g.count }} × · {{ g.kg | num: 3 }} kg</span> }
+                                                                    @for (g of crateGradeSums(); track g.label) { <span class="fpms-space-end-3">{{ g.label }}: {{ g.count }} × · {{ g.kg | num: 3 }} kg</span> }
                                                                 </td>
                                                             </tr>
                                                         }
                                                     </tfoot>
                                                 </table>
                                             </div>
-                                            <p class="small text-muted mb-2">Press Enter after each weight to go to the next crate; on the last crate, Enter adds a new one of the same type and grade.</p>
+                                            <p class="fpms-small fpms-muted fpms-space-bottom-2">Press Enter after each weight to go to the next crate; on the last crate, Enter adds a new one of the same type and grade.</p>
                                         }
-                                        <div class="form-row align-items-end">
-                                            <div class="form-group col-auto mb-2">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addOneCrate()" [disabled]="m.crates.length >= maxCrates"><i class="fas fa-plus mr-1"></i>Add crate</button>
+                                        <div class="fpms-grid-row align-items-end">
+                                            <div class="fpms-field fpms-col-auto fpms-space-bottom-2">
+                                                <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="addOneCrate()" [disabled]="m.crates.length >= maxCrates"><i class="fas fa-plus fpms-icon-gap"></i>Add crate</button>
                                             </div>
-                                            <div class="form-group col-auto mb-2">
-                                                <label class="small mb-0" for="bulkN">Add</label>
-                                                <input id="bulkN" type="number" min="1" max="200" step="1" class="form-control form-control-sm" style="width: 5rem" name="bulkN" [(ngModel)]="bulk.count" [ngModelOptions]="{ standalone: true }" />
+                                            <div class="fpms-field fpms-col-auto fpms-space-bottom-2">
+                                                <label class="fpms-small fpms-no-bottom" for="bulkN">Add</label>
+                                                <input id="bulkN" type="number" min="1" max="200" step="1" class="fpms-control fpms-control-compact" style="width: 5rem" name="bulkN" [(ngModel)]="bulk.count" [ngModelOptions]="{ standalone: true }" />
                                             </div>
-                                            <div class="form-group col-auto mb-2">
-                                                <label class="small mb-0" for="bulkC">×</label>
+                                            <div class="fpms-field fpms-col-auto fpms-space-bottom-2">
+                                                <label class="fpms-small fpms-no-bottom" for="bulkC">×</label>
                                                 <select id="bulkC" class="custom-select custom-select-sm" style="min-width: 9rem" name="bulkC" [(ngModel)]="bulk.containerTypeId" (ngModelChange)="onBulkContainer()" [ngModelOptions]="{ standalone: true }">
                                                     <option value="">Crate</option>
                                                     @for (t of containers; track t.id) { <option [value]="t.id">{{ t.name }}</option> }
                                                 </select>
                                             </div>
                                             @if (m.gradeCrates) {
-                                                <div class="form-group col-auto mb-2">
-                                                    <label class="small mb-0" for="bulkG">grade</label>
+                                                <div class="fpms-field fpms-col-auto fpms-space-bottom-2">
+                                                    <label class="fpms-small fpms-no-bottom" for="bulkG">grade</label>
                                                     <select id="bulkG" class="custom-select custom-select-sm" name="bulkG" [(ngModel)]="bulk.sizeGradeId" [ngModelOptions]="{ standalone: true }">
                                                         <option value="">Ungraded</option>
                                                         @for (o of gradedOptions(); track o.id) { <option [value]="o.id">{{ o.label }}</option> }
                                                     </select>
                                                 </div>
                                             }
-                                            <div class="form-group col-auto mb-2">
-                                                <label class="small mb-0" for="bulkKg">{{ bulkTare() > 0 ? 'scale kg each (with the crate)' : 'kg each' }}</label>
-                                                <input id="bulkKg" type="number" min="0.001" step="0.001" class="form-control form-control-sm" style="width: 6rem" name="bulkKg" [(ngModel)]="bulk.kg" [ngModelOptions]="{ standalone: true }" />
+                                            <div class="fpms-field fpms-col-auto fpms-space-bottom-2">
+                                                <label class="fpms-small fpms-no-bottom" for="bulkKg">{{ bulkTare() > 0 ? 'scale kg each (with the crate)' : 'kg each' }}</label>
+                                                <input id="bulkKg" type="number" min="0.001" step="0.001" class="fpms-control fpms-control-compact" style="width: 6rem" name="bulkKg" [(ngModel)]="bulk.kg" [ngModelOptions]="{ standalone: true }" />
                                             </div>
-                                            <div class="form-group col-auto mb-2">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addBulk()" [disabled]="!(bulk.count > 0) || !(bulk.kg > 0) || m.crates.length + bulk.count > maxCrates">Add</button>
+                                            <div class="fpms-field fpms-col-auto fpms-space-bottom-2">
+                                                <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="addBulk()" [disabled]="!(bulk.count > 0) || !(bulk.kg > 0) || m.crates.length + bulk.count > maxCrates">Add</button>
                                             </div>
                                             @if (canManageContainers) {
-                                                <div class="form-group col-auto mb-2 ml-auto small"><a routerLink="/app/harvests/crate-types">Crate types</a></div>
+                                                <div class="fpms-field fpms-col-auto fpms-space-bottom-2 fpms-margin-auto-start fpms-small"><a routerLink="/app/harvests/crate-types">Crate types</a></div>
                                             }
                                         </div>
                                     </div>
@@ -367,27 +367,27 @@ import { DisposalReasons } from '@shared/fpms/labels';
                             </div>
                             <!-- Size grading only on farms that grade, or on a harvest graded before grading was turned off (DEC-100). -->
                             @if (showGrades()) {
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">Size grading</h3></div>
-                                <div class="card-body p-0">
-                                    <div class="table-responsive">
-                                    <table class="table table-sm mb-0">
-                                        <thead><tr><th>Size grade</th><th style="width: 9rem">Kg</th>@if (!isNew) {<th class="text-right">Sold</th>}<th><span class="sr-only">Actions</span></th></tr></thead>
+                            <div class="fpms-panel">
+                                <div class="fpms-panel-head"><h3 class="fpms-panel-title">Size grading</h3></div>
+                                <div class="fpms-panel-body fpms-space-0">
+                                    <div class="fpms-table-scroll">
+                                    <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
+                                        <thead><tr><th>Size grade</th><th style="width: 9rem">Kg</th>@if (!isNew) {<th class="fpms-align-end">Sold</th>}<th><span class="sr-only">Actions</span></th></tr></thead>
                                         <tbody>
                                             @for (g of m.gradeLines; track $index) {
                                                 <tr>
                                                     <td>
-                                                        <select class="form-control form-control-sm" [name]="'gs' + $index" [(ngModel)]="g.sizeGradeId" (ngModelChange)="keepDraft()" required aria-label="Size grade" [disabled]="g.soldKg > 0 || gradedByCrate()">
+                                                        <select class="fpms-control fpms-control-compact" [name]="'gs' + $index" [(ngModel)]="g.sizeGradeId" (ngModelChange)="keepDraft()" required aria-label="Size grade" [disabled]="g.soldKg > 0 || gradedByCrate()">
                                                             @for (o of grades; track o.id) {
                                                                 <option [value]="o.id" [disabled]="usedGrade(o.id, g)">{{ o.label }}{{ o.isUngraded ? ' (pieces from ABW)' : '' }}</option>
                                                             }
                                                         </select>
                                                     </td>
-                                                    <td><input type="number" [min]="g.soldKg || 0.001" step="0.001" class="form-control form-control-sm" [name]="'gk' + $index" [(ngModel)]="g.kg" (ngModelChange)="keepDraft()" required aria-label="Kg" [readonly]="gradedByCrate()" /></td>
-                                                    @if (!isNew) { <td class="text-right small">{{ g.soldKg | num: 3 }}</td> }
-                                                    <td class="text-right">
+                                                    <td><input type="number" [min]="g.soldKg || 0.001" step="0.001" class="fpms-control fpms-control-compact" [name]="'gk' + $index" [(ngModel)]="g.kg" (ngModelChange)="keepDraft()" required aria-label="Kg" [readonly]="gradedByCrate()" /></td>
+                                                    @if (!isNew) { <td class="fpms-align-end fpms-small">{{ g.soldKg | num: 3 }}</td> }
+                                                    <td class="fpms-align-end">
                                                         @if (!(g.soldKg > 0) && !gradedByCrate()) {
-                                                            <button type="button" class="btn btn-sm btn-outline-danger" (click)="m.gradeLines.splice($index, 1); keepDraft()" aria-label="Remove"><i class="fas fa-times"></i></button>
+                                                            <button type="button" class="fpms-button fpms-button-compact fpms-button-danger" (click)="m.gradeLines.splice($index, 1); keepDraft()" aria-label="Remove"><i class="fas fa-times"></i></button>
                                                         }
                                                     </td>
                                                 </tr>
@@ -395,30 +395,30 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td><button type="button" class="btn btn-sm btn-outline-secondary" (click)="addGrade()" [disabled]="m.gradeLines.length >= grades.length || gradedByCrate()"><i class="fas fa-plus mr-1"></i>Add grade</button></td>
-                                                <td [class.text-danger]="gradeOver()" colspan="3"><strong>{{ gradeKg() | num: 3 }}</strong> of {{ m.totalKg || 0 | num: 3 }} kg graded</td>
+                                                <td><button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="addGrade()" [disabled]="m.gradeLines.length >= grades.length || gradedByCrate()"><i class="fas fa-plus fpms-icon-gap"></i>Add grade</button></td>
+                                                <td [class.fpms-danger]="gradeOver()" colspan="3"><strong>{{ gradeKg() | num: 3 }}</strong> of {{ m.totalKg || 0 | num: 3 }} kg graded</td>
                                             </tr>
                                         </tfoot>
                                     </table>
                                     </div>
                                     @if (gradeOver()) {
-                                        <p class="text-danger small px-3 mb-2">Graded kilograms cannot exceed the harvest total.</p>
+                                        <p class="fpms-danger fpms-small px-3 fpms-space-bottom-2">Graded kilograms cannot exceed the harvest total.</p>
                                     } @else if (m.totalKg > 0 && gradeKg() > 0 && gradeKg() < m.totalKg) {
-                                        <p class="text-warning-dark small px-3 mb-2">{{ m.totalKg - gradeKg() | num: 3 }} kg is not graded. Only graded kg can be sold; add it as "Ungraded / mixed" to sell it.</p>
+                                        <p class="fpms-warning-text fpms-small px-3 fpms-space-bottom-2">{{ m.totalKg - gradeKg() | num: 3 }} kg is not graded. Only graded kg can be sold; add it as "Ungraded / mixed" to sell it.</p>
                                     }
                                 </div>
                             </div>
                             }
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">Record what was not sold (optional)</h3></div>
-                                <div class="card-body">
-                                    <p class="small text-muted">Use this only for shrimp that will no longer be sold: staff or home use, given away, spoiled, or lost. Shrimp kept for a later sale stay in the unsold balance and remain available to sell. You can record their outcome later without changing the original harvest.</p>
+                            <div class="fpms-panel">
+                                <div class="fpms-panel-head"><h3 class="fpms-panel-title">Record what was not sold (optional)</h3></div>
+                                <div class="fpms-panel-body">
+                                    <p class="fpms-small fpms-muted">Use this only for shrimp that will no longer be sold: staff or home use, given away, spoiled, or lost. Shrimp kept for a later sale stay in the unsold balance and remain available to sell. You can record their outcome later without changing the original harvest.</p>
                                     @if (isNew || h?.unaccountedKg > 0) {
-                                        <div class="form-row">
-                                            <div class="form-group col-md-4">
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-md-4">
                                                 <label for="fu">Follow up unsold shrimp on</label>
-                                                <input id="fu" type="date" class="form-control" name="followUpOn" [(ngModel)]="m.followUpOn" (ngModelChange)="keepDraft()" [min]="(m.harvestedAt || '').substring(0, 10)" />
-                                                <small class="form-text text-muted">
+                                                <input id="fu" type="date" class="fpms-control" name="followUpOn" [(ngModel)]="m.followUpOn" (ngModelChange)="keepDraft()" [min]="(m.harvestedAt || '').substring(0, 10)" />
+                                                <small class="fpms-help fpms-muted">
                                                     Leave empty to use the farm's follow-up days (Farm settings).
                                                     @if (!isNew && h?.followUpOn) { Now: {{ h.followUpOn | farmDate }}{{ h.followUpDue ? ', due' : '' }}. }
                                                 </small>
@@ -427,38 +427,38 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                     }
                                     @if (isNew) {
                                         @for (d of m.disposals; track $index) {
-                                            <div class="form-row align-items-end">
-                                                <div class="form-group col-4">
-                                                    <label class="small" [for]="'dk' + $index">Kg</label>
-                                                    <input [id]="'dk' + $index" type="number" min="0.001" step="0.001" class="form-control form-control-sm" [name]="'dk' + $index" [(ngModel)]="d.kg" (ngModelChange)="keepDraft()" required />
+                                            <div class="fpms-grid-row align-items-end">
+                                                <div class="fpms-field fpms-col-4">
+                                                    <label class="fpms-small" [for]="'dk' + $index">Kg</label>
+                                                    <input [id]="'dk' + $index" type="number" min="0.001" step="0.001" class="fpms-control fpms-control-compact" [name]="'dk' + $index" [(ngModel)]="d.kg" (ngModelChange)="keepDraft()" required />
                                                 </div>
-                                                <div class="form-group col-4">
-                                                    <label class="small" [for]="'dr' + $index">Reason</label>
-                                                    <select [id]="'dr' + $index" class="form-control form-control-sm" [name]="'dr' + $index" [(ngModel)]="d.reason" (ngModelChange)="keepDraft()">
+                                                <div class="fpms-field fpms-col-4">
+                                                    <label class="fpms-small" [for]="'dr' + $index">Reason</label>
+                                                    <select [id]="'dr' + $index" class="fpms-control fpms-control-compact" [name]="'dr' + $index" [(ngModel)]="d.reason" (ngModelChange)="keepDraft()">
                                                         @for (o of Options.disposalReason; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
                                                     </select>
                                                 </div>
-                                                <div class="form-group col-3">
-                                                    <label class="small" [for]="'dn' + $index">Note</label>
-                                                    <input [id]="'dn' + $index" class="form-control form-control-sm" [name]="'dn' + $index" [(ngModel)]="d.note" (ngModelChange)="keepDraft()" maxlength="300" />
+                                                <div class="fpms-field fpms-col-3">
+                                                    <label class="fpms-small" [for]="'dn' + $index">Note</label>
+                                                    <input [id]="'dn' + $index" class="fpms-control fpms-control-compact" [name]="'dn' + $index" [(ngModel)]="d.note" (ngModelChange)="keepDraft()" maxlength="300" />
                                                 </div>
-                                                <div class="form-group col-1">
-                                                    <button type="button" class="btn btn-sm btn-link text-danger px-0" (click)="m.disposals.splice($index, 1); keepDraft()" aria-label="Remove"><i class="fas fa-times"></i></button>
+                                                <div class="fpms-field fpms-col-1">
+                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger px-0" (click)="m.disposals.splice($index, 1); keepDraft()" aria-label="Remove"><i class="fas fa-times"></i></button>
                                                 </div>
                                             </div>
                                         }
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="m.disposals.push({ kg: null, reason: 1, note: '' }); keepDraft()"><i class="fas fa-plus mr-1"></i>Add not-sold entry</button>
+                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="m.disposals.push({ kg: null, reason: 1, note: '' }); keepDraft()"><i class="fas fa-plus fpms-icon-gap"></i>Add not-sold entry</button>
                                     } @else {
                                         @if (h.disposals?.length) {
-                                            <div class="table-responsive mb-3">
-                                                <table class="table table-sm mb-0">
-                                                    <thead><tr><th>Recorded outcome</th><th>Note</th><th class="text-right">Kg</th><th>Recorded by</th><th>Recorded</th></tr></thead>
+                                            <div class="fpms-table-scroll fpms-space-bottom-3">
+                                                <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
+                                                    <thead><tr><th>Recorded outcome</th><th>Note</th><th class="fpms-align-end">Kg</th><th>Recorded by</th><th>Recorded</th></tr></thead>
                                                     <tbody>
                                                         @for (d of h.disposals; track d.id) {
                                                             <tr>
                                                                 <td>{{ DisposalReasons[d.reason] || 'Other' }}</td>
                                                                 <td>{{ d.note || '—' }}</td>
-                                                                <td class="text-right">{{ d.kg | num: 3 }}</td>
+                                                                <td class="fpms-align-end">{{ d.kg | num: 3 }}</td>
                                                                 <td>{{ d.recordedBy || '—' }}</td>
                                                                 <td>{{ d.creationTime | farmDateTime }}</td>
                                                             </tr>
@@ -467,27 +467,27 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                                 </table>
                                             </div>
                                         } @else {
-                                            <p class="small text-muted">No not-sold outcomes have been recorded.</p>
+                                            <p class="fpms-small fpms-muted">No not-sold outcomes have been recorded.</p>
                                         }
                                         @if (h.unaccountedKg > 0 && !readOnly) {
-                                            <div class="form-row align-items-end">
-                                                <div class="form-group col-md-3">
+                                            <div class="fpms-grid-row align-items-end">
+                                                <div class="fpms-field fpms-col-md-3">
                                                     <label for="newDisposalKg">Kg to record</label>
-                                                    <input id="newDisposalKg" name="newDisposalKg" type="number" min="0.001" [max]="h.unaccountedKg" step="0.001" class="form-control" [(ngModel)]="disposalKg" />
-                                                    <small class="form-text text-muted">Up to {{ h.unaccountedKg | num: 3 }} kg remains unaccounted for.</small>
+                                                    <input id="newDisposalKg" name="newDisposalKg" type="number" min="0.001" [max]="h.unaccountedKg" step="0.001" class="fpms-control" [(ngModel)]="disposalKg" />
+                                                    <small class="fpms-help fpms-muted">Up to {{ h.unaccountedKg | num: 3 }} kg remains unaccounted for.</small>
                                                 </div>
-                                                <div class="form-group col-md-3">
+                                                <div class="fpms-field fpms-col-md-3">
                                                     <label for="newDisposalReason">Outcome</label>
-                                                    <select id="newDisposalReason" name="newDisposalReason" class="form-control" [(ngModel)]="disposalReason">
+                                                    <select id="newDisposalReason" name="newDisposalReason" class="fpms-control" [(ngModel)]="disposalReason">
                                                         @for (o of Options.disposalReason; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
                                                     </select>
                                                 </div>
-                                                <div class="form-group col-md-4">
+                                                <div class="fpms-field fpms-col-md-4">
                                                     <label for="newDisposalNote">Note (optional)</label>
-                                                    <input id="newDisposalNote" name="newDisposalNote" class="form-control" [(ngModel)]="disposalNote" maxlength="300" />
+                                                    <input id="newDisposalNote" name="newDisposalNote" class="fpms-control" [(ngModel)]="disposalNote" maxlength="300" />
                                                 </div>
-                                                <div class="form-group col-md-2">
-                                                    <button type="button" class="btn btn-primary btn-block" (click)="recordDisposal()" [disabled]="!disposalKg || disposalKg <= 0 || disposalKg > h.unaccountedKg">Record outcome</button>
+                                                <div class="fpms-field fpms-col-md-2">
+                                                    <button type="button" class="fpms-button fpms-button-primary fpms-button-block" (click)="recordDisposal()" [disabled]="!disposalKg || disposalKg <= 0 || disposalKg > h.unaccountedKg">Record outcome</button>
                                                 </div>
                                             </div>
                                         }
@@ -495,83 +495,83 @@ import { DisposalReasons } from '@shared/fpms/labels';
                                 </div>
                             </div>
                             @if (isNew && m.buyerId && canSell) {
-                                <div class="card card-outline card-primary">
-                                    <div class="card-header">
-                                        <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" id="sell" name="sell" [(ngModel)]="m.sell" (ngModelChange)="keepDraft()" />
-                                            <label class="custom-control-label" for="sell">Record the sale to {{ buyerName() }} now (tally sheet)</label>
+                                <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
+                                    <div class="fpms-panel-head">
+                                        <div class="fpms-check custom-switch">
+                                            <input type="checkbox" class="fpms-check-input" id="sell" name="sell" [(ngModel)]="m.sell" (ngModelChange)="keepDraft()" />
+                                            <label class="fpms-check-label" for="sell">Record the sale to {{ buyerName() }} now (tally sheet)</label>
                                         </div>
                                     </div>
                                     @if (m.sell) {
-                                        <div class="card-body">
-                                            <p class="small text-muted">@if (showGrades()) { All {{ sellKg() | num: 3 }} kg are sold to this buyer at one price{{ gradeKg() > 0 ? ', on every grade line' : ' as "Ungraded / mixed"' }}. Splitting between buyers or grades at different prices: save the harvest alone, then record each sale. } @else { All {{ sellKg() | num: 3 }} kg are sold to this buyer at one price. Splitting between buyers at different prices: save the harvest alone, then record each sale. }</p>
+                                        <div class="fpms-panel-body">
+                                            <p class="fpms-small fpms-muted">@if (showGrades()) { All {{ sellKg() | num: 3 }} kg are sold to this buyer at one price{{ gradeKg() > 0 ? ', on every grade line' : ' as "Ungraded / mixed"' }}. Splitting between buyers or grades at different prices: save the harvest alone, then record each sale. } @else { All {{ sellKg() | num: 3 }} kg are sold to this buyer at one price. Splitting between buyers at different prices: save the harvest alone, then record each sale. }</p>
                                             @if (m.sale.priceMethod === 2 && abwSchemes.length) {
-                                                <div class="form-group">
+                                                <div class="fpms-field">
                                                     <label for="absale">Farm pricing scheme</label>
-                                                    <select id="absale" class="form-control" name="saleAbwScheme" [(ngModel)]="m.sale.abwSchemeId" (ngModelChange)="applyAbwScheme($event)">
+                                                    <select id="absale" class="fpms-control" name="saleAbwScheme" [(ngModel)]="m.sale.abwSchemeId" (ngModelChange)="applyAbwScheme($event)">
                                                         <option value="">Choose a scheme or enter custom terms</option>
                                                         @for (s of abwSchemes; track s.id) { <option [value]="s.id">{{ s.name }} · base {{ s.baseAbwG }}g</option> }
                                                     </select>
                                                 </div>
                                             }
-                                            <div class="form-row">
-                                                <div class="form-group col-md-4">
+                                            <div class="fpms-grid-row">
+                                                <div class="fpms-field fpms-col-md-4">
                                                     <label for="spm">Price</label>
-                                                    <select id="spm" class="form-control" name="salePriceMethod" [(ngModel)]="m.sale.priceMethod" (ngModelChange)="onSaleMethod()">
+                                                    <select id="spm" class="fpms-control" name="salePriceMethod" [(ngModel)]="m.sale.priceMethod" (ngModelChange)="onSaleMethod()">
                                                         @for (o of methodsFor(m.sale); track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
                                                     </select>
                                                 </div>
-                                                <div class="form-group col-md-4">
-                                                    <label for="spp">Price per kg (₱) @if (!perGradePricing()) {<span class="text-danger">*</span>}</label>
-                                                    <input id="spp" type="number" min="0" step="0.01" class="form-control" name="salePrice" [(ngModel)]="m.sale.pricePerKg" (ngModelChange)="keepDraft()" [required]="!perGradePricing()" [placeholder]="perGradePricing() ? 'per grade' : ''" />
+                                                <div class="fpms-field fpms-col-md-4">
+                                                    <label for="spp">Price per kg (₱) @if (!perGradePricing()) {<span class="fpms-danger">*</span>}</label>
+                                                    <input id="spp" type="number" min="0" step="0.01" class="fpms-control" name="salePrice" [(ngModel)]="m.sale.pricePerKg" (ngModelChange)="keepDraft()" [required]="!perGradePricing()" [placeholder]="perGradePricing() ? 'per grade' : ''" />
                                                 </div>
-                                                <div class="form-group col-md-4">
+                                                <div class="fpms-field fpms-col-md-4">
                                                     <label>Total amount</label>
-                                                    <div class="form-control-plaintext font-weight-bold">{{ saleTotal() | php }}</div>
+                                                    <div class="fpms-control-plain fpms-weight-bold">{{ saleTotal() | php }}</div>
                                                 </div>
                                             </div>
                                             <fpms-price-terms [t]="m.sale" key="sale" [tables]="saleTables()" [abw]="saleAbw()" [count]="saleCount()" [editShrimp]="false" shrimpSource="from the sample above" (changed)="applySaleFormula()"></fpms-price-terms>
                                             @if (m.sale.priceMethod > 1 && perGradePricing()) {
-                                                <p class="small text-muted mb-2">Several grades: each grade is priced from its own count, as listed. The price above applies to none of them.</p>
-                                                <ul class="small mb-2">
+                                                <p class="fpms-small fpms-muted fpms-space-bottom-2">Several grades: each grade is priced from its own count, as listed. The price above applies to none of them.</p>
+                                                <ul class="fpms-small fpms-space-bottom-2">
                                                     @for (x of saleLines(); track x.label) { <li>{{ x.label }}: {{ x.kg | num: 3 }} kg × {{ x.price != null ? (x.price | php) : '—' }}</li> }
                                                 </ul>
                                             }
                                             <fpms-sale-payment [m]="m.sale" key="salepay" [total]="saleTotal()" [minDue]="saleDay()" (changed)="keepDraft()"></fpms-sale-payment>
-                                            <p class="small text-muted mb-0">Both are saved together, and the dispatch receipt opens. Edit them later on their own pages.</p>
+                                            <p class="fpms-small fpms-muted fpms-no-bottom">Both are saved together, and the dispatch receipt opens. Edit them later on their own pages.</p>
                                         </div>
                                     }
                                 </div>
                             }
                         </fieldset>
                         @if (!isNew && h) {
-                            <p class="small text-muted">
+                            <p class="fpms-small fpms-muted">
                                 Recorded by {{ h.recordedBy }}, {{ h.creationTime | farmDateTime }} · {{ h.harvestedPieces | num: 0 }} pieces ·
                                 sold {{ h.soldKg | num: 2 }} kg · not sold {{ h.notSoldKg | num: 2 }} kg
-                                @if (h.unaccountedKg > 0) { · <span class="text-warning-dark">{{ h.unaccountedKg | num: 2 }} kg available to sell · follow up {{ h.followUpDue ? 'was due' : 'by' }} {{ h.followUpOn | farmDate }}</span> }
+                                @if (h.unaccountedKg > 0) { · <span class="fpms-warning-text">{{ h.unaccountedKg | num: 2 }} kg available to sell · follow up {{ h.followUpDue ? 'was due' : 'by' }} {{ h.followUpOn | farmDate }}</span> }
                             </p>
                         }
                         @if (!readOnly) {
                             @if (selling() && review) {
-                                <div class="card card-outline card-primary">
-                                    <div class="card-header"><h3 class="card-title">Check before saving</h3></div>
-                                    <div class="card-body">
-                                        <p class="mb-1">{{ buyerName() }} · {{ saleDay() | farmDate }} · {{ showGrades() ? saleLines().length + ' grade line(s)' : (sellKg() | num: 3 : true) + ' kg' }}{{ m.sale.dueDate ? ' · due ' + (m.sale.dueDate | farmDate) : '' }}</p>
-                                        <ul class="small mb-1">
+                                <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title">Check before saving</h3></div>
+                                    <div class="fpms-panel-body">
+                                        <p class="fpms-space-bottom-1">{{ buyerName() }} · {{ saleDay() | farmDate }} · {{ showGrades() ? saleLines().length + ' grade line(s)' : (sellKg() | num: 3 : true) + ' kg' }}{{ m.sale.dueDate ? ' · due ' + (m.sale.dueDate | farmDate) : '' }}</p>
+                                        <ul class="fpms-small fpms-space-bottom-1">
                                             @for (x of saleLines(); track x.label) { <li>{{ x.label }}: {{ x.kg | num: 3 }} kg × {{ x.price != null ? (x.price | php) : '—' }}</li> }
                                         </ul>
-                                        <p class="mb-1">Total <strong>{{ sellKg() | num: 3 }} kg</strong> for <strong>{{ saleTotal() | php }}</strong>; paid now {{ (m.sale.paidInFull ? saleTotal() : m.sale.paidNow || 0) | php }}.</p>
-                                        <p class="small text-muted mb-0">The harvest and the sale are saved together, and a dispatch receipt number is assigned. The dispatch receipt is for the farm's records, not an official receipt.</p>
+                                        <p class="fpms-space-bottom-1">Total <strong>{{ sellKg() | num: 3 }} kg</strong> for <strong>{{ saleTotal() | php }}</strong>; paid now {{ (m.sale.paidInFull ? saleTotal() : m.sale.paidNow || 0) | php }}.</p>
+                                        <p class="fpms-small fpms-muted fpms-no-bottom">The harvest and the sale are saved together, and a dispatch receipt number is assigned. The dispatch receipt is for the farm's records, not an official receipt.</p>
                                     </div>
-                                    <div class="card-footer">
-                                        <button type="button" class="btn btn-primary mr-2" [disabled]="busy() || !f.form.valid || gradeOver() || sampleHalf()" (click)="save(true)">Save harvest and sale</button>
-                                        <button type="button" class="btn btn-default" (click)="review = false">Back</button>
+                                    <div class="fpms-panel-foot">
+                                        <button type="button" class="fpms-button fpms-button-primary fpms-icon-gap" [disabled]="busy() || !f.form.valid || gradeOver() || sampleHalf()" (click)="save(true)">Save harvest and sale</button>
+                                        <button type="button" class="fpms-button fpms-button-secondary" (click)="review = false">Back</button>
                                     </div>
                                 </div>
                             } @else {
                                 <div class="fpms-form-foot">
-                                    <button type="submit" class="btn btn-primary btn-lg" [disabled]="busy() || !f.form.valid || gradeOver() || sampleHalf()">{{ isNew ? (selling() ? 'Review harvest and sale' : 'Save harvest') : 'Save changes' }}</button>
-                                    <a class="btn btn-default btn-lg" routerLink="/app/harvests">Cancel</a>
+                                    <button type="submit" class="fpms-button fpms-button-primary fpms-button-large" [disabled]="busy() || !f.form.valid || gradeOver() || sampleHalf()">{{ isNew ? (selling() ? 'Review harvest and sale' : 'Save harvest') : 'Save changes' }}</button>
+                                    <a class="fpms-button fpms-button-secondary fpms-button-large" routerLink="/app/harvests">Cancel</a>
                                     <fpms-form-hint [form]="f"></fpms-form-hint>
                                 </div>
                             }
