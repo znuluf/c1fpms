@@ -16,7 +16,7 @@ const CLOSED = 5;
         <fpms-page-header title="Pond batches" subtitle="One batch per grow-out pond per cycle.">
             @if (can('Farm.Reports')) {
                 <button
-                    class="btn btn-outline-secondary"
+                    class="fpms-button fpms-button-secondary"
                     (click)="
                         exportCsv('ExportList', {
                             list: 'Batches',
@@ -26,7 +26,7 @@ const CLOSED = 5;
                         })
                     "
                     [disabled]="busy()">
-                    <i class="fas fa-file-csv mr-1"></i>
+                    <i class="fas fa-file-csv fpms-icon-gap"></i>
                     Export CSV
                 </button>
             }
@@ -44,8 +44,8 @@ const CLOSED = 5;
                         (searchChange)="onSearch($event)"
                         (chipChange)="onStatus($event)"></fpms-list-toolbar>
                 </div>
-                <div class="card">
-                    <div class="card-body p-0 table-responsive">
+                <div class="fpms-panel">
+                    <div class="fpms-panel-body fpms-panel-flush fpms-table-scroll">
                         @if (!batches()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!batches().length) {
@@ -53,41 +53,41 @@ const CLOSED = 5;
                                 text="No batches match. Clear the search, or choose another status."
                                 icon="fas fa-seedling">
                                 @if (can('Farm.Production.Stock')) {
-                                    <a routerLink="/app/production/create-batch" class="btn btn-sm btn-primary">
+                                    <a routerLink="/app/production/create-batch" class="fpms-button fpms-button-compact fpms-button-primary">
                                         Stock a batch
                                     </a>
                                 }
                             </fpms-empty>
                         } @else {
-                            <table class="table table-hover mb-0">
+                            <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
                                     <tr>
                                         <th scope="col" fpmsSort="pondCode" [pager]="pager" (sorted)="load()" title="The pond and batch, its cycle and its status">Batch</th>
                                         <th scope="col" fpmsSort="stockingDate" [pager]="pager" (sorted)="load()" title="Stocking date and PL stocked">Stocked</th>
-                                        <th scope="col" class="text-right" title="Day of culture">DOC</th>
-                                        <th scope="col" class="text-right">ABW (g)</th>
-                                        <th scope="col" class="text-right">FCR</th>
-                                        <th scope="col" class="text-right" title="Estimated survival">Survival</th>
+                                        <th scope="col" class="fpms-align-end" title="Day of culture">DOC</th>
+                                        <th scope="col" class="fpms-align-end">ABW (g)</th>
+                                        <th scope="col" class="fpms-align-end">FCR</th>
+                                        <th scope="col" class="fpms-align-end" title="Estimated survival">Survival</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @for (b of batches(); track b.id) {
                                         <tr>
                                             <td>
-                                                <a class="text-nowrap" [routerLink]="['/app/production/batches', b.id]" [title]="b.batchCode"><span class="fpms-pond-tag">{{ b.pondCode }}</span> {{ batchShort(b.batchCode) }}</a>
-                                                <div class="text-muted">Cycle <a [routerLink]="['/app/production/cycles', b.cycleId]">{{ unbroken(b.cycleCode) }}</a></div>
-                                                <div class="mt-1"><fpms-badge [text]="b.status | label: L.BatchStatuses"></fpms-badge></div>
+                                                <a class="fpms-nowrap" [routerLink]="['/app/production/batches', b.id]" [title]="b.batchCode"><span class="fpms-pond-tag">{{ b.pondCode }}</span> {{ batchShort(b.batchCode) }}</a>
+                                                <div class="fpms-muted">Cycle <a [routerLink]="['/app/production/cycles', b.cycleId]">{{ unbroken(b.cycleCode) }}</a></div>
+                                                <div class="fpms-space-top"><fpms-badge [text]="b.status | label: L.BatchStatuses"></fpms-badge></div>
                                             </td>
-                                            <td class="text-nowrap">
+                                            <td class="fpms-nowrap">
                                                 {{ b.stockingDate | farmDate }}
-                                                <div class="text-muted">{{ b.plCountStocked | num: 0 }} PL</div>
+                                                <div class="fpms-muted">{{ b.plCountStocked | num: 0 }} PL</div>
                                             </td>
-                                            <td class="text-right">{{ b.doc ?? '—' }}</td>
-                                            <td class="text-right">{{ b.currentAbwG | num: 2 }}</td>
-                                            <td class="text-right">{{ b.fcrToDate | num: 2 }}</td>
-                                            <td class="text-right" [class.text-warning-dark]="b.estimatedSurvivalPct > 100">
+                                            <td class="fpms-align-end">{{ b.doc ?? '—' }}</td>
+                                            <td class="fpms-align-end">{{ b.currentAbwG | num: 2 }}</td>
+                                            <td class="fpms-align-end">{{ b.fcrToDate | num: 2 }}</td>
+                                            <td class="fpms-align-end" [class.text-warning-dark]="b.estimatedSurvivalPct > 100">
                                                 @if (b.estimatedSurvivalPct !== null && b.estimatedSurvivalPct !== undefined) {
-                                                    <span class="text-nowrap">{{ b.estimatedSurvivalPct | num: 1 }}%@if (b.estimatedSurvivalPct > 100) { <i class="fas fa-exclamation-triangle ml-1" aria-hidden="true"></i> }</span>
+                                                    <span class="fpms-nowrap">{{ b.estimatedSurvivalPct | num: 1 }}%@if (b.estimatedSurvivalPct > 100) { <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i> }</span>
                                                     @if (b.estimatedSurvivalPct > 100) { <div title="Check the stocking count and the latest survival estimate">Above 100%</div> }
                                                 } @else {
                                                     —
@@ -104,6 +104,35 @@ const CLOSED = 5;
             </div>
         </section>
     `,
+
+    styles: [`
+        .fpms-button {
+            display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+            min-height: 2.75rem; padding: var(--s2) var(--s4); border: 1px solid var(--line);
+            border-radius: var(--r-sm); font-weight: 600; text-decoration: none; cursor: pointer;
+        }
+        .fpms-button-primary { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+        .fpms-button-secondary { color: var(--ink-2); background: var(--paper); border-color: var(--line); }
+        .fpms-button-compact { min-height: 2.5rem; padding: var(--s2) var(--s3); }
+        .fpms-button:disabled { opacity: .58; cursor: not-allowed; }
+        .fpms-icon-gap { margin-inline-end: var(--s1); }
+        .fpms-panel { min-width: 0; overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); }
+        .fpms-panel-body { padding: var(--s4); }
+        .fpms-panel-flush { padding: 0; }
+        .fpms-table-scroll { width: 100%; overflow-x: auto; }
+        .fpms-data-table { width: 100%; border-collapse: collapse; color: var(--ink-2); background: var(--paper); }
+        .fpms-data-table th { padding: var(--s3) var(--s4); color: var(--muted); text-align: start; white-space: nowrap; font-size: .875rem; font-weight: 600; border-bottom: 1px solid var(--line); }
+        .fpms-data-table td { padding: var(--s3) var(--s4); border-top: 1px solid var(--line); vertical-align: middle; }
+        .fpms-table-hover tbody tr:hover { background: var(--bg); }
+        .fpms-align-end { text-align: end; }
+        .fpms-nowrap { white-space: nowrap; }
+        .fpms-muted { color: var(--muted); }
+        .fpms-space-top { margin-top: var(--s1); }
+        .fpms-no-bottom { margin-bottom: 0; }
+        @media (max-width: 1023px) {
+            .fpms-data-table { min-width: 46rem; }
+        }
+    `],
 })
 export class BatchesComponent extends FpmsPage implements OnInit {
     batches = signal<any[] | null>(null);
