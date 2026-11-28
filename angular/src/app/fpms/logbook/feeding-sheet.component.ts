@@ -38,7 +38,7 @@ const MINE = 'mine';
         <fpms-page-header [narrow]="true" title="Feeding" subtitle="Each feeding in the farm's schedule, for every stocked pond on one day.">
             <a class="btn btn-default" [routerLink]="['/app/logbook/sheets']" [queryParams]="{ sheet: 'feeding' }">Print log sheet</a>
         </fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 <!-- One line of filters on the page ground (DEC-105), not a box of its own. -->
                 <div class="fpms-filter-row">
