@@ -12,7 +12,7 @@ import { ReviewMode, saveReviewMode, savedReviewMode } from '@shared/fpms/feedba
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header [narrow]="true" title="My account" subtitle="Your own sign-in details."></fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 <div class="row">
                     <div class="col-lg-6">
