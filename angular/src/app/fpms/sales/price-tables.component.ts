@@ -14,79 +14,79 @@ import { FPMS_IMPORTS } from '../shared-imports';
     template: `
         <fpms-page-header title="Price tables" subtitle="Prices per kg by count (pieces per kg), e.g. a buyer's weekly price list.">
             @if (canManage && !editing) {
-                <button class="btn btn-primary" (click)="edit(null)"><i class="fas fa-plus mr-1"></i>New price table</button>
+                <button class="fpms-button fpms-button-primary" (click)="edit(null)"><i class="fas fa-plus fpms-icon-gap"></i>New price table</button>
             }
         </fpms-page-header>
         <section class="fpms-page">
             <div class="fpms-page-inner">
                 @if (editing) {
-                    <div class="card card-outline card-primary">
-                        <div class="card-header"><h3 class="card-title">{{ editing.id === emptyId ? 'New price table' : 'Edit ' + editing.name }}</h3></div>
-                        <form class="card-body" #f="ngForm" (ngSubmit)="save()" fpmsReview="price table" novalidate>
-                            <div class="form-row">
-                                <div class="form-group col-md-5">
-                                    <label for="tn">Name <span class="text-danger">*</span></label>
-                                    <input id="tn" class="form-control" name="name" [(ngModel)]="editing.name" required maxlength="60" placeholder="e.g. Mindanao Processing, November" />
+                    <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
+                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">{{ editing.id === emptyId ? 'New price table' : 'Edit ' + editing.name }}</h3></div>
+                        <form class="fpms-panel-body" #f="ngForm" (ngSubmit)="save()" fpmsReview="price table" novalidate>
+                            <div class="fpms-grid-row">
+                                <div class="fpms-field fpms-col-md-5">
+                                    <label for="tn">Name <span class="fpms-danger">*</span></label>
+                                    <input id="tn" class="fpms-control" name="name" [(ngModel)]="editing.name" required maxlength="60" placeholder="e.g. Mindanao Processing, November" />
                                 </div>
-                                <div class="form-group col-md-5">
+                                <div class="fpms-field fpms-col-md-5">
                                     <label for="tb">For buyer</label>
-                                    <select id="tb" class="form-control" name="buyerId" [(ngModel)]="editing.buyerId">
+                                    <select id="tb" class="fpms-control" name="buyerId" [(ngModel)]="editing.buyerId">
                                         <option value="">Any buyer</option>
                                         @for (b of buyers; track b.id) { <option [value]="b.id">{{ b.name }}</option> }
                                     </select>
-                                    <small class="form-text text-muted">A buyer's own table is suggested on their next sale.</small>
+                                    <small class="fpms-help fpms-muted">A buyer's own table is suggested on their next sale.</small>
                                 </div>
-                                <div class="form-group col-md-2 fpms-check-cell">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="ta" name="isActive" [(ngModel)]="editing.isActive" />
-                                        <label class="custom-control-label" for="ta">Active</label>
+                                <div class="fpms-field fpms-col-md-2 fpms-check-cell">
+                                    <div class="fpms-check fpms-check-box">
+                                        <input type="checkbox" class="fpms-check-input" id="ta" name="isActive" [(ngModel)]="editing.isActive" />
+                                        <label class="fpms-check-label" for="ta">Active</label>
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive">
-                                <table class="table table-sm mb-2">
-                                    <thead><tr><th>From count (pcs/kg)</th><th>To count (pcs/kg)</th><th>Price per kg (₱) <span class="text-danger">*</span></th><th></th></tr></thead>
+                            <div class="fpms-table-scroll">
+                                <table class="fpms-data-table fpms-table-compact fpms-space-bottom-2">
+                                    <thead><tr><th>From count (pcs/kg)</th><th>To count (pcs/kg)</th><th>Price per kg (₱) <span class="fpms-danger">*</span></th><th></th></tr></thead>
                                     <tbody>
                                         @for (r of editing.rows; track $index) {
                                             <tr>
-                                                <td><input type="number" min="1" step="1" class="form-control form-control-sm" [name]="'rmin' + $index" [(ngModel)]="r.minCountPerKg" placeholder="no lower limit" aria-label="From count" /></td>
-                                                <td><input type="number" min="1" step="1" class="form-control form-control-sm" [name]="'rmax' + $index" [(ngModel)]="r.maxCountPerKg" placeholder="no upper limit" aria-label="To count" /></td>
-                                                <td><input type="number" min="0" step="0.01" class="form-control form-control-sm" [name]="'rp' + $index" [(ngModel)]="r.pricePerKg" required aria-label="Price per kg" /></td>
-                                                <td class="text-right">
-                                                    <button type="button" class="btn btn-sm btn-outline-danger" (click)="editing.rows.splice($index, 1)" aria-label="Remove row"><i class="fas fa-times"></i></button>
+                                                <td><input type="number" min="1" step="1" class="fpms-control fpms-control-compact" [name]="'rmin' + $index" [(ngModel)]="r.minCountPerKg" placeholder="no lower limit" aria-label="From count" /></td>
+                                                <td><input type="number" min="1" step="1" class="fpms-control fpms-control-compact" [name]="'rmax' + $index" [(ngModel)]="r.maxCountPerKg" placeholder="no upper limit" aria-label="To count" /></td>
+                                                <td><input type="number" min="0" step="0.01" class="fpms-control fpms-control-compact" [name]="'rp' + $index" [(ngModel)]="r.pricePerKg" required aria-label="Price per kg" /></td>
+                                                <td class="fpms-align-end">
+                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-danger" (click)="editing.rows.splice($index, 1)" aria-label="Remove row"><i class="fas fa-times"></i></button>
                                                 </td>
                                             </tr>
                                         }
                                     </tbody>
                                 </table>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" (click)="addRow()"><i class="fas fa-plus mr-1"></i>Add count range</button>
-                            <p class="small text-muted">A smaller count means bigger shrimp. Ranges may not overlap; leave an end empty for "up to" or "and above".</p>
-                            <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !f.form.valid || !editing.rows.length">Save table</button>
-                            <button type="button" class="btn btn-default" (click)="editing = null">Cancel</button>
+                            <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary fpms-space-bottom-3" (click)="addRow()"><i class="fas fa-plus fpms-icon-gap"></i>Add count range</button>
+                            <p class="fpms-small fpms-muted">A smaller count means bigger shrimp. Ranges may not overlap; leave an end empty for "up to" or "and above".</p>
+                            <button type="submit" class="fpms-button fpms-button-primary fpms-icon-gap" [disabled]="busy() || !f.form.valid || !editing.rows.length">Save table</button>
+                            <button type="button" class="fpms-button fpms-button-secondary" (click)="editing = null">Cancel</button>
                         </form>
                     </div>
                 }
                 @if (!tables()) {
                     <fpms-loading></fpms-loading>
                 } @else if (!tables()?.length) {
-                    <div class="card"><div class="card-body"><fpms-empty text="No price tables yet. Add one when a buyer prices by count, e.g. 41–50 pcs/kg at ₱400." icon="fas fa-table"></fpms-empty></div></div>
+                    <div class="fpms-panel"><div class="fpms-panel-body"><fpms-empty text="No price tables yet. Add one when a buyer prices by count, e.g. 41–50 pcs/kg at ₱400." icon="fas fa-table"></fpms-empty></div></div>
                 } @else {
-                    <div class="row">
+                    <div class="fpms-grid-row">
                         @for (t of tables(); track t.id) {
-                            <div class="col-lg-6">
-                                <div class="card" [class.text-muted]="!t.isActive">
-                                    <div class="card-header d-flex align-items-center">
-                                        <h3 class="card-title mr-auto">{{ t.name }}{{ t.isActive ? '' : ' (inactive)' }}</h3>
-                                        <span class="small mr-2">{{ t.buyerName || 'Any buyer' }}</span>
-                                        @if (canManage) { <button class="btn btn-sm btn-outline-primary" (click)="edit(t)">Edit</button> }
+                            <div class="fpms-col-lg-6">
+                                <div class="fpms-panel" [class.fpms-muted]="!t.isActive">
+                                    <div class="fpms-panel-head fpms-flex align-items-center">
+                                        <h3 class="fpms-panel-title fpms-margin-auto-end">{{ t.name }}{{ t.isActive ? '' : ' (inactive)' }}</h3>
+                                        <span class="fpms-small fpms-icon-gap">{{ t.buyerName || 'Any buyer' }}</span>
+                                        @if (canManage) { <button class="fpms-button fpms-button-compact fpms-button-outline" (click)="edit(t)">Edit</button> }
                                     </div>
-                                    <div class="card-body p-0">
-                                        <table class="table table-sm mb-0">
-                                            <thead><tr><th>Count</th><th class="text-right">Price per kg</th></tr></thead>
+                                    <div class="fpms-panel-body fpms-space-0">
+                                        <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
+                                            <thead><tr><th>Count</th><th class="fpms-align-end">Price per kg</th></tr></thead>
                                             <tbody>
                                                 @for (r of t.rows; track $index) {
-                                                    <tr><td>{{ r.label }}</td><td class="text-right">{{ r.pricePerKg | php }}</td></tr>
+                                                    <tr><td>{{ r.label }}</td><td class="fpms-align-end">{{ r.pricePerKg | php }}</td></tr>
                                                 }
                                             </tbody>
                                         </table>
