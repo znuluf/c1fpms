@@ -10,7 +10,7 @@ Farm Production Management System for shrimp farms. ASP.NET Boilerplate 10.2 (.N
 - Status colors keep their meaning: success green, warning gold, error red, info blue. The brand orange and the logo's green are never used as a status. A state is never shown by color alone; it also has text or an icon.
 - Radius follows role (`--fpms-r-control`, `-tile`, `-card`), not one value for everything.
 - Type is system fonts only (`--fpms-font`). The farm network has no Internet, so no web fonts, CDN links or remote assets. Add libraries with npm so they are bundled.
-- Text is never below 14px. Controls and buttons keep the tablet-size touch targets already set in `fpms.less`. Contrast stays at WCAG 2.2 AA. Respect `prefers-reduced-motion`; motion is small (about 160ms) and answers a person's action.
+- Sizes follow the reference app (DEC-146): at 1025px and wider, controls and buttons are 32px tall (28px small, 40px large), field and body text 14px, labels 13px, hints, badges and column titles 12px. Page body text is not below 14px; 12 to 13px is for labels, hints, badges and column titles only. Tablets and phones (1024px and narrower) keep the tablet-size touch targets in `fpms.less`, and fields are 16px under 768px. Contrast stays at WCAG 2.2 AA. Respect `prefers-reduced-motion`; motion is small (about 160ms) and answers a person's action.
 - Check any UI change in both themes (My account > Appearance).
 
 ### Angular conventions in use

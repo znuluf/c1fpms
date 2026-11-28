@@ -2269,3 +2269,302 @@ button.fpms-filter-tag:focus-visible {
     outline: 2px solid var(--fpms-accent);
     outline-offset: 2px;
 }
+
+// ---- Reference sizes and shapes (DEC-146). Comes last on purpose: it sets the sizes of the reference app
+// (32 px controls, 13 px labels, 12 px hints and badges, 18 px cards) on top of everything above.
+// Control height is the reference's 32 px only from 1025 px wide; tablets and phones keep the touch size set in fpms.less.
+:root {
+    --fpms-r-card: 18px;
+    --fpms-shadow-1: none;
+    --fpms-gray: #64748b; // field border on hover
+    --fpms-gray-soft: #e2e8f0;
+    --fpms-gray-tint: #eef2f6;
+    --fpms-red-soft: #fde3e3;
+    --fpms-ring: color-mix(in srgb, var(--fpms-primary) 15%, transparent);
+    --fpms-ring-error: color-mix(in srgb, var(--fpms-error) 15%, transparent);
+    --fpms-primary-hover: color-mix(in srgb, var(--fpms-primary) 82%, white);
+    --fpms-scrim: rgba(13, 27, 42, 0.45);
+    --fpms-shadow-float: 0 34px 70px -40px rgba(13, 27, 42, 0.5);
+}
+
+// Page title and subtitle
+.fpms-page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+}
+.fpms-page-header .text-muted {
+    font-size: 1rem;
+}
+@media (min-width: 768px) {
+    .fpms-page-header h1 {
+        font-size: 2.25rem;
+    }
+    .fpms-page-header .text-muted {
+        font-size: 1.125rem;
+    }
+}
+
+// Cards
+.card-title {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+// Buttons: one dark primary, quiet outline, soft red for destructive
+.btn {
+    font-size: 0.875rem;
+}
+.btn.btn-primary:not(:disabled):not(.disabled) {
+    box-shadow: none;
+}
+.btn.btn-primary:not(:disabled):not(.disabled):hover,
+.btn.btn-primary:not(:disabled):not(.disabled):active {
+    background-color: var(--fpms-primary-hover);
+    border-color: var(--fpms-primary-hover);
+}
+.btn.btn-default,
+.btn.btn-outline-secondary {
+    border-color: var(--fpms-line);
+    background-color: var(--fpms-surface);
+    color: var(--fpms-text);
+}
+.btn.btn-default:hover,
+.btn.btn-outline-secondary:hover {
+    border-color: var(--fpms-primary);
+    background-color: var(--fpms-surface);
+    color: var(--fpms-text);
+}
+.btn.btn-danger {
+    border-color: transparent;
+    background-color: var(--fpms-red-soft);
+    color: var(--fpms-error);
+}
+.btn.btn-danger:hover,
+.btn.btn-danger:active {
+    border-color: var(--fpms-error);
+    background-color: var(--fpms-error);
+    color: #fff;
+}
+.btn:focus,
+.btn.focus,
+.btn.btn-primary:focus,
+.btn.btn-default:focus,
+.btn.btn-outline-secondary:focus,
+.btn.btn-danger:focus {
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--fpms-ring);
+}
+.btn.disabled,
+.btn:disabled {
+    opacity: 0.5;
+}
+
+// Fields: one box. Hairline border, darker on hover, ink border and soft ring on focus, red when invalid.
+.form-control,
+.custom-select {
+    border-color: var(--fpms-line);
+    background-color: var(--fpms-surface);
+    font-size: 0.875rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+.form-control:not(:disabled):not([readonly]):hover,
+.custom-select:not(:disabled):hover {
+    border-color: var(--fpms-gray);
+}
+.form-control:focus,
+.custom-select:focus {
+    border-color: var(--fpms-primary);
+    background-color: var(--fpms-surface);
+    box-shadow: 0 0 0 3px var(--fpms-ring);
+    outline: 0;
+}
+.form-control:disabled,
+.form-control[readonly],
+.custom-select:disabled {
+    background-color: var(--fpms-bg);
+    color: var(--fpms-muted);
+}
+.form-control.is-invalid,
+.was-validated .form-control:invalid,
+.custom-select.is-invalid {
+    border-color: var(--fpms-error);
+}
+.form-control.is-invalid:focus,
+.was-validated .form-control:invalid:focus {
+    box-shadow: 0 0 0 3px var(--fpms-ring-error);
+}
+select.form-control:not([multiple]):not([size]),
+select.custom-select:not([multiple]):not([size]) {
+    padding-right: 2.25rem;
+}
+textarea.form-control {
+    height: auto;
+    min-height: 6rem;
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+    line-height: 1.55;
+}
+// 16 px on phones, so iOS does not zoom into a focused field
+@media (max-width: 767.98px) {
+    .form-control,
+    .custom-select {
+        font-size: 1rem;
+    }
+}
+label:not(.custom-control-label),
+.col-form-label {
+    font-size: 0.8125rem;
+}
+.custom-control-label {
+    font-size: 0.875rem;
+}
+.form-text,
+.invalid-feedback {
+    font-size: 0.75rem;
+}
+.invalid-feedback {
+    font-weight: 500;
+    color: var(--fpms-error);
+}
+
+// Badges: a soft pill, 24 px tall, 12 px text
+.badge,
+.fpms-badge,
+table.table .badge {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    height: 1.5rem;
+    padding: 0 0.625rem;
+    font-size: 0.75rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+// Tables: 14 px cells, 12 px column titles, gray hover
+table.table {
+    font-size: 0.875rem;
+}
+table.table thead th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+.table-hover tbody tr:hover {
+    background-color: var(--fpms-tide-50);
+}
+
+// Sidebar rows: 36 px, 14 px medium, soft blue on hover, ink when current
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-link {
+    min-height: 2.25rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+    gap: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+.main-sidebar.fpms-sidebar .nav-sidebar > .nav-item:hover > .nav-link:not(.active),
+.main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link:not(.active):focus {
+    background-color: var(--fpms-accent-50);
+    color: var(--fpms-primary);
+}
+
+// Page tabs: segmented control, 32 px items; the second row is the compact one
+.fpms-section-tab {
+    font-size: 0.875rem;
+}
+.fpms-section-subtabs .fpms-section-tab {
+    font-size: 0.75rem;
+}
+
+// Dialogs: warm surface so white fields stand off it, 18 px corners, one soft float shadow
+.fpms-dialog-backdrop {
+    background: var(--fpms-scrim);
+}
+.fpms-dialog {
+    border: 1px solid var(--fpms-line);
+    border-radius: var(--fpms-r-card);
+    background: var(--fpms-bg);
+    box-shadow: var(--fpms-shadow-float);
+}
+.fpms-dialog-head h1,
+.fpms-dialog-head h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--fpms-text);
+}
+.fpms-dialog-close {
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0;
+    background: transparent;
+    font-size: 1.25rem;
+}
+.fpms-dialog-close:hover {
+    background: var(--fpms-gray-tint);
+    color: var(--fpms-text);
+}
+.modal-content {
+    border: 1px solid var(--fpms-line);
+    box-shadow: var(--fpms-shadow-float);
+}
+
+@media (min-width: 1025px) {
+    .btn:not(.btn-sm):not(.btn-xs):not(.btn-lg) {
+        min-height: 2rem;
+        padding: 0.3125rem 0.75rem;
+        line-height: 1.25rem;
+    }
+    .btn.btn-sm {
+        min-height: 1.75rem;
+        padding: 0.125rem 0.625rem;
+        font-size: 0.8125rem;
+        line-height: 1.25rem;
+    }
+    .btn.btn-lg {
+        min-height: 2.5rem;
+        padding: 0.4375rem 1rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+    .form-control,
+    .custom-select {
+        height: 2rem;
+        min-height: 2rem;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .form-control.form-control-sm {
+        height: 1.75rem;
+        min-height: 1.75rem;
+        font-size: 0.8125rem;
+    }
+    .form-control.form-control-lg {
+        height: 2.5rem;
+        min-height: 2.5rem;
+    }
+    textarea.form-control {
+        height: auto;
+        min-height: 6rem;
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+    }
+    .fpms-section-tab {
+        min-height: 2rem;
+        padding: 0 0.75rem;
+        border-radius: var(--fpms-r-control);
+    }
+    .fpms-section-subtabs .fpms-section-tab {
+        min-height: 1.75rem;
+        padding: 0 0.625rem;
+    }
+    .fpms-section-subtabs {
+        padding: 0.125rem;
+    }
+}

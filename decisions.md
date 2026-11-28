@@ -9,6 +9,7 @@ All decisions below were accepted on 2026-10-22 by the capstone development team
 | ID | Decision | Status |
 | :---- | :---- | :---- |
 | DEC-145 | Default theme follows the reference traceability app | Proposed (full write-up); screens not checked |
+| DEC-146 | Controls, text and shapes use the reference app's sizes at desktop widths | Proposed (full write-up); screens not checked |
 | DEC-144 | Every harvest records the ABW sample weight and pieces | Accepted (full write-up) |
 | DEC-143 | Optional fields folded on three forms, a calmer theme, and replacing AdminLTE with plain Bootstrap | Proposed (full write-up); screens not checked |
 | DEC-01 | Local on-premise MVP with a SaaS-ready multi-tenant model | Accepted (full write-up) |
@@ -3753,3 +3754,28 @@ Positive:
 
 Negative:
 - Pages keep their current layout; matching the reference further needs template work.
+
+## Decision DEC-146: Controls, text and shapes use the reference app's sizes at desktop widths
+
+Status: Proposed 2026-11-28 (branch design/simple-modern-ui; screens not checked)
+Date: 2026-11-28
+Related: DEC-143, DEC-145. Changes the size rules in CLAUDE.md that DEC-145 kept.
+
+### Context
+The owner asked to try the sizes of the reference app (32 px controls, 13 px labels, 12 px hints and badges, 18 px cards). The farm's partner uses desktop and laptop screens. Earlier rules held text at 14 px or more and tablet-size touch targets everywhere.
+
+### Options considered
+1. Keep the earlier sizes and copy only colours and shapes.
+2. Use the reference sizes everywhere.
+3. Use the reference sizes at 1025 px and wider; keep touch targets on tablets and phones.
+
+### Decision
+Option 3. One section at the end of `theme.less` sets the sizes, so it can be removed or adjusted on its own. Colours it needs are variables in that section's `:root`. The field border uses the reference's light line colour, which is below the 3:1 contrast WCAG 2.2 asks for on control edges (1.4.11); changing `--fpms-line` for fields to `--fpms-line-strong` restores it. Text of 12 and 13 px is limited to labels, hints, badges and column titles.
+
+### Consequences
+Positive:
+- Denser, closer to the reference; more rows and fields fit on a laptop screen.
+
+Negative:
+- Smaller targets and text on desktop than before. Tablets used with a wide screen (over 1024 px) get the smaller sizes too.
+- Light field borders are harder to see for some users until the stronger line is chosen.

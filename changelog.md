@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed (reference sizes and shapes, DEC-146)
+- **Sizes from the reference app.** On screens 1025 px wide and up, buttons and fields are 32 px tall (28 px small, 40 px large), with 14 px text in fields and buttons, 13 px labels, and 12 px hints, badges and column titles. Page titles are 24 px (36 px from 768 px wide) and bold. Cards have 18 px corners and no shadow, badges are 24 px pills, sidebar rows are 36 px, and dialogs have a warm surface with one soft shadow.
+- **Fields and buttons.** A hairline border that darkens on hover, an ink border with a soft ring on focus, a red border when invalid. Outline buttons are quiet, and Delete is a soft red that turns solid on hover.
+- **Tablets and phones are unchanged.** At 1024 px and narrower, controls keep the larger touch size. Fields are 16 px under 768 px so iOS does not zoom in.
+
 ### Changed (look from the reference screenshots, DEC-145)
 - **Theme.** Warm off-white background, white cards with thin borders, ink navy for primary buttons and the current page, larger page titles, softer status pills, and section tabs drawn as a segmented control. The neutral theme keeps its own colours and gets the same shapes. Link blue, success green, error red, the line colour and the hover tint now use the reference app's values (checked for AA contrast); a `.mono` class gives codes and IDs a system monospace font.
 
