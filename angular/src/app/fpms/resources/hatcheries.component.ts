@@ -15,8 +15,8 @@ import { ClientListFilter } from '@shared/fpms/client-list';
                 <button class="btn btn-primary" (click)="startEdit()" [disabled]="!!form"><i class="fas fa-plus mr-1"></i>Add hatchery</button>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (form) {
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="hatchery-dialog-title"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
