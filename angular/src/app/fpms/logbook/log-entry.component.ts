@@ -198,7 +198,7 @@ const DRAFT = 'log-entry';
                                             <div class="fpms-grid-row">
                                                 @for (p of mainParams(); track p.code) {
                                                     <div class="fpms-field fpms-col-md-6 fpms-col-xl-3">
-                                                        <label [for]="'r' + p.code">{{ p.name }}@if (p.unitCode) { ({{ p.unitCode }}) } @if (form.logType === 2 && p.requiredAtStocking) { <span class="fpms-danger">*</span> }</label>
+                                                        <label [for]="'r' + p.code">{{ p.name }} @if (p.unitCode) { ({{ p.unitCode }}) } @if (form.logType === 2 && p.requiredAtStocking) { <span class="fpms-danger">*</span> }</label>
                                                         <input [id]="'r' + p.code" type="number" step="any" inputmode="decimal" class="fpms-control" [name]="'r' + p.code" [(ngModel)]="readings[p.code]"
                                                             [min]="p.physicalMin" [max]="p.physicalMax" [required]="form.logType === 2 && p.requiredAtStocking"
                                                             (keydown)="restrictNumericKey($event, p.physicalMin < 0)" (paste)="validateNumericPaste($event, p.physicalMin < 0)" />
@@ -318,7 +318,7 @@ const DRAFT = 'log-entry';
                                                         </select>
                                                     </div>
                                                     <div class="fpms-col-3">
-                                                        <label [for]="'uq' + u.key">Quantity@if (lotUnit(u.lotId)) { ({{ lotUnit(u.lotId) }}) }</label>
+                                                        <label [for]="'uq' + u.key">Quantity @if (lotUnit(u.lotId)) { ({{ lotUnit(u.lotId) }}) }</label>
                                                         <input [id]="'uq' + u.key" type="number" min="0.001" step="0.001" inputmode="decimal" class="fpms-control" [name]="'uq' + u.key" [(ngModel)]="u.quantity" required (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
                                                     </div>
                                                     <div class="fpms-col-2">
@@ -345,7 +345,7 @@ const DRAFT = 'log-entry';
                                                 <summary>Treatment details <span class="fpms-fold-hint">dosage, method, withdrawal period, prescription; for drugs and chemicals</span></summary>
                                                 <div class="fpms-grid-row">
                                                     <div class="fpms-field fpms-col-6 fpms-col-md-3">
-                                                        <label for="dz">Dosage@if (chem.dosageUnit) { ({{ chem.dosageUnit }}) }</label>
+                                                        <label for="dz">Dosage @if (chem.dosageUnit) { ({{ chem.dosageUnit }}) }</label>
                                                         <input id="dz" type="number" min="0" step="any" inputmode="decimal" class="fpms-control" name="dz" [(ngModel)]="chem.dosage" (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
                                                     </div>
                                                     <div class="fpms-field fpms-col-6 fpms-col-md-3">
