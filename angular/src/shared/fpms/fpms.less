@@ -5,17 +5,19 @@
 // orange is never a status, and the logo's "Farm." green is for the logo only, so it is never
 // mistaken for the success green.
 :root {
-    --fpms-primary: #0d1b2a;
-    --fpms-primary-dark: #050d16;
-    --fpms-accent: #3a6ea5;
-    --fpms-link: #3a6ea5;
-    --fpms-bg: #fbfaf7;
-    --fpms-text: #232d36;
-    --fpms-muted: #596872;
-    --fpms-success: #0b7f58;
-    --fpms-warning: #b07a00;
-    --fpms-error: #bf3636;
-    --fpms-info: #2b6f9b;
+    // Base FPMS aliases now resolve through the shared design tokens.
+    // theme-neutral.less can still override these when the neutral theme is selected.
+    --fpms-primary: var(--ink);
+    --fpms-primary-dark: var(--ink-2);
+    --fpms-accent: var(--blue);
+    --fpms-link: var(--blue-deep);
+    --fpms-bg: var(--bg);
+    --fpms-text: var(--ink);
+    --fpms-muted: var(--muted);
+    --fpms-success: var(--green-deep);
+    --fpms-warning: var(--orange-deep);
+    --fpms-error: var(--red-deep);
+    --fpms-info: var(--blue-deep);
 }
 
 body,
