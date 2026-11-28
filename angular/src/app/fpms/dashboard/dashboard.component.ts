@@ -485,6 +485,204 @@ const SETUP_STEPS = ['profile', 'ponds'];
                 .fpms-upcoming-summary { grid-template-columns:1fr 1fr; }
                 .fpms-upcoming-summary div:last-child { grid-column:1 / -1; }
             }
+
+            /* Dashboard benchmark: quieter surfaces, clearer hierarchy, and deliberate spacing. */
+            :host .fpms-page-header {
+                padding-top: 1.15rem;
+                padding-bottom: 0.65rem;
+            }
+            :host .fpms-page-header h1 {
+                color: var(--fpms-text);
+                font-size: clamp(1.55rem, 2vw, 1.9rem);
+                font-weight: 700;
+                letter-spacing: -0.035em;
+                line-height: 1.2;
+            }
+            :host .fpms-page-header .text-muted {
+                max-width: 48rem;
+                margin-top: 0.35rem;
+                color: var(--fpms-muted) !important;
+                font-size: 0.9375rem;
+                line-height: 1.5;
+            }
+            :host .fpms-dash {
+                padding-top: 0.65rem;
+                gap: 1.5rem;
+            }
+            :host .fpms-section-h {
+                margin-bottom: 0.8rem;
+                color: var(--fpms-text);
+                font-size: 1.05rem;
+                font-weight: 700;
+                letter-spacing: -0.015em;
+            }
+            :host .fpms-glance {
+                margin-bottom: 1.75rem;
+            }
+            :host .fpms-glance-tiles {
+                border-color: var(--fpms-line);
+                border-radius: 0.85rem;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+            }
+            :host .fpms-glance-tile {
+                min-height: 8.25rem;
+                padding: 1.05rem 1.15rem;
+                gap: 0.25rem;
+            }
+            :host .fpms-glance-tile .l {
+                color: var(--fpms-muted);
+                font-size: 0.8125rem;
+                font-weight: 600;
+                letter-spacing: 0.01em;
+            }
+            :host .fpms-glance-tile .v {
+                color: var(--fpms-text);
+                font-size: 1.45rem;
+                font-weight: 750;
+                letter-spacing: -0.035em;
+                font-variant-numeric: tabular-nums;
+            }
+            :host .fpms-glance-tile .s {
+                font-size: 0.8125rem;
+                line-height: 1.45;
+            }
+            :host .fpms-glance-tile .go {
+                padding-top: 0.35rem;
+                font-size: 0.8125rem;
+                font-weight: 650;
+            }
+            :host .fpms-upcoming {
+                padding: 1.15rem 1.25rem 1.25rem;
+                border-radius: 0.85rem;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+            }
+            :host .fpms-upcoming-head {
+                align-items: center;
+            }
+            :host .fpms-upcoming-count {
+                padding: 0.3rem 0.65rem;
+                border: 1px solid var(--fpms-line);
+                border-radius: 999px;
+                background: var(--fpms-ground);
+                color: var(--fpms-text);
+                font-size: 0.75rem;
+                font-weight: 650;
+            }
+            :host .fpms-upcoming-summary {
+                gap: 1rem;
+                padding: 0.9rem 1rem;
+                border: 1px solid var(--fpms-line);
+                border-radius: 0.65rem;
+                background: var(--fpms-ground);
+            }
+            :host .fpms-upcoming-summary span {
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+            :host .fpms-upcoming-summary strong {
+                font-size: 1.15rem;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                font-variant-numeric: tabular-nums;
+            }
+            :host .fpms-upcoming-table th {
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+                background: transparent;
+                letter-spacing: 0.035em;
+                text-transform: uppercase;
+                font-size: 0.6875rem;
+            }
+            :host .fpms-ponds-head {
+                margin-bottom: 0.9rem;
+            }
+            :host .fpms-toolbar {
+                gap: 0.6rem;
+                padding: 0.75rem;
+                margin-bottom: 0;
+                border: 1px solid var(--fpms-line);
+                border-bottom: 0;
+                border-radius: 0.8rem 0.8rem 0 0;
+                background: var(--fpms-ground);
+            }
+            :host .fpms-search {
+                min-height: 2.5rem;
+                border-radius: 0.55rem;
+                background: var(--fpms-surface);
+            }
+            :host .fpms-sort {
+                color: var(--fpms-muted);
+                font-size: 0.8125rem;
+                font-weight: 600;
+            }
+            :host .fpms-sort select {
+                min-height: 2.5rem;
+                height: 2.5rem;
+                border-radius: 0.55rem;
+                background-color: var(--fpms-surface);
+            }
+            :host .fpms-chip {
+                min-height: 2.5rem;
+                margin-left: 0;
+                padding: 0 0.8rem;
+                border-radius: 0.55rem;
+                font-size: 0.8125rem;
+                font-weight: 600;
+            }
+            :host .fpms-pcal-panel {
+                border-radius: 0 0 0.8rem 0.8rem;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+            }
+            :host .fpms-pcal-row {
+                padding-right: 1.15rem;
+                padding-left: 1.15rem;
+            }
+            :host .fpms-pcal-row.head {
+                background: var(--fpms-ground);
+                font-size: 0.75rem;
+                font-weight: 650;
+            }
+            :host .fpms-pcal-row:not(.head) {
+                min-height: 4.25rem;
+            }
+            :host .fpms-att-box {
+                border-radius: 0.85rem;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+            }
+            :host .fpms-att-gh {
+                min-height: 3.25rem;
+                font-size: 0.875rem;
+            }
+            :host .fpms-att-peek {
+                line-height: 1.45;
+            }
+            @media (max-width: 767.98px) {
+                :host .fpms-page-header {
+                    padding-top: 0.75rem;
+                }
+                :host .fpms-upcoming-head {
+                    align-items: flex-start;
+                }
+                :host .fpms-toolbar {
+                    align-items: stretch;
+                }
+                :host .fpms-search {
+                    flex-basis: 100%;
+                    max-width: none;
+                }
+                :host .fpms-button-group-toggle {
+                    display: flex;
+                    width: 100%;
+                }
+                :host .fpms-button-group-toggle .fpms-chip {
+                    flex: 1 1 0;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                :host .fpms-glance-tile {
+                    transition: none;
+                }
+            }
         `,
     ],
 })
