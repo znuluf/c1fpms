@@ -11,7 +11,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
         <fpms-page-header [title]="d?.hatcheryBatchNumber ?? 'Fry delivery'" [subtitle]="d ? 'Post-larvae from ' + d.hatcheryName + (arrived() ? '. Arrived ' : '. Expected ') + (d.deliveryDate | farmDate) + '.' : ''" backLink="/app/resources/fry-deliveries" backLabel="Fry deliveries">
             @if (d) {
                 <fpms-badge [text]="d.isStocked ? 'Stocked' : (d.status | label: L.FryDeliveryStatuses)"></fpms-badge>
-                @if (d.isStockingFinished) { <span class="badge badge-dark ml-1">Stocking finished</span> }
+                @if (d.isStockingFinished) { <span class="fpms-label badge-dark fpms-icon-gap">Stocking finished</span> }
             }
         </fpms-page-header>
         <section class="fpms-page">
@@ -21,50 +21,50 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 } @else {
                     @if (receiving) {
                         <!-- DEC-131: arrival is its own step: when, the farm's count, and the papers and trip that came with the fry. -->
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="rv-h"><div class="fpms-dialog-body p-0"><div class="card card-outline card-primary mb-0 border-0">
-                            <div class="card-header"><h3 class="card-title" id="rv-h"><i class="fas fa-box-open" aria-hidden="true"></i>Receive fry · {{ d.hatcheryBatchNumber }}</h3></div>
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="rv-h"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-primary fpms-no-bottom border-0">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title" id="rv-h"><i class="fas fa-box-open" aria-hidden="true"></i>Receive fry · {{ d.hatcheryBatchNumber }}</h3></div>
                             <form #rf="ngForm" (ngSubmit)="saveReceive()" fpmsReview="arrival" [fpmsReviewNew]="true" novalidate>
-                                <div class="card-body">
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
-                                            <label for="r-at">Arrived <span class="text-danger">*</span></label>
-                                            <input id="r-at" type="datetime-local" class="form-control" name="receivedAt" [(ngModel)]="receiving.receivedAt" [max]="nowInput" required />
+                                <div class="fpms-panel-body">
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="r-at">Arrived <span class="fpms-danger">*</span></label>
+                                            <input id="r-at" type="datetime-local" class="fpms-control" name="receivedAt" [(ngModel)]="receiving.receivedAt" [max]="nowInput" required />
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="r-pl">PL counted at the farm <span class="text-danger">*</span></label>
-                                            <input id="r-pl" type="number" min="1" max="10000000" step="1" class="form-control" name="plReceived" [(ngModel)]="receiving.plReceived" required />
+                                        <div class="fpms-field fpms-col-md-4">
+                                            <label for="r-pl">PL counted at the farm <span class="fpms-danger">*</span></label>
+                                            <input id="r-pl" type="number" min="1" max="10000000" step="1" class="fpms-control" name="plReceived" [(ngModel)]="receiving.plReceived" required />
                                             @if (d.plOrdered && receiving.plReceived > 0) {
-                                                <small class="form-text text-muted">{{ extraText({ plReceived: receiving.plReceived, plOrdered: d.plOrdered }) }}</small>
+                                                <small class="fpms-help fpms-muted">{{ extraText({ plReceived: receiving.plReceived, plOrdered: d.plOrdered }) }}</small>
                                             } @else {
-                                                <small class="form-text text-muted">Stocking, survival and density use this count.</small>
+                                                <small class="fpms-help fpms-muted">Stocking, survival and density use this count.</small>
                                             }
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="fpms-field fpms-col-md-4">
                                             <label for="r-age">PL age (days)</label>
-                                            <input id="r-age" type="number" min="1" max="60" step="1" class="form-control" name="plAgeDays" [(ngModel)]="receiving.plAgeDays" />
+                                            <input id="r-age" type="number" min="1" max="60" step="1" class="fpms-control" name="plAgeDays" [(ngModel)]="receiving.plAgeDays" />
                                         </div>
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-md-4">
                                             <label for="r-phc">PL health certificate no.</label>
-                                            <input id="r-phc" class="form-control" name="plHealthCertificateNo" [(ngModel)]="receiving.plHealthCertificateNo" maxlength="100" />
+                                            <input id="r-phc" class="fpms-control" name="plHealthCertificateNo" [(ngModel)]="receiving.plHealthCertificateNo" maxlength="100" />
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="fpms-field fpms-col-md-4">
                                             <label for="r-sfsc">Shrimp Fry Source Certificate no.</label>
-                                            <input id="r-sfsc" class="form-control" name="sfscNo" [(ngModel)]="receiving.sfscNo" maxlength="100" placeholder="optional" />
+                                            <input id="r-sfsc" class="fpms-control" name="sfscNo" [(ngModel)]="receiving.sfscNo" maxlength="100" placeholder="optional" />
                                         </div>
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
+                                    <div class="fpms-grid-row">
+                                        <div class="fpms-field fpms-col-md-4">
                                             <label for="r-n">Note</label>
-                                            <input id="r-n" class="form-control" name="note" [(ngModel)]="receiving.note" maxlength="500" placeholder="e.g. 2 bags damaged" />
+                                            <input id="r-n" class="fpms-control" name="note" [(ngModel)]="receiving.note" maxlength="500" placeholder="e.g. 2 bags damaged" />
                                         </div>
                                     </div>
-                                    <p class="small text-muted mb-0">Dead or discarded fry are accounted for later, with Finish stocking.</p>
+                                    <p class="fpms-small fpms-muted fpms-no-bottom">Dead or discarded fry are accounted for later, with Finish stocking.</p>
                                 </div>
-                                <div class="card-footer">
-                                    <button type="submit" class="btn btn-primary mr-2" [disabled]="busy() || !rf.form.valid">Save arrival</button>
-                                    <button type="button" class="btn btn-default" (click)="receiving = null">Cancel</button>
+                                <div class="fpms-panel-foot">
+                                    <button type="submit" class="fpms-button fpms-button-primary fpms-icon-gap" [disabled]="busy() || !rf.form.valid">Save arrival</button>
+                                    <button type="button" class="fpms-button fpms-button-secondary" (click)="receiving = null">Cancel</button>
                                     <fpms-form-hint [form]="rf"></fpms-form-hint>
                                 </div>
                             </form>
@@ -104,16 +104,16 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         }
                     </section>
                     @if (d.pondAllocations?.length) {
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Planned destination ponds</h3></div>
-                            <div class="card-body p-0 table-responsive">
-                                <table class="table table-sm mb-0">
-                                    <thead><tr><th>Pond</th><th class="text-right">Planned PL</th><th>Status</th></tr></thead>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Planned destination ponds</h3></div>
+                            <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
+                                <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
+                                    <thead><tr><th>Pond</th><th class="fpms-align-end">Planned PL</th><th>Status</th></tr></thead>
                                     <tbody>
                                         @for (a of d.pondAllocations; track a.id) {
                                             <tr>
-                                                <td><a [routerLink]="['/app/ponds', a.pondId]">{{ a.pondCode }}</a><div class="small text-muted">{{ a.pondName }}</div></td>
-                                                <td class="text-right">{{ a.plannedPlCount | num: 0 }}</td>
+                                                <td><a [routerLink]="['/app/ponds', a.pondId]">{{ a.pondCode }}</a><div class="fpms-small fpms-muted">{{ a.pondName }}</div></td>
+                                                <td class="fpms-align-end">{{ a.plannedPlCount | num: 0 }}</td>
                                                 <td>{{ a.fulfilledAtUtc ? 'Stocked' : a.releasedAtUtc ? 'Released' : 'Reserved' }}</td>
                                             </tr>
                                         }
@@ -124,31 +124,31 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     }
                     <!-- The form takes the width on a laptop; the status column sits beside it from 1,200 px (DEC-111). -->
                         <!-- DEC-131: the delivery's steps, and only the next ones that make sense. -->
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Steps</h3></div>
-                            <div class="card-body">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Steps</h3></div>
+                            <div class="fpms-panel-body">
                                 <ol class="fpms-dsteps" aria-label="Delivery steps">
                                     @for (s of stepLine(); track s.label) {
                                         <li [class.done]="s.state === 'done'" [class.now]="s.state === 'now'" [class.ended]="s.state === 'ended'" [attr.aria-current]="s.state === 'now' ? 'step' : null">
                                             <i class="fas" [class.fa-check-circle]="s.state === 'done'" [class.fa-dot-circle]="s.state === 'now'" [class.fa-times-circle]="s.state === 'ended'" [class.fa-circle]="s.state === 'todo'" aria-hidden="true"></i>
                                             <span>{{ s.label }}</span>
-                                            @if (s.when) { <small class="text-muted">{{ s.when | farmDateTime }}</small> }
+                                            @if (s.when) { <small class="fpms-muted">{{ s.when | farmDateTime }}</small> }
                                         </li>
                                     }
                                 </ol>
                                 @if (d.canUpdateStatus && !step) {
                                     <div class="fpms-step-actions">
                                         @if (next().includes(3)) {
-                                            <button type="button" class="btn btn-primary" (click)="startReceive()"><i class="fas fa-box-open mr-1" aria-hidden="true"></i>Receive fry</button>
+                                            <button type="button" class="fpms-button fpms-button-primary" (click)="startReceive()"><i class="fas fa-box-open fpms-icon-gap" aria-hidden="true"></i>Receive fry</button>
                                         }
                                         @if (next().includes(2)) {
-                                            <button type="button" class="btn btn-outline-primary" (click)="startStep(2)"><i class="fas fa-truck mr-1" aria-hidden="true"></i>Mark in transit</button>
+                                            <button type="button" class="fpms-button fpms-button-outline" (click)="startStep(2)"><i class="fas fa-truck fpms-icon-gap" aria-hidden="true"></i>Mark in transit</button>
                                         }
                                         @if (next().includes(5)) {
-                                            <button type="button" class="btn btn-outline-danger" (click)="startStep(5)">Cancel order</button>
+                                            <button type="button" class="fpms-button fpms-button-danger" (click)="startStep(5)">Cancel order</button>
                                         }
                                         @if (next().includes(4)) {
-                                            <button type="button" class="btn btn-outline-danger" (click)="startStep(4)">Reject fry</button>
+                                            <button type="button" class="fpms-button fpms-button-danger" (click)="startStep(4)">Reject fry</button>
                                         }
                                     </div>
                                 }
@@ -156,96 +156,96 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <form #sf="ngForm" class="fpms-step-form" (ngSubmit)="saveStep()" novalidate>
                                         <h4 class="fpms-section-h">{{ stepTitle() }}</h4>
                                         @if (step.status !== 0) {
-                                            <div class="form-group">
+                                            <div class="fpms-field">
                                                 <label for="sw">When</label>
-                                                <input id="sw" type="datetime-local" class="form-control" name="when" [(ngModel)]="step.when" [max]="nowInput" />
+                                                <input id="sw" type="datetime-local" class="fpms-control" name="when" [(ngModel)]="step.when" [max]="nowInput" />
                                             </div>
                                         }
-                                        <div class="form-group">
-                                            <label for="sr">{{ step.status === 2 ? 'Note' : 'Reason' }} @if (step.status !== 2) { <span class="text-danger">*</span> }</label>
-                                            <input id="sr" class="form-control" name="note" [(ngModel)]="step.note" maxlength="500" [required]="step.status !== 2" minlength="3"
+                                        <div class="fpms-field">
+                                            <label for="sr">{{ step.status === 2 ? 'Note' : 'Reason' }} @if (step.status !== 2) { <span class="fpms-danger">*</span> }</label>
+                                            <input id="sr" class="fpms-control" name="note" [(ngModel)]="step.note" maxlength="500" [required]="step.status !== 2" minlength="3"
                                                 [placeholder]="step.status === 2 ? 'e.g. left the hatchery 4 AM' : step.status === 5 ? 'e.g. hatchery had no stock' : step.status === 4 ? 'e.g. weak fry, failed the stress test' : 'e.g. marked Received by mistake'" />
                                         </div>
-                                        <button type="submit" class="btn mr-2" [class.btn-primary]="step.status === 2" [class.btn-danger]="step.status !== 2" [disabled]="busy() || !sf.form.valid">{{ stepTitle() }}</button>
-                                        <button type="button" class="btn btn-default" (click)="step = null">Cancel</button>
+                                        <button type="submit" class="fpms-button fpms-icon-gap" [class.fpms-button-primary]="step.status === 2" [class.fpms-button-danger-solid]="step.status !== 2" [disabled]="busy() || !sf.form.valid">{{ stepTitle() }}</button>
+                                        <button type="button" class="fpms-button fpms-button-secondary" (click)="step = null">Cancel</button>
                                     </form>
                                 }
                                 @if (d.canEdit && d.canUpdateStatus && d.history.length > 1 && !step) {
-                                    <button type="button" class="btn btn-link px-0 mt-2" (click)="startStep(0)">Take back the last step</button>
+                                    <button type="button" class="fpms-button fpms-button-link px-0 fpms-space-top-2" (click)="startStep(0)">Take back the last step</button>
                                 }
                             </div>
                         </div>
-                    <div class="row">
-                        <div class="col-xl-8">
+                    <div class="fpms-grid-row">
+                        <div class="fpms-col-xl-8">
                             <form #f="ngForm" (ngSubmit)="save()" fpmsReview="delivery" novalidate>
                                 <fieldset [disabled]="!d.canEdit">
-                                    <div class="card">
-                                        <div class="card-header"><h3 class="card-title">Delivery</h3></div>
-                                        <div class="card-body">
-                                                                                        <div class="form-row">
-                                                <div class="form-group col-md-4">
-                                                    <label for="bn">Hatchery batch number <span class="text-danger">*</span></label>
-                                                    <input id="bn" class="form-control" name="hatcheryBatchNumber" [(ngModel)]="m.hatcheryBatchNumber" required maxlength="100" />
+                                    <div class="fpms-panel">
+                                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Delivery</h3></div>
+                                        <div class="fpms-panel-body">
+                                                                                        <div class="fpms-grid-row">
+                                                <div class="fpms-field fpms-col-md-4">
+                                                    <label for="bn">Hatchery batch number <span class="fpms-danger">*</span></label>
+                                                    <input id="bn" class="fpms-control" name="hatcheryBatchNumber" [(ngModel)]="m.hatcheryBatchNumber" required maxlength="100" />
                                                 </div>
-                                                <div class="form-group col-md-4">
-                                                    <label for="dd">{{ arrived() ? 'Delivery date' : 'Expected' }} <span class="text-danger">*</span></label>
-                                                    <input id="dd" type="date" class="form-control" name="deliveryDate" [(ngModel)]="m.deliveryDate" required />
+                                                <div class="fpms-field fpms-col-md-4">
+                                                    <label for="dd">{{ arrived() ? 'Delivery date' : 'Expected' }} <span class="fpms-danger">*</span></label>
+                                                    <input id="dd" type="date" class="fpms-control" name="deliveryDate" [(ngModel)]="m.deliveryDate" required />
                                                 </div>
-                                                <div class="form-group col-md-4">
+                                                <div class="fpms-field fpms-col-md-4">
                                                     <label for="cost">Cost (₱)</label>
-                                                    <input id="cost" type="number" min="0" step="0.01" class="form-control" name="costPhp" [(ngModel)]="m.costPhp" />
+                                                    <input id="cost" type="number" min="0" step="0.01" class="fpms-control" name="costPhp" [(ngModel)]="m.costPhp" />
                                                 </div>
                                             </div>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-4">
-                                                    <label for="pl">PL counted at the farm @if (arrived()) { <span class="text-danger">*</span> }</label>
+                                            <div class="fpms-grid-row">
+                                                <div class="fpms-field fpms-col-md-4">
+                                                    <label for="pl">PL counted at the farm @if (arrived()) { <span class="fpms-danger">*</span> }</label>
                                                     @if (arrived()) {
-                                                        <input id="pl" type="number" min="1" max="10000000" class="form-control" name="plReceived" [(ngModel)]="m.plReceived" required />
+                                                        <input id="pl" type="number" min="1" max="10000000" class="fpms-control" name="plReceived" [(ngModel)]="m.plReceived" required />
                                                         @if (d.isStocked) {
-                                                            <small class="form-text text-muted">{{ d.plStocked | num: 0 }} PL already stocked.{{ d.isStockingFinished ? ' Fixed after Finish stocking.' : '' }}</small>
+                                                            <small class="fpms-help fpms-muted">{{ d.plStocked | num: 0 }} PL already stocked.{{ d.isStockingFinished ? ' Fixed after Finish stocking.' : '' }}</small>
                                                         }
                                                     } @else {
                                                         <!-- DEC-131: an order has no count until Receive fry. -->
-                                                        <input id="pl" class="form-control" value="Counted at arrival" disabled />
+                                                        <input id="pl" class="fpms-control" value="Counted at arrival" disabled />
                                                     }
                                                 </div>
-                                                <div class="form-group col-md-4">
+                                                <div class="fpms-field fpms-col-md-4">
                                                     <label for="plo">PL ordered (PO)</label>
-                                                    <input id="plo" type="number" min="1" max="10000000" class="form-control" name="plOrdered" [(ngModel)]="m.plOrdered" />
+                                                    <input id="plo" type="number" min="1" max="10000000" class="fpms-control" name="plOrdered" [(ngModel)]="m.plOrdered" />
                                                     @if (m.plOrdered > 0 && m.plReceived > 0) {
-                                                        <small class="form-text text-muted">{{ extraText(m) }}</small>
+                                                        <small class="fpms-help fpms-muted">{{ extraText(m) }}</small>
                                                     }
                                                 </div>
-                                                <div class="form-group col-md-4">
+                                                <div class="fpms-field fpms-col-md-4">
                                                     <label for="age">PL age (days)</label>
-                                                    <input id="age" type="number" min="1" max="60" class="form-control" name="plAgeDays" [(ngModel)]="m.plAgeDays" />
+                                                    <input id="age" type="number" min="1" max="60" class="fpms-control" name="plAgeDays" [(ngModel)]="m.plAgeDays" />
                                                 </div>
                                             </div>
                                             @if (arrived()) {
-                                            <div class="form-row">
-                                                <div class="form-group col-md-4">
+                                            <div class="fpms-grid-row">
+                                                <div class="fpms-field fpms-col-md-4">
                                                     <label for="phc">PL health certificate no.</label>
-                                                    <input id="phc" class="form-control" name="plHealthCertificateNo" [(ngModel)]="m.plHealthCertificateNo" maxlength="100" />
+                                                    <input id="phc" class="fpms-control" name="plHealthCertificateNo" [(ngModel)]="m.plHealthCertificateNo" maxlength="100" />
                                                 </div>
-                                                <div class="form-group col-md-4">
+                                                <div class="fpms-field fpms-col-md-4">
                                                     <label for="sfsc">Shrimp Fry Source Certificate no.</label>
-                                                    <input id="sfsc" class="form-control" name="sfscNo" [(ngModel)]="m.sfscNo" maxlength="100" placeholder="optional" />
+                                                    <input id="sfsc" class="fpms-control" name="sfscNo" [(ngModel)]="m.sfscNo" maxlength="100" placeholder="optional" />
                                                 </div>
                                             </div>
                                             } @else {
-                                                <p class="text-muted">The papers are entered with <strong>Receive fry</strong> when the fry arrive.</p>
+                                                <p class="fpms-muted">The papers are entered with <strong>Receive fry</strong> when the fry arrive.</p>
                                             }
-                                            <div class="form-row">
-                                                <div class="form-group col-md-12">
+                                            <div class="fpms-grid-row">
+                                                <div class="fpms-field fpms-col-md-12">
                                                     <label for="n">Notes</label>
-                                                    <input id="n" class="form-control" name="notes" [(ngModel)]="m.notes" maxlength="500" />
+                                                    <input id="n" class="fpms-control" name="notes" [(ngModel)]="m.notes" maxlength="500" />
                                                 </div>
                                             </div>
 
                                         </div>
                                         @if (d.canEdit) {
-                                            <div class="card-footer">
-                                                <button type="submit" class="btn btn-primary" [disabled]="busy() || !f.form.valid">Save</button>
+                                            <div class="fpms-panel-foot">
+                                                <button type="submit" class="fpms-button fpms-button-primary" [disabled]="busy() || !f.form.valid">Save</button>
                                                 <fpms-form-hint [form]="f"></fpms-form-hint>
                                             </div>
                                         }
@@ -253,56 +253,56 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 </fieldset>
                             </form>
                             @if (!d.isStockingFinished && d.canFinishStocking) {
-                                <div class="card card-outline card-primary">
-                                    <div class="card-header"><h3 class="card-title">Finish stocking</h3></div>
-                                    <div class="card-body">
-                                        <p class="small">
+                                <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
+                                    <div class="fpms-panel-head"><h3 class="fpms-panel-title">Finish stocking</h3></div>
+                                    <div class="fpms-panel-body">
+                                        <p class="fpms-small">
                                             Record the PL from this delivery that were not stocked, so the delivery adds up. Afterwards no more ponds can be stocked from it.
                                             <strong>{{ d.plReceived - d.plStocked | num: 0 }} PL</strong> to account for ({{ d.plReceived | num: 0 }} received − {{ d.plStocked | num: 0 }} stocked).
                                         </p>
                                         @for (s of shortfalls; track $index) {
-                                            <div class="form-row align-items-end">
-                                                <div class="form-group col-5">
-                                                    <label class="small" [for]="'sr' + $index">Reason</label>
-                                                    <select [id]="'sr' + $index" class="form-control form-control-sm" [(ngModel)]="s.reason">
+                                            <div class="fpms-grid-row align-items-end">
+                                                <div class="fpms-field fpms-col-5">
+                                                    <label class="fpms-small" [for]="'sr' + $index">Reason</label>
+                                                    <select [id]="'sr' + $index" class="fpms-control fpms-control-compact" [(ngModel)]="s.reason">
                                                         @for (o of Options.shortfallReason; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
                                                     </select>
                                                 </div>
-                                                <div class="form-group col-3">
-                                                    <label class="small" [for]="'sc' + $index">PL</label>
-                                                    <input [id]="'sc' + $index" type="number" min="1" step="1" class="form-control form-control-sm" [(ngModel)]="s.count" />
+                                                <div class="fpms-field fpms-col-3">
+                                                    <label class="fpms-small" [for]="'sc' + $index">PL</label>
+                                                    <input [id]="'sc' + $index" type="number" min="1" step="1" class="fpms-control fpms-control-compact" [(ngModel)]="s.count" />
                                                 </div>
-                                                <div class="form-group col-3">
-                                                    <label class="small" [for]="'sn' + $index">Note</label>
-                                                    <input [id]="'sn' + $index" class="form-control form-control-sm" [(ngModel)]="s.note" maxlength="500" />
+                                                <div class="fpms-field fpms-col-3">
+                                                    <label class="fpms-small" [for]="'sn' + $index">Note</label>
+                                                    <input [id]="'sn' + $index" class="fpms-control fpms-control-compact" [(ngModel)]="s.note" maxlength="500" />
                                                 </div>
-                                                <div class="form-group col-1">
-                                                    <button type="button" class="btn btn-sm btn-link text-danger px-0" (click)="shortfalls.splice($index, 1)" aria-label="Remove line"><i class="fas fa-times"></i></button>
+                                                <div class="fpms-field fpms-col-1">
+                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger px-0" (click)="shortfalls.splice($index, 1)" aria-label="Remove line"><i class="fas fa-times"></i></button>
                                                 </div>
                                             </div>
                                         }
-                                        <button type="button" class="btn btn-sm btn-link px-0" (click)="addShortfall()"><i class="fas fa-plus mr-1"></i>Add a reason</button>
-                                        <div class="small mt-1" [class.text-danger]="shortfallGap !== 0" [class.text-success]="shortfallGap === 0">
+                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-link px-0" (click)="addShortfall()"><i class="fas fa-plus fpms-icon-gap"></i>Add a reason</button>
+                                        <div class="fpms-small fpms-space-top-1" [class.fpms-danger]="shortfallGap !== 0" [class.fpms-success]="shortfallGap === 0">
                                             Stocked {{ d.plStocked | num: 0 }} + not stocked {{ shortfallTotal | num: 0 }} = {{ d.plStocked + shortfallTotal | num: 0 }} of {{ d.plReceived | num: 0 }} received
                                             {{ shortfallGap === 0 ? '✓' : '(' + (shortfallGap | num: 0) + ' still to account for)' }}
                                         </div>
                                     </div>
-                                    <div class="card-footer">
-                                        <button class="btn btn-primary" [disabled]="busy() || shortfallGap !== 0 || !shortfallsValid()" (click)="finishStocking()">Finish stocking</button>
+                                    <div class="fpms-panel-foot">
+                                        <button class="fpms-button fpms-button-primary" [disabled]="busy() || shortfallGap !== 0 || !shortfallsValid()" (click)="finishStocking()">Finish stocking</button>
                                     </div>
                                 </div>
                             } @else if (d.status === 3 && can('Farm.Production.Stock')) {
-                                <a class="btn btn-outline-primary mb-3" routerLink="/app/production/create-batch"><i class="fas fa-shrimp mr-1"></i>Stock a batch from this delivery</a>
+                                <a class="fpms-button fpms-button-outline fpms-space-bottom-3" routerLink="/app/production/create-batch"><i class="fas fa-shrimp fpms-icon-gap"></i>Stock a batch from this delivery</a>
                             }
                         </div>
-                        <div class="col-xl-4">
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">History</h3></div>
+                        <div class="fpms-col-xl-4">
+                            <div class="fpms-panel">
+                                <div class="fpms-panel-head"><h3 class="fpms-panel-title">History</h3></div>
                                 <ul class="list-group list-group-flush">
                                     @for (h of d.history; track $index) {
-                                        <li class="list-group-item py-2">
-                                            <div><fpms-badge [text]="h.status | label: L.FryDeliveryStatuses"></fpms-badge> <span class="small text-muted ml-1">{{ h.changedAtUtc | farmDateTime }} · {{ h.changedBy }}</span></div>
-                                            @if (h.note) { <div class="small">{{ h.note }}</div> }
+                                        <li class="list-group-item fpms-space-y-2">
+                                            <div><fpms-badge [text]="h.status | label: L.FryDeliveryStatuses"></fpms-badge> <span class="fpms-small fpms-muted fpms-icon-gap">{{ h.changedAtUtc | farmDateTime }} · {{ h.changedBy }}</span></div>
+                                            @if (h.note) { <div class="fpms-small">{{ h.note }}</div> }
                                         </li>
                                     }
                                 </ul>
