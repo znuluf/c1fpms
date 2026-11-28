@@ -32,7 +32,7 @@ interface Sheet {
                                 <button type="button" class="fpms-chip" [attr.aria-pressed]="selected === s.key" (click)="selected = s.key">{{ s.short }}</button>
                             }
                         </div>
-                        <div class="fpms-grid-row align-items-end">
+                        <div class="fpms-grid-row fpms-align-end-items">
                             <div class="fpms-field fpms-col-md-4">
                                 <label for="pond">Pond</label>
                                 <select id="pond" class="fpms-control" [(ngModel)]="pond">
@@ -89,7 +89,7 @@ interface Sheet {
                             </tbody>
                         </table>
                         </div>
-                        <div class="fpms-small fpms-flex justify-content-between">
+                        <div class="fpms-small fpms-flex fpms-justify-between">
                             <span>Recorded by: <span class="fpms-blank"></span></span>
                             <span>Entered into FPMS on: <span class="fpms-blank"></span> by <span class="fpms-blank"></span></span>
                         </div>
