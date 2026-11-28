@@ -21,74 +21,74 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
     template: `
         <fpms-page-header [narrow]="true" [title]="isNew ? 'Record sale' : 'Edit sale ' + (original?.dispatchReceiptNo ?? '')" [subtitle]="isNew ? 'Sell harvested kilograms to a buyer. The dispatch receipt number is made when you save.' : ''" backLink="/app/sales" backLabel="Sales"></fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
+            <div class="fpms-page-inner fpms-narrow">
                 @if (loading) {
                     <fpms-loading></fpms-loading>
                 } @else if (!buyers.length || !sellable.length) {
-                    <div class="card">
-                        <div class="card-body">
+                    <div class="fpms-panel">
+                        <div class="fpms-panel-body">
                             @if (!buyers.length) {
-                                <fpms-empty text="Add an active buyer first." icon="fas fa-handshake"><a routerLink="/app/resources/buyers" class="btn btn-sm btn-primary">Go to buyers</a></fpms-empty>
+                                <fpms-empty text="Add an active buyer first." icon="fas fa-handshake"><a routerLink="/app/resources/buyers" class="fpms-button fpms-button-compact fpms-button-primary">Go to buyers</a></fpms-empty>
                             } @else {
-                                <fpms-empty [text]="grading ? 'No harvest grade has kilograms left to sell. Record a harvest with its size grades first.' : 'No harvest has kilograms left to sell. Record a harvest first.'" icon="fas fa-shrimp"><a routerLink="/app/harvests" class="btn btn-sm btn-primary">Go to harvests</a></fpms-empty>
+                                <fpms-empty [text]="grading ? 'No harvest grade has kilograms left to sell. Record a harvest with its size grades first.' : 'No harvest has kilograms left to sell. Record a harvest first.'" icon="fas fa-shrimp"><a routerLink="/app/harvests" class="fpms-button fpms-button-compact fpms-button-primary">Go to harvests</a></fpms-empty>
                             }
                         </div>
                     </div>
                 } @else {
                     <!-- One panel (DEC-107): the sale's parts are sections of it, with Review sale as its footer. -->
                     @if (restoredAt) {
-                        <div class="alert alert-info d-flex align-items-center" role="status">
-                            <i class="fas fa-history mr-2" aria-hidden="true"></i>
-                            <span class="mr-auto">Your unsaved sale from {{ restoredAt | farmDateTime }} was restored.</span>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="discardDraft()">Discard it</button>
+                        <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                            <i class="fas fa-history fpms-icon-gap" aria-hidden="true"></i>
+                            <span class="fpms-margin-auto-end">Your unsaved sale from {{ restoredAt | farmDateTime }} was restored.</span>
+                            <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="discardDraft()">Discard it</button>
                         </div>
                     }
                     <form #f="ngForm" class="fpms-form-stack" (ngSubmit)="review = true" (input)="keepDraft()" (change)="keepDraft()" novalidate>
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="form-row">
-                                    <div class="form-group col-md-8 mb-0">
-                                        <label for="by">Buyer <span class="text-danger">*</span></label>
-                                        <select id="by" class="form-control" name="buyerId" [(ngModel)]="m.buyerId" (ngModelChange)="terms = {}" required>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-body">
+                                <div class="fpms-grid-row">
+                                    <div class="fpms-field fpms-col-md-8 fpms-no-bottom">
+                                        <label for="by">Buyer <span class="fpms-danger">*</span></label>
+                                        <select id="by" class="fpms-control" name="buyerId" [(ngModel)]="m.buyerId" (ngModelChange)="terms = {}" required>
                                             @for (b of buyers; track b.id) { <option [value]="b.id">{{ b.name }}</option> }
                                         </select>
                                     </div>
-                                    <div class="form-group col-md-4 mb-0">
-                                        <label for="sd">Sale date <span class="text-danger">*</span></label>
-                                        <input id="sd" type="date" class="form-control" name="saleDate" [(ngModel)]="m.saleDate" required [max]="today" />
+                                    <div class="fpms-field fpms-col-md-4 fpms-no-bottom">
+                                        <label for="sd">Sale date <span class="fpms-danger">*</span></label>
+                                        <input id="sd" type="date" class="fpms-control" name="saleDate" [(ngModel)]="m.saleDate" required [max]="today" />
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!-- What was sold (DEC-107): a block per line, the harvest across the top so its name is never cut off, then
                              its kilograms, price and amount, each with its own label. -->
-                        <div class="card">
-                            <div class="card-header d-flex align-items-center flex-wrap">
-                                <h3 class="card-title mr-auto">What was sold</h3>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head fpms-flex align-items-center flex-wrap">
+                                <h3 class="fpms-panel-title fpms-margin-auto-end">What was sold</h3>
                                 <span>{{ totalKg() | num: 3 : true }} kg · <strong>{{ total() | php }}</strong></span>
                             </div>
-                            <div class="card-body pt-0">
+                            <div class="fpms-panel-body pt-0">
                                 @if (abwSchemes.length) {
-                                    <div class="form-group mt-3">
+                                    <div class="fpms-field fpms-space-top-3">
                                         <label for="saleAbwScheme">Base ABW pricing for this sale</label>
                                         <select id="saleAbwScheme" class="custom-select" name="saleAbwScheme" [(ngModel)]="m.abwSchemeId" (ngModelChange)="applySaleAbwScheme($event)">
                                             <option value="">Choose a scheme to apply to all lines</option>
                                             @for (s of abwSchemes; track s.id) { <option [value]="s.id">{{ s.name }} · base {{ s.baseAbwG }}g</option> }
                                         </select>
-                                        <small class="form-text text-muted">The selected terms are copied to every sale line and calculated against each harvest's ABW.</small>
+                                        <small class="fpms-help fpms-muted">The selected terms are copied to every sale line and calculated against each harvest's ABW.</small>
                                     </div>
                                 }
                                 @for (l of m.lines; track $index) {
                                     <div class="fpms-sale-line">
                                         <div class="harvest">
                                             <label [for]="'g' + $index">{{ grading ? 'Harvest grade' : 'Harvest' }}</label>
-                                            <select [id]="'g' + $index" class="form-control" [name]="'g' + $index" [(ngModel)]="l.harvestGradeLineId" (ngModelChange)="onGrade(l)" required>
+                                            <select [id]="'g' + $index" class="fpms-control" [name]="'g' + $index" [(ngModel)]="l.harvestGradeLineId" (ngModelChange)="onGrade(l)" required>
                                                 @for (o of sellable; track o.harvestGradeLineId) {
                                                     <option [value]="o.harvestGradeLineId" [disabled]="used(o.harvestGradeLineId, l)">{{ o.harvestDate | farmDate }} · {{ o.pondCode }}{{ o.lotCode ? ' · lot ' + o.lotCode : '' }}{{ gradeText(o) }} ({{ unsold(o) | num: 3 : true }} kg grade balance; {{ o.harvestAvailableKg | num: 3 : true }} kg harvest available)</option>
                                                 }
                                             </select>
                                             @if (over(l)) {
-                                                <small class="form-text text-danger">
+                                                <small class="fpms-help fpms-danger">
                                                     @if (gradeOver(l)) { More than the {{ unsold(option(l)) | num: 3 : true }} kg left in this grade. }
                                                     @else { The sale lines total more than the {{ option(l)?.harvestAvailableKg | num: 3 : true }} kg available from this harvest after not-sold entries. }
                                                 </small>
@@ -96,17 +96,17 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                         </div>
                                         <div class="rm">
                                             @if (m.lines.length > 1) {
-                                                <button type="button" class="btn btn-sm btn-outline-danger" (click)="m.lines.splice($index, 1)" aria-label="Remove this line"><i class="fas fa-times" aria-hidden="true"></i></button>
+                                                <button type="button" class="fpms-button fpms-button-compact fpms-button-danger" (click)="m.lines.splice($index, 1)" aria-label="Remove this line"><i class="fas fa-times" aria-hidden="true"></i></button>
                                             }
                                         </div>
                                         <div>
-                                            <label [for]="'k' + $index">Farm kg <span class="text-danger">*</span></label>
-                                            <input [id]="'k' + $index" type="number" min="0.001" step="0.001" class="form-control" [name]="'k' + $index" [(ngModel)]="l.kg" required />
+                                            <label [for]="'k' + $index">Farm kg <span class="fpms-danger">*</span></label>
+                                            <input [id]="'k' + $index" type="number" min="0.001" step="0.001" class="fpms-control" [name]="'k' + $index" [(ngModel)]="l.kg" required />
                                         </div>
                                         <div>
                                             <label [for]="'bk' + $index">Buyer kg</label>
-                                            <input [id]="'bk' + $index" type="number" min="0" step="0.001" class="form-control" [name]="'bk' + $index" [(ngModel)]="l.buyerAcceptedKg" placeholder="Same" />
-                                            @if (diffPct(l) > 10) { <small class="form-text text-warning-dark">{{ diffPct(l) | num: 1 }}% off the farm kg</small> }
+                                            <input [id]="'bk' + $index" type="number" min="0" step="0.001" class="fpms-control" [name]="'bk' + $index" [(ngModel)]="l.buyerAcceptedKg" placeholder="Same" />
+                                            @if (diffPct(l) > 10) { <small class="fpms-help fpms-warning-text">{{ diffPct(l) | num: 1 }}% off the farm kg</small> }
                                         </div>
                                         <div>
                                             <label [for]="'pm' + $index">Price agreed</label>
@@ -115,8 +115,8 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                             </select>
                                         </div>
                                         <div>
-                                            <label [for]="'p' + $index">Price / kg (₱) <span class="text-danger">*</span></label>
-                                            <input [id]="'p' + $index" type="number" min="0" step="0.01" class="form-control" [name]="'p' + $index" [(ngModel)]="l.pricePerKg" required />
+                                            <label [for]="'p' + $index">Price / kg (₱) <span class="fpms-danger">*</span></label>
+                                            <input [id]="'p' + $index" type="number" min="0" step="0.01" class="fpms-control" [name]="'p' + $index" [(ngModel)]="l.pricePerKg" required />
                                         </div>
                                         <div class="amt">
                                             <span class="l">Amount</span>
@@ -129,35 +129,35 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                         }
                                     </div>
                                 }
-                                <button type="button" class="btn btn-sm btn-outline-secondary mt-3" (click)="addLine()" [disabled]="m.lines.length >= sellable.length"><i class="fas fa-plus mr-1" aria-hidden="true"></i>{{ grading ? 'Add grade' : 'Add another harvest' }}</button>
-                                <details class="fpms-fold mt-3 mb-0">
+                                <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary fpms-space-top-3" (click)="addLine()" [disabled]="m.lines.length >= sellable.length"><i class="fas fa-plus fpms-icon-gap" aria-hidden="true"></i>{{ grading ? 'Add grade' : 'Add another harvest' }}</button>
+                                <details class="fpms-fold fpms-space-top-3 fpms-no-bottom">
                                     <summary>How kg and prices work <span class="fpms-fold-hint">buyer kg, base ABW price</span></summary>
-                                    <p class="mb-1">Leave Buyer kg empty when the buyer pays on the farm's weight. When it is filled, the amount uses it; yield and FCR keep the farm weight.</p>
-                                    <p class="mb-0">"Base ABW pricing" works the price out from the selected base price and base ABW, adjusting for each gram above or below it; the shrimp ABW starts from the harvest's sampled ABW.</p>
+                                    <p class="fpms-space-bottom-1">Leave Buyer kg empty when the buyer pays on the farm's weight. When it is filled, the amount uses it; yield and FCR keep the farm weight.</p>
+                                    <p class="fpms-no-bottom">"Base ABW pricing" works the price out from the selected base price and base ABW, adjusting for each gram above or below it; the shrimp ABW starts from the harvest's sampled ABW.</p>
                                 </details>
                             </div>
                         </div>
                         @if (crateHarvests().length) {
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">Crates for this buyer (optional)</h3></div>
-                                <div class="card-body">
-                                    <p class="small text-muted">Type the crate numbers from the harvest's tally that went to this buyer, e.g. 1-10, 15. Their dispatch receipt then lists these crates. A crate can be on one sale only.</p>
+                            <div class="fpms-panel">
+                                <div class="fpms-panel-head"><h3 class="fpms-panel-title">Crates for this buyer (optional)</h3></div>
+                                <div class="fpms-panel-body">
+                                    <p class="fpms-small fpms-muted">Type the crate numbers from the harvest's tally that went to this buyer, e.g. 1-10, 15. Their dispatch receipt then lists these crates. A crate can be on one sale only.</p>
                                     @for (h of crateHarvests(); track h.id) {
-                                        <div class="form-group" [class.mb-0]="$last">
-                                            <label [for]="'cr' + $index">{{ h.harvestedAtUtc | farmDayOf }} · {{ h.pondCode }}{{ h.lotCode ? ' · lot ' + h.lotCode : '' }} <span class="text-muted font-weight-normal">· {{ h.crates.length }} crates, {{ freeCrates(h).length }} not on another sale</span></label>
+                                        <div class="fpms-field" [class.fpms-no-bottom]="$last">
+                                            <label [for]="'cr' + $index">{{ h.harvestedAtUtc | farmDayOf }} · {{ h.pondCode }}{{ h.lotCode ? ' · lot ' + h.lotCode : '' }} <span class="fpms-muted fpms-weight-normal">· {{ h.crates.length }} crates, {{ freeCrates(h).length }} not on another sale</span></label>
                                             <div class="input-group">
-                                                <input [id]="'cr' + $index" class="form-control" [name]="'cr' + $index" [(ngModel)]="crateText[h.id]" placeholder="e.g. 1-10, 15" autocomplete="off" />
+                                                <input [id]="'cr' + $index" class="fpms-control" [name]="'cr' + $index" [(ngModel)]="crateText[h.id]" placeholder="e.g. 1-10, 15" autocomplete="off" />
                                                 <div class="input-group-append">
-                                                    <button type="button" class="btn btn-outline-secondary" (click)="takeAllCrates(h)" [disabled]="!freeCrates(h).length">All {{ freeCrates(h).length }} free crates</button>
+                                                    <button type="button" class="fpms-button fpms-button-secondary" (click)="takeAllCrates(h)" [disabled]="!freeCrates(h).length">All {{ freeCrates(h).length }} free crates</button>
                                                 </div>
                                             </div>
                                             @if (crateError(h); as e) {
-                                                <small class="form-text text-danger">{{ e }}</small>
+                                                <small class="fpms-help fpms-danger">{{ e }}</small>
                                             } @else if (chosenCrates(h).length) {
-                                                <small class="form-text text-muted">
+                                                <small class="fpms-help fpms-muted">
                                                     {{ chosenCrates(h).length }} crate(s) · {{ chosenKg(h) | num: 3 }} kg.
                                                     @if (crateMismatch(h)) {
-                                                        <span class="text-warning-dark">The lines from this harvest total {{ lineKg(h) | num: 3 }} kg.</span>
+                                                        <span class="fpms-warning-text">The lines from this harvest total {{ lineKg(h) | num: 3 }} kg.</span>
                                                         @if (canUseCrateKg(h)) { <a href="javascript:;" (click)="useCrateKg(h)">Use the crates' kg</a> }
                                                     }
                                                 </small>
@@ -167,29 +167,29 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
                                 </div>
                             </div>
                         }
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Payment</h3></div>
-                            <div class="card-body">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Payment</h3></div>
+                            <div class="fpms-panel-body">
                                 <fpms-sale-payment [m]="m" key="pay" [total]="total()" [minDue]="m.saleDate" [showPaidNow]="isNew"></fpms-sale-payment>
                             </div>
                         </div>
 
                         @if (!review) {
                             <div class="fpms-form-foot">
-                                <button type="submit" class="btn btn-primary btn-lg" [disabled]="!f.form.valid || !validLines().length || anyOver() || anyCrateError()">Review sale</button>
+                                <button type="submit" class="fpms-button fpms-button-primary fpms-button-large" [disabled]="!f.form.valid || !validLines().length || anyOver() || anyCrateError()">Review sale</button>
                                 <fpms-form-hint [form]="f"></fpms-form-hint>
                             </div>
                         } @else {
-                            <div class="card card-outline card-primary">
-                                <div class="card-header"><h3 class="card-title">Check before saving</h3></div>
-                                <div class="card-body">
-                                    <p class="mb-1">{{ buyerName() }} · {{ m.saleDate | farmDate }} · {{ validLines().length }} {{ grading ? 'grade line(s)' : 'line(s)' }}{{ totalChosenCrates() ? ' · ' + totalChosenCrates() + ' crate(s)' : '' }}{{ m.dueDate ? ' · due ' + (m.dueDate | farmDate) : '' }}</p>
-                                    <p class="mb-1">Total <strong>{{ totalKg() | num: 3 }} kg</strong> for <strong>{{ total() | php }}</strong>{{ isNew ? '; paid now ' + ((m.paidInFull ? total() : m.paidNow || 0) | php) : '' }}.</p>
-                                    <p class="small text-muted mb-0">{{ isNew ? 'A dispatch receipt number is assigned when you save. ' : '' }}The dispatch receipt is for the farm's records, not an official receipt.</p>
+                            <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
+                                <div class="fpms-panel-head"><h3 class="fpms-panel-title">Check before saving</h3></div>
+                                <div class="fpms-panel-body">
+                                    <p class="fpms-space-bottom-1">{{ buyerName() }} · {{ m.saleDate | farmDate }} · {{ validLines().length }} {{ grading ? 'grade line(s)' : 'line(s)' }}{{ totalChosenCrates() ? ' · ' + totalChosenCrates() + ' crate(s)' : '' }}{{ m.dueDate ? ' · due ' + (m.dueDate | farmDate) : '' }}</p>
+                                    <p class="fpms-space-bottom-1">Total <strong>{{ totalKg() | num: 3 }} kg</strong> for <strong>{{ total() | php }}</strong>{{ isNew ? '; paid now ' + ((m.paidInFull ? total() : m.paidNow || 0) | php) : '' }}.</p>
+                                    <p class="fpms-small fpms-muted fpms-no-bottom">{{ isNew ? 'A dispatch receipt number is assigned when you save. ' : '' }}The dispatch receipt is for the farm's records, not an official receipt.</p>
                                 </div>
-                                <div class="card-footer">
-                                    <button type="button" class="btn btn-primary mr-2" [disabled]="busy()" (click)="save()">Save sale</button>
-                                    <button type="button" class="btn btn-default" (click)="review = false">Back</button>
+                                <div class="fpms-panel-foot">
+                                    <button type="button" class="fpms-button fpms-button-primary fpms-icon-gap" [disabled]="busy()" (click)="save()">Save sale</button>
+                                    <button type="button" class="fpms-button fpms-button-secondary" (click)="review = false">Back</button>
                                 </div>
                             </div>
                         }
