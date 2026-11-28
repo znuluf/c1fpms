@@ -58,6 +58,14 @@
     --fpms-alert-info-bg: #e9f2f8;
     --fpms-alert-info-border: #b7d4e6;
     --fpms-alert-info-text: #1e4f6e;
+    // Control, table and interaction states keep their existing shades.
+    --fpms-control-placeholder: #5e6e6e;
+    --fpms-control-disabled-bg: #edf1f0;
+    --fpms-table-stripe-bg: #f9fbfa;
+    --fpms-warning-hover-bg: #fff1d0;
+    --fpms-warning-hover-text: #5f4300;
+    --fpms-soft-action-hover-bg: #c8ecec;
+    --fpms-host-border: #f0b8b8;
 
     // Shape: radius follows role, not one value for everything
     --fpms-r-control: 10px;
@@ -212,7 +220,7 @@ small,
     color: var(--fpms-error);
 }
 .main-header.fpms-host-header {
-    border-bottom-color: #f0b8b8;
+    border-bottom-color: var(--fpms-host-border);
 }
 
 // Date and time at the farm
@@ -886,11 +894,11 @@ input[type='radio'] {
     accent-color: var(--fpms-accent);
 }
 .form-control::placeholder {
-    color: #5e6e6e;
+    color: var(--fpms-control-placeholder);
 }
 .form-control:disabled,
 .form-control[readonly] {
-    background-color: #edf1f0;
+    background-color: var(--fpms-control-disabled-bg);
 }
 .form-control.is-invalid,
 .was-validated .form-control:invalid {
@@ -961,7 +969,7 @@ label,
     background-color: var(--fpms-tide-50);
 }
 .table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f9fbfa;
+    background-color: var(--fpms-table-stripe-bg);
 }
 // The row that is "current" (open batch, selected item): a soft accent tint and edge, not Bootstrap's default blue
 .table tbody tr.table-info,
@@ -1388,7 +1396,7 @@ a.fpms-stat:focus {
 }
 a.fpms-stat.warn:hover,
 a.fpms-stat.warn:focus {
-    background: #fff1d0;
+    background: var(--fpms-warning-hover-bg);
 }
 
 // ---- Dashboard pond tiles
@@ -1619,8 +1627,8 @@ body.fpms-welcome-page {
 }
 .fw-btn-soft:hover,
 .fw-btn-soft:focus {
-    background: #c8ecec;
-    border-color: #c8ecec;
+    background: var(--fpms-soft-action-hover-bg);
+    border-color: var(--fpms-soft-action-hover-bg);
     color: var(--fpms-primary-dark);
     text-decoration: none;
     transform: translateY(-1px);
@@ -1742,8 +1750,8 @@ body.fpms-welcome-page {
 }
 .fpms-more-menu .dropdown-item.text-danger:hover,
 .fpms-more-menu .dropdown-item.text-danger:focus {
-    background: #fbeeee;
-    color: #8c2b2b !important;
+    background: var(--fpms-badge-danger-bg);
+    color: var(--fpms-badge-danger-text) !important;
 }
 .fpms-more-menu .dropdown-item i {
     width: 1.1rem;
@@ -1820,8 +1828,8 @@ body.fpms-welcome-page {
 .btn-warning:hover,
 .btn-warning:focus,
 .btn-warning:not(:disabled):not(.disabled):active {
-    background-color: #5f4300;
-    border-color: #5f4300;
+    background-color: var(--fpms-warning-hover-text);
+    border-color: var(--fpms-warning-hover-text);
     color: var(--paper);
 }
 .btn-danger {
@@ -1832,8 +1840,8 @@ body.fpms-welcome-page {
 .btn-danger:hover,
 .btn-danger:focus,
 .btn-danger:not(:disabled):not(.disabled):active {
-    background-color: #8c2b2b;
-    border-color: #8c2b2b;
+    background-color: var(--fpms-badge-danger-text);
+    border-color: var(--fpms-badge-danger-text);
     color: var(--paper);
 }
 .btn-outline-danger {
