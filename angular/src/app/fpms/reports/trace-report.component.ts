@@ -20,8 +20,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (notFound) {
                     <div class="alert alert-warning">
                         No harvest has the lot code <strong class="text-monospace">{{ lotCode }}</strong>. Check the code on the crate, receipt or tally sheet,
