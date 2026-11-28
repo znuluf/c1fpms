@@ -19,8 +19,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (!s) {
                     <fpms-loading></fpms-loading>
                 } @else {
