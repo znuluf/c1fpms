@@ -12,7 +12,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 <button type="button" class="btn btn-primary" (click)="startAdd()"><i class="fas fa-plus mr-1" aria-hidden="true"></i>Add a prefix</button>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 @if (adding) {
                     <!-- One form at a time (DEC-96): name, an optional short code, and what the ponds will be called. -->
