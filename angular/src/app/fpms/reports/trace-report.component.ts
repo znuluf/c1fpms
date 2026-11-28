@@ -14,36 +14,36 @@ import { FPMS_IMPORTS } from '../shared-imports';
     template: `
         <fpms-page-header [title]="lotCode ? 'Trace · lot ' + lotCode : t ? 'Trace · batch ' + t.batchCode : 'Trace report'" [subtitle]="t ? (t.lotCode ? 'Batch ' + t.batchCode + ' · ' : '') + 'Pond ' + t.pondCode + ' · Cycle ' + t.cycleCode + ' · ' + (t.batchStatus | label: L.BatchStatuses) + '.' : ''" [backLink]="back().link" [backLabel]="back().label">
             @if (t?.lotCode) {
-                <a class="btn btn-outline-secondary mr-1" [routerLink]="['/app/reports/trace', t.batchId]">Whole batch</a>
+                <a class="fpms-button fpms-button-secondary fpms-icon-gap" [routerLink]="['/app/reports/trace', t.batchId]">Whole batch</a>
             }
             @if (t) {
-                <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
+                <button class="fpms-button fpms-button-primary" (click)="print()"><i class="fas fa-print fpms-icon-gap"></i>Print</button>
             }
         </fpms-page-header>
         <section class="fpms-page">
             <div class="fpms-page-inner">
                 @if (notFound) {
-                    <div class="alert alert-warning">
-                        No harvest has the lot code <strong class="text-monospace">{{ lotCode }}</strong>. Check the code on the crate, receipt or tally sheet,
+                    <div class="fpms-alert fpms-alert-warning">
+                        No harvest has the lot code <strong class="fpms-monospace">{{ lotCode }}</strong>. Check the code on the crate, receipt or tally sheet,
                         or search for it in <a routerLink="/app/harvests">Harvests</a>.
                     </div>
                 } @else if (!t) {
                     <fpms-loading></fpms-loading>
                 } @else {
-                    <div class="card no-print">
-                        <div class="card-body py-2 d-flex flex-wrap align-items-center">
-                            <span class="font-weight-bold mr-2">Prepare as</span>
+                    <div class="fpms-panel no-print">
+                        <div class="fpms-panel-body fpms-space-y-2 fpms-flex flex-wrap align-items-center">
+                            <span class="fpms-weight-bold fpms-icon-gap">Prepare as</span>
                             <button type="button" class="tr-chip" [attr.aria-pressed]="!buyerCopy()" (click)="buyerCopy.set(false)">Internal copy</button>
                             <button type="button" class="tr-chip" [attr.aria-pressed]="buyerCopy()" (click)="setBuyerCopy()" [disabled]="!buyers().length">Buyer copy</button>
                             @if (buyerCopy()) {
-                                <label class="mb-0 ml-3 small text-muted">
+                                <label class="fpms-no-bottom fpms-space-start-3 fpms-small fpms-muted">
                                     Prepared for
-                                    <select class="form-control form-control-sm d-inline-block w-auto ml-1" [ngModel]="who()" (ngModelChange)="who.set($event)">
+                                    <select class="fpms-control fpms-control-compact d-inline-block w-auto fpms-icon-gap" [ngModel]="who()" (ngModelChange)="who.set($event)">
                                         @for (b of buyers(); track b) { <option [ngValue]="b">{{ b }}</option> }
                                     </select>
                                 </label>
                             }
-                            <div class="small text-muted w-100 mt-1">
+                            <div class="fpms-small fpms-muted w-100 fpms-space-top-1">
                                 @if (buyerCopy()) {
                                     For a buyer who asks where their shrimp came from. It shows only their own purchase and leaves out other buyers, unsold quantities and the list of missing items.
                                 } @else {
@@ -54,7 +54,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     </div>
                     @if (!buyerCopy() && gaps().length) {
                         <!-- What the sheet will print as "Not recorded" (DEC-121): grouped by the sheet's sections, repeats merged, each with where to record it. -->
-                        <section class="card fpms-gaps no-print" aria-labelledby="gaps-h">
+                        <section class="fpms-panel fpms-gaps no-print" aria-labelledby="gaps-h">
                             <div class="fpms-gaps-head">
                                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                                 <div>
@@ -69,9 +69,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                         <li>
                                             <div class="fpms-gaps-what">
                                                 {{ g.what }}
-                                                @if (g.detail) { <div class="text-muted">{{ g.detail }}</div> }
+                                                @if (g.detail) { <div class="fpms-muted">{{ g.detail }}</div> }
                                             </div>
-                                            <a class="btn btn-sm btn-outline-primary text-nowrap" [routerLink]="g.link">{{ g.action }}<i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></a>
+                                            <a class="fpms-button fpms-button-compact fpms-button-outline fpms-nowrap" [routerLink]="g.link">{{ g.action }}<i class="fas fa-arrow-right fpms-icon-gap" aria-hidden="true"></i></a>
                                         </li>
                                     }
                                 </ul>
@@ -81,7 +81,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <article class="fpms-paper fpms-print-doc ts">
                         <div class="fpms-doc-head ts-letterhead">
                             <div><div class="fpms-doc-farm">{{ t.farmName }}</div></div>
-                            <div class="text-right"><div class="fpms-doc-title">TRACE REPORT</div></div>
+                            <div class="fpms-align-end"><div class="fpms-doc-title">TRACE REPORT</div></div>
                         </div>
                         <header class="ts-head">
                             <div>
@@ -319,7 +319,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 <p class="ts-quiet">No sale recorded.</p>
                             }
                             @if (buyerCopy()) {
-                                <p class="ts-quiet mt-2 mb-0">Other buyers, kilograms left to sell or not sold, and internal notes are left out of this copy.</p>
+                                <p class="ts-quiet fpms-space-top-2 fpms-no-bottom">Other buyers, kilograms left to sell or not sold, and internal notes are left out of this copy.</p>
                             }
                         </section>
 
