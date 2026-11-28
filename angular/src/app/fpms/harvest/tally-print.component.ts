@@ -21,14 +21,14 @@ import { FPMS_IMPORTS } from '../shared-imports';
     template: `
         <fpms-page-header title="Harvest tally sheet" [subtitle]="t ? t.harvest.pondCode + ' · ' + t.harvest.batchCode : ''" [backLink]="t ? '/app/harvests/' + t.harvest.id : '/app/harvests'" backLabel="Harvest">
             @if (t && t.harvest.lotCode && can('Farm.Reports')) {
-                <a class="btn btn-outline-secondary mr-1" [routerLink]="['/app/reports/trace/lot', t.harvest.lotCode]" [queryParams]="{ from: 'harvests' }"><i class="fas fa-project-diagram mr-1"></i>Trace this lot</a>
+                <a class="fpms-button fpms-button-secondary fpms-icon-gap" [routerLink]="['/app/reports/trace/lot', t.harvest.lotCode]" [queryParams]="{ from: 'harvests' }"><i class="fas fa-project-diagram fpms-icon-gap"></i>Trace this lot</a>
             }
             @if (t) {
-                <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
+                <button class="fpms-button fpms-button-primary" (click)="print()"><i class="fas fa-print fpms-icon-gap"></i>Print</button>
             }
                     @if (t && t.showsSales) {
                 @for (x of t.sales; track x.saleId) {
-                    <a class="btn btn-outline-secondary mr-1" [routerLink]="['/app/sales', x.saleId, 'tally']" [title]="'The tally sheet of ' + x.dispatchReceiptNo + ' only, for the buyer'">Sheet for {{ x.buyerName }}</a>
+                    <a class="fpms-button fpms-button-secondary fpms-icon-gap" [routerLink]="['/app/sales', x.saleId, 'tally']" [title]="'The tally sheet of ' + x.dispatchReceiptNo + ' only, for the buyer'">Sheet for {{ x.buyerName }}</a>
                 }
             }
 </fpms-page-header>
@@ -41,14 +41,14 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="fpms-doc-head">
                             <div>
                                 <div class="fpms-doc-farm">{{ t.farmName }}</div>
-                                @if (session.tenant?.farmId) { <div class="small">Farm ID {{ session.tenant?.farmId }}</div> }
-                                <div class="small">{{ t.farmAddress }}</div>
-                                @if (t.farmContact) { <div class="small">{{ t.farmContact }}</div> }
+                                @if (session.tenant?.farmId) { <div class="fpms-small">Farm ID {{ session.tenant?.farmId }}</div> }
+                                <div class="fpms-small">{{ t.farmAddress }}</div>
+                                @if (t.farmContact) { <div class="fpms-small">{{ t.farmContact }}</div> }
                             </div>
-                            <div class="text-right">
+                            <div class="fpms-align-end">
                                 <div class="fpms-doc-title">HARVEST TALLY SHEET</div>
-                                <div class="small">Date: <strong>{{ h.harvestedAtUtc | farmDateTime }}</strong></div>
-                                <div class="small">{{ h.harvestType | label: L.HarvestTypes }} harvest</div>
+                                <div class="fpms-small">Date: <strong>{{ h.harvestedAtUtc | farmDateTime }}</strong></div>
+                                <div class="fpms-small">{{ h.harvestType | label: L.HarvestTypes }} harvest</div>
                             </div>
                         </div>
                         <div class="fpms-doc-meta">
@@ -75,7 +75,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         @if (h.crates.length) {
                             <fpms-crate-grid [crates]="gridCrates()" [legend]="receiptLegend()"></fpms-crate-grid>
                         } @else {
-                            <p class="small text-muted">Weighed as a total only; no crate tally was recorded.</p>
+                            <p class="fpms-small fpms-muted">Weighed as a total only; no crate tally was recorded.</p>
                         }
 
                         <div class="fpms-doc-summary">
@@ -107,7 +107,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
 
                         @if (whereRows().length) {
                             <table class="fpms-doc-table">
-                                <caption class="text-left small font-weight-bold" style="caption-side: top; color: var(--fpms-text)">Where it went</caption>
+                                <caption class="fpms-text-start fpms-small fpms-weight-bold" style="caption-side: top; color: var(--fpms-text)">Where it went</caption>
                                 <thead>
                                     <tr><th scope="col">Went to</th><th scope="col">Dispatch receipt</th><th scope="col" class="num">Crates</th><th scope="col" class="num">Kg</th><th scope="col" class="num">Amount</th></tr>
                                 </thead>
@@ -130,7 +130,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         @if (t.showsSales && t.sales.length === 1) {
                             @for (s of t.sales; track s.saleId) {
                                 <table class="fpms-doc-table">
-                                    <caption class="text-left small font-weight-bold" style="caption-side: top; color: var(--fpms-text)">Dispatch receipt {{ s.dispatchReceiptNo }} · {{ s.saleDate | farmDate }}</caption>
+                                    <caption class="fpms-text-start fpms-small fpms-weight-bold" style="caption-side: top; color: var(--fpms-text)">Dispatch receipt {{ s.dispatchReceiptNo }} · {{ s.saleDate | farmDate }}</caption>
                                     <thead>
                                         <tr><th scope="col">Grade</th><th scope="col" class="num">Kg</th><th scope="col" class="num">Price per kilo</th><th scope="col" class="num">Amount</th></tr>
                                     </thead>
@@ -155,7 +155,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 </table>
                             }
                         } @else if (!(t.showsSales && t.sales.length)) {
-                            <div class="fpms-doc-fields mb-3" style="max-width: 24rem">
+                            <div class="fpms-doc-fields fpms-space-bottom-3" style="max-width: 24rem">
                                 <span>Agreed base price</span>
                                 <div class="blank"></div>
                                 <span>Price per kilo</span>
@@ -165,12 +165,12 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </div>
                         }
 
-                        <div class="row mt-5 mb-3 small fpms-doc-signs">
-                            <div class="col-4"><div class="fpms-sign">Weighed by</div></div>
-                            <div class="col-4"><div class="fpms-sign">Checked by (farm)</div></div>
-                            <div class="col-4"><div class="fpms-sign">Customer / representative</div></div>
+                        <div class="fpms-grid-row fpms-space-top-7 fpms-space-bottom-3 fpms-small fpms-doc-signs">
+                            <div class="fpms-col-4"><div class="fpms-sign">Weighed by</div></div>
+                            <div class="fpms-col-4"><div class="fpms-sign">Checked by (farm)</div></div>
+                            <div class="fpms-col-4"><div class="fpms-sign">Customer / representative</div></div>
                         </div>
-                        <p class="small text-center text-muted mb-0">Recorded by {{ h.recordedBy }} on {{ h.creationTime | farmDateTime }}. Tally sheet for the farm's records; not an official receipt.</p>
+                        <p class="fpms-small fpms-align-center fpms-muted fpms-no-bottom">Recorded by {{ h.recordedBy }} on {{ h.creationTime | farmDateTime }}. Tally sheet for the farm's records; not an official receipt.</p>
                     </div>
                 }
             </div>
