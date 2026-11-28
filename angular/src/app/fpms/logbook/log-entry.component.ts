@@ -23,10 +23,10 @@ const DRAFT = 'log-entry';
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (restoredAt) {
-                        <div class="alert alert-info d-flex align-items-center" role="status">
-                            <i class="fas fa-history mr-2"></i>
-                            <span class="mr-auto">Your unsaved entry from {{ restoredAt | farmDateTime }} was restored.</span>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="discardDraft()">Discard it</button>
+                        <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                            <i class="fas fa-history fpms-icon-gap"></i>
+                            <span class="fpms-margin-auto-end">Your unsaved entry from {{ restoredAt | farmDateTime }} was restored.</span>
+                            <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="discardDraft()">Discard it</button>
                         </div>
                     }
 
@@ -35,7 +35,7 @@ const DRAFT = 'log-entry';
                             <section class="fpms-summary fpms-today-band" aria-label="This pond today">
                                 <div class="fpms-today-head">
                                     <h3>{{ batch?.pondCode }} {{ t.day === today ? 'today' : 'on ' + (t.day | farmDate) }}{{ batch?.indicators?.doc != null ? ' · day ' + batch.indicators.doc : '' }}</h3>
-                                    <a [routerLink]="['/app/production/batches', batch?.id]" [queryParams]="{ tab: 'daily' }">Open the Daily record<i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></a>
+                                    <a [routerLink]="['/app/production/batches', batch?.id]" [queryParams]="{ tab: 'daily' }">Open the Daily record<i class="fas fa-arrow-right fpms-icon-gap" aria-hidden="true"></i></a>
                                 </div>
                                 <dl class="fpms-figures-more">
                                     <div><dt>Feedings</dt><dd>{{ t.fed }} of {{ t.feedings }} entered</dd></div>
@@ -48,8 +48,8 @@ const DRAFT = 'log-entry';
 
                     @if (result) {
                         <!-- After saving (DEC-117): what was saved, anything to check, the figures now, and what to do next. -->
-                        <section class="card fpms-saved" [class.fpms-saved-warn]="result.warnings.length" [class.fpms-saved-kept]="result.kept" aria-labelledby="saved-h">
-                            <div class="card-body">
+                        <section class="fpms-panel fpms-saved" [class.fpms-saved-warn]="result.warnings.length" [class.fpms-saved-kept]="result.kept" aria-labelledby="saved-h">
+                            <div class="fpms-panel-body">
                                 <h3 id="saved-h" class="fpms-saved-h" tabindex="-1">
                                     <i class="fas" [class.fa-check-circle]="!result.wasDuplicate && !result.kept" [class.fa-info-circle]="result.wasDuplicate" [class.fa-cloud-upload-alt]="result.kept" aria-hidden="true"></i>
                                     {{ result.kept ? 'Kept on this tablet' : result.wasDuplicate ? 'Already saved' : isNew ? 'Saved' : 'Changes saved' }}:
@@ -57,23 +57,23 @@ const DRAFT = 'log-entry';
                                     <span class="fpms-saved-when">{{ savedAt | farmDateTime }}</span>
                                 </h3>
                                 @if (result.wasDuplicate) {
-                                    <p class="mb-2">This entry was already recorded, so no second copy was made.</p>
+                                    <p class="fpms-space-bottom-2">This entry was already recorded, so no second copy was made.</p>
                                 }
                                 @if (result.kept) {
-                                    <p class="mb-2">
+                                    <p class="fpms-space-bottom-2">
                                         The farm server could not be reached. This entry is kept on this tablet and is sent by itself when the connection is back.
                                         You can keep recording. Until it is sent, the Daily record and the figures do not include it.
                                     </p>
                                 }
                                 @if (savedRows.length) {
-                                    <dl class="fpms-facts mb-2">
+                                    <dl class="fpms-facts fpms-space-bottom-2">
                                         @for (r of savedRows; track $index) {
                                             <div><dt>{{ r.label }}</dt><dd>{{ r.after }}</dd></div>
                                         }
                                     </dl>
                                 }
                                 @if (result.warnings.length) {
-                                    <h4 class="fpms-section-h mt-3">Check this</h4>
+                                    <h4 class="fpms-section-h fpms-space-top-3">Check this</h4>
                                     <ul class="fpms-notices fpms-saved-notices">
                                         @for (w of result.warnings; track $index) {
                                             <li class="warn"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i><span>{{ w.message }}</span></li>
@@ -81,7 +81,7 @@ const DRAFT = 'log-entry';
                                     </ul>
                                 }
                                 @if (result.indicators; as i) {
-                                    <h4 class="fpms-section-h mt-3">{{ batch?.pondCode }} now</h4>
+                                    <h4 class="fpms-section-h fpms-space-top-3">{{ batch?.pondCode }} now</h4>
                                     <dl class="fpms-figures fpms-figures-sm">
                                         <div class="fpms-figure"><dt class="l">Day of culture</dt><dd class="v">{{ i.doc ?? '—' }}</dd></div>
                                         <div class="fpms-figure"><dt class="l">ABW</dt><dd class="v">{{ i.currentAbwG | num: 2 }}<span class="u">g</span></dd></div>
@@ -92,10 +92,10 @@ const DRAFT = 'log-entry';
                                 }
                                 @if (isNew) {
                                     <div class="fpms-saved-actions">
-                                        <button class="btn btn-primary" (click)="another(true)">Record another {{ (savedType | label: L.LogTypes).toLowerCase() }}</button>
-                                        <button class="btn btn-outline-primary" (click)="another(false)">Record something else</button>
-                                        @if (result.log?.id) { <a class="btn btn-default" [routerLink]="['/app/logbook', result.log.id]">Correct it</a> }
-                                        <a class="btn btn-link" [routerLink]="['/app/production/batches', form.batchId]" [queryParams]="{ tab: 'daily' }">Open the Daily record</a>
+                                        <button class="fpms-button fpms-button-primary" (click)="another(true)">Record another {{ (savedType | label: L.LogTypes).toLowerCase() }}</button>
+                                        <button class="fpms-button fpms-button-outline" (click)="another(false)">Record something else</button>
+                                        @if (result.log?.id) { <a class="fpms-button fpms-button-secondary" [routerLink]="['/app/logbook', result.log.id]">Correct it</a> }
+                                        <a class="fpms-button fpms-button-link" [routerLink]="['/app/production/batches', form.batchId]" [queryParams]="{ tab: 'daily' }">Open the Daily record</a>
                                     </div>
                                 }
                             </div>
@@ -103,10 +103,10 @@ const DRAFT = 'log-entry';
                     }
 
                     @if (log?.isVoided) {
-                        <div class="alert alert-secondary small"><i class="fas fa-ban mr-1"></i>This entry was voided: {{ log.voidReason }}</div>
+                        <div class="fpms-alert fpms-alert-neutral fpms-small"><i class="fas fa-ban fpms-icon-gap"></i>This entry was voided: {{ log.voidReason }}</div>
                     } @else if (readOnly && !isNew) {
-                        <div class="alert alert-secondary small">
-                            <i class="fas fa-lock mr-1"></i>
+                        <div class="fpms-alert fpms-alert-neutral fpms-small">
+                            <i class="fas fa-lock fpms-icon-gap"></i>
                             @if (batch?.isReadOnly) { The batch is Closed; its logs are read-only. }
                             @else if (historical) { This is a historical {{ log.logType | label: L.LogTypes }} entry kept for the record; it can no longer be edited. }
                             @else { You can only edit entries you recorded. Ask a Farm Owner to correct it. }
@@ -121,43 +121,43 @@ const DRAFT = 'log-entry';
                             <fieldset [disabled]="readOnly">
                                 <!-- Observed at, shown beside the pond (new entries) or on its own; declared inside the form so it is validated with it. -->
                                 <ng-template #observedTpl>
-                                    <label for="obs">Observed at <span class="text-danger">*</span></label>
-                                    <input id="obs" type="datetime-local" class="form-control" name="observedAt" [(ngModel)]="form.observedAt" required [max]="nowInput" />
-                                    <small class="form-text text-muted">Farm time. For a paper sheet, the time written on it.</small>
+                                    <label for="obs">Observed at <span class="fpms-danger">*</span></label>
+                                    <input id="obs" type="datetime-local" class="fpms-control" name="observedAt" [(ngModel)]="form.observedAt" required [max]="nowInput" />
+                                    <small class="fpms-help fpms-muted">Farm time. For a paper sheet, the time written on it.</small>
                                 </ng-template>
-                                <div class="card">
-                                    <div class="card-body">
+                                <div class="fpms-panel">
+                                    <div class="fpms-panel-body">
                                         @if (isNew) {
                                             @if (inWizard) {
-                                                <p class="mb-3"><strong>Pond (batch):</strong> {{ batch?.pondCode }} · {{ batch?.batchCode }}@if (othersPond(); as o) { <span class="d-block small text-warning-dark"><i class="fas fa-user mr-1" aria-hidden="true"></i>{{ o }}</span> }</p>
+                                                <p class="fpms-space-bottom-3"><strong>Pond (batch):</strong> {{ batch?.pondCode }} · {{ batch?.batchCode }}@if (othersPond(); as o) { <span class="fpms-block fpms-small fpms-warning-text"><i class="fas fa-user fpms-icon-gap" aria-hidden="true"></i>{{ o }}</span> }</p>
                                             } @else {
-                                            <div class="form-row">
-                                                    <div class="form-group col-md-6">
-                                                        <label for="batch">Pond (batch) <span class="text-danger">*</span></label>
-                                                        <select id="batch" class="form-control" name="batchId" [(ngModel)]="form.batchId" (ngModelChange)="onBatch()" required>
+                                            <div class="fpms-grid-row">
+                                                    <div class="fpms-field fpms-col-md-6">
+                                                        <label for="batch">Pond (batch) <span class="fpms-danger">*</span></label>
+                                                        <select id="batch" class="fpms-control" name="batchId" [(ngModel)]="form.batchId" (ngModelChange)="onBatch()" required>
                                                             @for (x of openBatches; track x.id) {
                                                                 <option [value]="x.id">{{ x.pondCode }} · {{ x.letter ? 'Batch ' + x.letter : x.batchCode }} ({{ x.status | label: L.BatchStatuses }}){{ x.isMine ? ' · yours' : '' }}</option>
                                                             }
                                                         </select>
                                                         @if (othersPond(); as o) {
                                                             <!-- DEC-127: said, never blocked; the review carries it as a note. -->
-                                                            <small class="form-text text-warning-dark"><i class="fas fa-user mr-1" aria-hidden="true"></i>{{ o }}</small>
+                                                            <small class="fpms-help fpms-warning-text"><i class="fas fa-user fpms-icon-gap" aria-hidden="true"></i>{{ o }}</small>
                                                         }
                                                         @if (!openBatches.length) {
-                                                            <small class="form-text text-muted">No pond is stocked. Stock a batch first (Production → Stock a batch).</small>
+                                                            <small class="fpms-help fpms-muted">No pond is stocked. Stock a batch first (Production → Stock a batch).</small>
                                                         }
                                                     </div>
                                                     <!-- When, beside where (DEC-106). -->
                                                     @if (form.logType) {
-                                                        <div class="form-group col-md-6">
+                                                        <div class="fpms-field fpms-col-md-6">
                                                             <ng-container *ngTemplateOutlet="observedTpl"></ng-container>
                                                         </div>
                                                     }
                                                 </div>
                                             }
                                             @if (batch && !(inWizard && form.logType)) {
-                                                <label class="d-block">What are you recording? <span class="text-danger">*</span></label>
-                                                <div class="fpms-lw-tiles fpms-lw-tiles-row mt-2" role="radiogroup" aria-label="Record type">
+                                                <label class="fpms-block">What are you recording? <span class="fpms-danger">*</span></label>
+                                                <div class="fpms-lw-tiles fpms-lw-tiles-row fpms-space-top-2" role="radiogroup" aria-label="Record type">
                                                     @if (!inWizard) {
                                                         <a class="fpms-lw-tile" [routerLink]="['/app/logbook/feeding']" [queryParams]="{ batchId: batch.id }">
                                                             <i class="fas fa-utensils" aria-hidden="true"></i>Feeding <span class="sr-only">(opens the Feeding sheet)</span>
@@ -171,11 +171,11 @@ const DRAFT = 'log-entry';
                                                 </div>
                                             }
                                         } @else {
-                                            <p class="mb-2"><strong>Pond (batch):</strong> {{ batch?.pondCode }} · {{ batch?.batchCode }} · cycle {{ batch?.cycleCode }}</p>
+                                            <p class="fpms-space-bottom-2"><strong>Pond (batch):</strong> {{ batch?.pondCode }} · {{ batch?.batchCode }} · cycle {{ batch?.cycleCode }}</p>
                                         }
                                         @if (form.logType && (!isNew || inWizard)) {
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6 mb-0">
+                                            <div class="fpms-grid-row">
+                                                <div class="fpms-field fpms-col-md-6 fpms-no-bottom">
                                                     <ng-container *ngTemplateOutlet="observedTpl"></ng-container>
                                                 </div>
                                             </div>
@@ -184,60 +184,60 @@ const DRAFT = 'log-entry';
                                 </div>
 
                                 @if (historical && log) {
-                                    <div class="card">
-                                        <div class="card-header"><h3 class="card-title">{{ log.logType | label: L.LogTypes }}</h3></div>
-                                        <div class="card-body">{{ summary(log) || '—' }}</div>
+                                    <div class="fpms-panel">
+                                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">{{ log.logType | label: L.LogTypes }}</h3></div>
+                                        <div class="fpms-panel-body">{{ summary(log) || '—' }}</div>
                                     </div>
                                 }
 
                                 @if (form.logType === 2 || form.logType === 4) {
-                                    <div class="card">
-                                        <div class="card-header"><h3 class="card-title">Water quality readings</h3></div>
-                                        <div class="card-body">
-                                            <p class="small text-muted">Enter the parameters you measured (at least one{{ form.logType === 2 ? '; DO, temperature, pH and salinity are required before stocking' : '' }}). Out-of-range readings are saved and flagged.</p>
-                                            <div class="form-row">
+                                    <div class="fpms-panel">
+                                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Water quality readings</h3></div>
+                                        <div class="fpms-panel-body">
+                                            <p class="fpms-small fpms-muted">Enter the parameters you measured (at least one{{ form.logType === 2 ? '; DO, temperature, pH and salinity are required before stocking' : '' }}). Out-of-range readings are saved and flagged.</p>
+                                            <div class="fpms-grid-row">
                                                 @for (p of mainParams(); track p.code) {
-                                                    <div class="form-group col-md-6 col-xl-3">
-                                                        <label [for]="'r' + p.code">{{ p.name }} @if (form.logType === 2 && p.requiredAtStocking) { <span class="text-danger">*</span> }</label>
+                                                    <div class="fpms-field fpms-col-md-6 fpms-col-xl-3">
+                                                        <label [for]="'r' + p.code">{{ p.name }} @if (form.logType === 2 && p.requiredAtStocking) { <span class="fpms-danger">*</span> }</label>
                                                         <div class="input-group">
-                                                            <input [id]="'r' + p.code" type="number" step="any" inputmode="decimal" class="form-control" [name]="'r' + p.code" [(ngModel)]="readings[p.code]"
+                                                            <input [id]="'r' + p.code" type="number" step="any" inputmode="decimal" class="fpms-control" [name]="'r' + p.code" [(ngModel)]="readings[p.code]"
                                                                 [min]="p.physicalMin" [max]="p.physicalMax" [required]="form.logType === 2 && p.requiredAtStocking" />
                                                             <div class="input-group-append"><span class="input-group-text">{{ p.unitCode }}</span></div>
                                                         </div>
-                                                        <small class="form-text" [class.text-muted]="wq(p) === 'ok' || wq(p) === 'empty'" [class.text-warning-dark]="wq(p) === 'out'" [class.text-danger]="wq(p) === 'invalid'">
+                                                        <small class="fpms-help" [class.fpms-muted]="wq(p) === 'ok' || wq(p) === 'empty'" [class.fpms-warning-text]="wq(p) === 'out'" [class.fpms-danger]="wq(p) === 'invalid'">
                                                             @switch (wq(p)) {
-                                                                @case ('out') { <i class="fas fa-exclamation-triangle mr-1"></i>Out of range ({{ p.optimalRange }}) }
+                                                                @case ('out') { <i class="fas fa-exclamation-triangle fpms-icon-gap"></i>Out of range ({{ p.optimalRange }}) }
                                                                 @case ('invalid') { Not physically possible ({{ p.physicalMin }}–{{ p.physicalMax }}) }
                                                                 @default { {{ p.optimalRange }} · {{ p.guidanceFrequency }} }
                                                             }
                                                         </small>
                                                         @if (wq(p) === 'out' && advice(p); as a) {
-                                                            <small class="form-text text-warning-dark">{{ a }}</small>
+                                                            <small class="fpms-help fpms-warning-text">{{ a }}</small>
                                                         }
                                                     </div>
                                                 }
                                             </div>
                                             @if (otherParams().length) {
-                                                <details class="fpms-fold mb-0" [open]="form.logType === 2 || otherEntered()">
+                                                <details class="fpms-fold fpms-no-bottom" [open]="form.logType === 2 || otherEntered()">
                                                     <summary>Other readings <span class="fpms-fold-hint">{{ otherNames() }}</span></summary>
-                                                    <div class="form-row">
+                                                    <div class="fpms-grid-row">
                                                         @for (p of otherParams(); track p.code) {
-                                                    <div class="form-group col-md-6 col-xl-3">
-                                                        <label [for]="'r' + p.code">{{ p.name }} @if (form.logType === 2 && p.requiredAtStocking) { <span class="text-danger">*</span> }</label>
+                                                    <div class="fpms-field fpms-col-md-6 fpms-col-xl-3">
+                                                        <label [for]="'r' + p.code">{{ p.name }} @if (form.logType === 2 && p.requiredAtStocking) { <span class="fpms-danger">*</span> }</label>
                                                         <div class="input-group">
-                                                            <input [id]="'r' + p.code" type="number" step="any" inputmode="decimal" class="form-control" [name]="'r' + p.code" [(ngModel)]="readings[p.code]"
+                                                            <input [id]="'r' + p.code" type="number" step="any" inputmode="decimal" class="fpms-control" [name]="'r' + p.code" [(ngModel)]="readings[p.code]"
                                                                 [min]="p.physicalMin" [max]="p.physicalMax" [required]="form.logType === 2 && p.requiredAtStocking" />
                                                             <div class="input-group-append"><span class="input-group-text">{{ p.unitCode }}</span></div>
                                                         </div>
-                                                        <small class="form-text" [class.text-muted]="wq(p) === 'ok' || wq(p) === 'empty'" [class.text-warning-dark]="wq(p) === 'out'" [class.text-danger]="wq(p) === 'invalid'">
+                                                        <small class="fpms-help" [class.fpms-muted]="wq(p) === 'ok' || wq(p) === 'empty'" [class.fpms-warning-text]="wq(p) === 'out'" [class.fpms-danger]="wq(p) === 'invalid'">
                                                             @switch (wq(p)) {
-                                                                @case ('out') { <i class="fas fa-exclamation-triangle mr-1"></i>Out of range ({{ p.optimalRange }}) }
+                                                                @case ('out') { <i class="fas fa-exclamation-triangle fpms-icon-gap"></i>Out of range ({{ p.optimalRange }}) }
                                                                 @case ('invalid') { Not physically possible ({{ p.physicalMin }}–{{ p.physicalMax }}) }
                                                                 @default { {{ p.optimalRange }} · {{ p.guidanceFrequency }} }
                                                             }
                                                         </small>
                                                         @if (wq(p) === 'out' && advice(p); as a) {
-                                                            <small class="form-text text-warning-dark">{{ a }}</small>
+                                                            <small class="fpms-help fpms-warning-text">{{ a }}</small>
                                                         }
                                                     </div>
                                                         }
@@ -249,152 +249,152 @@ const DRAFT = 'log-entry';
                                 }
 
                                 @if (form.logType === 5) {
-                                    <div class="card">
-                                        <div class="card-header"><h3 class="card-title">Growth sampling</h3></div>
-                                        <div class="card-body">
+                                    <div class="fpms-panel">
+                                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Growth sampling</h3></div>
+                                        <div class="fpms-panel-body">
                                             <!-- DEC-97: the ABW is typed as in the logbook; a sample, if taken, works it out instead. -->
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="abw">Average body weight (ABW) <span class="text-danger">*</span></label>
+                                            <div class="fpms-grid-row">
+                                                <div class="fpms-field fpms-col-md-6">
+                                                    <label for="abw">Average body weight (ABW) <span class="fpms-danger">*</span></label>
                                                     <div class="input-group">
                                                         @if (hasSample()) {
-                                                            <input id="abw" class="form-control" name="abwShown" [ngModel]="sampleAbw() != null ? (sampleAbw()! | num: 2) : ''" readonly />
+                                                            <input id="abw" class="fpms-control" name="abwShown" [ngModel]="sampleAbw() != null ? (sampleAbw()! | num: 2) : ''" readonly />
                                                         } @else {
-                                                            <input id="abw" type="number" min="0.01" max="60" step="0.01" inputmode="decimal" class="form-control" name="abw" [(ngModel)]="growth.abwG" required />
+                                                            <input id="abw" type="number" min="0.01" max="60" step="0.01" inputmode="decimal" class="fpms-control" name="abw" [(ngModel)]="growth.abwG" required />
                                                         }
                                                         <div class="input-group-append"><span class="input-group-text">g</span></div>
                                                     </div>
-                                                    <small class="form-text text-muted">{{ hasSample() ? 'Worked out from the sample below.' : 'Type it as in the logbook, or work it out from a sample below.' }}</small>
-                                                    @if (finalAbw() != null && finalAbw()! > 60) { <small class="form-text text-danger">More than 60 g is not possible. Check the value.</small> }
-                                                    @if (abwChange(); as c) { <small class="form-text">{{ c }}</small> }
+                                                    <small class="fpms-help fpms-muted">{{ hasSample() ? 'Worked out from the sample below.' : 'Type it as in the logbook, or work it out from a sample below.' }}</small>
+                                                    @if (finalAbw() != null && finalAbw()! > 60) { <small class="fpms-help fpms-danger">More than 60 g is not possible. Check the value.</small> }
+                                                    @if (abwChange(); as c) { <small class="fpms-help">{{ c }}</small> }
                                                 </div>
                                             </div>
                                             <details class="fpms-fold" [open]="hasSample()">
                                                 <summary>Work it out from a sample <span class="fpms-fold-hint">shrimp counted and their total weight</span></summary>
-                                                <div class="form-row">
-                                                    <div class="form-group col-md-6 mb-md-0">
+                                                <div class="fpms-grid-row">
+                                                    <div class="fpms-field fpms-col-md-6 fpms-space-bottom-md-0">
                                                         <label for="sc">Shrimp in the sample</label>
                                                         <div class="input-group">
-                                                            <input id="sc" type="number" min="1" step="1" inputmode="numeric" class="form-control" name="sc" [(ngModel)]="growth.sampleCount" [required]="hasSample()" />
+                                                            <input id="sc" type="number" min="1" step="1" inputmode="numeric" class="fpms-control" name="sc" [(ngModel)]="growth.sampleCount" [required]="hasSample()" />
                                                             <div class="input-group-append"><span class="input-group-text">pcs</span></div>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group col-md-6 mb-0">
+                                                    <div class="fpms-field fpms-col-md-6 fpms-no-bottom">
                                                         <label for="sw2">Total sample weight</label>
                                                         <div class="input-group">
-                                                            <input id="sw2" type="number" min="0.01" step="0.01" inputmode="decimal" class="form-control" name="sw2" [(ngModel)]="growth.totalSampleWeightG" [required]="hasSample()" />
+                                                            <input id="sw2" type="number" min="0.01" step="0.01" inputmode="decimal" class="fpms-control" name="sw2" [(ngModel)]="growth.totalSampleWeightG" [required]="hasSample()" />
                                                             <div class="input-group-append"><span class="input-group-text">g</span></div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                @if (hasSample() && sampleAbw() == null) { <small class="d-block text-muted mt-2">Enter both numbers, or clear both and type the ABW.</small> }
+                                                @if (hasSample() && sampleAbw() == null) { <small class="fpms-block fpms-muted fpms-space-top-2">Enter both numbers, or clear both and type the ABW.</small> }
                                             </details>
-                                            <details class="fpms-fold mb-0" [open]="growth.estimatedSurvivalPct != null && growth.estimatedSurvivalPct !== ''">
+                                            <details class="fpms-fold fpms-no-bottom" [open]="growth.estimatedSurvivalPct != null && growth.estimatedSurvivalPct !== ''">
                                                 <summary>Estimated survival <span class="fpms-fold-hint">from a cast-net or feed tray check</span></summary>
-                                                <div class="form-row">
-                                                    <div class="form-group col-md-6 mb-0">
+                                                <div class="fpms-grid-row">
+                                                    <div class="fpms-field fpms-col-md-6 fpms-no-bottom">
                                                         <label for="esp">Estimated survival</label>
                                                         <div class="input-group">
-                                                            <input id="esp" type="number" min="0" max="100" step="0.1" inputmode="decimal" class="form-control" name="esp" [(ngModel)]="growth.estimatedSurvivalPct" />
+                                                            <input id="esp" type="number" min="0" max="100" step="0.1" inputmode="decimal" class="fpms-control" name="esp" [(ngModel)]="growth.estimatedSurvivalPct" />
                                                             <div class="input-group-append"><span class="input-group-text">%</span></div>
                                                         </div>
                                                         @if (growth.estimatedSurvivalPct != null && growth.estimatedSurvivalPct !== '' && (growth.estimatedSurvivalPct < 0 || growth.estimatedSurvivalPct > 100)) {
-                                                            <small class="d-block text-danger">Enter a percentage from 0 to 100.</small>
+                                                            <small class="fpms-block fpms-danger">Enter a percentage from 0 to 100.</small>
                                                         }
                                                     </div>
-                                                    <div class="col-md-6 d-flex align-items-center">
-                                                        <small class="text-muted">When given, it replaces the population worked out from mortality: PL stocked × this % (losses and harvests after this sample are still taken off).</small>
+                                                    <div class="fpms-col-md-6 fpms-flex align-items-center">
+                                                        <small class="fpms-muted">When given, it replaces the population worked out from mortality: PL stocked × this % (losses and harvests after this sample are still taken off).</small>
                                                     </div>
                                                 </div>
                                             </details>
                                             @if (log?.growthRateGPerDay != null) {
-                                                <p class="small text-muted mt-3 mb-0">Growth since previous sample: {{ log.growthRateGPerDay | num: 2 }} g/day</p>
+                                                <p class="fpms-small fpms-muted fpms-space-top-3 fpms-no-bottom">Growth since previous sample: {{ log.growthRateGPerDay | num: 2 }} g/day</p>
                                             }
                                         </div>
                                     </div>
                                 }
 
                                 @if (form.logType === 6) {
-                                    <div class="card">
-                                        <div class="card-header"><h3 class="card-title">Chemical and supplement application</h3></div>
-                                        <div class="card-body">
+                                    <div class="fpms-panel">
+                                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Chemical and supplement application</h3></div>
+                                        <div class="fpms-panel-body">
                                             @if (!productLots.length) {
-                                                <div class="alert alert-info small">No supplement or chemical lots in stock records. Ask a Farm Owner to record a receipt under Inventory.</div>
+                                                <div class="fpms-alert fpms-alert-info fpms-small">No supplement or chemical lots in stock records. Ask a Farm Owner to record a receipt under Inventory.</div>
                                             }
-                                            <label class="d-block">Products used <span class="text-danger">*</span></label>
+                                            <label class="fpms-block">Products used <span class="fpms-danger">*</span></label>
                                             @for (u of chem.usages; track u.key) {
-                                                <div class="form-row align-items-start mb-1">
-                                                    <div class="col-7">
-                                                        <select class="form-control" [name]="'ul' + u.key" [(ngModel)]="u.lotId" (ngModelChange)="prefillWithdrawal()" aria-label="Product lot" required>
+                                                <div class="fpms-grid-row align-items-start fpms-space-bottom-1">
+                                                    <div class="fpms-col-7">
+                                                        <select class="fpms-control" [name]="'ul' + u.key" [(ngModel)]="u.lotId" (ngModelChange)="prefillWithdrawal()" aria-label="Product lot" required>
                                                             @for (o of productLots; track o.lotId) {
                                                                 <option [value]="o.lotId">{{ o.label }}</option>
                                                             }
                                                         </select>
                                                     </div>
-                                                    <div class="col-3">
+                                                    <div class="fpms-col-3">
                                                         <div class="input-group">
-                                                            <input type="number" min="0.001" step="0.001" inputmode="decimal" class="form-control" [name]="'uq' + u.key" [(ngModel)]="u.quantity" placeholder="Qty" aria-label="Quantity" required />
+                                                            <input type="number" min="0.001" step="0.001" inputmode="decimal" class="fpms-control" [name]="'uq' + u.key" [(ngModel)]="u.quantity" placeholder="Qty" aria-label="Quantity" required />
                                                             <div class="input-group-append"><span class="input-group-text">{{ lotUnit(u.lotId) }}</span></div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-2">
+                                                    <div class="fpms-col-2">
                                                         @if (chem.usages.length > 1) {
-                                                            <button type="button" class="btn btn-outline-danger" (click)="removeUsage(u)" aria-label="Remove product"><i class="fas fa-times"></i></button>
+                                                            <button type="button" class="fpms-button fpms-button-danger" (click)="removeUsage(u)" aria-label="Remove product"><i class="fas fa-times"></i></button>
                                                         }
                                                     </div>
                                                     @if (lotShort(u.lotId, u.quantity)) {
-                                                        <div class="col-12"><small class="text-warning-dark"><i class="fas fa-exclamation-triangle mr-1"></i>More than this lot's stock on hand. It will save and the lot will be flagged for reconciliation.</small></div>
+                                                        <div class="fpms-col-12"><small class="fpms-warning-text"><i class="fas fa-exclamation-triangle fpms-icon-gap"></i>More than this lot's stock on hand. It will save and the lot will be flagged for reconciliation.</small></div>
                                                     }
                                                     @if (lotExpired(u.lotId)) {
-                                                        <div class="col-12"><small class="text-warning-dark"><i class="fas fa-exclamation-triangle mr-1"></i>This lot is past its expiry date.</small></div>
+                                                        <div class="fpms-col-12"><small class="fpms-warning-text"><i class="fas fa-exclamation-triangle fpms-icon-gap"></i>This lot is past its expiry date.</small></div>
                                                     }
                                                 </div>
                                             }
-                                            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" (click)="addUsage()" [disabled]="!productLots.length">
-                                                <i class="fas fa-plus mr-1"></i>Add another product
+                                            <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary fpms-space-bottom-3" (click)="addUsage()" [disabled]="!productLots.length">
+                                                <i class="fas fa-plus fpms-icon-gap"></i>Add another product
                                             </button>
-                                            <div class="form-group">
+                                            <div class="fpms-field">
                                                 <label for="rs">Reason</label>
-                                                <input id="rs" class="form-control" name="rs" [(ngModel)]="chem.reason" maxlength="500" placeholder="e.g. low alkalinity, probiotic schedule, disinfection" />
+                                                <input id="rs" class="fpms-control" name="rs" [(ngModel)]="chem.reason" maxlength="500" placeholder="e.g. low alkalinity, probiotic schedule, disinfection" />
                                             </div>
-                                            <details class="fpms-fold mb-1" [open]="chemHasTreatment()">
+                                            <details class="fpms-fold fpms-space-bottom-1" [open]="chemHasTreatment()">
                                                 <summary>Treatment details <span class="fpms-fold-hint">dosage, method, withdrawal period, prescription; for drugs and chemicals</span></summary>
-                                                <div class="form-row">
-                                                    <div class="form-group col-6 col-md-3">
+                                                <div class="fpms-grid-row">
+                                                    <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                                         <label for="dz">Dosage</label>
-                                                        <input id="dz" type="number" min="0" step="any" class="form-control" name="dz" [(ngModel)]="chem.dosage" />
+                                                        <input id="dz" type="number" min="0" step="any" class="fpms-control" name="dz" [(ngModel)]="chem.dosage" />
                                                     </div>
-                                                    <div class="form-group col-6 col-md-3">
+                                                    <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                                         <label for="du">Dosage unit</label>
-                                                        <select id="du" class="form-control" name="du" [(ngModel)]="chem.dosageUnit">
+                                                        <select id="du" class="fpms-control" name="du" [(ngModel)]="chem.dosageUnit">
                                                             <option value="">Select unit</option>
                                                             @for (u of dosageUnitOptions(); track u) {
                                                                 <option [value]="u">{{ u }}</option>
                                                             }
                                                         </select>
                                                     </div>
-                                                    <div class="form-group col-md-6">
+                                                    <div class="fpms-field fpms-col-md-6">
                                                         <label for="me">Method</label>
-                                                        <input id="me" class="form-control" name="me" [(ngModel)]="chem.method" maxlength="100" placeholder="broadcast, mixed in feed, bath" />
+                                                        <input id="me" class="fpms-control" name="me" [(ngModel)]="chem.method" maxlength="100" placeholder="broadcast, mixed in feed, bath" />
                                                     </div>
                                                 </div>
-                                                <div class="form-row">
-                                                    <div class="form-group col-6 col-md-3">
+                                                <div class="fpms-grid-row">
+                                                    <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                                         <label for="ed">Last treatment day</label>
-                                                        <input id="ed" type="date" class="form-control" name="ed" [(ngModel)]="chem.endDate" [min]="observedDate()" />
+                                                        <input id="ed" type="date" class="fpms-control" name="ed" [(ngModel)]="chem.endDate" [min]="observedDate()" />
                                                     </div>
-                                                    <div class="form-group col-6 col-md-3">
+                                                    <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                                         <label for="wd">Withdrawal days</label>
-                                                        <input id="wd" type="number" min="0" max="365" step="1" class="form-control" name="wd" [(ngModel)]="chem.withdrawalDays" />
-                                                        <small class="form-text text-muted">Pre-filled from the product when set.</small>
+                                                        <input id="wd" type="number" min="0" max="365" step="1" class="fpms-control" name="wd" [(ngModel)]="chem.withdrawalDays" />
+                                                        <small class="fpms-help fpms-muted">Pre-filled from the product when set.</small>
                                                     </div>
-                                                    <div class="form-group col-md-6">
+                                                    <div class="fpms-field fpms-col-md-6">
                                                         <label for="rx">Prescription / reference</label>
-                                                        <input id="rx" class="form-control" name="rx" [(ngModel)]="chem.prescriptionRef" maxlength="100" placeholder="optional" />
+                                                        <input id="rx" class="fpms-control" name="rx" [(ngModel)]="chem.prescriptionRef" maxlength="100" placeholder="optional" />
                                                     </div>
                                                 </div>
                                                 @if (safeHarvestDate()) {
-                                                    <p class="small mb-0"><i class="fas fa-prescription-bottle-alt mr-1"></i>Earliest safe harvest date: <strong>{{ safeHarvestDate() | farmDate }}</strong>. A harvest before then saves with a warning.</p>
+                                                    <p class="fpms-small fpms-no-bottom"><i class="fas fa-prescription-bottle-alt fpms-icon-gap"></i>Earliest safe harvest date: <strong>{{ safeHarvestDate() | farmDate }}</strong>. A harvest before then saves with a warning.</p>
                                                 }
                                             </details>
                                         </div>
@@ -402,20 +402,20 @@ const DRAFT = 'log-entry';
                                 }
 
                                 @if (form.logType === 7) {
-                                    <div class="card">
-                                        <div class="card-header"><h3 class="card-title">Mortality</h3></div>
-                                        <div class="card-body">
-                                            <div class="form-row">
-                                                <div class="form-group col-md-4">
-                                                    <label for="mc">Dead shrimp counted <span class="text-danger">*</span></label>
-                                                    <input id="mc" type="number" min="0" step="1" inputmode="numeric" class="form-control" name="mc" [(ngModel)]="mortality.count" required />
+                                    <div class="fpms-panel">
+                                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Mortality</h3></div>
+                                        <div class="fpms-panel-body">
+                                            <div class="fpms-grid-row">
+                                                <div class="fpms-field fpms-col-md-4">
+                                                    <label for="mc">Dead shrimp counted <span class="fpms-danger">*</span></label>
+                                                    <input id="mc" type="number" min="0" step="1" inputmode="numeric" class="fpms-control" name="mc" [(ngModel)]="mortality.count" required />
                                                 </div>
-                                                <div class="form-group col-md-8">
-                                                    <label class="d-block">Cause <span class="text-danger">*</span></label>
+                                                <div class="fpms-field fpms-col-md-8">
+                                                    <label class="fpms-block">Cause <span class="fpms-danger">*</span></label>
                                                     <div role="radiogroup" aria-label="Cause">
                                                         @for (o of Options.mortalityCause; track o.value) {
-                                                            <button type="button" class="btn mr-1 mb-1" role="radio" [attr.aria-checked]="mortality.cause === o.value"
-                                                                [class.btn-primary]="mortality.cause === o.value" [class.btn-outline-primary]="mortality.cause !== o.value" (click)="mortality.cause = o.value; keepDraft()">
+                                                            <button type="button" class="fpms-button fpms-icon-gap fpms-space-bottom-1" role="radio" [attr.aria-checked]="mortality.cause === o.value"
+                                                                [class.fpms-button-primary]="mortality.cause === o.value" [class.fpms-button-outline]="mortality.cause !== o.value" (click)="mortality.cause = o.value; keepDraft()">
                                                                 {{ o.label }}
                                                             </button>
                                                         }
@@ -423,30 +423,30 @@ const DRAFT = 'log-entry';
                                                 </div>
                                             </div>
                                             @if (mortality.cause === 1) {
-                                                <div class="form-group">
-                                                    <label for="dn">Disease name <span class="text-danger">*</span></label>
-                                                    <input id="dn" class="form-control" name="dn" [(ngModel)]="mortality.diseaseName" maxlength="100" required list="diseases" placeholder="e.g. WSSV, AHPND, EHP" />
+                                                <div class="fpms-field">
+                                                    <label for="dn">Disease name <span class="fpms-danger">*</span></label>
+                                                    <input id="dn" class="fpms-control" name="dn" [(ngModel)]="mortality.diseaseName" maxlength="100" required list="diseases" placeholder="e.g. WSSV, AHPND, EHP" />
                                                     <datalist id="diseases"><option value="WSSV"></option><option value="AHPND"></option><option value="EHP"></option><option value="IMNV"></option><option value="Vibriosis"></option></datalist>
                                                 </div>
                                             }
                                             @if (mortality.cause === 7) {
-                                                <div class="form-group">
-                                                    <label for="oc">Describe the cause <span class="text-danger">*</span></label>
-                                                    <input id="oc" class="form-control" name="oc" [(ngModel)]="mortality.otherCause" maxlength="500" required placeholder="e.g. predation by birds, molting stress" />
+                                                <div class="fpms-field">
+                                                    <label for="oc">Describe the cause <span class="fpms-danger">*</span></label>
+                                                    <input id="oc" class="fpms-control" name="oc" [(ngModel)]="mortality.otherCause" maxlength="500" required placeholder="e.g. predation by birds, molting stress" />
                                                 </div>
                                             }
                                             @if (mortalityShare(); as share) {
-                                                <p class="small text-muted">{{ share }}</p>
+                                                <p class="fpms-small fpms-muted">{{ share }}</p>
                                             }
-                                            <details class="fpms-fold mb-0" [open]="mortality.cause === 1 || !!mortality.symptoms || !!mortality.responseAction">
+                                            <details class="fpms-fold fpms-no-bottom" [open]="mortality.cause === 1 || !!mortality.symptoms || !!mortality.responseAction">
                                                 <summary>Symptoms and action taken <span class="fpms-fold-hint">{{ mortality.cause === 1 ? 'asked for with a disease' : 'optional' }}</span></summary>
-                                                <div class="form-group">
+                                                <div class="fpms-field">
                                                     <label for="sy">Observed symptoms</label>
-                                                    <input id="sy" class="form-control" name="sy" [(ngModel)]="mortality.symptoms" maxlength="500" placeholder="e.g. red discoloration, soft shell, empty gut" />
+                                                    <input id="sy" class="fpms-control" name="sy" [(ngModel)]="mortality.symptoms" maxlength="500" placeholder="e.g. red discoloration, soft shell, empty gut" />
                                                 </div>
-                                                <div class="form-group mb-0">
+                                                <div class="fpms-field fpms-no-bottom">
                                                     <label for="ra">Action taken</label>
-                                                    <input id="ra" class="form-control" name="ra" [(ngModel)]="mortality.responseAction" maxlength="500" />
+                                                    <input id="ra" class="fpms-control" name="ra" [(ngModel)]="mortality.responseAction" maxlength="500" />
                                                 </div>
                                             </details>
                                         </div>
@@ -454,35 +454,35 @@ const DRAFT = 'log-entry';
                                 }
 
                                 @if (form.logType === 10) {
-                                    <div class="card">
-                                        <div class="card-header"><h3 class="card-title">Pond activity</h3></div>
-                                        <div class="card-body">
-                                            <label class="d-block">What was done? <span class="text-danger">*</span></label>
+                                    <div class="fpms-panel">
+                                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Pond activity</h3></div>
+                                        <div class="fpms-panel-body">
+                                            <label class="fpms-block">What was done? <span class="fpms-danger">*</span></label>
                                             <div class="fpms-choice" role="radiogroup" aria-label="Pond activity">
                                                 @for (o of pondActivities; track o.value) {
-                                                    <button type="button" class="btn mr-1 mb-1" role="radio" [attr.aria-checked]="activity.activityType === o.value"
-                                                        [class.btn-primary]="activity.activityType === o.value" [class.btn-outline-primary]="activity.activityType !== o.value"
+                                                    <button type="button" class="fpms-button fpms-icon-gap fpms-space-bottom-1" role="radio" [attr.aria-checked]="activity.activityType === o.value"
+                                                        [class.fpms-button-primary]="activity.activityType === o.value" [class.fpms-button-outline]="activity.activityType !== o.value"
                                                         [disabled]="readOnly" (click)="activity.activityType = o.value; keepDraft()">{{ o.label }}</button>
                                                 }
                                             </div>
-                                            <small class="form-text text-muted">For example the water exchange every two days. Add the amount or the reason in the notes.</small>
+                                            <small class="fpms-help fpms-muted">For example the water exchange every two days. Add the amount or the reason in the notes.</small>
                                         </div>
                                     </div>
                                 }
 
                                 @if (form.logType) {
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="form-group mb-0">
-                                                <label for="notes">{{ form.logType === 9 ? 'Note' : 'Notes' }} @if (notesRequired) { <span class="text-danger">*</span> }</label>
-                                                <textarea id="notes" rows="3" class="form-control" name="notes" [(ngModel)]="form.notes" maxlength="2000" [required]="notesRequired" [placeholder]="form.logType === 10 ? 'e.g. about 30% of the water changed' : ''"></textarea>
+                                    <div class="fpms-panel">
+                                        <div class="fpms-panel-body">
+                                            <div class="fpms-field fpms-no-bottom">
+                                                <label for="notes">{{ form.logType === 9 ? 'Note' : 'Notes' }} @if (notesRequired) { <span class="fpms-danger">*</span> }</label>
+                                                <textarea id="notes" rows="3" class="fpms-control" name="notes" [(ngModel)]="form.notes" maxlength="2000" [required]="notesRequired" [placeholder]="form.logType === 10 ? 'e.g. about 30% of the water changed' : ''"></textarea>
                                             </div>
                                         </div>
                                     </div>
                                 }
 
                                 @if (log && !isNew) {
-                                    <p class="small text-muted">
+                                    <p class="fpms-small fpms-muted">
                                         Recorded by {{ log.recordedBy }} on {{ log.creationTime | farmDateTime }}{{ log.lastModificationTime ? ', last edited ' + (log.lastModificationTime | farmDateTime) : '' }}.
                                         @for (u of log.usages; track $index) {
                                             <br />Stock used: {{ u.label }} {{ u.quantity | num: 3 }} {{ u.unit }}
@@ -492,9 +492,9 @@ const DRAFT = 'log-entry';
                             </fieldset>
                             @if (!readOnly && form.logType) {
                                 <div class="fpms-form-foot">
-                                <button type="submit" class="btn btn-primary btn-lg mr-2" [disabled]="busy() || !f.form.valid || !canSubmit()">
+                                <button type="submit" class="fpms-button fpms-button-primary fpms-button-large fpms-icon-gap" [disabled]="busy() || !f.form.valid || !canSubmit()">
                                     @if (busy()) {
-                                        <i class="fas fa-spinner fa-spin mr-1"></i>
+                                        <i class="fas fa-spinner fa-spin fpms-icon-gap"></i>
                                     }
                                     {{ isNew ? 'Save' : 'Save changes' }}
                                 </button>
@@ -507,12 +507,12 @@ const DRAFT = 'log-entry';
                                 <!-- The last few entries of this kind, beside the form on a wide screen and under it otherwise (DEC-106). -->
                                 <aside class="fpms-entry-side" [attr.aria-label]="recentTitle()">
                                     @if (form.logType && t.recent.length) {
-                                        <div class="card">
-                                            <div class="card-header"><h3 class="card-title">{{ recentTitle() }}</h3></div>
-                                            <div class="card-body">
+                                        <div class="fpms-panel">
+                                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">{{ recentTitle() }}</h3></div>
+                                            <div class="fpms-panel-body">
                                                 <ul class="fpms-side-list">
                                                     @for (r of t.recent; track $index) {
-                                                        <li><span class="text-muted">{{ r.date | farmDate }}</span> {{ r.text }}</li>
+                                                        <li><span class="fpms-muted">{{ r.date | farmDate }}</span> {{ r.text }}</li>
                                                     }
                                                 </ul>
                                             </div>
@@ -523,15 +523,15 @@ const DRAFT = 'log-entry';
                         </div>
 
                         @if (!isNew && log?.canVoid && !log?.isVoided) {
-                            <div class="card card-outline card-danger mt-4" id="void-card">
-                                <div class="card-header"><h3 class="card-title">Void this entry</h3></div>
-                                <div class="card-body">
-                                    <p class="small text-muted">Voiding hides the entry from records and indicators{{ log.usages?.length ? ' and returns its products to stock with reversing movements' : '' }}. It is kept in the audit history with your reason. You can then record it again correctly.</p>
-                                    <div class="form-group">
-                                        <label for="vr">Reason <span class="text-danger">*</span></label>
-                                        <input id="vr" class="form-control" name="vr" [(ngModel)]="voidReason" maxlength="500" placeholder="e.g. entered on the wrong pond" />
+                            <div class="fpms-panel fpms-panel-outline fpms-panel-danger fpms-space-top-5" id="void-card">
+                                <div class="fpms-panel-head"><h3 class="fpms-panel-title">Void this entry</h3></div>
+                                <div class="fpms-panel-body">
+                                    <p class="fpms-small fpms-muted">Voiding hides the entry from records and indicators{{ log.usages?.length ? ' and returns its products to stock with reversing movements' : '' }}. It is kept in the audit history with your reason. You can then record it again correctly.</p>
+                                    <div class="fpms-field">
+                                        <label for="vr">Reason <span class="fpms-danger">*</span></label>
+                                        <input id="vr" class="fpms-control" name="vr" [(ngModel)]="voidReason" maxlength="500" placeholder="e.g. entered on the wrong pond" />
                                     </div>
-                                    <button type="button" class="btn btn-outline-danger" (click)="voidEntry()" [disabled]="busy() || !voidReason.trim()">Void entry</button>
+                                    <button type="button" class="fpms-button fpms-button-danger" (click)="voidEntry()" [disabled]="busy() || !voidReason.trim()">Void entry</button>
                                 </div>
                             </div>
                         }
