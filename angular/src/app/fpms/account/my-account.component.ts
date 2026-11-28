@@ -13,96 +13,96 @@ import { ReviewMode, saveReviewMode, savedReviewMode } from '@shared/fpms/feedba
     template: `
         <fpms-page-header [narrow]="true" title="My account" subtitle="Your own sign-in details."></fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Profile</h3></div>
+            <div class="fpms-page-inner fpms-narrow">
+                <div class="fpms-grid-row">
+                    <div class="fpms-col-lg-6">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Profile</h3></div>
                             @if (!p) {
                                 <fpms-loading></fpms-loading>
                             } @else {
                                 <form #pf="ngForm" (ngSubmit)="saveProfile()" fpmsReview="profile" novalidate>
-                                    <div class="card-body">
-                                        <div class="form-group">
+                                    <div class="fpms-panel-body">
+                                        <div class="fpms-field">
                                             <label for="un">Username</label>
-                                            <input id="un" class="form-control" [value]="p.userName" disabled />
+                                            <input id="un" class="fpms-control" [value]="p.userName" disabled />
                                         </div>
-                                        <div class="form-row">
-                                            <div class="form-group col-6">
+                                        <div class="fpms-grid-row">
+                                            <div class="fpms-field fpms-col-6">
                                                 <label for="n">First name</label>
-                                                <input id="n" class="form-control" name="name" [(ngModel)]="p.name" required maxlength="64" />
+                                                <input id="n" class="fpms-control" name="name" [(ngModel)]="p.name" required maxlength="64" />
                                             </div>
-                                            <div class="form-group col-6">
+                                            <div class="fpms-field fpms-col-6">
                                                 <label for="s">Surname</label>
-                                                <input id="s" class="form-control" name="surname" [(ngModel)]="p.surname" required maxlength="64" />
+                                                <input id="s" class="fpms-control" name="surname" [(ngModel)]="p.surname" required maxlength="64" />
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="fpms-field">
                                             <label for="e">Email</label>
-                                            <input id="e" type="email" email class="form-control" name="emailAddress" [(ngModel)]="p.emailAddress" required maxlength="256" />
+                                            <input id="e" type="email" email class="fpms-control" name="emailAddress" [(ngModel)]="p.emailAddress" required maxlength="256" />
                                         </div>
                                     </div>
-                                    <div class="card-footer">
-                                        <button class="btn btn-primary" type="submit" [disabled]="busy() || !pf.form.valid">Save profile</button>
+                                    <div class="fpms-panel-foot">
+                                        <button class="fpms-button fpms-button-primary" type="submit" [disabled]="busy() || !pf.form.valid">Save profile</button>
                                         <fpms-form-hint [form]="pf"></fpms-form-hint>
                                     </div>
                                 </form>
                             }
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Appearance</h3></div>
-                            <div class="card-body" role="radiogroup" aria-label="Colour theme">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Appearance</h3></div>
+                            <div class="fpms-panel-body" role="radiogroup" aria-label="Colour theme">
                                 @for (m of themeModes; track m.value) {
-                                    <div class="custom-control custom-radio mb-2">
-                                        <input type="radio" class="custom-control-input" name="theme" [id]="'theme-' + m.value" [value]="m.value" [checked]="theme === m.value" (change)="setTheme(m.value)" />
-                                        <label class="custom-control-label" [for]="'theme-' + m.value">{{ m.label }}</label>
-                                        <small class="form-text text-muted mt-0">{{ m.hint }}</small>
+                                    <div class="fpms-check custom-radio fpms-space-bottom-2">
+                                        <input type="radio" class="fpms-check-input" name="theme" [id]="'theme-' + m.value" [value]="m.value" [checked]="theme === m.value" (change)="setTheme(m.value)" />
+                                        <label class="fpms-check-label" [for]="'theme-' + m.value">{{ m.label }}</label>
+                                        <small class="fpms-help fpms-muted fpms-space-top-0">{{ m.hint }}</small>
                                     </div>
                                 }
-                                <small class="form-text text-muted">Saved on this device only.</small>
+                                <small class="fpms-help fpms-muted">Saved on this device only.</small>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Review before saving</h3></div>
-                            <div class="card-body" role="radiogroup" aria-label="Review before saving">
-                                <div class="custom-control custom-radio mb-2">
-                                    <input type="radio" class="custom-control-input" name="review" id="review-all" [checked]="reviewMode === 'all'" (change)="setReviewMode('all')" />
-                                    <label class="custom-control-label" for="review-all">New records and changes</label>
-                                    <small class="form-text text-muted mt-0">Every save shows what will be saved first.</small>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Review before saving</h3></div>
+                            <div class="fpms-panel-body" role="radiogroup" aria-label="Review before saving">
+                                <div class="fpms-check custom-radio fpms-space-bottom-2">
+                                    <input type="radio" class="fpms-check-input" name="review" id="review-all" [checked]="reviewMode === 'all'" (change)="setReviewMode('all')" />
+                                    <label class="fpms-check-label" for="review-all">New records and changes</label>
+                                    <small class="fpms-help fpms-muted fpms-space-top-0">Every save shows what will be saved first.</small>
                                 </div>
-                                <div class="custom-control custom-radio mb-2">
-                                    <input type="radio" class="custom-control-input" name="review" id="review-changes" [checked]="reviewMode === 'changes'" (change)="setReviewMode('changes')" />
-                                    <label class="custom-control-label" for="review-changes">Changes only</label>
-                                    <small class="form-text text-muted mt-0">New records save straight away; changes to saved records are still shown first.</small>
+                                <div class="fpms-check custom-radio fpms-space-bottom-2">
+                                    <input type="radio" class="fpms-check-input" name="review" id="review-changes" [checked]="reviewMode === 'changes'" (change)="setReviewMode('changes')" />
+                                    <label class="fpms-check-label" for="review-changes">Changes only</label>
+                                    <small class="fpms-help fpms-muted fpms-space-top-0">New records save straight away; changes to saved records are still shown first.</small>
                                 </div>
-                                <small class="form-text text-muted">Removals always ask first. Saved on this device only.</small>
+                                <small class="fpms-help fpms-muted">Removals always ask first. Saved on this device only.</small>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Change password</h3></div>
+                    <div class="fpms-col-lg-6">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head"><h3 class="fpms-panel-title">Change password</h3></div>
                             <form #wf="ngForm" (ngSubmit)="changePassword()" novalidate>
-                                <div class="card-body">
-                                    <div class="form-group">
+                                <div class="fpms-panel-body">
+                                    <div class="fpms-field">
                                         <label for="cur">Current password</label>
-                                        <input id="cur" type="password" class="form-control" name="current" [(ngModel)]="pw.current" required autocomplete="current-password" />
+                                        <input id="cur" type="password" class="fpms-control" name="current" [(ngModel)]="pw.current" required autocomplete="current-password" />
                                     </div>
-                                    <div class="form-group">
+                                    <div class="fpms-field">
                                         <label for="nw">New password</label>
-                                        <input id="nw" type="password" class="form-control" name="next" [(ngModel)]="pw.next" required minlength="8" autocomplete="new-password" />
-                                        <small class="form-text text-muted">At least 8 characters with upper- and lower-case letters and a digit.</small>
+                                        <input id="nw" type="password" class="fpms-control" name="next" [(ngModel)]="pw.next" required minlength="8" autocomplete="new-password" />
+                                        <small class="fpms-help fpms-muted">At least 8 characters with upper- and lower-case letters and a digit.</small>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="fpms-field">
                                         <label for="cf">Confirm new password</label>
-                                        <input id="cf" type="password" class="form-control" name="confirm" [(ngModel)]="pw.confirm" required autocomplete="new-password" />
+                                        <input id="cf" type="password" class="fpms-control" name="confirm" [(ngModel)]="pw.confirm" required autocomplete="new-password" />
                                         @if (pw.confirm && pw.confirm !== pw.next) {
-                                            <small class="text-danger">Passwords do not match.</small>
+                                            <small class="fpms-danger">Passwords do not match.</small>
                                         }
                                     </div>
                                 </div>
-                                <div class="card-footer">
-                                    <button class="btn btn-primary" type="submit" [disabled]="busy() || !wf.form.valid || pw.next.length < 8 || pw.next !== pw.confirm">Change password</button>
+                                <div class="fpms-panel-foot">
+                                    <button class="fpms-button fpms-button-primary" type="submit" [disabled]="busy() || !wf.form.valid || pw.next.length < 8 || pw.next !== pw.confirm">Change password</button>
                                     <fpms-form-hint [form]="wf"></fpms-form-hint>
                                 </div>
                             </form>
