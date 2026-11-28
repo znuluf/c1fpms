@@ -67,7 +67,7 @@ const MINE = 'mine';
                 }
 
                 @if (restoredAt) {
-                    <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                    <div class="fpms-alert fpms-alert-info fpms-flex fpms-align-center-items" role="status">
                         <i class="fas fa-history fpms-icon-gap"></i>
                         <span class="fpms-margin-auto-end">Your unsaved feeding entries from {{ restoredAt | farmDateTime }} were restored.</span>
                         <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="discardDraft()">Discard them</button>
@@ -75,7 +75,7 @@ const MINE = 'mine';
                 }
 
                 @if (keptCount) {
-                    <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                    <div class="fpms-alert fpms-alert-info fpms-flex fpms-align-center-items" role="status">
                         <i class="fas fa-cloud-upload-alt fpms-icon-gap" aria-hidden="true"></i>
                         <span class="fpms-margin-auto-end">
                             {{ keptCount }} feeding{{ keptCount === 1 ? ' is' : 's are' }} kept on this tablet: the farm server could not be reached.
@@ -125,7 +125,7 @@ const MINE = 'mine';
                 } @else if (sheet) {
                     @for (row of sheet.rows; track row.batchId) {
                         <div class="fpms-panel" [class.fpms-panel-outline]="row.batchId === focusBatchId" [class.fpms-panel-primary]="row.batchId === focusBatchId">
-                            <div class="fpms-panel-head fpms-flex align-items-center">
+                            <div class="fpms-panel-head fpms-flex fpms-align-center-items">
                                 <h3 class="fpms-panel-title fpms-margin-auto-end">
                                     <a [routerLink]="['/app/production/batches', row.batchId]" [title]="row.batchCode"><span class="fpms-pond-tag">{{ row.pondCode }}</span> {{ batchShort(row.batchCode) }}</a>
                                 </h3>
@@ -140,14 +140,14 @@ const MINE = 'mine';
                                             @let existing = row.sessions[s - 1];
                                             @let e = entry(row.batchId, s);
                                             <div class="fpms-slot" [class.fpms-slot-justsaved]="!e.open && !!justSaved[row.batchId + '.' + s]" [class.fpms-slot-open]="e.open" [class.fpms-slot-now]="!existing && !e.open && currentSlot(row) === s" [class.fpms-slot-later]="!existing && !e.open && isLater(s)" [class.fpms-slot-fed]="existing && existing.status !== 2 && !e.open" [class.fpms-slot-skipped]="existing && existing.status === 2 && !e.open">
-                                                <div class="fpms-flex align-items-center fpms-space-bottom-1">
+                                                <div class="fpms-flex fpms-align-center-items fpms-space-bottom-1">
                                                     @if (!existing) {
                                                         <div class="fpms-check fpms-check-box fpms-margin-auto-end">
                                                             <input type="checkbox" class="fpms-check-input" [id]="'fed' + row.batchId + s" [(ngModel)]="e.open" (ngModelChange)="keepDraft()" [disabled]="!canCreate || !feedLots.length" />
                                                             <label class="fpms-check-label fpms-weight-bold" [for]="'fed' + row.batchId + s">Record {{ s | label: L.FeedingSessions }}</label>
                                                         </div>
                                                         @if (usualTime(s)) {
-                                                            <span class="fpms-slot-time" title="Usual time"><i class="far fa-clock" aria-hidden="true"></i><span class="sr-only">usually </span>{{ usualTime(s) }}</span>
+                                                            <span class="fpms-slot-time" title="Usual time"><i class="far fa-clock" aria-hidden="true"></i><span class="fpms-visually-hidden">usually </span>{{ usualTime(s) }}</span>
                                                         }
                                                     } @else if (existing.status === 2) {
                                                         <strong class="fpms-margin-auto-end">{{ s | label: L.FeedingSessions }}: <span class="fpms-muted">Not fed</span></strong>
@@ -217,9 +217,9 @@ const MINE = 'mine';
                                                                 </select>
                                                             </div>
                                                             <div class="kg">
-                                                                <div class="input-group input-group-sm">
+                                                                <div class="fpms-input-group fpms-input-group-compact">
                                                                     <input type="number" min="0.001" max="1000" step="0.001" inputmode="decimal" class="fpms-control" [(ngModel)]="l.kg" (ngModelChange)="keepDraft()" aria-label="Kilograms fed" />
-                                                                    <div class="input-group-append"><span class="input-group-text">kg</span></div>
+                                                                    <div class="fpms-input-group-append"><span class="fpms-input-group-addon">kg</span></div>
                                                                 </div>
                                                             </div>
                                                             <div class="rm">
@@ -236,7 +236,7 @@ const MINE = 'mine';
                                                         <button type="button" class="fpms-button fpms-button-compact fpms-button-link px-0" (click)="addLine(e)"><i class="fas fa-plus fpms-icon-gap"></i>Another lot</button>
                                                     }
                                                     @if (e.status === 1) {
-                                                        <div class="fpms-grid-row align-items-center fpms-space-top-1">
+                                                        <div class="fpms-grid-row fpms-align-center-items fpms-space-top-1">
                                                             <label class="fpms-col-auto fpms-no-bottom" [for]="'fat' + row.batchId + s">Time fed <span class="fpms-weight-normal fpms-muted">(optional)</span></label>
                                                             <div class="fpms-col-auto">
                                                                 <input type="time" class="fpms-control fpms-control-compact" [id]="'fat' + row.batchId + s" [(ngModel)]="e.fedAt" (ngModelChange)="keepDraft()" />
@@ -269,7 +269,7 @@ const MINE = 'mine';
                     }
 
                     @if (canCreate && sheet.rows.length) {
-                        <div class="fpms-flex align-items-center fpms-space-bottom-3 fpms-savebar" [class.fpms-savebar-sticky]="!inWizard">
+                        <div class="fpms-flex fpms-align-center-items fpms-space-bottom-3 fpms-savebar" [class.fpms-savebar-sticky]="!inWizard">
                             <button type="button" class="fpms-button fpms-button-primary fpms-button-large fpms-space-end-3 fpms-nowrap" (click)="save()" [disabled]="busy() || !pending().length || !valid()">
                                 @if (busy()) { <i class="fas fa-spinner fa-spin fpms-icon-gap"></i> }
                                 Save {{ pending().length || '' }} feeding{{ pending().length === 1 ? '' : 's' }}
