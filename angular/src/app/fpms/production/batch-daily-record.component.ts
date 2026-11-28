@@ -70,35 +70,35 @@ function daysBetween(a: string, b: string): number {
                 <div class="fpms-dr-title">
                     @if (mode() === 'day') {
                         <h3>{{ longDate(day()) }}</h3>
-                        <div class="text-muted">Day of culture {{ docOf(day()) }} · week {{ weekNo() }}{{ day() === today ? ' · today' : '' }}</div>
+                        <div class="fpms-muted">Day of culture {{ docOf(day()) }} · week {{ weekNo() }}{{ day() === today ? ' · today' : '' }}</div>
                     } @else {
                         <h3>Week {{ weekNo() }} of culture</h3>
-                        <div class="text-muted">{{ weekDates()[0] | farmDate }} to {{ weekDates()[6] | farmDate }} · days of culture {{ docOf(weekDates()[0]) }} to {{ docOf(weekDates()[6]) }}</div>
+                        <div class="fpms-muted">{{ weekDates()[0] | farmDate }} to {{ weekDates()[6] | farmDate }} · days of culture {{ docOf(weekDates()[0]) }} to {{ docOf(weekDates()[6]) }}</div>
                     }
                 </div>
                 @if (canRecord() && mode() === 'day') {
-                    <button type="button" class="btn btn-primary no-print" (click)="record.emit(day())"><i class="fas fa-plus mr-1" aria-hidden="true"></i>Record for this day</button>
+                    <button type="button" class="fpms-button fpms-button-primary no-print" (click)="record.emit(day())"><i class="fas fa-plus fpms-icon-gap" aria-hidden="true"></i>Record for this day</button>
                 }
             </div>
             <div class="fpms-dr-toolbar no-print">
-                <div class="btn-group" role="group" aria-label="Show">
-                    <button type="button" class="btn" [class.btn-primary]="mode() === 'day'" [class.btn-outline-primary]="mode() !== 'day'" [attr.aria-pressed]="mode() === 'day'" (click)="mode.set('day')">Day</button>
-                    <button type="button" class="btn" [class.btn-primary]="mode() === 'week'" [class.btn-outline-primary]="mode() !== 'week'" [attr.aria-pressed]="mode() === 'week'" (click)="mode.set('week')">Week</button>
+                <div class="fpms-button-group" role="group" aria-label="Show">
+                    <button type="button" class="fpms-button" [class.btn-primary]="mode() === 'day'" [class.btn-outline-primary]="mode() !== 'day'" [attr.aria-pressed]="mode() === 'day'" (click)="mode.set('day')">Day</button>
+                    <button type="button" class="fpms-button" [class.btn-primary]="mode() === 'week'" [class.btn-outline-primary]="mode() !== 'week'" [attr.aria-pressed]="mode() === 'week'" (click)="mode.set('week')">Week</button>
                 </div>
                 @if (actionsOn() && mode() === 'day') {
                     <!-- View or Edit (DEC-126): the record read-only, or with Correct, Void and Record on its rows. -->
-                    <div class="btn-group" role="group" aria-label="Mode">
-                        <button type="button" class="btn" [class.btn-primary]="!editing()" [class.btn-outline-primary]="editing()" [attr.aria-pressed]="!editing()" (click)="setEditing(false)">View</button>
-                        <button type="button" class="btn" [class.btn-primary]="editing()" [class.btn-outline-primary]="!editing()" [attr.aria-pressed]="editing()" (click)="setEditing(true)"><i class="fas fa-pen mr-1" aria-hidden="true"></i>Edit</button>
+                    <div class="fpms-button-group" role="group" aria-label="Mode">
+                        <button type="button" class="fpms-button" [class.btn-primary]="!editing()" [class.btn-outline-primary]="editing()" [attr.aria-pressed]="!editing()" (click)="setEditing(false)">View</button>
+                        <button type="button" class="fpms-button" [class.btn-primary]="editing()" [class.btn-outline-primary]="!editing()" [attr.aria-pressed]="editing()" (click)="setEditing(true)"><i class="fas fa-pen fpms-icon-gap" aria-hidden="true"></i>Edit</button>
                     </div>
                 }
                 <div class="fpms-dr-steps">
-                    <button type="button" class="btn btn-outline-secondary" [attr.aria-label]="mode() === 'day' ? 'Previous day' : 'Previous week'" [disabled]="!canStep(-1)" (click)="step(-1)"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" [attr.aria-label]="mode() === 'day' ? 'Next day' : 'Next week'" [disabled]="!canStep(1)" (click)="step(1)"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+                    <button type="button" class="fpms-button fpms-button-secondary" [attr.aria-label]="mode() === 'day' ? 'Previous day' : 'Previous week'" [disabled]="!canStep(-1)" (click)="step(-1)"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+                    <button type="button" class="fpms-button fpms-button-secondary" [attr.aria-label]="mode() === 'day' ? 'Next day' : 'Next week'" [disabled]="!canStep(1)" (click)="step(1)"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
                 </div>
                 <label class="fpms-dr-goto">
                     <span>{{ mode() === 'day' ? 'Go to' : 'Go to the week of' }}</span>
-                    <input type="date" class="form-control" [min]="start()" [max]="end()" [value]="day()" (change)="goTo($any($event.target).value)" />
+                    <input type="date" class="fpms-control" [min]="start()" [max]="end()" [value]="day()" (change)="goTo($any($event.target).value)" />
                 </label>
             </div>
 
@@ -130,9 +130,9 @@ function daysBetween(a: string, b: string): number {
             </div>
 
             @if (error()) {
-                <div class="alert alert-warning d-flex align-items-center" role="alert">
-                    <span class="mr-auto"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>The records for these dates could not be loaded. {{ error() }}</span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="reload()">Try again</button>
+                <div class="fpms-alert fpms-alert-warning fpms-flex align-items-center" role="alert">
+                    <span class="fpms-margin-auto-end"><i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>The records for these dates could not be loaded. {{ error() }}</span>
+                    <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="reload()">Try again</button>
                 </div>
             } @else if (loading()) {
                 <fpms-loading></fpms-loading>
@@ -149,23 +149,23 @@ function daysBetween(a: string, b: string): number {
 
                 <div class="fpms-dr-columns">
                     <div class="fpms-dr-main">
-                        <div class="card">
-                            <div class="card-header d-flex align-items-center">
-                                <h4 class="card-title mr-auto">Feeding</h4>
-                                <span class="text-muted">{{ statusOf(day()).text }} · {{ feedKg(fs) | num: 1 }} kg</span>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head fpms-flex align-items-center">
+                                <h4 class="fpms-panel-title fpms-margin-auto-end">Feeding</h4>
+                                <span class="fpms-muted">{{ statusOf(day()).text }} · {{ feedKg(fs) | num: 1 }} kg</span>
                             </div>
-                            <div class="card-body p-0 table-responsive">
-                                <table class="table table-sm mb-0">
-                                    <thead><tr><th class="text-nowrap">Feeding</th><th class="text-right">Kg</th><th>Feed lot</th><th title="Who entered it, and when">Entered</th>@if (showActions()) {<th><span class="sr-only">Actions</span></th>}</tr></thead>
+                            <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
+                                <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
+                                    <thead><tr><th class="fpms-nowrap">Feeding</th><th class="fpms-align-end">Kg</th><th>Feed lot</th><th title="Who entered it, and when">Entered</th>@if (showActions()) {<th><span class="sr-only">Actions</span></th>}</tr></thead>
                                     <tbody>
                                         @for (n of slots(); track n) {
                                             @let s = sessionOf(day(), n);
                                             <tr>
-                                                <td class="text-nowrap">
+                                                <td class="fpms-nowrap">
                                                     Feeding {{ n }}
-                                                    @if (s?.fedAtTime) { <div class="text-muted">fed {{ s.fedAtTime }}</div> }
+                                                    @if (s?.fedAtTime) { <div class="fpms-muted">fed {{ s.fedAtTime }}</div> }
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="fpms-align-end">
                                                     @let c = feedCell(day(), n);
                                                     <span [class]="cellClass(c)">{{ c.text }}</span>
                                                 </td>
@@ -173,23 +173,23 @@ function daysBetween(a: string, b: string): number {
                                                     @for (l of s?.lines ?? []; track l.lotId) {
                                                         <div>{{ l.label }}{{ s.lines.length > 1 ? ': ' + (l.kg | num: 3) + ' kg' : '' }}</div>
                                                     }
-                                                    @if (s?.notes) { <div class="text-muted">{{ s.notes }}</div> }
+                                                    @if (s?.notes) { <div class="fpms-muted">{{ s.notes }}</div> }
                                                 </td>
                                                 <td>
                                                     @if (s) {
                                                         {{ s.recordedBy }}
-                                                        <div class="text-muted text-nowrap">{{ entered(s.creationTime, day()) }}</div>
+                                                        <div class="fpms-muted fpms-nowrap">{{ entered(s.creationTime, day()) }}</div>
                                                     }
                                                 </td>
                                                 @if (showActions()) {
                                                     <!-- Row actions (DEC-125): each opens the feeding sheet for this pond and day in the log drawer. -->
-                                                    <td class="text-right">
+                                                    <td class="fpms-align-end">
                                                         <div class="fpms-actions-stack">
                                                             @if (!s) {
-                                                                @if (canRecordDay()) { <button type="button" class="btn btn-sm btn-outline-primary" (click)="openFeeding()" [attr.aria-label]="'Record feeding ' + n">Record</button> }
+                                                                @if (canRecordDay()) { <button type="button" class="fpms-button fpms-button-compact fpms-button-outline" (click)="openFeeding()" [attr.aria-label]="'Record feeding ' + n">Record</button> }
                                                             } @else {
-                                                                @if (s.canEdit) { <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openFeeding()" [attr.aria-label]="'Correct feeding ' + n">Correct</button> }
-                                                                @if (s.canVoid) { <button type="button" class="btn btn-sm btn-outline-danger" (click)="openFeeding()" [attr.aria-label]="'Void feeding ' + n">Void</button> }
+                                                                @if (s.canEdit) { <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="openFeeding()" [attr.aria-label]="'Correct feeding ' + n">Correct</button> }
+                                                                @if (s.canVoid) { <button type="button" class="fpms-button fpms-button-compact fpms-button-danger" (click)="openFeeding()" [attr.aria-label]="'Void feeding ' + n">Void</button> }
                                                             }
                                                         </div>
                                                     </td>
@@ -201,69 +201,69 @@ function daysBetween(a: string, b: string): number {
                             </div>
                         </div>
 
-                        <div class="card">
-                            <div class="card-header d-flex align-items-center">
-                                <h4 class="card-title mr-auto">Water quality</h4>
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head fpms-flex align-items-center">
+                                <h4 class="fpms-panel-title fpms-margin-auto-end">Water quality</h4>
                                 @if (outOfRange(ls).length) {
-                                    <span class="text-warning-dark mr-2"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ outOfRange(ls).length }} out of range</span>
+                                    <span class="fpms-warning-text fpms-icon-gap"><i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>{{ outOfRange(ls).length }} out of range</span>
                                 }
                                 @if (canRecordDay()) {
-                                    <button type="button" class="btn btn-sm" [class.btn-outline-primary]="!byType(ls, WATER).length" [class.btn-outline-secondary]="byType(ls, WATER).length" (click)="openNew(WATER)">{{ byType(ls, WATER).length ? 'Add reading' : 'Record' }}</button>
+                                    <button type="button" class="fpms-button fpms-button-compact" [class.btn-outline-primary]="!byType(ls, WATER).length" [class.btn-outline-secondary]="byType(ls, WATER).length" (click)="openNew(WATER)">{{ byType(ls, WATER).length ? 'Add reading' : 'Record' }}</button>
                                 }
                             </div>
-                            <div class="card-body p-0">
+                            <div class="fpms-panel-body fpms-space-0">
                                 @for (l of byType(ls, WATER); track l.id) {
                                     <div class="fpms-dr-entry">
                                         <div class="fpms-dr-entry-head">
-                                            <span class="text-muted">{{ time(l.observedAtUtc) }} · {{ l.recordedBy }}</span>
+                                            <span class="fpms-muted">{{ time(l.observedAtUtc) }} · {{ l.recordedBy }}</span>
                                             <ng-container *ngTemplateOutlet="entryActions; context: { $implicit: l }"></ng-container>
                                         </div>
                                         <!-- Each reading on its own ruled row (DEC-116). -->
-                                        <dl class="fpms-facts mt-1">
+                                        <dl class="fpms-facts fpms-space-top-1">
                                             @for (m of l.measurements; track m.parameterCode) {
                                                 <div>
                                                     <dt>{{ m.parameterName ?? m.parameterCode }}</dt>
                                                     <dd>
                                                         {{ m.value }} {{ m.unitCode }}
-                                                        @if (m.isOutOfRange) { <span class="fpms-dr-warn ml-1"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ sideText(m) }}</span> }
+                                                        @if (m.isOutOfRange) { <span class="fpms-dr-warn fpms-icon-gap"><i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>{{ sideText(m) }}</span> }
                                                     </dd>
                                                 </div>
                                             }
                                         </dl>
                                     </div>
                                 } @empty {
-                                    <p class="text-muted px-3 py-2 mb-0">{{ isPast(day()) ? 'No water quality entered for this day.' : 'None entered yet.' }}</p>
+                                    <p class="fpms-muted px-3 fpms-space-y-2 fpms-no-bottom">{{ isPast(day()) ? 'No water quality entered for this day.' : 'None entered yet.' }}</p>
                                 }
                             </div>
                         </div>
                     </div>
 
                     <div class="fpms-dr-side">
-                        <div class="card">
-                            <div class="card-header d-flex align-items-center">
-                                <h4 class="card-title mr-auto">Other entries</h4>
-                                @if (deadOn(ls)) { <span class="text-muted">{{ deadOn(ls) | num: 0 }} dead</span> }
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-head fpms-flex align-items-center">
+                                <h4 class="fpms-panel-title fpms-margin-auto-end">Other entries</h4>
+                                @if (deadOn(ls)) { <span class="fpms-muted">{{ deadOn(ls) | num: 0 }} dead</span> }
                             </div>
-                            <div class="card-body p-0">
+                            <div class="fpms-panel-body fpms-space-0">
                                 @for (l of otherLogs(ls); track l.id) {
                                     <div class="fpms-dr-entry">
                                         <div class="fpms-dr-entry-head">
-                                            <span class="text-muted">{{ l.logType | label: LogTypes }} · {{ time(l.observedAtUtc) }}</span>
+                                            <span class="fpms-muted">{{ l.logType | label: LogTypes }} · {{ time(l.observedAtUtc) }}</span>
                                             <ng-container *ngTemplateOutlet="entryActions; context: { $implicit: l }"></ng-container>
                                         </div>
                                         <div>{{ summary(l) || '—' }}</div>
-                                        <div class="text-muted">{{ l.recordedBy }}</div>
+                                        <div class="fpms-muted">{{ l.recordedBy }}</div>
                                     </div>
                                 } @empty {
-                                    <p class="text-muted px-3 py-2 mb-0">No growth sample, mortality, chemical, pond activity or note this day.</p>
+                                    <p class="fpms-muted px-3 fpms-space-y-2 fpms-no-bottom">No growth sample, mortality, chemical, pond activity or note this day.</p>
                                 }
                             </div>
                             @if (canRecordDay()) {
                                 <!-- Record any other kind for this day (DEC-125): each opens its form in the log drawer. -->
-                                <div class="card-footer fpms-dr-record">
-                                    <span class="text-muted">Record</span>
+                                <div class="fpms-panel-foot fpms-dr-record">
+                                    <span class="fpms-muted">Record</span>
                                     @for (t of otherTypes; track t.value) {
-                                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="openNew(t.value)">{{ t.label }}</button>
+                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-outline" (click)="openNew(t.value)">{{ t.label }}</button>
                                     }
                                 </div>
                             }
@@ -271,16 +271,16 @@ function daysBetween(a: string, b: string): number {
                     </div>
                 </div>
             } @else {
-                <div class="card">
-                    <div class="card-body p-0 table-responsive">
-                        <table class="table table-sm mb-0 fpms-dr-week">
+                <div class="fpms-panel">
+                    <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
+                        <table class="fpms-data-table fpms-table-compact fpms-no-bottom fpms-dr-week">
                             <thead>
                                 <tr>
                                     <th scope="col">Day of culture</th>
-                                    @for (n of slots(); track n) { <th scope="col" class="text-right">Feeding {{ n }}</th> }
-                                    <th scope="col" class="text-right">Total kg</th>
+                                    @for (n of slots(); track n) { <th scope="col" class="fpms-align-end">Feeding {{ n }}</th> }
+                                    <th scope="col" class="fpms-align-end">Total kg</th>
                                     <th scope="col">Water quality</th>
-                                    <th scope="col" class="text-right">Dead</th>
+                                    <th scope="col" class="fpms-align-end">Dead</th>
                                     <th scope="col">Remarks</th>
                                 </tr>
                             </thead>
@@ -295,18 +295,18 @@ function daysBetween(a: string, b: string): number {
                                             } @else {
                                                 Day {{ docOf(d) }}
                                             }
-                                            <div class="font-weight-normal text-muted">{{ weekdayShort(d) }} {{ d | farmDate }}</div>
+                                            <div class="fpms-weight-normal fpms-muted">{{ weekdayShort(d) }} {{ d | farmDate }}</div>
                                         </th>
                                         @for (n of slots(); track n) {
                                             @let c = feedCell(d, n);
-                                            <td class="text-right"><span [class]="cellClass(c)">{{ c.text }}</span></td>
+                                            <td class="fpms-align-end"><span [class]="cellClass(c)">{{ c.text }}</span></td>
                                         }
-                                        <td class="text-right font-weight-bold">{{ fs.length ? (feedKg(fs) | num: 1) : '—' }}</td>
+                                        <td class="fpms-align-end fpms-weight-bold">{{ fs.length ? (feedKg(fs) | num: 1) : '—' }}</td>
                                         <td>
                                             @let w = waterCell(d, ls);
                                             <span [class]="cellClass(w)">{{ w.text }}</span>
                                         </td>
-                                        <td class="text-right">{{ deadOn(ls) ? (deadOn(ls) | num: 0) : '—' }}</td>
+                                        <td class="fpms-align-end">{{ deadOn(ls) ? (deadOn(ls) | num: 0) : '—' }}</td>
                                         <td class="fpms-dr-remarks">{{ remarks(fs, ls) || '—' }}</td>
                                     </tr>
                                 }
@@ -315,28 +315,28 @@ function daysBetween(a: string, b: string): number {
                                 <tr>
                                     <th scope="row">Week so far</th>
                                     @for (n of slots(); track n) { <td></td> }
-                                    <td class="text-right font-weight-bold">{{ feedKg(feedings()) | num: 1 }}</td>
+                                    <td class="fpms-align-end fpms-weight-bold">{{ feedKg(feedings()) | num: 1 }}</td>
                                     <td>{{ outOfRange(logs()).length }} out of range</td>
-                                    <td class="text-right font-weight-bold">{{ deadOn(logs()) | num: 0 }}</td>
+                                    <td class="fpms-align-end fpms-weight-bold">{{ deadOn(logs()) | num: 0 }}</td>
                                     <td></td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
-                <p class="text-muted">Week 1 starts on the stocking day (day of culture 0). Select a day to see its full record.</p>
+                <p class="fpms-muted">Week 1 starts on the stocking day (day of culture 0). Select a day to see its full record.</p>
             }
         }
         <ng-template #entryActions let-l>
             @if (showActions()) {
                 <span class="fpms-dr-actions">
                     @if (l.canEdit) {
-                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openEntry(l)" [attr.aria-label]="'Correct ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">Correct</button>
+                        <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="openEntry(l)" [attr.aria-label]="'Correct ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">Correct</button>
                     } @else {
-                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openEntry(l)" [attr.aria-label]="'View ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">View</button>
+                        <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="openEntry(l)" [attr.aria-label]="'View ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">View</button>
                     }
                     @if (l.canVoid) {
-                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="openEntry(l, 'void')" [attr.aria-label]="'Void ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">Void</button>
+                        <button type="button" class="fpms-button fpms-button-compact fpms-button-danger" (click)="openEntry(l, 'void')" [attr.aria-label]="'Void ' + (l.logType | label: LogTypes) + ' at ' + time(l.observedAtUtc)">Void</button>
                     }
                 </span>
             }
