@@ -1,0 +1,94 @@
+$ink: #1c2128;
+$ink-2: #2f3843;
+$muted: #5b6472;
+$line: #e3e6eb;
+$paper: #ffffff;
+$bg: #f7f8fa;
+
+$orange: #e8842e;
+$orange-deep: #c96a17;
+$orange-soft: #fbeadb;
+$orange-tint: #fdf5ee;
+
+$blue: #3d6ca8;
+$blue-deep: #2d5488;
+$blue-soft: #e3ecf6;
+$blue-tint: #f2f6fb;
+
+$green: #3f9e70;
+$green-deep: #2f7d57;
+$green-soft: #e4f2ea;
+$green-tint: #f1f9f5;
+
+$red: #c4453d;
+$red-deep: #9e2f28;
+$red-soft: #f8e4e2;
+$red-tint: #fdf2f1;
+
+$s1: 4px;
+$s2: 8px;
+$s3: 12px;
+$s4: 16px;
+$s5: 24px;
+$s6: 32px;
+$s7: 48px;
+
+$r-sm: 6px;
+$r-md: 10px;
+$r-lg: 14px;
+
+$shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+$shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+
+$sidebar-w: 240px;
+$sidebar-rail: 64px;
+$topbar-h: 56px;
+
+// Public design tokens. Components should consume these CSS custom properties.
+:root {
+    --ink: #{$ink};
+    --ink-2: #{$ink-2};
+    --muted: #{$muted};
+    --line: #{$line};
+    --paper: #{$paper};
+    --bg: #{$bg};
+
+    --orange: #{$orange};
+    --orange-deep: #{$orange-deep};
+    --orange-soft: #{$orange-soft};
+    --orange-tint: #{$orange-tint};
+
+    --blue: #{$blue};
+    --blue-deep: #{$blue-deep};
+    --blue-soft: #{$blue-soft};
+    --blue-tint: #{$blue-tint};
+
+    --green: #{$green};
+    --green-deep: #{$green-deep};
+    --green-soft: #{$green-soft};
+    --green-tint: #{$green-tint};
+
+    --red: #{$red};
+    --red-deep: #{$red-deep};
+    --red-soft: #{$red-soft};
+    --red-tint: #{$red-tint};
+
+    --s1: #{$s1};
+    --s2: #{$s2};
+    --s3: #{$s3};
+    --s4: #{$s4};
+    --s5: #{$s5};
+    --s6: #{$s6};
+    --s7: #{$s7};
+
+    --r-sm: #{$r-sm};
+    --r-md: #{$r-md};
+    --r-lg: #{$r-lg};
+
+    --shadow-sm: #{$shadow-sm};
+    --shadow-md: #{$shadow-md};
+
+    --sidebar-w: #{$sidebar-w};
+    --sidebar-rail: #{$sidebar-rail};
+    --topbar-h: #{$topbar-h};
+}
