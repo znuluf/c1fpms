@@ -56,11 +56,11 @@ interface PondCard {
         <section class="fpms-page">
             <div class="fpms-page-inner">
                 @if (pondSummary(); as summary) {
-                    <div class="row fpms-space-bottom-3" aria-label="Pond summary">
-                        <div class="col-6 col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.total }}</div><div class="fpms-small fpms-muted">Ponds on record</div></div></div></div>
-                        <div class="col-6 col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.growOut }}</div><div class="fpms-small fpms-muted">Grow-out ponds</div></div></div></div>
-                        <div class="col-6 col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.inProduction }}</div><div class="fpms-small fpms-muted">In production</div></div></div></div>
-                        <div class="col-6 col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.areaHa | num: 2 }} ha</div><div class="fpms-small fpms-muted">Total pond area</div></div></div></div>
+                    <div class="fpms-grid-row fpms-space-bottom-3" aria-label="Pond summary">
+                        <div class="fpms-col-6 fpms-col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.total }}</div><div class="fpms-small fpms-muted">Ponds on record</div></div></div></div>
+                        <div class="fpms-col-6 fpms-col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.growOut }}</div><div class="fpms-small fpms-muted">Grow-out ponds</div></div></div></div>
+                        <div class="fpms-col-6 fpms-col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.inProduction }}</div><div class="fpms-small fpms-muted">In production</div></div></div></div>
+                        <div class="fpms-col-6 fpms-col-lg-3 fpms-space-bottom-2"><div class="fpms-panel fpms-no-bottom h-100"><div class="fpms-panel-body fpms-space-y-2"><div class="fpms-stat-value fpms-no-bottom">{{ summary.areaHa | num: 2 }} ha</div><div class="fpms-small fpms-muted">Total pond area</div></div></div></div>
                     </div>
                 }
                 <section class="fpms-panel" aria-labelledby="pond-h">
