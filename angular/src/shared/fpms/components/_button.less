@@ -1,0 +1,301 @@
+// Shared button primitives and legacy Bootstrap button compatibility.
+// Imported after the other FPMS styles so the extracted rules retain their original
+// precedence over one another. Contextual layout rules remain with their owning components.
+
+// ---- Primary actions and navigation
+.btn-primary {
+    background-color: var(--fpms-primary);
+    border-color: var(--fpms-primary);
+    &:hover,
+    &:focus,
+    &:not(:disabled):not(.disabled):active {
+        background-color: var(--fpms-primary-dark);
+        border-color: var(--fpms-primary-dark);
+    }
+}
+.btn-outline-primary {
+    color: var(--fpms-primary);
+    border-color: var(--fpms-primary);
+    &:hover {
+        background-color: var(--fpms-primary);
+        border-color: var(--fpms-primary);
+    }
+}
+
+// Semantic colors (always paired with text or icons)
+.btn-success {
+    background-color: var(--fpms-success);
+    border-color: var(--fpms-success);
+    color: var(--paper);
+}
+
+// Touch targets for tablet use at the ponds
+.btn:not(.btn-sm):not(.btn-xs) {
+    min-height: 38px;
+}
+
+@media (max-width: 1024px) {
+    .btn:not(.btn-sm) {
+        min-height: 44px;
+    }
+}
+
+@media print {
+    .btn {
+        display: none !important;
+    }
+}
+
+// ---- Buttons
+.btn {
+    border-radius: var(--fpms-r-control);
+    font-weight: 600;
+    transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease),
+        box-shadow var(--fpms-motion) var(--fpms-ease), transform var(--fpms-motion) var(--fpms-ease);
+}
+.btn-sm {
+    border-radius: 6px;
+}
+.btn-outline-secondary,
+.btn-default {
+    color: var(--fpms-text);
+    background-color: var(--fpms-surface);
+    border-color: var(--fpms-control-border);
+}
+.btn-outline-secondary:hover,
+.btn-default:hover {
+    color: var(--fpms-primary);
+    background-color: var(--fpms-tide-50);
+    border-color: var(--fpms-primary);
+}
+.btn-outline-primary:hover {
+    color: var(--paper);
+}
+.btn-primary:not(:disabled):not(.disabled) {
+    box-shadow: 0 1px 2px rgba(13, 27, 42, 0.2);
+}
+
+// Buttons lift a hair on hover and settle when pressed
+.btn:not(:disabled):not(.disabled):hover {
+    transform: translateY(-1px);
+}
+.btn:not(:disabled):not(.disabled):active {
+    transform: none;
+}
+
+// Button meanings: primary commits, outline-primary is a secondary action, outline-secondary and
+// default are neutral (navigation, cancel), warning is a reversible state change (close, reopen,
+// reset), danger destroys or voids. Warning and danger use the FPMS status colors.
+.btn-warning {
+    background-color: var(--fpms-warning-text);
+    border-color: var(--fpms-warning-text);
+    color: var(--paper);
+}
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-warning:not(:disabled):not(.disabled):active {
+    background-color: var(--fpms-warning-hover-text);
+    border-color: var(--fpms-warning-hover-text);
+    color: var(--paper);
+}
+.btn-danger {
+    background-color: var(--fpms-error);
+    border-color: var(--fpms-error);
+    color: var(--paper);
+}
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger:not(:disabled):not(.disabled):active {
+    background-color: var(--fpms-badge-danger-text);
+    border-color: var(--fpms-badge-danger-text);
+    color: var(--paper);
+}
+.btn-outline-danger {
+    color: var(--fpms-error);
+    border-color: var(--fpms-error);
+}
+.btn-outline-danger:hover,
+.btn-outline-danger:not(:disabled):not(.disabled):active {
+    background-color: var(--fpms-error);
+    border-color: var(--fpms-error);
+    color: var(--paper);
+}
+.btn:disabled,
+.btn.disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+.btn:disabled:hover,
+.btn.disabled:hover {
+    transform: none;
+}
+
+.btn.fpms-auth-secondary {
+    background: var(--fpms-ground-muted);
+    border-color: transparent;
+    color: var(--fpms-text);
+}
+.btn.fpms-auth-secondary:hover,
+.btn.fpms-auth-secondary:focus {
+    background: var(--fpms-line);
+    color: var(--fpms-text);
+}
+
+// Buttons: one dark primary, quiet outline, soft red for destructive
+.btn {
+    font-size: var(--fpms-text-sm);
+}
+.btn.btn-primary:not(:disabled):not(.disabled) {
+    box-shadow: none;
+}
+.btn.btn-primary:not(:disabled):not(.disabled):hover,
+.btn.btn-primary:not(:disabled):not(.disabled):active {
+    background-color: var(--fpms-primary-hover);
+    border-color: var(--fpms-primary-hover);
+}
+.btn.btn-default,
+.btn.btn-outline-secondary {
+    border-color: var(--fpms-line);
+    background-color: var(--fpms-surface);
+    color: var(--fpms-text);
+}
+.btn.btn-default:hover,
+.btn.btn-outline-secondary:hover {
+    border-color: var(--fpms-primary);
+    background-color: var(--fpms-surface);
+    color: var(--fpms-text);
+}
+.btn.btn-danger {
+    border-color: transparent;
+    background-color: var(--fpms-red-soft);
+    color: var(--fpms-error);
+}
+.btn.btn-danger:hover,
+.btn.btn-danger:active {
+    border-color: var(--fpms-error);
+    background-color: var(--fpms-error);
+    color: var(--paper);
+}
+.btn:focus,
+.btn.focus,
+.btn.btn-primary:focus,
+.btn.btn-default:focus,
+.btn.btn-outline-secondary:focus,
+.btn.btn-danger:focus {
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--fpms-ring);
+}
+.btn.disabled,
+.btn:disabled {
+    opacity: 0.5;
+}
+
+@media (min-width: 1025px) {
+    .btn:not(.btn-sm):not(.btn-xs):not(.btn-lg) {
+        min-height: 2rem;
+        padding: 0.3125rem 0.75rem;
+        line-height: 1.25rem;
+    }
+    .btn.btn-sm {
+        min-height: 1.75rem;
+        padding: 0.125rem 0.625rem;
+        font-size: 0.8125rem;
+        line-height: 1.25rem;
+    }
+    .btn.btn-lg {
+        min-height: 2.5rem;
+        padding: 0.4375rem 1rem;
+        font-size: var(--fpms-text-sm);
+        line-height: 1.25rem;
+    }
+}
+
+// Buttons: clear hierarchy, consistent shape, and comfortable pointer targets.
+.btn {
+    min-height: 2.75rem;
+    padding: 0.55rem 1rem;
+    border-radius: var(--r-sm);
+    border-width: 1px;
+    font-weight: 600;
+    box-shadow: none;
+    transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease), color var(--fpms-motion) var(--fpms-ease), box-shadow var(--fpms-motion) var(--fpms-ease);
+}
+.btn-sm,
+.btn-xs {
+    min-height: 2.5rem;
+    padding: 0.4rem 0.75rem;
+}
+.btn-primary,
+.btn-primary:focus {
+    color: var(--paper);
+    background: var(--ink);
+    border-color: var(--ink);
+}
+.btn-primary:not(:disabled):not(.disabled):hover {
+    color: var(--paper);
+    background: var(--ink-2);
+    border-color: var(--ink-2);
+}
+.btn-outline-primary {
+    color: var(--ink);
+    border-color: var(--line);
+    background: var(--paper);
+}
+.btn-outline-primary:not(:disabled):hover {
+    color: var(--ink);
+    background: var(--bg);
+    border-color: var(--ink-2);
+}
+.btn-outline-secondary,
+.btn-default {
+    color: var(--ink-2);
+    border-color: var(--line);
+    background: var(--paper);
+}
+.btn-outline-secondary:not(:disabled):hover,
+.btn-default:not(:disabled):hover {
+    color: var(--ink);
+    background: var(--bg);
+    border-color: var(--muted);
+}
+.btn-success {
+    color: var(--paper);
+    background: var(--green-deep);
+    border-color: var(--green-deep);
+}
+.btn-danger {
+    color: var(--paper);
+    background: var(--red-deep);
+    border-color: var(--red-deep);
+}
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.58;
+    box-shadow: none;
+    transform: none;
+}
+
+// Semantic page primitives used as individual views leave the legacy Bootstrap markup.
+.fpms-button {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+    min-height: 2.75rem; padding: var(--s2) var(--s4); border: 1px solid var(--line);
+    border-radius: var(--r-sm); color: var(--ink-2); background: var(--paper);
+    font-weight: 600; text-decoration: none; cursor: pointer;
+}
+.fpms-button-primary { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+.fpms-button-secondary { color: var(--ink-2); background: var(--paper); border-color: var(--line); }
+.fpms-button-outline { color: var(--blue-deep); background: var(--paper); border-color: var(--line); }
+.fpms-button-danger { color: var(--red-deep); background: var(--paper); border-color: var(--red-soft); }
+.fpms-button-warning { color: var(--orange-deep); background: var(--orange-soft); border-color: var(--orange-soft); }
+.fpms-button-compact { min-height: 2.5rem; padding: var(--s2) var(--s3); }
+.fpms-button-link { min-height: 0; padding: 0; border: 0; color: var(--blue-deep); background: transparent; }
+.fpms-button:disabled { opacity: .58; cursor: not-allowed; }
+
+.fpms-button-large { min-height: 3rem; padding: var(--s3) var(--s5); }
+
+.fpms-button-block { display: flex; width: 100%; }
+
+.fpms-button-danger-solid { color: var(--paper); background: var(--red-deep); border-color: var(--red-deep); }
+.fpms-button-group-toggle { display: inline-flex; flex-wrap: wrap; gap: var(--s1); }
+
+.fpms-button-success { color: var(--green-deep); background: var(--paper); border-color: var(--green-soft); }

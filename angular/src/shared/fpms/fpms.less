@@ -1,23 +1,5 @@
 // FPMS component styles. Shared design tokens and global base rules live in base.less.
-// ---- Primary actions and navigation
-.btn-primary {
-    background-color: var(--fpms-primary);
-    border-color: var(--fpms-primary);
-    &:hover,
-    &:focus,
-    &:not(:disabled):not(.disabled):active {
-        background-color: var(--fpms-primary-dark);
-        border-color: var(--fpms-primary-dark);
-    }
-}
-.btn-outline-primary {
-    color: var(--fpms-primary);
-    border-color: var(--fpms-primary);
-    &:hover {
-        background-color: var(--fpms-primary);
-        border-color: var(--fpms-primary);
-    }
-}
+
 a {
     color: var(--fpms-link);
 }
@@ -27,11 +9,7 @@ a:hover {
 // Sidebar, cards and status badges are styled in theme.less.
 
 // Semantic colors (always paired with text or icons)
-.btn-success {
-    background-color: var(--fpms-success);
-    border-color: var(--fpms-success);
-    color: var(--paper);
-}
+
 .text-success {
     color: var(--fpms-success) !important;
 }
@@ -49,13 +27,9 @@ a:hover {
     margin-right: 0.15rem;
 }
 
-// Touch targets for tablet use at the ponds
-.btn:not(.btn-sm):not(.btn-xs) {
-    min-height: 38px;
-}
+
 @media (max-width: 1024px) {
-    .form-control,
-    .btn:not(.btn-sm) {
+    .form-control {
         min-height: 44px;
     }
 }
@@ -347,8 +321,7 @@ select:focus-visible {
     .main-footer,
     .no-print,
     .fpms-actions,
-    .content-header,
-    .btn {
+    .content-header {
         display: none !important;
     }
     .content-wrapper,

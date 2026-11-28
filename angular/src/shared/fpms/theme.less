@@ -839,34 +839,7 @@ fpms-logo {
     border-left-color: var(--fpms-error);
 }
 
-// ---- Buttons
-.btn {
-    border-radius: var(--fpms-r-control);
-    font-weight: 600;
-    transition: background-color var(--fpms-motion) var(--fpms-ease), border-color var(--fpms-motion) var(--fpms-ease),
-        box-shadow var(--fpms-motion) var(--fpms-ease), transform var(--fpms-motion) var(--fpms-ease);
-}
-.btn-sm {
-    border-radius: 6px;
-}
-.btn-outline-secondary,
-.btn-default {
-    color: var(--fpms-text);
-    background-color: var(--fpms-surface);
-    border-color: var(--fpms-control-border);
-}
-.btn-outline-secondary:hover,
-.btn-default:hover {
-    color: var(--fpms-primary);
-    background-color: var(--fpms-tide-50);
-    border-color: var(--fpms-primary);
-}
-.btn-outline-primary:hover {
-    color: var(--paper);
-}
-.btn-primary:not(:disabled):not(.disabled) {
-    box-shadow: 0 1px 2px rgba(13, 27, 42, 0.2);
-}
+
 
 // ---- Forms
 .form-control,
@@ -1298,13 +1271,7 @@ button.fpms-chip {
     color: var(--fpms-alert-info-text);
 }
 
-// Buttons lift a hair on hover and settle when pressed
-.btn:not(:disabled):not(.disabled):hover {
-    transform: translateY(-1px);
-}
-.btn:not(:disabled):not(.disabled):active {
-    transform: none;
-}
+
 
 // ---- Tabs, pagination, modals
 .nav-tabs .nav-link {
@@ -1828,52 +1795,7 @@ body.fpms-welcome-page {
     }
 }
 
-// Button meanings: primary commits, outline-primary is a secondary action, outline-secondary and
-// default are neutral (navigation, cancel), warning is a reversible state change (close, reopen,
-// reset), danger destroys or voids. Warning and danger use the FPMS status colors.
-.btn-warning {
-    background-color: var(--fpms-warning-text);
-    border-color: var(--fpms-warning-text);
-    color: var(--paper);
-}
-.btn-warning:hover,
-.btn-warning:focus,
-.btn-warning:not(:disabled):not(.disabled):active {
-    background-color: var(--fpms-warning-hover-text);
-    border-color: var(--fpms-warning-hover-text);
-    color: var(--paper);
-}
-.btn-danger {
-    background-color: var(--fpms-error);
-    border-color: var(--fpms-error);
-    color: var(--paper);
-}
-.btn-danger:hover,
-.btn-danger:focus,
-.btn-danger:not(:disabled):not(.disabled):active {
-    background-color: var(--fpms-badge-danger-text);
-    border-color: var(--fpms-badge-danger-text);
-    color: var(--paper);
-}
-.btn-outline-danger {
-    color: var(--fpms-error);
-    border-color: var(--fpms-error);
-}
-.btn-outline-danger:hover,
-.btn-outline-danger:not(:disabled):not(.disabled):active {
-    background-color: var(--fpms-error);
-    border-color: var(--fpms-error);
-    color: var(--paper);
-}
-.btn:disabled,
-.btn.disabled {
-    cursor: not-allowed;
-    opacity: 0.55;
-}
-.btn:disabled:hover,
-.btn.disabled:hover {
-    transform: none;
-}
+
 
 // Field validation: a field shows as invalid once it has been left, or after a submit attempt
 .form-control.ng-invalid.ng-touched,
@@ -2074,16 +1996,7 @@ body.fpms-account .login-box .card {
     margin: 0 0 1.5rem;
     color: var(--fpms-muted);
 }
-.btn.fpms-auth-secondary {
-    background: var(--fpms-ground-muted);
-    border-color: transparent;
-    color: var(--fpms-text);
-}
-.btn.fpms-auth-secondary:hover,
-.btn.fpms-auth-secondary:focus {
-    background: var(--fpms-line);
-    color: var(--fpms-text);
-}
+
 
 
 // ---- Sidebar collapsed to icons (DEC-119), desktop widths only. The page takes the width back through --fpms-nav-w,
@@ -2352,54 +2265,7 @@ button.fpms-filter-tag:focus-visible {
     font-weight: 700;
 }
 
-// Buttons: one dark primary, quiet outline, soft red for destructive
-.btn {
-    font-size: var(--fpms-text-sm);
-}
-.btn.btn-primary:not(:disabled):not(.disabled) {
-    box-shadow: none;
-}
-.btn.btn-primary:not(:disabled):not(.disabled):hover,
-.btn.btn-primary:not(:disabled):not(.disabled):active {
-    background-color: var(--fpms-primary-hover);
-    border-color: var(--fpms-primary-hover);
-}
-.btn.btn-default,
-.btn.btn-outline-secondary {
-    border-color: var(--fpms-line);
-    background-color: var(--fpms-surface);
-    color: var(--fpms-text);
-}
-.btn.btn-default:hover,
-.btn.btn-outline-secondary:hover {
-    border-color: var(--fpms-primary);
-    background-color: var(--fpms-surface);
-    color: var(--fpms-text);
-}
-.btn.btn-danger {
-    border-color: transparent;
-    background-color: var(--fpms-red-soft);
-    color: var(--fpms-error);
-}
-.btn.btn-danger:hover,
-.btn.btn-danger:active {
-    border-color: var(--fpms-error);
-    background-color: var(--fpms-error);
-    color: var(--paper);
-}
-.btn:focus,
-.btn.focus,
-.btn.btn-primary:focus,
-.btn.btn-default:focus,
-.btn.btn-outline-secondary:focus,
-.btn.btn-danger:focus {
-    outline: 0;
-    box-shadow: 0 0 0 3px var(--fpms-ring);
-}
-.btn.disabled,
-.btn:disabled {
-    opacity: 0.5;
-}
+
 
 // Fields: one box. Hairline border, darker on hover, ink border and soft ring on focus, red when invalid.
 .form-control,
@@ -2556,23 +2422,7 @@ table.table thead th {
 }
 
 @media (min-width: 1025px) {
-    .btn:not(.btn-sm):not(.btn-xs):not(.btn-lg) {
-        min-height: 2rem;
-        padding: 0.3125rem 0.75rem;
-        line-height: 1.25rem;
-    }
-    .btn.btn-sm {
-        min-height: 1.75rem;
-        padding: 0.125rem 0.625rem;
-        font-size: 0.8125rem;
-        line-height: 1.25rem;
-    }
-    .btn.btn-lg {
-        min-height: 2.5rem;
-        padding: 0.4375rem 1rem;
-        font-size: var(--fpms-text-sm);
-        line-height: 1.25rem;
-    }
+
     .form-control,
     .custom-select {
         height: 2rem;
