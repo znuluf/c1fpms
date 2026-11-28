@@ -18,7 +18,7 @@ import { BatchFiguresComponent } from './batch-figures.component';
             [subtitle]="b() ? b().pondCode + ' · ' + batchShort(b().batchCode) + ' · cycle ' + b().cycleCode + (b().indicators?.doc != null ? ' · day ' + b().indicators.doc + ' of culture' : '') + '.' : ''">
             @if (b(); as x) {
                 <!-- Recording happens in the Daily record below ("Record for this day" and its rows), so the header keeps only the batch page. -->
-                <a class="btn btn-outline-primary" [routerLink]="['/app/production/batches', x.id]"><i class="fas fa-seedling mr-1" aria-hidden="true"></i>Batch page</a>
+                <a class="fpms-button fpms-button-outline" [routerLink]="['/app/production/batches', x.id]"><i class="fas fa-seedling fpms-icon-gap" aria-hidden="true"></i>Batch page</a>
             }
         </fpms-page-header>
         <section class="fpms-page">
@@ -26,14 +26,14 @@ import { BatchFiguresComponent } from './batch-figures.component';
                 @if (mine() === null) {
                     <fpms-loading></fpms-loading>
                 } @else if (failed()) {
-                    <div class="alert alert-danger d-flex align-items-center">
-                        <i class="fas fa-exclamation-circle mr-2" aria-hidden="true"></i>
-                        <span class="mr-auto">Your pond did not load. Check the connection, then try again.</span>
-                        <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="busy()" (click)="init()">Try again</button>
+                    <div class="fpms-alert fpms-alert-danger fpms-flex align-items-center">
+                        <i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>
+                        <span class="fpms-margin-auto-end">Your pond did not load. Check the connection, then try again.</span>
+                        <button type="button" class="fpms-button fpms-button-compact fpms-button-danger" [disabled]="busy()" (click)="init()">Try again</button>
                     </div>
                 } @else if (!mine()!.length) {
                     <fpms-empty icon="fas fa-user" text="No pond is named for you yet. The Farm Owner names who looks after each batch, on the batch page. Until then, every stocked pond is on Daily log status.">
-                        <a class="btn btn-outline-primary" routerLink="/app/logbook/status">Daily log status</a>
+                        <a class="fpms-button fpms-button-outline" routerLink="/app/logbook/status">Daily log status</a>
                     </fpms-empty>
                 } @else {
                     @if (mine()!.length > 1) {
