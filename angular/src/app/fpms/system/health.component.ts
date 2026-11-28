@@ -17,7 +17,7 @@ const KINDS = [
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="System health" subtitle="Backups, storage, certificate and server errors. System Administration.">
-            <button class="btn btn-default" (click)="reload()" [disabled]="busy()"><i class="fas fa-sync-alt mr-1"></i>Refresh</button>
+            <button class="fpms-button fpms-button-secondary" (click)="reload()" [disabled]="busy()"><i class="fas fa-sync-alt fpms-icon-gap"></i>Refresh</button>
         </fpms-page-header>
         <section class="fpms-page">
             <div class="fpms-page-inner">
@@ -40,14 +40,14 @@ const KINDS = [
                                     <span><strong>{{ a.severity === 2 ? 'Critical' : 'Warning' }}:</strong> {{ a.message }}</span>
                                 </li>
                             } @empty {
-                                <li><i class="fas fa-check-circle text-success" aria-hidden="true"></i><span>No alerts. Backups are current and storage is fine.</span></li>
+                                <li><i class="fas fa-check-circle fpms-success" aria-hidden="true"></i><span>No alerts. Backups are current and storage is fine.</span></li>
                             }
                         </ul>
                     </section>
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title">Last successful runs</h3></div>
-                        <div class="card-body p-0 table-responsive">
-                            <table class="table table-sm mb-0">
+                    <div class="fpms-panel">
+                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Last successful runs</h3></div>
+                        <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
+                            <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
                                 <thead><tr><th>Job</th><th>Last success</th><th>Expected</th></tr></thead>
                                 <tbody>
                                     <tr><td>Full backup</td><td>{{ h.lastFullBackupUtc ? (h.lastFullBackupUtc | farmDateTime) : 'Never recorded' }}</td><td>Daily</td></tr>
@@ -59,39 +59,39 @@ const KINDS = [
                                 </tbody>
                             </table>
                         </div>
-                        <div class="card-footer text-muted">Server time {{ h.serverTimeUtc | farmDateTime }} ({{ h.timeZone }}).</div>
+                        <div class="fpms-panel-foot fpms-muted">Server time {{ h.serverTimeUtc | farmDateTime }} ({{ h.timeZone }}).</div>
                     </div>
                 }
-                <h3 class="fpms-section-h mt-4">Backup and maintenance history</h3>
+                <h3 class="fpms-section-h fpms-space-top-5">Backup and maintenance history</h3>
                 <div class="fpms-filter-row">
                     <label class="sl-field">
                         <span>Job</span>
-                        <select class="form-control form-control-sm w-auto" [(ngModel)]="kind" (ngModelChange)="pager.reset(); loadRuns()">
+                        <select class="fpms-control fpms-control-compact w-auto" [(ngModel)]="kind" (ngModelChange)="pager.reset(); loadRuns()">
                             <option [ngValue]="null">All jobs</option>
                             @for (k of kinds; track k.value) {
                                 <option [ngValue]="k.value">{{ k.label }}</option>
                             }
                         </select>
                     </label>
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="fo" [(ngModel)]="failedOnly" (ngModelChange)="pager.reset(); loadRuns()" />
-                        <label class="custom-control-label" for="fo">Failures only</label>
+                    <div class="fpms-check fpms-check-box">
+                        <input type="checkbox" class="fpms-check-input" id="fo" [(ngModel)]="failedOnly" (ngModelChange)="pager.reset(); loadRuns()" />
+                        <label class="fpms-check-label" for="fo">Failures only</label>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-body p-0 table-responsive">
+                <div class="fpms-panel">
+                    <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!runs()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!runs().length) {
                             <fpms-empty text="No runs recorded. The backup scripts write a row after each run (see the runbook)." icon="fas fa-database"></fpms-empty>
                         } @else {
                             <!-- Five columns (DEC-122): the job with its result, the file with its host. -->
-                            <table class="table table-sm mb-0">
+                            <table class="fpms-data-table fpms-table-compact fpms-no-bottom">
                                 <thead>
                                     <tr>
                                         <th fpmsSort="startedAt" [pager]="pager" (sorted)="loadRuns()">Started</th>
                                         <th fpmsSort="kind" [pager]="pager" (sorted)="loadRuns()" title="Job and result">Job</th>
-                                        <th class="text-right" fpmsSort="sizeBytes" [pager]="pager" (sorted)="loadRuns()">Size</th>
+                                        <th class="fpms-align-end" fpmsSort="sizeBytes" [pager]="pager" (sorted)="loadRuns()">Size</th>
                                         <th title="File and host">File</th>
                                         <th>Message</th>
                                     </tr>
@@ -99,13 +99,13 @@ const KINDS = [
                                 <tbody>
                                     @for (r of runs(); track r.id) {
                                         <tr>
-                                            <td class="text-nowrap">{{ r.startedAtUtc | farmDayOf }}<div class="text-muted">{{ r.startedAtUtc | farmTime }}</div></td>
+                                            <td class="fpms-nowrap">{{ r.startedAtUtc | farmDayOf }}<div class="fpms-muted">{{ r.startedAtUtc | farmTime }}</div></td>
                                             <td>
                                                 {{ kindLabel(r.kind) }}
-                                                <div class="mt-1"><fpms-badge [text]="r.succeeded ? 'OK' : 'Failed'" [tone]="r.succeeded ? 'success' : 'danger'"></fpms-badge></div>
+                                                <div class="fpms-space-top-1"><fpms-badge [text]="r.succeeded ? 'OK' : 'Failed'" [tone]="r.succeeded ? 'success' : 'danger'"></fpms-badge></div>
                                             </td>
-                                            <td class="text-right text-nowrap">{{ r.sizeBytes != null ? (r.sizeBytes / 1048576 | num: 1) + ' MB' : '—' }}</td>
-                                            <td class="fpms-break-any">{{ r.fileName || '—' }}<div class="text-muted">{{ r.host }}</div></td>
+                                            <td class="fpms-align-end fpms-nowrap">{{ r.sizeBytes != null ? (r.sizeBytes / 1048576 | num: 1) + ' MB' : '—' }}</td>
+                                            <td class="fpms-break-any">{{ r.fileName || '—' }}<div class="fpms-muted">{{ r.host }}</div></td>
                                             <td>{{ r.message }}</td>
                                         </tr>
                                     }
