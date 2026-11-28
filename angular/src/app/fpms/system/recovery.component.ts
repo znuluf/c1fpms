@@ -9,16 +9,16 @@ import { FPMS_IMPORTS } from '../shared-imports';
     template: `
         <fpms-page-header [narrow]="true" title="Account recovery" subtitle="Unlock an account or issue a temporary password. System Administration."></fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
-                <div class="alert alert-info">
-                    <i class="fas fa-user-shield mr-1"></i>Before acting, verify the person's identity through a second Farm Owner of the same farm or the pre-agreed security question.
+            <div class="fpms-page-inner fpms-narrow">
+                <div class="fpms-alert fpms-alert-info">
+                    <i class="fas fa-user-shield fpms-icon-gap"></i>Before acting, verify the person's identity through a second Farm Owner of the same farm or the pre-agreed security question.
                     Every action is recorded in the security log.
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="form-group">
+                <div class="fpms-panel">
+                    <div class="fpms-panel-body">
+                        <div class="fpms-field">
                             <label for="farm">Farm</label>
-                            <select id="farm" class="form-control" [(ngModel)]="tenantId" (ngModelChange)="loadUsers()">
+                            <select id="farm" class="fpms-control" [(ngModel)]="tenantId" (ngModelChange)="loadUsers()">
                                 <option [ngValue]="null">Choose a farm</option>
                                 @for (x of farms; track x.tenantId) {
                                     <option [ngValue]="x.tenantId">{{ x.farmCode }} · {{ x.name }}</option>
@@ -26,19 +26,19 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </select>
                         </div>
                         @if (users) {
-                            <div class="table-responsive">
+                            <div class="fpms-table-scroll">
                             <!-- Three columns (DEC-122): the person (pick one), role, status. -->
-                            <table class="table table-hover mb-0">
+                            <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead><tr><th>Person</th><th>Role</th><th>Status</th></tr></thead>
                                 <tbody>
                                     @for (u of users; track u.userId) {
-                                        <tr [class.table-active]="selected?.userId === u.userId" (click)="select(u)" style="cursor: pointer">
+                                        <tr [class.fpms-row-selected]="selected?.userId === u.userId" (click)="select(u)" style="cursor: pointer">
                                             <td>
-                                                <div class="custom-control custom-radio">
-                                                    <input type="radio" class="custom-control-input" name="user" [id]="'u' + u.userId" [checked]="selected?.userId === u.userId" (change)="select(u)" />
-                                                    <label class="custom-control-label" [for]="'u' + u.userId"><strong>{{ u.fullName }}</strong></label>
+                                                <div class="fpms-check fpms-check-radio">
+                                                    <input type="radio" class="fpms-check-input" name="user" [id]="'u' + u.userId" [checked]="selected?.userId === u.userId" (change)="select(u)" />
+                                                    <label class="fpms-check-label" [for]="'u' + u.userId"><strong>{{ u.fullName }}</strong></label>
                                                 </div>
-                                                <div class="text-muted pl-4">{{ u.userName }}</div>
+                                                <div class="fpms-muted pl-4">{{ u.userName }}</div>
                                             </td>
                                             <td>{{ u.roleName }}</td>
                                             <td class="fpms-badge-stack">
@@ -57,41 +57,41 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 </div>
 
                 @if (selected) {
-                    <div class="card card-outline card-warning">
-                        <div class="card-header"><h3 class="card-title">Recover {{ selected.userName }}</h3></div>
-                        <div class="card-body">
-                            <div class="form-group">
+                    <div class="fpms-panel fpms-panel-outline fpms-panel-warning">
+                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Recover {{ selected.userName }}</h3></div>
+                        <div class="fpms-panel-body">
+                            <div class="fpms-field">
                                 <label for="vm">Identity verified through</label>
-                                <select id="vm" class="form-control" [(ngModel)]="method">
+                                <select id="vm" class="fpms-control" [(ngModel)]="method">
                                     @for (o of Options.verification; track o.value) {
                                         <option [ngValue]="o.value">{{ o.label }}</option>
                                     }
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <div class="fpms-field">
                                 <label for="note">Note</label>
-                                <input id="note" class="form-control" [(ngModel)]="note" maxlength="300" placeholder="e.g. confirmed by second owner J. Cruz by phone" />
+                                <input id="note" class="fpms-control" [(ngModel)]="note" maxlength="300" placeholder="e.g. confirmed by second owner J. Cruz by phone" />
                             </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="ver" [(ngModel)]="verified" />
-                                <label class="custom-control-label" for="ver">I verified this person's identity.</label>
+                            <div class="fpms-check fpms-check-box">
+                                <input type="checkbox" class="fpms-check-input" id="ver" [(ngModel)]="verified" />
+                                <label class="fpms-check-label" for="ver">I verified this person's identity.</label>
                             </div>
                         </div>
-                        <div class="card-footer">
-                            <button class="btn btn-outline-primary mr-2" [disabled]="busy() || !verified" (click)="unlock()">Unlock account</button>
-                            <button class="btn btn-warning" [disabled]="busy() || !verified" (click)="issue()">Issue temporary password</button>
+                        <div class="fpms-panel-foot">
+                            <button class="fpms-button fpms-button-outline fpms-icon-gap" [disabled]="busy() || !verified" (click)="unlock()">Unlock account</button>
+                            <button class="fpms-button fpms-button-warning" [disabled]="busy() || !verified" (click)="issue()">Issue temporary password</button>
                         </div>
                     </div>
                 }
 
                 @if (temp) {
-                    <div class="card card-outline card-success">
-                        <div class="card-body">
-                            <p class="mb-1">Temporary password for <strong>{{ temp.userName }}</strong> (shown once):</p>
-                            <p class="h3 font-weight-bold mb-2"><code>{{ temp.temporaryPassword }}</code></p>
-                            <p class="text-muted mb-0">Give it to the person directly. They must choose a new password at their next sign-in.</p>
+                    <div class="fpms-panel fpms-panel-outline fpms-panel-success">
+                        <div class="fpms-panel-body">
+                            <p class="fpms-space-bottom-1">Temporary password for <strong>{{ temp.userName }}</strong> (shown once):</p>
+                            <p class="h3 fpms-weight-bold fpms-space-bottom-2"><code>{{ temp.temporaryPassword }}</code></p>
+                            <p class="fpms-muted fpms-no-bottom">Give it to the person directly. They must choose a new password at their next sign-in.</p>
                         </div>
-                        <div class="card-footer"><button class="btn btn-default btn-sm" (click)="temp = null">Done</button></div>
+                        <div class="fpms-panel-foot"><button class="fpms-button fpms-button-secondary fpms-button-compact" (click)="temp = null">Done</button></div>
                     </div>
                 }
             </div>
