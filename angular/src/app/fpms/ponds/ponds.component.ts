@@ -391,7 +391,6 @@ interface PondCard {
         .fpms-no-bottom { margin-bottom:0; }
         @media (max-width:767px) { .fpms-panel-head,.fpms-panel-body { padding:var(--s3); } .fpms-data-table { min-width:47rem; } }
 
-        `
             .pd-h2 {
                 float: none;
                 font-size: 1.15rem;
