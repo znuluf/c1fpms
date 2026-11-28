@@ -9,8 +9,8 @@ import { unbroken } from '@shared/fpms/labels';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="Farms" subtitle="Registered farms and their accounts. System Administration."></fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 <div class="card">
                     <div class="card-header"><h3 class="card-title">Farm registration</h3></div>
                     <div class="card-body d-flex align-items-center flex-wrap">
