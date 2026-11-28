@@ -20,7 +20,7 @@ import { crateKg, formatCrateNos, parseCrateNos } from '@shared/fpms/crates';
     imports: [...FPMS_IMPORTS, PriceTermsComponent, SalePaymentComponent],
     template: `
         <fpms-page-header [narrow]="true" [title]="isNew ? 'Record sale' : 'Edit sale ' + (original?.dispatchReceiptNo ?? '')" [subtitle]="isNew ? 'Sell harvested kilograms to a buyer. The dispatch receipt number is made when you save.' : ''" backLink="/app/sales" backLabel="Sales"></fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 @if (loading) {
                     <fpms-loading></fpms-loading>
