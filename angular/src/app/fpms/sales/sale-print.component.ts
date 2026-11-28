@@ -95,7 +95,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             </div>
                         </div>
                         <table class="fpms-doc-table">
-                            <caption class="sr-only">What was sold</caption>
+                            <caption class="fpms-visually-hidden">What was sold</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">Lot code</th>
@@ -151,8 +151,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         </p>
                         @if (s.payments.length) {
                             <table class="fpms-doc-table">
-                                <caption class="sr-only">Payments received</caption>
-                                <thead><tr><th scope="col">Payment date</th><th scope="col">Method</th><th scope="col">Note</th><th scope="col" class="num">Amount</th><th class="d-print-none"><span class="sr-only">Actions</span></th></tr></thead>
+                                <caption class="fpms-visually-hidden">Payments received</caption>
+                                <thead><tr><th scope="col">Payment date</th><th scope="col">Method</th><th scope="col">Note</th><th scope="col" class="num">Amount</th><th class="d-print-none"><span class="fpms-visually-hidden">Actions</span></th></tr></thead>
                                 <tbody>
                                     @for (p of s.payments; track p.id) {
                                         <tr>
@@ -179,7 +179,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             <div class="fpms-col-4"><div class="fpms-sign">Driver</div></div>
                             <div class="fpms-col-4"><div class="fpms-sign">Received by (buyer)</div></div>
                         </div>
-                        <p class="fpms-small fpms-align-center border-top pt-2 fpms-no-bottom"><strong>{{ s.documentNotice }}</strong></p>
+                        <p class="fpms-small fpms-align-center fpms-border-top pt-2 fpms-no-bottom"><strong>{{ s.documentNotice }}</strong></p>
                         <p class="fpms-small fpms-align-center fpms-muted fpms-no-bottom">Recorded by {{ s.recordedBy }} on {{ s.creationTime | farmDateTime }}</p>
                     </div>
                 }
