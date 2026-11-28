@@ -30,7 +30,7 @@ import { batchShort } from '@shared/fpms/labels';
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (reopening) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-reopen-title"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-warning fpms-no-bottom border-0">
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-reopen-title"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-warning fpms-no-bottom fpms-no-border">
                             <div class="fpms-panel-head"><h3 id="cycle-reopen-title" class="fpms-panel-title">Reopen cycle {{ c.cycleCode }}</h3></div>
                             <div class="fpms-panel-body">
                                 <p class="fpms-small">The cycle becomes Active again and its outcome is cleared. Its batches stay Closed; reopen a batch from its page to correct it. The reason is kept in the cycle's history.</p>
@@ -44,7 +44,7 @@ import { batchShort } from '@shared/fpms/labels';
                         </div></div></div></div>
                     }
                     @if (closing) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-close-title"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-warning fpms-no-bottom border-0">
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-close-title"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-warning fpms-no-bottom fpms-no-border">
                             <div class="fpms-panel-head"><h3 id="cycle-close-title" class="fpms-panel-title">Close production cycle {{ c.cycleCode }}</h3></div>
                             <div class="fpms-panel-body">
                                 <p>Every batch is closed. Closing the cycle makes all its records read-only. Sales and payment status can still be updated.</p>
@@ -52,9 +52,9 @@ import { batchShort } from '@shared/fpms/labels';
                                     <label class="fpms-block">Outcome <span class="fpms-danger">*</span></label>
                                     @for (o of Options.cycleOutcome; track o.value) {
                                         @if (o.value !== 2 || c.suggestedOutcome === 2) {
-                                            <div class="custom-control custom-radio custom-control-inline">
-                                                <input type="radio" class="custom-control-input" [id]="'oc' + o.value" name="outcome" [value]="o.value" [(ngModel)]="closing.outcome" />
-                                                <label class="custom-control-label" [for]="'oc' + o.value">{{ o.label }}</label>
+                                            <div class="fpms-check fpms-check-radio fpms-check-inline">
+                                                <input type="radio" class="fpms-check-input" [id]="'oc' + o.value" name="outcome" [value]="o.value" [(ngModel)]="closing.outcome" />
+                                                <label class="fpms-check-label" [for]="'oc' + o.value">{{ o.label }}</label>
                                             </div>
                                         }
                                     }
@@ -62,9 +62,9 @@ import { batchShort } from '@shared/fpms/labels';
                                         Pre-selected as {{ c.suggestedOutcome | label: L.CycleOutcomes }}{{ c.suggestedOutcome === 2 ? ' because every batch has a historical incident record' : '' }}. Change it if that is not right.
                                     </small>
                                 </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="cc" [(ngModel)]="closing.confirm" />
-                                    <label class="custom-control-label" for="cc">I understand every record of this cycle will become read-only.</label>
+                                <div class="fpms-check custom-checkbox">
+                                    <input type="checkbox" class="fpms-check-input" id="cc" [(ngModel)]="closing.confirm" />
+                                    <label class="fpms-check-label" for="cc">I understand every record of this cycle will become read-only.</label>
                                 </div>
                             </div>
                             <div class="fpms-panel-foot">
@@ -113,7 +113,7 @@ import { batchShort } from '@shared/fpms/labels';
                                             <td class="fpms-align-end">{{ b.doc ?? '—' }}</td>
                                             <td class="fpms-align-end">{{ b.currentAbwG | num: 2 }}</td>
                                             <td class="fpms-align-end">{{ b.fcrToDate | num: 2 }}</td>
-                                            <td class="fpms-align-end" [class.text-warning-dark]="b.estimatedSurvivalPct > 100">
+                                            <td class="fpms-align-end" [class.fpms-warning-text]="b.estimatedSurvivalPct > 100">
                                                 <span class="fpms-nowrap">{{ b.estimatedSurvivalPct | num: 1 }}%@if (b.estimatedSurvivalPct > 100) { <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i> }</span>
                                                 @if (b.estimatedSurvivalPct > 100) { <div>Above 100%</div> }
                                             </td>
