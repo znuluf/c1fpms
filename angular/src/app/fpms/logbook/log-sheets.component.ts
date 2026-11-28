@@ -18,24 +18,24 @@ interface Sheet {
     template: `
         <fpms-page-header title="Printable log sheets" subtitle="Print one sheet per pond, fill it in at the pond, and enter it later at a desk. Write the time you actually observed each entry.">
             @if (can('Farm.Harvests')) {
-                <a routerLink="/app/harvests/blank-tally" class="btn btn-outline-secondary mr-1"><i class="fas fa-clipboard-list mr-1" aria-hidden="true"></i>Blank harvest tally sheet</a>
+                <a routerLink="/app/harvests/blank-tally" class="fpms-button fpms-button-secondary fpms-icon-gap"><i class="fas fa-clipboard-list fpms-icon-gap" aria-hidden="true"></i>Blank harvest tally sheet</a>
             }
-            <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
+            <button class="fpms-button fpms-button-primary" (click)="print()"><i class="fas fa-print fpms-icon-gap"></i>Print</button>
         </fpms-page-header>
         <section class="fpms-page">
             <div class="fpms-page-inner">
-                <div class="card no-print">
-                    <div class="card-body">
-                        <div class="mb-3" role="group" aria-label="Sheet">
+                <div class="fpms-panel no-print">
+                    <div class="fpms-panel-body">
+                        <div class="fpms-space-bottom-3" role="group" aria-label="Sheet">
                             <button type="button" class="fpms-chip" [attr.aria-pressed]="selected === 'all'" (click)="selected = 'all'">All sheets</button>
                             @for (s of sheets; track s.key) {
                                 <button type="button" class="fpms-chip" [attr.aria-pressed]="selected === s.key" (click)="selected = s.key">{{ s.short }}</button>
                             }
                         </div>
-                        <div class="form-row align-items-end">
-                            <div class="form-group col-md-4">
+                        <div class="fpms-grid-row align-items-end">
+                            <div class="fpms-field fpms-col-md-4">
                                 <label for="pond">Pond</label>
-                                <select id="pond" class="form-control" [(ngModel)]="pond">
+                                <select id="pond" class="fpms-control" [(ngModel)]="pond">
                                     <option value="">Blank (write in)</option>
                                     @for (p of ponds; track p.id) {
                                         <option [value]="p.pondCode + (p.currentBatchCode ? ' · ' + p.currentBatchCode : '')">{{ p.pondCode }}{{ p.currentBatchCode ? ' · ' + p.currentBatchCode : '' }}</option>
@@ -50,9 +50,9 @@ interface Sheet {
                         <div class="fpms-doc-head">
                             <div>
                                 <div class="fpms-doc-farm">{{ session.tenant?.name }}</div>
-                                <div class="small">Paper log: fill in at the pond, enter into FPMS afterwards</div>
+                                <div class="fpms-small">Paper log: fill in at the pond, enter into FPMS afterwards</div>
                             </div>
-                            <div class="text-right">
+                            <div class="fpms-align-end">
                                 <div class="fpms-doc-title">{{ s.title }}</div>
                             </div>
                         </div>
@@ -67,10 +67,10 @@ interface Sheet {
                             </div>
                         </div>
                         @if (s.key === 'wq') {
-                            <p class="small mb-1">Optimal ranges (GAqP): @for (p of params; track p.code) { <span class="mr-2"><b>{{ p.name }}</b> {{ p.optimalRange }} ({{ p.guidanceFrequency }})</span> }</p>
+                            <p class="fpms-small fpms-space-bottom-1">Optimal ranges (GAqP): @for (p of params; track p.code) { <span class="fpms-icon-gap"><b>{{ p.name }}</b> {{ p.optimalRange }} ({{ p.guidanceFrequency }})</span> }</p>
                         }
-                        <div class="table-responsive">
-                        <table class="table table-bordered table-sm fpms-paper-table">
+                        <div class="fpms-table-scroll">
+                        <table class="fpms-data-table fpms-table-bordered fpms-table-compact fpms-paper-table">
                             <thead>
                                 <tr>
                                     @for (c of s.columns; track c) {
@@ -89,7 +89,7 @@ interface Sheet {
                             </tbody>
                         </table>
                         </div>
-                        <div class="small d-flex justify-content-between">
+                        <div class="fpms-small fpms-flex justify-content-between">
                             <span>Recorded by: <span class="fpms-blank"></span></span>
                             <span>Entered into FPMS on: <span class="fpms-blank"></span> by <span class="fpms-blank"></span></span>
                         </div>
