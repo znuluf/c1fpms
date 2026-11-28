@@ -22,16 +22,16 @@ import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR
                     <label class="fpms-time-label" [for]="idPrefix() + i">{{ itemLabel() }} {{ i + 1 }}</label>
                     <input
                         type="time"
-                        class="form-control"
+                        class="fpms-input"
                         [id]="idPrefix() + i"
                         [value]="t"
                         [disabled]="disabled()"
-                        [class.is-invalid]="!t || dupes().has(t)"
+                        [class.fpms-input-invalid]="!t || dupes().has(t)"
                         (change)="set(i, $any($event.target).value)"
                         (blur)="sort()" />
                     <button
                         type="button"
-                        class="btn btn-default fpms-button fpms-button-secondary fpms-time-remove"
+                        class="fpms-button fpms-button-secondary fpms-time-remove"
                         [disabled]="disabled() || times().length <= min()"
                         [attr.aria-label]="'Remove ' + itemLabel().toLowerCase() + ' ' + (i + 1)"
                         [title]="'Remove ' + itemLabel().toLowerCase() + ' ' + (i + 1)"
@@ -42,13 +42,13 @@ import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR
             }
         </div>
         <div class="fpms-times-foot">
-            <button type="button" class="btn btn-sm btn-outline-primary fpms-button fpms-button-outline" [disabled]="disabled() || times().length >= max()" (click)="add()">
+            <button type="button" class="fpms-button fpms-button-outline" [disabled]="disabled() || times().length >= max()" (click)="add()">
                 <i class="fas fa-plus fpms-icon-gap" aria-hidden="true"></i>Add {{ itemLabel().toLowerCase() }}
             </button>
-            <span class="text-muted">{{ count() }} a day{{ times().length >= max() ? ' (the most allowed)' : '' }}</span>
+            <span class="fpms-text-muted">{{ count() }} a day{{ times().length >= max() ? ' (the most allowed)' : '' }}</span>
         </div>
         @if (dupes().size) {
-            <small class="form-text text-danger"><i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>Two {{ itemLabel().toLowerCase() }}s are at {{ dupeText() }}. Change or remove one.</small>
+            <small class="fpms-form-message fpms-form-message-error"><i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>Two {{ itemLabel().toLowerCase() }}s are at {{ dupeText() }}. Change or remove one.</small>
         }
         @if (hasEmpty()) {
             <small class="form-text text-danger"><i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>Choose a time for every {{ itemLabel().toLowerCase() }}, or remove it.</small>

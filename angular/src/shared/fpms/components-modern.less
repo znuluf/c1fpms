@@ -433,3 +433,46 @@ select:focus-visible {
 .fpms-validation-message.fpms-validation-visible {
     display: block;
 }
+
+
+// Semantic equivalents for controls used by standalone FPMS widgets.
+.fpms-input {
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    box-shadow: none;
+}
+
+.fpms-input:focus-visible {
+    border-color: var(--blue);
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--blue-soft);
+}
+
+.fpms-input:disabled {
+    color: var(--muted);
+    background: var(--bg);
+}
+
+.fpms-input.fpms-input-invalid {
+    border-color: var(--red);
+}
+
+.fpms-text-muted {
+    color: var(--muted);
+}
+
+.fpms-form-message {
+    display: block;
+    margin-top: var(--s1);
+    font-size: 0.875rem;
+}
+
+.fpms-form-message-error {
+    color: var(--red-deep);
+}
