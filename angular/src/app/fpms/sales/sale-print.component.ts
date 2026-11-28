@@ -21,19 +21,19 @@ import { FPMS_IMPORTS } from '../shared-imports';
             @if (s) {
                 @if (can('Farm.Reports')) {
                     @for (b of tracedBatches(); track b.id) {
-                        <a class="btn btn-outline-secondary mr-1" [routerLink]="['/app/reports/trace', b.id]" [queryParams]="{ from: 'sales' }">Trace report{{ tracedBatches().length > 1 ? ' · ' + b.label : '' }}</a>
+                        <a class="fpms-button fpms-button-secondary fpms-icon-gap" [routerLink]="['/app/reports/trace', b.id]" [queryParams]="{ from: 'sales' }">Trace report{{ tracedBatches().length > 1 ? ' · ' + b.label : '' }}</a>
                     }
                 }
-                <a class="btn btn-outline-secondary mr-1" [routerLink]="['/app/sales', s.id, 'tally']"><i class="fas fa-clipboard-list mr-1" aria-hidden="true"></i>Buyer's tally sheet</a>
-                <a class="btn btn-outline-primary mr-1" [routerLink]="['/app/sales', s.id, 'edit']">Edit</a>
+                <a class="fpms-button fpms-button-secondary fpms-icon-gap" [routerLink]="['/app/sales', s.id, 'tally']"><i class="fas fa-clipboard-list fpms-icon-gap" aria-hidden="true"></i>Buyer's tally sheet</a>
+                <a class="fpms-button fpms-button-outline fpms-icon-gap" [routerLink]="['/app/sales', s.id, 'edit']">Edit</a>
                 @if (canManage) {
-                    <button class="btn btn-outline-danger mr-1" (click)="voiding = { reason: '' }">Void</button>
+                    <button class="fpms-button fpms-button-danger fpms-icon-gap" (click)="voiding = { reason: '' }">Void</button>
                 }
-                <div class="btn-group mr-1" role="group" aria-label="Which copy to print">
-                    <button type="button" class="btn btn-outline-secondary" [class.active]="copy === 'buyer'" [attr.aria-pressed]="copy === 'buyer'" (click)="copy = 'buyer'">Buyer copy</button>
-                    <button type="button" class="btn btn-outline-secondary" [class.active]="copy === 'farm'" [attr.aria-pressed]="copy === 'farm'" (click)="copy = 'farm'" title="Shows how each price was worked out">Farm copy</button>
+                <div class="fpms-button-group fpms-icon-gap" role="group" aria-label="Which copy to print">
+                    <button type="button" class="fpms-button fpms-button-secondary" [class.active]="copy === 'buyer'" [attr.aria-pressed]="copy === 'buyer'" (click)="copy = 'buyer'">Buyer copy</button>
+                    <button type="button" class="fpms-button fpms-button-secondary" [class.active]="copy === 'farm'" [attr.aria-pressed]="copy === 'farm'" (click)="copy = 'farm'" title="Shows how each price was worked out">Farm copy</button>
                 </div>
-                <button class="btn btn-primary" (click)="print()"><i class="fas fa-print mr-1"></i>Print</button>
+                <button class="fpms-button fpms-button-primary" (click)="print()"><i class="fas fa-print fpms-icon-gap"></i>Print</button>
             }
         </fpms-page-header>
         <section class="fpms-page">
@@ -42,15 +42,15 @@ import { FPMS_IMPORTS } from '../shared-imports';
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (voiding) {
-                        <div class="card card-outline card-danger d-print-none">
-                            <div class="card-body">
-                                <label for="vr">Why is this sale void? <span class="text-danger">*</span></label>
-                                <input id="vr" class="form-control" [(ngModel)]="voiding.reason" maxlength="200" placeholder="e.g. entered twice, buyer cancelled" />
-                                <small class="form-text text-muted">Its kilograms are left to sell again. The number {{ s.dispatchReceiptNo }} is not reused.</small>
+                        <div class="fpms-panel fpms-panel-outline fpms-panel-danger d-print-none">
+                            <div class="fpms-panel-body">
+                                <label for="vr">Why is this sale void? <span class="fpms-danger">*</span></label>
+                                <input id="vr" class="fpms-control" [(ngModel)]="voiding.reason" maxlength="200" placeholder="e.g. entered twice, buyer cancelled" />
+                                <small class="fpms-help fpms-muted">Its kilograms are left to sell again. The number {{ s.dispatchReceiptNo }} is not reused.</small>
                             </div>
-                            <div class="card-footer">
-                                <button class="btn btn-danger mr-2" [disabled]="busy() || !voiding.reason.trim()" (click)="voidSale()">Void sale</button>
-                                <button class="btn btn-default" (click)="voiding = null">Cancel</button>
+                            <div class="fpms-panel-foot">
+                                <button class="fpms-button fpms-button-danger-solid fpms-icon-gap" [disabled]="busy() || !voiding.reason.trim()" (click)="voidSale()">Void sale</button>
+                                <button class="fpms-button fpms-button-secondary" (click)="voiding = null">Cancel</button>
                             </div>
                         </div>
                     }
@@ -58,19 +58,19 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="fpms-doc-head">
                             <div>
                                 <div class="fpms-doc-farm">{{ s.farmName }}</div>
-                                <div class="small">{{ s.farmAddress }}</div>
-                                @if (s.farmContact) { <div class="small">{{ s.farmContact }}</div> }
-                                @if (session.tenant?.farmId) { <div class="small">Farm ID {{ session.tenant?.farmId }}</div> }
-                                <div class="small">BFAR registration no.: {{ s.bfarRegistrationNo || '—' }}</div>
+                                <div class="fpms-small">{{ s.farmAddress }}</div>
+                                @if (s.farmContact) { <div class="fpms-small">{{ s.farmContact }}</div> }
+                                @if (session.tenant?.farmId) { <div class="fpms-small">Farm ID {{ session.tenant?.farmId }}</div> }
+                                <div class="fpms-small">BFAR registration no.: {{ s.bfarRegistrationNo || '—' }}</div>
                                 @if (s.sfscNos) {
-                                    <div class="small">Shrimp Fry Source Certificate no.: {{ s.sfscNos }}</div>
+                                    <div class="fpms-small">Shrimp Fry Source Certificate no.: {{ s.sfscNos }}</div>
                                 }
                             </div>
-                            <div class="text-right">
+                            <div class="fpms-align-end">
                                 <div class="fpms-doc-title">DISPATCH RECEIPT</div>
                                 <div><strong>No. {{ s.dispatchReceiptNo }}</strong></div>
-                                <div class="small">Date: <strong>{{ s.saleDate | farmDate }}</strong></div>
-                                @if (s.dueDate) { <div class="small">Due: {{ s.dueDate | farmDate }}</div> }
+                                <div class="fpms-small">Date: <strong>{{ s.saleDate | farmDate }}</strong></div>
+                                @if (s.dueDate) { <div class="fpms-small">Due: {{ s.dueDate | farmDate }}</div> }
                                 <div class="fpms-doc-copy">{{ copy === 'farm' ? 'Farm copy' : 'Buyer copy' }}</div>
                             </div>
                         </div>
@@ -79,8 +79,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 <span>Buyer</span>
                                 <div>
                                     <strong>{{ s.buyerName }}</strong>
-                                    @if (s.buyerContact || s.buyerPhone) { <div class="small">{{ s.buyerContact }} {{ s.buyerPhone ? '· ' + s.buyerPhone : '' }}</div> }
-                                    @if (s.buyerAddress) { <div class="small">{{ s.buyerAddress }}</div> }
+                                    @if (s.buyerContact || s.buyerPhone) { <div class="fpms-small">{{ s.buyerContact }} {{ s.buyerPhone ? '· ' + s.buyerPhone : '' }}</div> }
+                                    @if (s.buyerAddress) { <div class="fpms-small">{{ s.buyerAddress }}</div> }
                                 </div>
                                 <span>Source</span>
                                 <div>{{ s.batches }}</div>
@@ -110,9 +110,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             <tbody>
                                 @for (l of s.lines; track l.id) {
                                     <tr>
-                                        <td class="text-monospace text-nowrap">
+                                        <td class="fpms-monospace fpms-nowrap">
                                             {{ l.lotCode || '—' }}
-                                            @if (l.lotCode && can('Farm.Reports')) { <a class="no-print d-block small" [routerLink]="['/app/reports/trace/lot', l.lotCode]" [queryParams]="{ from: 'sales' }">Trace this lot</a> }
+                                            @if (l.lotCode && can('Farm.Reports')) { <a class="no-print fpms-block fpms-small" [routerLink]="['/app/reports/trace/lot', l.lotCode]" [queryParams]="{ from: 'sales' }">Trace this lot</a> }
                                         </td>
                                         <td>{{ l.harvestedAtUtc | farmDayOf }} · {{ l.pondCode }} · {{ l.batchCode }}</td>
                                         <td>{{ l.sizeLabel }}</td>
@@ -144,10 +144,10 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 <tr class="plain"><td [attr.colspan]="hasBuyerKg() ? 6 : 5" class="num">{{ s.overpaid > 0 ? 'Overpaid' : 'Balance' }}</td><td class="num"><strong>{{ (s.overpaid > 0 ? s.overpaid : s.balance) | php }}</strong></td></tr>
                             </tfoot>
                         </table>
-                        <p class="small mb-2">
+                        <p class="fpms-small fpms-space-bottom-2">
                             {{ hasBuyerKg() ? "Amounts use the buyer's weight where one is shown, otherwise the farm's weight." : 'Amounts are on the weight shown.' }}
                             Payment terms: {{ s.paymentTerms || '—' }} · Status: {{ s.paymentStatus | label: L.PaymentStatuses }}
-                            @if (s.isOverdue) { <strong class="text-danger"> · Overdue</strong> }
+                            @if (s.isOverdue) { <strong class="fpms-danger"> · Overdue</strong> }
                         </p>
                         @if (s.payments.length) {
                             <table class="fpms-doc-table">
@@ -162,7 +162,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                             <td class="num">{{ p.amount | php }}</td>
                                             <td class="num d-print-none">
                                                 @if (canManage) {
-                                                    <button class="btn btn-xs btn-link text-danger p-0" [disabled]="busy()" (click)="removePayment(p)">Remove</button>
+                                                    <button class="fpms-button fpms-button-compact fpms-button-link fpms-danger fpms-space-0" [disabled]="busy()" (click)="removePayment(p)">Remove</button>
                                                 }
                                             </td>
                                         </tr>
@@ -174,13 +174,13 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             <div class="fpms-doc-section">Crate tally{{ g.lotCode ? ' · lot ' + g.lotCode : '' }}</div>
                             <fpms-crate-grid [crates]="g.crates" [gradeSummary]="true"></fpms-crate-grid>
                         }
-                        <div class="row mt-5 mb-3 small fpms-doc-signs">
-                            <div class="col-4"><div class="fpms-sign">Released by (farm)</div></div>
-                            <div class="col-4"><div class="fpms-sign">Driver</div></div>
-                            <div class="col-4"><div class="fpms-sign">Received by (buyer)</div></div>
+                        <div class="fpms-grid-row fpms-space-top-7 fpms-space-bottom-3 fpms-small fpms-doc-signs">
+                            <div class="fpms-col-4"><div class="fpms-sign">Released by (farm)</div></div>
+                            <div class="fpms-col-4"><div class="fpms-sign">Driver</div></div>
+                            <div class="fpms-col-4"><div class="fpms-sign">Received by (buyer)</div></div>
                         </div>
-                        <p class="small text-center border-top pt-2 mb-0"><strong>{{ s.documentNotice }}</strong></p>
-                        <p class="small text-center text-muted mb-0">Recorded by {{ s.recordedBy }} on {{ s.creationTime | farmDateTime }}</p>
+                        <p class="fpms-small fpms-align-center border-top pt-2 fpms-no-bottom"><strong>{{ s.documentNotice }}</strong></p>
+                        <p class="fpms-small fpms-align-center fpms-muted fpms-no-bottom">Recorded by {{ s.recordedBy }} on {{ s.creationTime | farmDateTime }}</p>
                     </div>
                 }
             </div>
