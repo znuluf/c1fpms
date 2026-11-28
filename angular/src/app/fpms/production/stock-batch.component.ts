@@ -70,7 +70,7 @@ interface Allocation {
                                     <!-- Each delivery as a tile: what it is, then how much is left to stock (DEC-114). -->
                                     <div class="fpms-choices" role="radiogroup" aria-label="Fry delivery">
                                         @for (d of shownDeliveries; track d.id) {
-                                            <div class="fpms-check custom-radio fpms-choice">
+                                            <div class="fpms-check fpms-check-radio fpms-choice">
                                                 <input type="radio" class="fpms-check-input" [id]="'d' + d.id" name="delivery" [value]="d.id" [(ngModel)]="deliveryId" [disabled]="!!cycleId" />
                                                 <label class="fpms-check-label" [for]="'d' + d.id">
                                                     <span class="fpms-choice-title">{{ d.hatcheryBatchNumber }} <span class="fpms-label fpms-label-info fpms-icon-gap">{{ ago(d.daysSinceReceived) }}</span></span>
