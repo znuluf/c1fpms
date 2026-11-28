@@ -32,8 +32,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 }
             }
 </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (!t) {
                     <fpms-loading></fpms-loading>
                 } @else {
