@@ -79,31 +79,31 @@ const SETUP_STEPS = ['profile', 'ponds'];
                     @let x = d();
 
                     @if (x.isOwner && pendingSetup().length) {
-                        <div class="card card-outline card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">
+                        <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
+                            <div class="fpms-panel-head">
+                                <h3 class="fpms-panel-title">
                                     <i class="fas fa-tasks" aria-hidden="true"></i>
                                     Set up your farm
                                 </h3>
-                                <span class="float-right text-muted">{{ doneSetup().length }} of {{ doneSetup().length + pendingSetup().length }} done</span>
+                                <span class="float-right fpms-muted">{{ doneSetup().length }} of {{ doneSetup().length + pendingSetup().length }} done</span>
                             </div>
-                            <div class="card-body py-2">
-                                <ul class="list-unstyled mb-0 fpms-setup">
+                            <div class="fpms-panel-body fpms-space-y-2">
+                                <ul class="list-unstyled fpms-no-bottom fpms-setup">
                                     @for (t of pendingSetup(); track t.key) {
                                         <li>
-                                            <i class="far fa-circle mr-2" aria-hidden="true"></i>
+                                            <i class="far fa-circle fpms-icon-gap" aria-hidden="true"></i>
                                             <a [routerLink]="t.route">{{ t.label }}</a>
                                         </li>
                                     }
                                 </ul>
                                 @if (doneSetup().length) {
-                                    <details class="fpms-setup-done mt-1">
-                                        <summary class="text-muted">Show {{ doneSetup().length }} finished</summary>
-                                        <ul class="list-unstyled mb-0 fpms-setup">
+                                    <details class="fpms-setup-done fpms-space-top-1">
+                                        <summary class="fpms-muted">Show {{ doneSetup().length }} finished</summary>
+                                        <ul class="list-unstyled fpms-no-bottom fpms-setup">
                                             @for (t of doneSetup(); track t.key) {
                                                 <li>
-                                                    <i class="far fa-check-circle text-success mr-2" aria-hidden="true"></i>
-                                                    <span class="text-muted">{{ t.label }}</span>
+                                                    <i class="far fa-check-circle fpms-success fpms-icon-gap" aria-hidden="true"></i>
+                                                    <span class="fpms-muted">{{ t.label }}</span>
                                                     <span class="sr-only">(done)</span>
                                                 </li>
                                             }
@@ -139,8 +139,8 @@ const SETUP_STEPS = ['profile', 'ponds'];
                         <section class="fpms-upcoming" aria-labelledby="upcoming-h">
                             <div class="fpms-upcoming-head">
                                 <div>
-                                    <h2 id="upcoming-h" class="fpms-section-h mb-1">Upcoming harvests</h2>
-                                    <p class="text-muted mb-0">Planning estimates for the next 30 days. Confirm readiness and withdrawal requirements before harvesting.</p>
+                                    <h2 id="upcoming-h" class="fpms-section-h fpms-space-bottom-1">Upcoming harvests</h2>
+                                    <p class="fpms-muted fpms-no-bottom">Planning estimates for the next 30 days. Confirm readiness and withdrawal requirements before harvesting.</p>
                                 </div>
                                 <span class="fpms-upcoming-count">{{ upcomingHarvests().length }} batches</span>
                             </div>
@@ -149,16 +149,16 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                 <div><span>Current estimated biomass</span><strong>{{ upcomingBiomass() | number:'1.0-1' }} kg</strong></div>
                                 <div><span>Nearest date</span><strong>{{ shortDate(upcomingHarvests()[0].estimatedDate) }}</strong></div>
                             </div>
-                            <div class="table-responsive">
-                                <table class="table table-sm fpms-upcoming-table mb-0">
+                            <div class="fpms-table-scroll">
+                                <table class="fpms-data-table fpms-table-compact fpms-upcoming-table fpms-no-bottom">
                                     <thead><tr><th scope="col">Pond / batch</th><th scope="col">Estimated date</th><th scope="col">DOC</th><th scope="col">ABW (g)</th><th scope="col">Estimated biomass</th></tr></thead>
                                     <tbody>
                                         @for (h of upcomingHarvests(); track h.batchId) {
                                             <tr>
-                                                <td><a [routerLink]="['/app/production/batches', h.batchId]"><strong>{{ h.pondCode }}</strong><span class="d-block text-muted small">{{ batchShort(h.batchCode) }}</span></a></td>
-                                                <td><strong>{{ shortDate(h.estimatedDate) }}</strong><span class="d-block text-muted small">{{ h.dateBasis }}</span></td>
+                                                <td><a [routerLink]="['/app/production/batches', h.batchId]"><strong>{{ h.pondCode }}</strong><span class="fpms-block fpms-muted fpms-small">{{ batchShort(h.batchCode) }}</span></a></td>
+                                                <td><strong>{{ shortDate(h.estimatedDate) }}</strong><span class="fpms-block fpms-muted fpms-small">{{ h.dateBasis }}</span></td>
                                                 <td>{{ h.doc }}</td>
-                                                <td>{{ h.currentAbwG === null ? '–' : (h.currentAbwG | num:1) }}<span class="text-muted small" *ngIf="h.targetAbwG"> / {{ h.targetAbwG | num:1 }} target</span></td>
+                                                <td>{{ h.currentAbwG === null ? '–' : (h.currentAbwG | num:1) }}<span class="fpms-muted fpms-small" *ngIf="h.targetAbwG"> / {{ h.targetAbwG | num:1 }} target</span></td>
                                                 <td>{{ h.estimatedBiomassKg === null ? '–' : (h.estimatedBiomassKg | num:1) + ' kg' }}</td>
                                             </tr>
                                         }
@@ -168,8 +168,8 @@ const SETUP_STEPS = ['profile', 'ponds'];
                         </section>
                     } @else if (hasStockedBatches()) {
                         <section class="fpms-upcoming fpms-upcoming-empty" aria-labelledby="upcoming-h">
-                            <h2 id="upcoming-h" class="fpms-section-h mb-1">Upcoming harvests</h2>
-                            <p class="text-muted mb-0">No harvest estimates fall within the next 30 days. Estimates appear when a batch has a configured maximum culture duration.</p>
+                            <h2 id="upcoming-h" class="fpms-section-h fpms-space-bottom-1">Upcoming harvests</h2>
+                            <p class="fpms-muted fpms-no-bottom">No harvest estimates fall within the next 30 days. Estimates appear when a batch has a configured maximum culture duration.</p>
                         </section>
                     }
 
@@ -177,11 +177,11 @@ const SETUP_STEPS = ['profile', 'ponds'];
                          last 7 days, then Day, ABW, FCR and survival; last sample and water status are on Daily log status. -->
                     <section class="fpms-ponds" aria-labelledby="cal-h">
                         <div class="fpms-ponds-head">
-                            <h2 id="cal-h" class="fpms-section-h mb-0">Ponds</h2>
+                            <h2 id="cal-h" class="fpms-section-h fpms-no-bottom">Ponds</h2>
                             @if (can('Farm.Logs')) {
-                                <a routerLink="/app/logbook/status" class="btn btn-outline-primary btn-sm">
+                                <a routerLink="/app/logbook/status" class="fpms-button fpms-button-outline fpms-button-compact">
                                     Proceed to Operations
-                                    <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i>
+                                    <i class="fas fa-arrow-right fpms-icon-gap" aria-hidden="true"></i>
                                 </a>
                             }
                         </div>
@@ -197,7 +197,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                             </label>
                             <label class="fpms-sort">
                                 <span>Sort by</span>
-                                <select class="form-control form-control-sm" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
+                                <select class="fpms-control fpms-control-compact" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
                                     <option value="pond">Pond code</option>
                                     <option value="attention">Needs attention first</option>
                                     <option value="doc">DOC, highest first</option>
@@ -207,7 +207,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                             @if (cycles().length > 1) {
                                 <label class="fpms-sort">
                                     <span>Cycle</span>
-                                    <select class="form-control form-control-sm" aria-label="Cycle" [ngModel]="cycle()" (ngModelChange)="cycle.set($event)">
+                                    <select class="fpms-control fpms-control-compact" aria-label="Cycle" [ngModel]="cycle()" (ngModelChange)="cycle.set($event)">
                                         <option value="">All cycles</option>
                                         @for (c of cycles(); track c) {
                                             <option [value]="c">{{ c }}</option>
@@ -218,7 +218,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                             @if (showPeople()) {
                                 <label class="fpms-sort">
                                     <span>Technician</span>
-                                    <select class="form-control form-control-sm" aria-label="Technician" [ngModel]="person()" (ngModelChange)="person.set($event)">
+                                    <select class="fpms-control fpms-control-compact" aria-label="Technician" [ngModel]="person()" (ngModelChange)="person.set($event)">
                                         <option value="">Everyone</option>
                                         @for (p of people(); track p) {
                                             <option [value]="p">{{ p }}</option>
@@ -227,7 +227,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                     </select>
                                 </label>
                             }
-                            <div class="btn-group-toggle ml-auto" role="group" aria-label="Show">
+                            <div class="fpms-button-group-toggle fpms-margin-auto-start" role="group" aria-label="Show">
                                 <button type="button" class="fpms-chip" [attr.aria-pressed]="group() === 'all'" (click)="group.set('all')">All batches · {{ rows().length }}</button>
                                 <button type="button" class="fpms-chip" [attr.aria-pressed]="group() === 'alert'" (click)="group.set('alert')">Alerts · {{ alertRows() }}</button>
                             </div>
@@ -239,7 +239,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                             } @else if (!rows().length) {
                                 <fpms-empty text="No batch is stocked yet." icon="fas fa-water">
                                     @if (can('Farm.Production.Stock')) {
-                                        <a routerLink="/app/production/create-batch" class="btn btn-sm btn-primary">Stock a batch</a>
+                                        <a routerLink="/app/production/create-batch" class="fpms-button fpms-button-compact fpms-button-primary">Stock a batch</a>
                                     }
                                 </fpms-empty>
                             } @else {
@@ -302,7 +302,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                     </div>
                                 </div>
                                 @if (!visible().length) {
-                                    <p class="text-muted px-4 py-3 mb-0">No pond matches. Clear the search or the filters.</p>
+                                    <p class="fpms-muted px-4 fpms-space-y-3 fpms-no-bottom">No pond matches. Clear the search or the filters.</p>
                                 }
                                 <div class="fpms-pcal-foot">
                                     <div class="fpms-legend">
@@ -318,7 +318,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                         <span><i class="dot-key dot-g"></i>Growth sampling</span>
                                         <span><i class="dot-key dot-c"></i>Chemical</span>
                                     </div>
-                                    <a routerLink="/app/logbook/status" class="text-nowrap">See the full status, up to 31 days<i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></a>
+                                    <a routerLink="/app/logbook/status" class="fpms-nowrap">See the full status, up to 31 days<i class="fas fa-arrow-right fpms-icon-gap" aria-hidden="true"></i></a>
                                 </div>
                             }
                         </div>
@@ -331,7 +331,7 @@ const SETUP_STEPS = ['profile', 'ponds'];
                             <h2 id="att-h" class="fpms-section-h">Needs attention</h2>
                             <div class="fpms-att-box">
                                 @if (!attentionTotal()) {
-                                    <p class="fpms-att-none mb-0"><i class="fas fa-check mr-2" aria-hidden="true"></i>Nothing needs attention: no water alerts or high mortality in the last 7 days, nothing missed before today, and stock and permits are in order.</p>
+                                    <p class="fpms-att-none fpms-no-bottom"><i class="fas fa-check fpms-icon-gap" aria-hidden="true"></i>Nothing needs attention: no water alerts or high mortality in the last 7 days, nothing missed before today, and stock and permits are in order.</p>
                                 } @else {
                                     @for (g of allGroups(); track g.key) {
                                         @if (g.rows.length) {
@@ -353,14 +353,14 @@ const SETUP_STEPS = ['profile', 'ponds'];
                                                             <li>
                                                                 <div class="what">
                                                                     <strong>{{ r.title }}</strong>
-                                                                    @if (r.ownerOnly) { <span class="badge badge-secondary ml-1">Owner</span> }
+                                                                    @if (r.ownerOnly) { <span class="fpms-label badge-secondary fpms-icon-gap">Owner</span> }
                                                                     <div class="where">
                                                                         @if (r.whereLink) { <a [routerLink]="r.whereLink">{{ r.where }}</a> } @else { {{ r.where }} }
                                                                         @if (r.since) { · {{ r.since }} }
                                                                     </div>
                                                                     @if (r.detail) { <div class="detail">{{ r.detail }}</div> }
                                                                 </div>
-                                                                <a class="btn btn-sm btn-outline-primary" [routerLink]="r.actionLink" [queryParams]="r.actionParams">{{ r.action }}</a>
+                                                                <a class="fpms-button fpms-button-compact fpms-button-outline" [routerLink]="r.actionLink" [queryParams]="r.actionParams">{{ r.action }}</a>
                                                             </li>
                                                         }
                                                     </ul>
