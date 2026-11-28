@@ -23,7 +23,7 @@ const DRAFT = 'log-entry';
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (restoredAt) {
-                        <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                        <div class="fpms-alert fpms-alert-info fpms-flex fpms-align-center-items" role="status">
                             <i class="fas fa-history fpms-icon-gap"></i>
                             <span class="fpms-margin-auto-end">Your unsaved entry from {{ restoredAt | farmDateTime }} was restored.</span>
                             <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="discardDraft()">Discard it</button>
@@ -160,7 +160,7 @@ const DRAFT = 'log-entry';
                                                 <div class="fpms-lw-tiles fpms-lw-tiles-row fpms-space-top-2" role="radiogroup" aria-label="Record type">
                                                     @if (!inWizard) {
                                                         <a class="fpms-lw-tile" [routerLink]="['/app/logbook/feeding']" [queryParams]="{ batchId: batch.id }">
-                                                            <i class="fas fa-utensils" aria-hidden="true"></i>Feeding <span class="sr-only">(opens the Feeding sheet)</span>
+                                                            <i class="fas fa-utensils" aria-hidden="true"></i>Feeding <span class="fpms-visually-hidden">(opens the Feeding sheet)</span>
                                                         </a>
                                                     }
                                                     @for (o of allowedTypes; track o.value) {
@@ -199,10 +199,10 @@ const DRAFT = 'log-entry';
                                                 @for (p of mainParams(); track p.code) {
                                                     <div class="fpms-field fpms-col-md-6 fpms-col-xl-3">
                                                         <label [for]="'r' + p.code">{{ p.name }} @if (form.logType === 2 && p.requiredAtStocking) { <span class="fpms-danger">*</span> }</label>
-                                                        <div class="input-group">
+                                                        <div class="fpms-input-group">
                                                             <input [id]="'r' + p.code" type="number" step="any" inputmode="decimal" class="fpms-control" [name]="'r' + p.code" [(ngModel)]="readings[p.code]"
                                                                 [min]="p.physicalMin" [max]="p.physicalMax" [required]="form.logType === 2 && p.requiredAtStocking" />
-                                                            <div class="input-group-append"><span class="input-group-text">{{ p.unitCode }}</span></div>
+                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">{{ p.unitCode }}</span></div>
                                                         </div>
                                                         <small class="fpms-help" [class.fpms-muted]="wq(p) === 'ok' || wq(p) === 'empty'" [class.fpms-warning-text]="wq(p) === 'out'" [class.fpms-danger]="wq(p) === 'invalid'">
                                                             @switch (wq(p)) {
@@ -224,10 +224,10 @@ const DRAFT = 'log-entry';
                                                         @for (p of otherParams(); track p.code) {
                                                     <div class="fpms-field fpms-col-md-6 fpms-col-xl-3">
                                                         <label [for]="'r' + p.code">{{ p.name }} @if (form.logType === 2 && p.requiredAtStocking) { <span class="fpms-danger">*</span> }</label>
-                                                        <div class="input-group">
+                                                        <div class="fpms-input-group">
                                                             <input [id]="'r' + p.code" type="number" step="any" inputmode="decimal" class="fpms-control" [name]="'r' + p.code" [(ngModel)]="readings[p.code]"
                                                                 [min]="p.physicalMin" [max]="p.physicalMax" [required]="form.logType === 2 && p.requiredAtStocking" />
-                                                            <div class="input-group-append"><span class="input-group-text">{{ p.unitCode }}</span></div>
+                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">{{ p.unitCode }}</span></div>
                                                         </div>
                                                         <small class="fpms-help" [class.fpms-muted]="wq(p) === 'ok' || wq(p) === 'empty'" [class.fpms-warning-text]="wq(p) === 'out'" [class.fpms-danger]="wq(p) === 'invalid'">
                                                             @switch (wq(p)) {
@@ -256,13 +256,13 @@ const DRAFT = 'log-entry';
                                             <div class="fpms-grid-row">
                                                 <div class="fpms-field fpms-col-md-6">
                                                     <label for="abw">Average body weight (ABW) <span class="fpms-danger">*</span></label>
-                                                    <div class="input-group">
+                                                    <div class="fpms-input-group">
                                                         @if (hasSample()) {
                                                             <input id="abw" class="fpms-control" name="abwShown" [ngModel]="sampleAbw() != null ? (sampleAbw()! | num: 2) : ''" readonly />
                                                         } @else {
                                                             <input id="abw" type="number" min="0.01" max="60" step="0.01" inputmode="decimal" class="fpms-control" name="abw" [(ngModel)]="growth.abwG" required />
                                                         }
-                                                        <div class="input-group-append"><span class="input-group-text">g</span></div>
+                                                        <div class="fpms-input-group-append"><span class="fpms-input-group-addon">g</span></div>
                                                     </div>
                                                     <small class="fpms-help fpms-muted">{{ hasSample() ? 'Worked out from the sample below.' : 'Type it as in the logbook, or work it out from a sample below.' }}</small>
                                                     @if (finalAbw() != null && finalAbw()! > 60) { <small class="fpms-help fpms-danger">More than 60 g is not possible. Check the value.</small> }
@@ -274,16 +274,16 @@ const DRAFT = 'log-entry';
                                                 <div class="fpms-grid-row">
                                                     <div class="fpms-field fpms-col-md-6 fpms-space-bottom-md-0">
                                                         <label for="sc">Shrimp in the sample</label>
-                                                        <div class="input-group">
+                                                        <div class="fpms-input-group">
                                                             <input id="sc" type="number" min="1" step="1" inputmode="numeric" class="fpms-control" name="sc" [(ngModel)]="growth.sampleCount" [required]="hasSample()" />
-                                                            <div class="input-group-append"><span class="input-group-text">pcs</span></div>
+                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">pcs</span></div>
                                                         </div>
                                                     </div>
                                                     <div class="fpms-field fpms-col-md-6 fpms-no-bottom">
                                                         <label for="sw2">Total sample weight</label>
-                                                        <div class="input-group">
+                                                        <div class="fpms-input-group">
                                                             <input id="sw2" type="number" min="0.01" step="0.01" inputmode="decimal" class="fpms-control" name="sw2" [(ngModel)]="growth.totalSampleWeightG" [required]="hasSample()" />
-                                                            <div class="input-group-append"><span class="input-group-text">g</span></div>
+                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">g</span></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -294,15 +294,15 @@ const DRAFT = 'log-entry';
                                                 <div class="fpms-grid-row">
                                                     <div class="fpms-field fpms-col-md-6 fpms-no-bottom">
                                                         <label for="esp">Estimated survival</label>
-                                                        <div class="input-group">
+                                                        <div class="fpms-input-group">
                                                             <input id="esp" type="number" min="0" max="100" step="0.1" inputmode="decimal" class="fpms-control" name="esp" [(ngModel)]="growth.estimatedSurvivalPct" />
-                                                            <div class="input-group-append"><span class="input-group-text">%</span></div>
+                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">%</span></div>
                                                         </div>
                                                         @if (growth.estimatedSurvivalPct != null && growth.estimatedSurvivalPct !== '' && (growth.estimatedSurvivalPct < 0 || growth.estimatedSurvivalPct > 100)) {
                                                             <small class="fpms-block fpms-danger">Enter a percentage from 0 to 100.</small>
                                                         }
                                                     </div>
-                                                    <div class="fpms-col-md-6 fpms-flex align-items-center">
+                                                    <div class="fpms-col-md-6 fpms-flex fpms-align-center-items">
                                                         <small class="fpms-muted">When given, it replaces the population worked out from mortality: PL stocked × this % (losses and harvests after this sample are still taken off).</small>
                                                     </div>
                                                 </div>
@@ -323,7 +323,7 @@ const DRAFT = 'log-entry';
                                             }
                                             <label class="fpms-block">Products used <span class="fpms-danger">*</span></label>
                                             @for (u of chem.usages; track u.key) {
-                                                <div class="fpms-grid-row align-items-start fpms-space-bottom-1">
+                                                <div class="fpms-grid-row fpms-align-start-items fpms-space-bottom-1">
                                                     <div class="fpms-col-7">
                                                         <select class="fpms-control" [name]="'ul' + u.key" [(ngModel)]="u.lotId" (ngModelChange)="prefillWithdrawal()" aria-label="Product lot" required>
                                                             @for (o of productLots; track o.lotId) {
@@ -332,9 +332,9 @@ const DRAFT = 'log-entry';
                                                         </select>
                                                     </div>
                                                     <div class="fpms-col-3">
-                                                        <div class="input-group">
+                                                        <div class="fpms-input-group">
                                                             <input type="number" min="0.001" step="0.001" inputmode="decimal" class="fpms-control" [name]="'uq' + u.key" [(ngModel)]="u.quantity" placeholder="Qty" aria-label="Quantity" required />
-                                                            <div class="input-group-append"><span class="input-group-text">{{ lotUnit(u.lotId) }}</span></div>
+                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">{{ lotUnit(u.lotId) }}</span></div>
                                                         </div>
                                                     </div>
                                                     <div class="fpms-col-2">
