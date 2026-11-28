@@ -3,6 +3,17 @@
 // bringing common page surfaces onto the shared design tokens. Page-specific
 // template cleanup remains incremental; no business logic or form rules belong here.
 
+.fpms-page {
+    min-width: 0;
+    padding: var(--s5) !important;
+    color: var(--ink);
+    background: var(--bg);
+}
+
+.fpms-page-inner {
+    min-width: 0;
+}
+
 .content-wrapper {
     min-width: 0;
     background: var(--bg);
@@ -152,7 +163,8 @@ hr {
 }
 
 @media (max-width: 767px) {
-    .content {
+    .content,
+    .fpms-page {
         padding: var(--s3) !important;
     }
 
