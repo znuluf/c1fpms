@@ -1,0 +1,32 @@
+// FPMS semantic tokens and global base rules (Capstone-Planning.md Section 4, UI and UX Design Brief).
+// Palette (DEC-145): ink navy #0D1B2A for actions and the current page, blue #3A6EA5 for links and focus, on a
+// warm off-white ground. The logo keeps its own orange and green; neither is used for status.
+// Status colors keep their meanings: success green, warning gold, error red, info blue. Brand
+// orange is never a status, and the logo's "Farm." green is for the logo only, so it is never
+// mistaken for the success green.
+:root {
+    // Base FPMS aliases now resolve through the shared design tokens.
+    // theme-neutral.less can still override these when the neutral theme is selected.
+    --fpms-primary: var(--ink);
+    --fpms-primary-dark: var(--ink-2);
+    --fpms-accent: var(--blue);
+    --fpms-link: var(--blue-deep);
+    --fpms-bg: var(--bg);
+    --fpms-text: var(--ink);
+    --fpms-muted: var(--muted);
+    --fpms-success: var(--green-deep);
+    --fpms-warning: var(--orange-deep);
+    --fpms-error: var(--red-deep);
+    --fpms-info: var(--blue-deep);
+}
+
+body,
+.content-wrapper {
+    background-color: var(--fpms-bg) !important;
+    color: var(--fpms-text);
+}
+
+.text-muted {
+    color: var(--fpms-muted) !important;
+}
+
