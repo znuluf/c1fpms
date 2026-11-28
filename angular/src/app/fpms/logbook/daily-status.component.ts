@@ -32,8 +32,8 @@ interface StatusRow {
         <fpms-page-header
             title="Daily log status"
             subtitle="Every open batch, day by day: what was entered, and how long since the last mortality, growth sample and chemical."></fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 <!-- Same look as the dashboard's ponds calendar (DEC-102, DEC-103): a toolbar on the page ground, then one panel. -->
                 <div class="fpms-toolbar">
                     <label class="fpms-search">
