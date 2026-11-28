@@ -1,8 +1,8 @@
 <div class="modal-footer justify-content-between">
-    <button type="button" class="btn btn-default" [disabled]="cancelDisabled()" (click)="onCancelClick.emit($event)">
+    <button type="button" class="btn btn-default fpms-button fpms-button-secondary" [disabled]="cancelDisabled()" (click)="onCancelClick.emit($event)">
         {{ cancelLabel() }}
     </button>
-    <button type="submit" class="btn btn-primary" [disabled]="saveDisabled()">
+    <button type="submit" class="btn btn-primary fpms-button fpms-button-primary" [disabled]="saveDisabled()">
         {{ saveLabel() }}
     </button>
 </div>

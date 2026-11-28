@@ -395,3 +395,41 @@ select:focus-visible {
     outline: 2px solid var(--blue);
     outline-offset: 2px;
 }
+
+
+// Shared ABP component refinements. Framework structure remains intact where
+// ngx-pagination and the ABP modal host depend on Bootstrap-compatible markup.
+.fpms-dialog-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    padding: var(--s1);
+    border: 1px solid var(--line);
+}
+
+.fpms-pagination .page-link {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    border-radius: var(--r-sm);
+}
+
+.fpms-pagination .page-link:focus-visible,
+.fpms-dialog-close:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px var(--blue-soft);
+}
+
+.fpms-validation-message {
+    display: none;
+    margin-top: var(--s1);
+    color: var(--red-deep);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.fpms-validation-message.fpms-validation-visible {
+    display: block;
+}
