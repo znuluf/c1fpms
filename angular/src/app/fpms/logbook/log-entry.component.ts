@@ -198,12 +198,10 @@ const DRAFT = 'log-entry';
                                             <div class="fpms-grid-row">
                                                 @for (p of mainParams(); track p.code) {
                                                     <div class="fpms-field fpms-col-md-6 fpms-col-xl-3">
-                                                        <label [for]="'r' + p.code">{{ p.name }} @if (form.logType === 2 && p.requiredAtStocking) { <span class="fpms-danger">*</span> }</label>
-                                                        <div class="fpms-input-group">
-                                                            <input [id]="'r' + p.code" type="number" step="any" inputmode="decimal" class="fpms-control" [name]="'r' + p.code" [(ngModel)]="readings[p.code]"
-                                                                [min]="p.physicalMin" [max]="p.physicalMax" [required]="form.logType === 2 && p.requiredAtStocking" />
-                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">{{ p.unitCode }}</span></div>
-                                                        </div>
+                                                        <label [for]="'r' + p.code">{{ p.name }}@if (p.unitCode) { ({{ p.unitCode }}) } @if (form.logType === 2 && p.requiredAtStocking) { <span class="fpms-danger">*</span> }</label>
+                                                        <input [id]="'r' + p.code" type="number" step="any" inputmode="decimal" class="fpms-control" [name]="'r' + p.code" [(ngModel)]="readings[p.code]"
+                                                            [min]="p.physicalMin" [max]="p.physicalMax" [required]="form.logType === 2 && p.requiredAtStocking"
+                                                            (keydown)="restrictNumericKey($event, p.physicalMin < 0)" (paste)="validateNumericPaste($event, p.physicalMin < 0)" />
                                                         <small class="fpms-help" [class.fpms-muted]="wq(p) === 'ok' || wq(p) === 'empty'" [class.fpms-warning-text]="wq(p) === 'out'" [class.fpms-danger]="wq(p) === 'invalid'">
                                                             @switch (wq(p)) {
                                                                 @case ('out') { <i class="fas fa-exclamation-triangle fpms-icon-gap"></i>Out of range ({{ p.optimalRange }}) }
@@ -255,15 +253,12 @@ const DRAFT = 'log-entry';
                                             <!-- DEC-97: the ABW is typed as in the logbook; a sample, if taken, works it out instead. -->
                                             <div class="fpms-grid-row">
                                                 <div class="fpms-field fpms-col-md-6">
-                                                    <label for="abw">Average body weight (ABW) <span class="fpms-danger">*</span></label>
-                                                    <div class="fpms-input-group">
-                                                        @if (hasSample()) {
-                                                            <input id="abw" class="fpms-control" name="abwShown" [ngModel]="sampleAbw() != null ? (sampleAbw()! | num: 2) : ''" readonly />
-                                                        } @else {
-                                                            <input id="abw" type="number" min="0.01" max="60" step="0.01" inputmode="decimal" class="fpms-control" name="abw" [(ngModel)]="growth.abwG" required />
-                                                        }
-                                                        <div class="fpms-input-group-append"><span class="fpms-input-group-addon">g</span></div>
-                                                    </div>
+                                                    <label for="abw">Average body weight (ABW, g) <span class="fpms-danger">*</span></label>
+                                                    @if (hasSample()) {
+                                                        <input id="abw" class="fpms-control" name="abwShown" [ngModel]="sampleAbw() != null ? (sampleAbw()! | num: 2) : ''" readonly />
+                                                    } @else {
+                                                        <input id="abw" type="number" min="0.01" max="60" step="0.01" inputmode="decimal" class="fpms-control" name="abw" [(ngModel)]="growth.abwG" required (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
+                                                    }
                                                     <small class="fpms-help fpms-muted">{{ hasSample() ? 'Worked out from the sample below.' : 'Type it as in the logbook, or work it out from a sample below.' }}</small>
                                                     @if (finalAbw() != null && finalAbw()! > 60) { <small class="fpms-help fpms-danger">More than 60 g is not possible. Check the value.</small> }
                                                     @if (abwChange(); as c) { <small class="fpms-help">{{ c }}</small> }
@@ -273,18 +268,12 @@ const DRAFT = 'log-entry';
                                                 <summary>Work it out from a sample <span class="fpms-fold-hint">shrimp counted and their total weight</span></summary>
                                                 <div class="fpms-grid-row">
                                                     <div class="fpms-field fpms-col-md-6 fpms-space-bottom-md-0">
-                                                        <label for="sc">Shrimp in the sample</label>
-                                                        <div class="fpms-input-group">
-                                                            <input id="sc" type="number" min="1" step="1" inputmode="numeric" class="fpms-control" name="sc" [(ngModel)]="growth.sampleCount" [required]="hasSample()" />
-                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">pcs</span></div>
-                                                        </div>
+                                                        <label for="sc">Shrimp in the sample (pcs)</label>
+                                                        <input id="sc" type="number" min="1" step="1" inputmode="numeric" class="fpms-control" name="sc" [(ngModel)]="growth.sampleCount" [required]="hasSample()" (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
                                                     </div>
                                                     <div class="fpms-field fpms-col-md-6 fpms-no-bottom">
-                                                        <label for="sw2">Total sample weight</label>
-                                                        <div class="fpms-input-group">
-                                                            <input id="sw2" type="number" min="0.01" step="0.01" inputmode="decimal" class="fpms-control" name="sw2" [(ngModel)]="growth.totalSampleWeightG" [required]="hasSample()" />
-                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">g</span></div>
-                                                        </div>
+                                                        <label for="sw2">Total sample weight (g)</label>
+                                                        <input id="sw2" type="number" min="0.01" step="0.01" inputmode="decimal" class="fpms-control" name="sw2" [(ngModel)]="growth.totalSampleWeightG" [required]="hasSample()" (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
                                                     </div>
                                                 </div>
                                                 @if (hasSample() && sampleAbw() == null) { <small class="fpms-block fpms-muted fpms-space-top-2">Enter both numbers, or clear both and type the ABW.</small> }
@@ -293,11 +282,8 @@ const DRAFT = 'log-entry';
                                                 <summary>Estimated survival <span class="fpms-fold-hint">from a cast-net or feed tray check</span></summary>
                                                 <div class="fpms-grid-row">
                                                     <div class="fpms-field fpms-col-md-6 fpms-no-bottom">
-                                                        <label for="esp">Estimated survival</label>
-                                                        <div class="fpms-input-group">
-                                                            <input id="esp" type="number" min="0" max="100" step="0.1" inputmode="decimal" class="fpms-control" name="esp" [(ngModel)]="growth.estimatedSurvivalPct" />
-                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">%</span></div>
-                                                        </div>
+                                                        <label for="esp">Estimated survival (%)</label>
+                                                        <input id="esp" type="number" min="0" max="100" step="0.1" inputmode="decimal" class="fpms-control" name="esp" [(ngModel)]="growth.estimatedSurvivalPct" (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
                                                         @if (growth.estimatedSurvivalPct != null && growth.estimatedSurvivalPct !== '' && (growth.estimatedSurvivalPct < 0 || growth.estimatedSurvivalPct > 100)) {
                                                             <small class="fpms-block fpms-danger">Enter a percentage from 0 to 100.</small>
                                                         }
@@ -332,10 +318,8 @@ const DRAFT = 'log-entry';
                                                         </select>
                                                     </div>
                                                     <div class="fpms-col-3">
-                                                        <div class="fpms-input-group">
-                                                            <input type="number" min="0.001" step="0.001" inputmode="decimal" class="fpms-control" [name]="'uq' + u.key" [(ngModel)]="u.quantity" placeholder="Qty" aria-label="Quantity" required />
-                                                            <div class="fpms-input-group-append"><span class="fpms-input-group-addon">{{ lotUnit(u.lotId) }}</span></div>
-                                                        </div>
+                                                        <label [for]="'uq' + u.key">Quantity@if (lotUnit(u.lotId)) { ({{ lotUnit(u.lotId) }}) }</label>
+                                                        <input [id]="'uq' + u.key" type="number" min="0.001" step="0.001" inputmode="decimal" class="fpms-control" [name]="'uq' + u.key" [(ngModel)]="u.quantity" required (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
                                                     </div>
                                                     <div class="fpms-col-2">
                                                         @if (chem.usages.length > 1) {
@@ -361,8 +345,8 @@ const DRAFT = 'log-entry';
                                                 <summary>Treatment details <span class="fpms-fold-hint">dosage, method, withdrawal period, prescription; for drugs and chemicals</span></summary>
                                                 <div class="fpms-grid-row">
                                                     <div class="fpms-field fpms-col-6 fpms-col-md-3">
-                                                        <label for="dz">Dosage</label>
-                                                        <input id="dz" type="number" min="0" step="any" class="fpms-control" name="dz" [(ngModel)]="chem.dosage" />
+                                                        <label for="dz">Dosage@if (chem.dosageUnit) { ({{ chem.dosageUnit }}) }</label>
+                                                        <input id="dz" type="number" min="0" step="any" inputmode="decimal" class="fpms-control" name="dz" [(ngModel)]="chem.dosage" (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
                                                     </div>
                                                     <div class="fpms-field fpms-col-6 fpms-col-md-3">
                                                         <label for="du">Dosage unit</label>
@@ -384,8 +368,8 @@ const DRAFT = 'log-entry';
                                                         <input id="ed" type="date" class="fpms-control" name="ed" [(ngModel)]="chem.endDate" [min]="observedDate()" />
                                                     </div>
                                                     <div class="fpms-field fpms-col-6 fpms-col-md-3">
-                                                        <label for="wd">Withdrawal days</label>
-                                                        <input id="wd" type="number" min="0" max="365" step="1" class="fpms-control" name="wd" [(ngModel)]="chem.withdrawalDays" />
+                                                        <label for="wd">Withdrawal period (days)</label>
+                                                        <input id="wd" type="number" min="0" max="365" step="1" inputmode="numeric" class="fpms-control" name="wd" [(ngModel)]="chem.withdrawalDays" (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
                                                         <small class="fpms-help fpms-muted">Pre-filled from the product when set.</small>
                                                     </div>
                                                     <div class="fpms-field fpms-col-md-6">
@@ -407,8 +391,8 @@ const DRAFT = 'log-entry';
                                         <div class="fpms-panel-body">
                                             <div class="fpms-grid-row">
                                                 <div class="fpms-field fpms-col-md-4">
-                                                    <label for="mc">Dead shrimp counted <span class="fpms-danger">*</span></label>
-                                                    <input id="mc" type="number" min="0" step="1" inputmode="numeric" class="fpms-control" name="mc" [(ngModel)]="mortality.count" required />
+                                                    <label for="mc">Dead shrimp counted (pcs) <span class="fpms-danger">*</span></label>
+                                                    <input id="mc" type="number" min="0" step="1" inputmode="numeric" class="fpms-control" name="mc" [(ngModel)]="mortality.count" required (keydown)="restrictNumericKey($event)" (paste)="validateNumericPaste($event)" />
                                                 </div>
                                                 <div class="fpms-field fpms-col-md-8">
                                                     <label class="fpms-block">Cause <span class="fpms-danger">*</span></label>
@@ -567,6 +551,30 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
     /** Pond activity (DEC-91): 5 water exchange, 6 aeration, 7 pond cleaning, 4 other. */
     activity: { activityType: number | null } = { activityType: null };
     readonly pondActivities = [5, 6, 7, 4].map((value) => ({ value, label: this.L.PondActivities[value] }));
+
+    /** Keep number inputs numeric while retaining normal editing and accessibility shortcuts. */
+    restrictNumericKey(event: KeyboardEvent, allowNegative = false): void {
+        if (event.ctrlKey || event.metaKey || event.altKey ||
+            ['Backspace', 'Delete', 'Tab', 'Enter', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key) ||
+            /^[0-9.]$/.test(event.key)) {
+            return;
+        }
+        if (allowNegative && event.key === '-' && (event.target as HTMLInputElement).selectionStart === 0) {
+            return;
+        }
+        if (event.key.length === 1) {
+            event.preventDefault();
+        }
+    }
+
+    /** Reject pasted text that is not a plain decimal number; native min/max/step validation still applies. */
+    validateNumericPaste(event: ClipboardEvent, allowNegative = false): void {
+        const value = event.clipboardData?.getData('text')?.trim() ?? '';
+        const pattern = allowNegative ? /^-?(?:\d+(?:\.\d*)?|\.\d+)$/ : /^(?:\d+(?:\.\d*)?|\.\d+)$/;
+        if (!pattern.test(value)) {
+            event.preventDefault();
+        }
+    }
 
     /** A note needs its text, and so does a pond activity of type Other. */
     get notesRequired(): boolean {
