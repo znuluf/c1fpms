@@ -417,3 +417,39 @@ hr {
 .fpms-tab:hover { color: var(--ink); background: var(--bg); }
 .fpms-tab.active { color: var(--ink); border-bottom-color: var(--orange); }
 .fpms-tab:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+
+// Semantic input groups used for numeric values with visible units and suffixes.
+.fpms-input-group {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+}
+.fpms-input-group > .fpms-control {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+    border-radius: var(--r-sm) 0 0 var(--r-sm);
+}
+.fpms-input-group-append {
+    display: flex;
+    flex: 0 0 auto;
+}
+.fpms-input-group-addon {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--s2) var(--s3);
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-left: 0;
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    white-space: nowrap;
+}
+.fpms-input-group-compact > .fpms-control,
+.fpms-input-group-compact .fpms-input-group-addon {
+    min-height: 2.5rem;
+    padding-block: var(--s1);
+}
