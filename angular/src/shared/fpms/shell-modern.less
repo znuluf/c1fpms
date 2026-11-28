@@ -1,0 +1,182 @@
+// Token-driven application shell overrides. Imported after legacy FPMS theme rules.
+
+:root {
+    --fpms-nav-w: var(--sidebar-w);
+}
+
+.main-sidebar.fpms-sidebar,
+.wrapper .main-sidebar.fpms-sidebar {
+    width: var(--sidebar-w);
+}
+
+.wrapper .main-sidebar.fpms-sidebar {
+    top: 0;
+    bottom: 0;
+    height: 100vh;
+}
+
+.main-header.navbar,
+.main-sidebar.fpms-sidebar .fpms-brand {
+    height: var(--topbar-h);
+    min-height: var(--topbar-h);
+}
+
+html body.sidebar-mini .wrapper .main-header,
+html body.sidebar-mini .wrapper > .content-wrapper,
+html body.sidebar-mini .wrapper .main-footer {
+    margin-left: var(--fpms-nav-w) !important;
+}
+
+body.fpms-nav-mini {
+    --fpms-nav-w: var(--sidebar-rail);
+}
+
+body.fpms-nav-mini:not(.fpms-nav-peek) .main-sidebar.fpms-sidebar {
+    width: var(--sidebar-rail);
+}
+
+body.fpms-nav-mini.fpms-nav-peek .main-sidebar.fpms-sidebar {
+    width: var(--sidebar-w);
+}
+
+body.fpms-nav-mini.fpms-nav-peek .main-sidebar.fpms-sidebar .fpms-brand {
+    width: var(--sidebar-w) !important;
+}
+
+// Compact desktop: show the icon rail by default, with hover and keyboard-focus expansion.
+@media (min-width: 1024px) and (max-width: 1280px) {
+    body.sidebar-mini {
+        --fpms-nav-w: var(--sidebar-rail);
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar {
+        width: var(--sidebar-rail);
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-brand {
+        width: var(--sidebar-rail) !important;
+        justify-content: center;
+        padding: 0;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-brand .fpms-logo-wordmark {
+        display: none;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-brand .fpms-logo-mark {
+        display: block;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-nav-card .sidebar {
+        padding: 0 var(--s2);
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .nav-sidebar > .fpms-nav-label {
+        height: 1px;
+        margin: var(--s2);
+        padding: 0;
+        overflow: hidden;
+        font-size: 0;
+        background: var(--line);
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .nav-sidebar .nav-link,
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+        padding: var(--s2) 0;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .nav-sidebar .nav-link p,
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link span,
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-user-panel .info {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-chevron,
+    body.sidebar-mini .main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview {
+        display: none;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-nav-foot {
+        padding: var(--s2);
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar .fpms-user-panel {
+        justify-content: center;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within {
+        width: var(--sidebar-w);
+        box-shadow: var(--shadow-md);
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .fpms-brand,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .fpms-brand {
+        width: var(--sidebar-w) !important;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .fpms-brand .fpms-logo-wordmark,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .fpms-brand .fpms-logo-wordmark {
+        display: block;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .fpms-brand .fpms-logo-mark,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .fpms-brand .fpms-logo-mark {
+        display: none;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .nav-sidebar .nav-link p,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .nav-sidebar .nav-link p,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .fpms-nav-foot .nav-link span,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .fpms-nav-foot .nav-link span,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .fpms-user-panel .info,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .fpms-user-panel .info {
+        position: static;
+        width: auto;
+        height: auto;
+        overflow: visible;
+        clip: auto;
+        white-space: normal;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .nav-sidebar .nav-treeview,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .nav-sidebar .nav-treeview {
+        display: block;
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .fpms-nav-card .sidebar,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .fpms-nav-card .sidebar {
+        padding: 0 var(--s3);
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .fpms-nav-foot,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .fpms-nav-foot {
+        padding: var(--s2) var(--s3);
+    }
+
+    body.sidebar-mini .main-sidebar.fpms-sidebar:hover .fpms-user-panel,
+    body.sidebar-mini .main-sidebar.fpms-sidebar:focus-within .fpms-user-panel {
+        justify-content: flex-start;
+    }
+}
+
+@media (min-width: 1024px) {
+    html,
+    body,
+    .wrapper,
+    .content-wrapper {
+        min-width: 0;
+    }
+
+    .content-wrapper {
+        overflow-x: clip;
+    }
+}
