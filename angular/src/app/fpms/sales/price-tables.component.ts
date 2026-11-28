@@ -76,7 +76,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         @for (t of tables(); track t.id) {
                             <div class="fpms-col-lg-6">
                                 <div class="fpms-panel" [class.fpms-muted]="!t.isActive">
-                                    <div class="fpms-panel-head fpms-flex align-items-center">
+                                    <div class="fpms-panel-head fpms-flex fpms-align-center-items">
                                         <h3 class="fpms-panel-title fpms-margin-auto-end">{{ t.name }}{{ t.isActive ? '' : ' (inactive)' }}</h3>
                                         <span class="fpms-small fpms-icon-gap">{{ t.buyerName || 'Any buyer' }}</span>
                                         @if (canManage) { <button class="fpms-button fpms-button-compact fpms-button-outline" (click)="edit(t)">Edit</button> }
