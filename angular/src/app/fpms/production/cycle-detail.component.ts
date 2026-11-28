@@ -12,15 +12,15 @@ import { batchShort } from '@shared/fpms/labels';
         <fpms-page-header [title]="'Cycle ' + (c?.cycleCode ?? '')" [subtitle]="c ? (c.startDate ? 'Started ' + (c.startDate | farmDate) + '. ' : '') + 'Holds the batches stocked from fry delivery ' + c.hatcheryBatchNumber + '.' : ''" backLink="/app/production/cycles" backLabel="Production cycles">
             @if (c) {
                 <fpms-badge [text]="c.status | label: L.CycleStatuses"></fpms-badge>
-                @if (c.outcome) { <span class="badge ml-1" [class.badge-success]="c.outcome === 1" [class.badge-warning]="c.outcome === 2">{{ c.outcome | label: L.CycleOutcomes }}</span> }
+                @if (c.outcome) { <span class="fpms-label fpms-icon-gap" [class.fpms-label-success]="c.outcome === 1" [class.fpms-label-warning]="c.outcome === 2">{{ c.outcome | label: L.CycleOutcomes }}</span> }
                 @if (c.canCreateBatch) {
-                    <a class="btn btn-primary" routerLink="/app/production/create-batch" [queryParams]="{ cycleId: c.id }"><i class="fas fa-shrimp mr-1"></i>Add batch to this cycle</a>
+                    <a class="fpms-button fpms-button-primary" routerLink="/app/production/create-batch" [queryParams]="{ cycleId: c.id }"><i class="fas fa-shrimp fpms-icon-gap"></i>Add batch to this cycle</a>
                 }
                 @if (c.canClose) {
-                    <button class="btn btn-outline-secondary" (click)="closing = { confirm: false, outcome: c.suggestedOutcome }">Close production cycle</button>
+                    <button class="fpms-button fpms-button-secondary" (click)="closing = { confirm: false, outcome: c.suggestedOutcome }">Close production cycle</button>
                 }
                 @if (c.canReopen) {
-                    <button class="btn btn-outline-secondary" (click)="reopening = { reason: '' }">Reopen cycle</button>
+                    <button class="fpms-button fpms-button-secondary" (click)="reopening = { reason: '' }">Reopen cycle</button>
                 }
             }
         </fpms-page-header>
@@ -30,26 +30,26 @@ import { batchShort } from '@shared/fpms/labels';
                     <fpms-loading></fpms-loading>
                 } @else {
                     @if (reopening) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-reopen-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
-                            <div class="card-header"><h3 id="cycle-reopen-title" class="card-title">Reopen cycle {{ c.cycleCode }}</h3></div>
-                            <div class="card-body">
-                                <p class="small">The cycle becomes Active again and its outcome is cleared. Its batches stay Closed; reopen a batch from its page to correct it. The reason is kept in the cycle's history.</p>
-                                <label for="rr">Reason <span class="text-danger">*</span></label>
-                                <input id="rr" class="form-control" [(ngModel)]="reopening.reason" maxlength="500" placeholder="e.g. a harvest weight was entered wrong" />
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-reopen-title"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-warning fpms-no-bottom border-0">
+                            <div class="fpms-panel-head"><h3 id="cycle-reopen-title" class="fpms-panel-title">Reopen cycle {{ c.cycleCode }}</h3></div>
+                            <div class="fpms-panel-body">
+                                <p class="fpms-small">The cycle becomes Active again and its outcome is cleared. Its batches stay Closed; reopen a batch from its page to correct it. The reason is kept in the cycle's history.</p>
+                                <label for="rr">Reason <span class="fpms-danger">*</span></label>
+                                <input id="rr" class="fpms-control" [(ngModel)]="reopening.reason" maxlength="500" placeholder="e.g. a harvest weight was entered wrong" />
                             </div>
-                            <div class="card-footer">
-                                <button class="btn btn-warning mr-2" [disabled]="busy() || reopening.reason.trim().length < 3" (click)="reopen()">Reopen cycle</button>
-                                <button class="btn btn-default" (click)="reopening = null">Cancel</button>
+                            <div class="fpms-panel-foot">
+                                <button class="fpms-button fpms-button-warning fpms-icon-gap" [disabled]="busy() || reopening.reason.trim().length < 3" (click)="reopen()">Reopen cycle</button>
+                                <button class="fpms-button fpms-button-secondary" (click)="reopening = null">Cancel</button>
                             </div>
                         </div></div></div></div>
                     }
                     @if (closing) {
-                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-close-title"><div class="fpms-dialog-body p-0"><div class="card card-outline card-warning mb-0 border-0">
-                            <div class="card-header"><h3 id="cycle-close-title" class="card-title">Close production cycle {{ c.cycleCode }}</h3></div>
-                            <div class="card-body">
+                        <div class="fpms-dialog-backdrop"><div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="cycle-close-title"><div class="fpms-dialog-body fpms-space-0"><div class="fpms-panel fpms-panel-outline fpms-panel-warning fpms-no-bottom border-0">
+                            <div class="fpms-panel-head"><h3 id="cycle-close-title" class="fpms-panel-title">Close production cycle {{ c.cycleCode }}</h3></div>
+                            <div class="fpms-panel-body">
                                 <p>Every batch is closed. Closing the cycle makes all its records read-only. Sales and payment status can still be updated.</p>
-                                <div class="form-group">
-                                    <label class="d-block">Outcome <span class="text-danger">*</span></label>
+                                <div class="fpms-field">
+                                    <label class="fpms-block">Outcome <span class="fpms-danger">*</span></label>
                                     @for (o of Options.cycleOutcome; track o.value) {
                                         @if (o.value !== 2 || c.suggestedOutcome === 2) {
                                             <div class="custom-control custom-radio custom-control-inline">
@@ -58,7 +58,7 @@ import { batchShort } from '@shared/fpms/labels';
                                             </div>
                                         }
                                     }
-                                    <small class="form-text text-muted">
+                                    <small class="fpms-help fpms-muted">
                                         Pre-selected as {{ c.suggestedOutcome | label: L.CycleOutcomes }}{{ c.suggestedOutcome === 2 ? ' because every batch has a historical incident record' : '' }}. Change it if that is not right.
                                     </small>
                                 </div>
@@ -67,9 +67,9 @@ import { batchShort } from '@shared/fpms/labels';
                                     <label class="custom-control-label" for="cc">I understand every record of this cycle will become read-only.</label>
                                 </div>
                             </div>
-                            <div class="card-footer">
-                                <button class="btn btn-warning mr-2" [disabled]="busy() || !closing.confirm || !closing.outcome" (click)="close()">Close cycle</button>
-                                <button class="btn btn-default" (click)="closing = null">Cancel</button>
+                            <div class="fpms-panel-foot">
+                                <button class="fpms-button fpms-button-warning fpms-icon-gap" [disabled]="busy() || !closing.confirm || !closing.outcome" (click)="close()">Close cycle</button>
+                                <button class="fpms-button fpms-button-secondary" (click)="closing = null">Cancel</button>
                             </div>
                         </div></div></div></div>
                     }
@@ -92,34 +92,34 @@ import { batchShort } from '@shared/fpms/labels';
                         }
                     </section>
                     <!-- Batches across the width; six columns that each hold what belongs together, so the table fits 1,000 px (DEC-112). -->
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title">Batches <span class="text-muted font-weight-normal">· {{ c.openBatchCount }} of {{ c.batches?.length ?? 0 }} open</span></h3></div>
-                        <div class="card-body p-0 table-responsive">
-                            <table class="table table-hover mb-0">
+                    <div class="fpms-panel">
+                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Batches <span class="fpms-muted fpms-weight-normal">· {{ c.openBatchCount }} of {{ c.batches?.length ?? 0 }} open</span></h3></div>
+                        <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
+                            <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
-                                    <tr><th>Batch</th><th>Stocked</th><th class="text-right">DOC</th><th class="text-right">ABW (g)</th><th class="text-right">FCR</th><th class="text-right" title="Estimated survival">Survival</th></tr>
+                                    <tr><th>Batch</th><th>Stocked</th><th class="fpms-align-end">DOC</th><th class="fpms-align-end">ABW (g)</th><th class="fpms-align-end">FCR</th><th class="fpms-align-end" title="Estimated survival">Survival</th></tr>
                                 </thead>
                                 <tbody>
                                     @for (b of c.batches; track b.id) {
                                         <tr>
                                             <td>
-                                                <a class="text-nowrap" [routerLink]="['/app/production/batches', b.id]" [title]="b.batchCode"><span class="fpms-pond-tag">{{ b.pondCode }}</span> {{ batchShort(b.batchCode) }}</a>
-                                                <div class="mt-1"><fpms-badge [text]="b.status | label: L.BatchStatuses"></fpms-badge></div>
+                                                <a class="fpms-nowrap" [routerLink]="['/app/production/batches', b.id]" [title]="b.batchCode"><span class="fpms-pond-tag">{{ b.pondCode }}</span> {{ batchShort(b.batchCode) }}</a>
+                                                <div class="fpms-space-top-1"><fpms-badge [text]="b.status | label: L.BatchStatuses"></fpms-badge></div>
                                             </td>
-                                            <td class="text-nowrap">
+                                            <td class="fpms-nowrap">
                                                 {{ b.stockingDate | farmDate }}
-                                                <div class="text-muted">{{ b.plCountStocked | num: 0 }} PL</div>
+                                                <div class="fpms-muted">{{ b.plCountStocked | num: 0 }} PL</div>
                                             </td>
-                                            <td class="text-right">{{ b.doc ?? '—' }}</td>
-                                            <td class="text-right">{{ b.currentAbwG | num: 2 }}</td>
-                                            <td class="text-right">{{ b.fcrToDate | num: 2 }}</td>
-                                            <td class="text-right" [class.text-warning-dark]="b.estimatedSurvivalPct > 100">
-                                                <span class="text-nowrap">{{ b.estimatedSurvivalPct | num: 1 }}%@if (b.estimatedSurvivalPct > 100) { <i class="fas fa-exclamation-triangle ml-1" aria-hidden="true"></i> }</span>
+                                            <td class="fpms-align-end">{{ b.doc ?? '—' }}</td>
+                                            <td class="fpms-align-end">{{ b.currentAbwG | num: 2 }}</td>
+                                            <td class="fpms-align-end">{{ b.fcrToDate | num: 2 }}</td>
+                                            <td class="fpms-align-end" [class.text-warning-dark]="b.estimatedSurvivalPct > 100">
+                                                <span class="fpms-nowrap">{{ b.estimatedSurvivalPct | num: 1 }}%@if (b.estimatedSurvivalPct > 100) { <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i> }</span>
                                                 @if (b.estimatedSurvivalPct > 100) { <div>Above 100%</div> }
                                             </td>
                                         </tr>
                                     } @empty {
-                                        <tr><td colspan="6" class="text-center text-muted py-3">No batches yet.{{ c.canCreateBatch ? ' Use Add batch to this cycle.' : '' }}</td></tr>
+                                        <tr><td colspan="6" class="fpms-align-center fpms-muted fpms-space-y-3">No batches yet.{{ c.canCreateBatch ? ' Use Add batch to this cycle.' : '' }}</td></tr>
                                     }
                                 </tbody>
                             </table>
@@ -127,18 +127,18 @@ import { batchShort } from '@shared/fpms/labels';
                     </div>
                     <!-- Reference below: the fry delivery as facts, then the cycle's history (DEC-112). -->
                     <div class="fpms-split">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="fpms-panel">
+                            <div class="fpms-panel-body">
                                 <h3 class="fpms-section-h">Fry delivery</h3>
                                 <dl class="fpms-facts">
-                                    <div><dt>Hatchery</dt><dd>{{ c.hatcheryName }} <span class="fpms-pond-tag ml-1">{{ c.hatcheryShortCode }}</span></dd></div>
+                                    <div><dt>Hatchery</dt><dd>{{ c.hatcheryName }} <span class="fpms-pond-tag fpms-icon-gap">{{ c.hatcheryShortCode }}</span></dd></div>
                                     <div><dt>Hatchery batch number</dt><dd><a [routerLink]="['/app/resources/fry-deliveries', c.fryDeliveryId]">{{ c.hatcheryBatchNumber }}</a></dd></div>
                                     <div><dt>Delivered</dt><dd>{{ c.deliveryDate | farmDate }}</dd></div>
                                     <div><dt>PL age</dt><dd>{{ c.plAgeDays != null ? 'PL' + c.plAgeDays : '—' }}</dd></div>
                                     <div><dt>PL received</dt><dd>{{ c.plReceived | num: 0 }}</dd></div>
                                     <div><dt>PL stocked</dt><dd>{{ c.plStocked | num: 0 }}</dd></div>
                                     @if (c.isStockingFinished) {
-                                        <div><dt>PL not stocked</dt><dd>{{ c.plNotStocked | num: 0 }} <span class="text-muted font-weight-normal">(stocking finished)</span></dd></div>
+                                        <div><dt>PL not stocked</dt><dd>{{ c.plNotStocked | num: 0 }} <span class="fpms-muted fpms-weight-normal">(stocking finished)</span></dd></div>
                                     } @else {
                                         <div><dt>PL left</dt><dd>{{ c.plLeft | num: 0 }}</dd></div>
                                     }
@@ -147,17 +147,17 @@ import { batchShort } from '@shared/fpms/labels';
                             </div>
                         </div>
                         <aside>
-                            <div class="card">
-                                <div class="card-body">
+                            <div class="fpms-panel">
+                                <div class="fpms-panel-body">
                                     <h3 class="fpms-section-h">Reopened</h3>
                                     @if (c.reopenings?.length) {
-                                        <ul class="list-unstyled mb-0">
+                                        <ul class="list-unstyled fpms-no-bottom">
                                             @for (r of c.reopenings; track $index) {
-                                                <li class="mb-2">{{ r.reopenedAtUtc | farmDateTime }} by {{ r.reopenedBy }}<div class="text-muted">{{ r.reason }}</div></li>
+                                                <li class="fpms-space-bottom-2">{{ r.reopenedAtUtc | farmDateTime }} by {{ r.reopenedBy }}<div class="fpms-muted">{{ r.reason }}</div></li>
                                             }
                                         </ul>
                                     } @else {
-                                        <p class="text-muted mb-0">Never reopened.</p>
+                                        <p class="fpms-muted fpms-no-bottom">Never reopened.</p>
                                     }
                                 </div>
                             </div>
