@@ -27,7 +27,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                 } @else {
                                     <table class="fpms-data-table fpms-no-bottom">
                                         <thead>
-                                            <tr><th>Name</th><th class="fpms-align-end">Usual kg</th><th class="fpms-align-end" title="Empty weight of the crate (tare)">Empty kg</th><th class="fpms-align-end">Order</th><th>Use</th><th><span class="sr-only">Actions</span></th></tr>
+                                            <tr><th>Name</th><th class="fpms-align-end">Usual kg</th><th class="fpms-align-end" title="Empty weight of the crate (tare)">Empty kg</th><th class="fpms-align-end">Order</th><th>Use</th><th><span class="fpms-visually-hidden">Actions</span></th></tr>
                                         </thead>
                                         <tbody>
                                             @for (t of types(); track t.id) {

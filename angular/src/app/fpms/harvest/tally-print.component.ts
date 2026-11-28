@@ -95,7 +95,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         </div>
                         @if (h.gradeLines.length > 1 || hasGrades()) {
                             <table class="fpms-doc-table" style="max-width: 22rem">
-                                <caption class="sr-only">Kilograms per size grade</caption>
+                                <caption class="fpms-visually-hidden">Kilograms per size grade</caption>
                                 <thead><tr><th scope="col">Size grade</th><th scope="col" class="num">Kg</th></tr></thead>
                                 <tbody>
                                     @for (g of h.gradeLines; track g.id) {

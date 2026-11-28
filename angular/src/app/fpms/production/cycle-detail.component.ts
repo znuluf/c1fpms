@@ -151,7 +151,7 @@ import { batchShort } from '@shared/fpms/labels';
                                 <div class="fpms-panel-body">
                                     <h3 class="fpms-section-h">Reopened</h3>
                                     @if (c.reopenings?.length) {
-                                        <ul class="list-unstyled fpms-no-bottom">
+                                        <ul class="fpms-list-unstyled fpms-no-bottom">
                                             @for (r of c.reopenings; track $index) {
                                                 <li class="fpms-space-bottom-2">{{ r.reopenedAtUtc | farmDateTime }} by {{ r.reopenedBy }}<div class="fpms-muted">{{ r.reason }}</div></li>
                                             }

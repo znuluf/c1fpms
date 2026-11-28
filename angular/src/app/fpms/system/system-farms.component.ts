@@ -13,7 +13,7 @@ import { unbroken } from '@shared/fpms/labels';
             <div class="fpms-page-inner">
                 <div class="fpms-panel">
                     <div class="fpms-panel-head"><h3 class="fpms-panel-title">Farm registration</h3></div>
-                    <div class="fpms-panel-body fpms-flex fpms-align-center-items flex-wrap">
+                    <div class="fpms-panel-body fpms-flex fpms-align-center-items fpms-wrap">
                         @if (registration() !== null) {
                             <span class="fpms-space-end-3">
                                 Registration is <fpms-badge [text]="registration() ? 'Open' : 'Closed'" [tone]="registration() ? 'success' : 'secondary'"></fpms-badge>
