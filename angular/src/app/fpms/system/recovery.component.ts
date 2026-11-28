@@ -8,7 +8,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header [narrow]="true" title="Account recovery" subtitle="Unlock an account or issue a temporary password. System Administration."></fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 <div class="alert alert-info">
                     <i class="fas fa-user-shield mr-1"></i>Before acting, verify the person's identity through a second Farm Owner of the same farm or the pre-agreed security question.
