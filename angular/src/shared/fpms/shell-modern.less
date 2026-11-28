@@ -238,7 +238,13 @@ body.fpms-nav-mini.fpms-nav-peek .main-sidebar.fpms-sidebar .fpms-brand {
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item.has-treeview.menu-open > .nav-link {
     color: #fff;
     background: var(--fpms-nav-bg-raised);
-    outline: none;
+}
+
+.main-sidebar.fpms-sidebar .nav-sidebar > .nav-item > .nav-link:focus-visible,
+.main-sidebar.fpms-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link:focus-visible,
+.main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link:focus-visible {
+    outline: 2px solid #93c5fd;
+    outline-offset: 2px;
 }
 
 .main-sidebar.fpms-sidebar .nav-sidebar > .nav-item:hover > .nav-link .nav-icon,
@@ -323,7 +329,6 @@ body.fpms-nav-mini.fpms-nav-peek .main-sidebar.fpms-sidebar .fpms-brand {
 .main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link:focus-visible {
     color: #fff;
     background: var(--fpms-nav-bg-raised);
-    outline: none;
 }
 
 .main-sidebar.fpms-sidebar .fpms-nav-foot .nav-link:hover .nav-icon,
