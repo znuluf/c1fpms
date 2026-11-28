@@ -13,8 +13,8 @@ import { ClientListFilter } from '@shared/fpms/client-list';
         <fpms-page-header title="Buyers" subtitle="Harvest buyers and their sales history.">
             <button class="btn btn-primary" (click)="startEdit()" [disabled]="!!form"><i class="fas fa-plus mr-1"></i>Add buyer</button>
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (form) {
                     <div class="fpms-dialog-backdrop"><div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="buyer-dialog-title"><div class="fpms-dialog-body p-0">
                         <div class="card card-outline card-primary">
