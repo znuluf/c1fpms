@@ -554,12 +554,16 @@ export class LogEntryComponent extends FpmsPage implements OnInit {
 
     /** Keep number inputs numeric while retaining normal editing and accessibility shortcuts. */
     restrictNumericKey(event: KeyboardEvent, allowNegative = false): void {
+        const input = event.target as HTMLInputElement;
         if (event.ctrlKey || event.metaKey || event.altKey ||
             ['Backspace', 'Delete', 'Tab', 'Enter', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key) ||
-            /^[0-9.]$/.test(event.key)) {
+            /^[0-9]$/.test(event.key)) {
             return;
         }
-        if (allowNegative && event.key === '-') {
+        if (event.key === '.' && !input.value.includes('.')) {
+            return;
+        }
+        if (allowNegative && event.key === '-' && input.value === '') {
             return;
         }
         if (event.key.length === 1) {
