@@ -36,7 +36,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="fpms-panel-head"><h3 class="fpms-panel-title">Water-quality ranges</h3></div>
                         <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                             <table class="fpms-data-table fpms-table-compact fpms-no-bottom fpms-standards">
-                                <thead><tr><th>Parameter</th><th>Standard</th><th title="The farm's own minimum">Farm min.</th><th title="The farm's own maximum">Farm max.</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                                <thead><tr><th>Parameter</th><th>Standard</th><th title="The farm's own minimum">Farm min.</th><th title="The farm's own maximum">Farm max.</th><th><span class="fpms-visually-hidden">Actions</span></th></tr></thead>
                                 <tbody>
                                     @for (p of x.parameters; track p.code) {
                                         <tr>
@@ -73,7 +73,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="fpms-panel-head"><h3 class="fpms-panel-title">Stocking density ranges (PL/m²)</h3></div>
                         <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                             <table class="fpms-data-table fpms-table-compact fpms-no-bottom fpms-standards">
-                                <thead><tr><th title="Farming system and pond construction">System</th><th>Standard</th><th title="The farm's own minimum">Farm min.</th><th title="The farm's own maximum">Farm max.</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                                <thead><tr><th title="Farming system and pond construction">System</th><th>Standard</th><th title="The farm's own minimum">Farm min.</th><th title="The farm's own maximum">Farm max.</th><th><span class="fpms-visually-hidden">Actions</span></th></tr></thead>
                                 <tbody>
                                     @for (b of x.densityBands; track bandKey(b)) {
                                         <tr>
@@ -117,7 +117,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                         <div class="fpms-panel-head"><h3 class="fpms-panel-title">Warning thresholds</h3></div>
                         <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                             <table class="fpms-data-table fpms-table-compact fpms-no-bottom fpms-standards">
-                                <thead><tr><th>Warn when</th><th>Standard</th><th>Farm value</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                                <thead><tr><th>Warn when</th><th>Standard</th><th>Farm value</th><th><span class="fpms-visually-hidden">Actions</span></th></tr></thead>
                                 <tbody>
                                     @for (t of x.thresholds; track t.code) {
                                         <tr>
@@ -131,9 +131,9 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                             </td>
                                             <td>{{ t.default }} {{ t.unit }}@if (t.source !== commonSource(x.thresholds)) { <div class="fpms-muted">{{ t.source }}</div> }</td>
                                             <td style="width: 9rem">
-                                                <div class="input-group input-group-sm">
+                                                <div class="fpms-input-group fpms-input-group-compact">
                                                     <input type="number" step="any" [min]="t.min" [max]="t.max" class="fpms-control" [(ngModel)]="thresholdEdit[t.code]" [disabled]="!x.canEdit" [attr.aria-label]="t.name" [placeholder]="t.default" />
-                                                    <div class="input-group-append"><span class="input-group-text">{{ t.unit }}</span></div>
+                                                    <div class="fpms-input-group-append"><span class="fpms-input-group-addon">{{ t.unit }}</span></div>
                                                 </div>
                                             </td>
                                             <td class="fpms-align-end">
