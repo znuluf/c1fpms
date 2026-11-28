@@ -33,7 +33,7 @@ import { DisposalReasons } from '@shared/fpms/labels';
                 <a class="btn btn-outline-primary" routerLink="/app/sales/new" [queryParams]="{ harvestId: h.id }"><i class="fas fa-cash-register mr-1"></i>Sell this harvest</a>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 @if (loading) {
                     <fpms-loading></fpms-loading>
