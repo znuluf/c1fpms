@@ -69,18 +69,20 @@ interface PondCard {
                         <div class="fpms-small fpms-muted fpms-full-width fpms-space-bottom-2">
                             Latest values from the sheets entered so far. Each value shows the day it was observed.
                         </div>
-                        <fpms-list-toolbar
-                            placeholder="Search by pond, purpose or batch"
-                            [search]="f.search()"
-                            [resultText]="f.resultText()"
-                            [chips]="f.chips()"
-                            [chip]="f.chip()"
-                            (searchChange)="onSearch($event)"
-                            (chipChange)="onChip($event)"></fpms-list-toolbar>
-                        <div class="fpms-flex fpms-justify-end fpms-space-top-2" role="group" aria-label="Pond display">
+                        <div class="pd-toolbar-row">
+                            <fpms-list-toolbar
+                                placeholder="Search by pond, purpose or batch"
+                                [search]="f.search()"
+                                [resultText]="f.resultText()"
+                                [chips]="f.chips()"
+                                [chip]="f.chip()"
+                                (searchChange)="onSearch($event)"
+                                (chipChange)="onChip($event)"></fpms-list-toolbar>
+                            <div class="pd-view-toggle" role="group" aria-label="Pond display">
                             <div class="fpms-button-group fpms-button-group-compact">
                                 <button type="button" class="fpms-button" [class.fpms-button-primary]="viewMode() === 'table'" [class.fpms-button-secondary]="viewMode() !== 'table'" [attr.aria-pressed]="viewMode() === 'table'" (click)="setViewMode('table')">Table</button>
                                 <button type="button" class="fpms-button" [class.fpms-button-primary]="viewMode() === 'tiles'" [class.fpms-button-secondary]="viewMode() !== 'tiles'" [attr.aria-pressed]="viewMode() === 'tiles'" (click)="setViewMode('tiles')">Tiles</button>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -391,6 +393,27 @@ interface PondCard {
         .fpms-no-bottom { margin-bottom:0; }
         @media (max-width:767px) { .fpms-panel-head,.fpms-panel-body { padding:var(--s3); } .fpms-data-table { min-width:47rem; } }
 
+            .pd-toolbar-row {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                width: 100%;
+            }
+            .pd-toolbar-row fpms-list-toolbar {
+                display: block;
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+            .pd-view-toggle {
+                display: flex;
+                flex: 0 0 auto;
+                justify-content: flex-end;
+                margin-left: auto;
+            }
+            @media (max-width: 767px) {
+                .pd-toolbar-row { flex-wrap: wrap; }
+                .pd-view-toggle { margin-left: auto; }
+            }
             .pd-h2 {
                 float: none;
                 font-size: 1.15rem;
