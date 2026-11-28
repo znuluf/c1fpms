@@ -42,7 +42,7 @@ interface StatusRow {
                     </label>
                     <label class="fpms-field">
                         <span>Show the last</span>
-                        <select class="form-control form-control-sm" [ngModel]="days()" (ngModelChange)="setDays($event)">
+                        <select class="fpms-control fpms-control-compact" [ngModel]="days()" (ngModelChange)="setDays($event)">
                             @for (n of [7, 14, 31]; track n) {
                                 <option [ngValue]="n">{{ n }} days</option>
                             }
@@ -50,12 +50,12 @@ interface StatusRow {
                     </label>
                     <label class="fpms-field">
                         <span>Up to</span>
-                        <input type="date" class="form-control form-control-sm" [ngModel]="endDate()" [max]="today" (ngModelChange)="setEnd($event)" />
+                        <input type="date" class="fpms-control fpms-control-compact" [ngModel]="endDate()" [max]="today" (ngModelChange)="setEnd($event)" />
                     </label>
                     @if (cycles().length > 1) {
                         <label class="fpms-field">
                             <span>Cycle</span>
-                            <select class="form-control form-control-sm" [ngModel]="cycle()" (ngModelChange)="cycle.set($event)">
+                            <select class="fpms-control fpms-control-compact" [ngModel]="cycle()" (ngModelChange)="cycle.set($event)">
                                 <option value="">All cycles</option>
                                 @for (c of cycles(); track c) {
                                     <option [value]="c">{{ c }}</option>
@@ -70,7 +70,7 @@ interface StatusRow {
                         <button type="button" class="fpms-chip" [attr.aria-pressed]="filter() === 'gaps'" (click)="filter.set('gaps')">With gaps · {{ withGaps() }}</button>
                         <button type="button" class="fpms-chip" [attr.aria-pressed]="filter() === 'alerts'" (click)="filter.set('alerts')">Water alerts · {{ withAlerts() }}</button>
                     </div>
-                    <span class="small text-muted ml-auto" role="status">{{ resultText() }}</span>
+                    <span class="fpms-small fpms-muted fpms-margin-auto-start" role="status">{{ resultText() }}</span>
                 </div>
 
                 <div class="fpms-pcal-panel">
@@ -149,7 +149,7 @@ interface StatusRow {
                                 <span><i class="dot-key dot-g"></i>Growth sampling</span>
                                 <span><i class="dot-key dot-c"></i>Chemical</span>
                             </div>
-                            <p class="mb-0">Click a day to open that pond's Daily record, where Record for this day fills a gap. A blank day is a gap, never "overdue"; Not fed counts as entered.</p>
+                            <p class="fpms-no-bottom">Click a day to open that pond's Daily record, where Record for this day fills a gap. A blank day is a gap, never "overdue"; Not fed counts as entered.</p>
                         </div>
                     }
                 </div>
