@@ -29,7 +29,7 @@ export interface GridCrate {
     imports: [CommonModule, ...FPMS_PIPES],
     template: `
         <table class="fpms-crate-grid" [class.is-blank]="blank > 0">
-            <caption class="sr-only">{{ blank > 0 ? 'Blank crate tally' : 'Crate tally: crate number and net kilograms' }}</caption>
+            <caption class="fpms-visually-hidden">{{ blank > 0 ? 'Blank crate tally' : 'Crate tally: crate number and net kilograms' }}</caption>
             <colgroup>
                 @for (i of cols; track i) {
                     <col class="box" />
@@ -38,7 +38,7 @@ export interface GridCrate {
             </colgroup>
             <thead>
                 <tr>
-                    <th [attr.colspan]="perRow" scope="col" class="text-left">{{ heading }}</th>
+                    <th [attr.colspan]="perRow" scope="col" class="fpms-text-start">{{ heading }}</th>
                     <th scope="col" class="num">Row total</th>
                 </tr>
             </thead>
@@ -67,13 +67,13 @@ export interface GridCrate {
             <tfoot>
                 <tr>
                     @if (blank > 0) {
-                        <td [attr.colspan]="perRow" class="text-left">
+                        <td [attr.colspan]="perRow" class="fpms-text-start">
                             Total crates <span class="fill"></span>
                             Empty-crate weight each <span class="fill short"></span> kg
                         </td>
                         <td class="num"><span class="fill short"></span> kg</td>
                     } @else {
-                        <td [attr.colspan]="perRow" class="text-left">
+                        <td [attr.colspan]="perRow" class="fpms-text-start">
                             {{ crates.length }} crate{{ crates.length === 1 ? '' : 's' }}, net of the empty crate
                             @if (tareKg() > 0) { · {{ tareKg() | num: 2 }} kg of crate weight subtracted }
                         </td>
@@ -91,7 +91,7 @@ export interface GridCrate {
         }
         @if (false && gradeSummary && grades().length > 1) {
             <table class="fpms-doc-table fpms-crate-grades">
-                <caption class="sr-only">Kilograms per size grade</caption>
+                <caption class="fpms-visually-hidden">Kilograms per size grade</caption>
                 <thead><tr><th scope="col">Size grade</th><th scope="col" class="num">Crates</th><th scope="col" class="num">Kg</th></tr></thead>
                 <tbody>
                     @for (g of grades(); track g.label) {

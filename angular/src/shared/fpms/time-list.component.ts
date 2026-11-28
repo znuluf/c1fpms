@@ -31,7 +31,7 @@ import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR
                         (blur)="sort()" />
                     <button
                         type="button"
-                        class="btn btn-default fpms-time-remove"
+                        class="btn btn-default fpms-button fpms-button-secondary fpms-time-remove"
                         [disabled]="disabled() || times().length <= min()"
                         [attr.aria-label]="'Remove ' + itemLabel().toLowerCase() + ' ' + (i + 1)"
                         [title]="'Remove ' + itemLabel().toLowerCase() + ' ' + (i + 1)"
@@ -42,16 +42,16 @@ import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR
             }
         </div>
         <div class="fpms-times-foot">
-            <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="disabled() || times().length >= max()" (click)="add()">
-                <i class="fas fa-plus mr-1" aria-hidden="true"></i>Add {{ itemLabel().toLowerCase() }}
+            <button type="button" class="btn btn-sm btn-outline-primary fpms-button fpms-button-outline" [disabled]="disabled() || times().length >= max()" (click)="add()">
+                <i class="fas fa-plus fpms-icon-gap" aria-hidden="true"></i>Add {{ itemLabel().toLowerCase() }}
             </button>
             <span class="text-muted">{{ count() }} a day{{ times().length >= max() ? ' (the most allowed)' : '' }}</span>
         </div>
         @if (dupes().size) {
-            <small class="form-text text-danger"><i class="fas fa-exclamation-circle mr-1" aria-hidden="true"></i>Two {{ itemLabel().toLowerCase() }}s are at {{ dupeText() }}. Change or remove one.</small>
+            <small class="form-text text-danger"><i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>Two {{ itemLabel().toLowerCase() }}s are at {{ dupeText() }}. Change or remove one.</small>
         }
         @if (hasEmpty()) {
-            <small class="form-text text-danger"><i class="fas fa-exclamation-circle mr-1" aria-hidden="true"></i>Choose a time for every {{ itemLabel().toLowerCase() }}, or remove it.</small>
+            <small class="form-text text-danger"><i class="fas fa-exclamation-circle fpms-icon-gap" aria-hidden="true"></i>Choose a time for every {{ itemLabel().toLowerCase() }}, or remove it.</small>
         }
     `,
 })
