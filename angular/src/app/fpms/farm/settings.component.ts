@@ -13,7 +13,7 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
     imports: [...FPMS_IMPORTS, TimeListComponent],
     template: `
         <fpms-page-header [narrow]="true" title="Farm settings" subtitle="Production defaults, monitoring practices and system preferences."></fpms-page-header>
-        <section class="content px-2 pb-3">
+        <section class="fpms-page">
             <div class="container-fluid fpms-narrow">
                 @if (!p) {
                     <fpms-loading></fpms-loading>
