@@ -43,7 +43,7 @@ interface Allocation {
                     @for (s of stepNames; track $index) {
                         <li [class.active]="step === $index" [class.done]="step > $index" [attr.aria-current]="step === $index ? 'step' : null">
                             <span class="n">
-                                @if (step > $index) { <i class="fas fa-check" aria-hidden="true"></i><span class="sr-only">Done:</span> } @else { {{ $index + 1 }} }
+                                @if (step > $index) { <i class="fas fa-check" aria-hidden="true"></i><span class="fpms-visually-hidden">Done:</span> } @else { {{ $index + 1 }} }
                             </span>
                             <span class="t">{{ s }}</span>
                         </li>
@@ -73,7 +73,7 @@ interface Allocation {
                                             <div class="fpms-check custom-radio fpms-choice">
                                                 <input type="radio" class="fpms-check-input" [id]="'d' + d.id" name="delivery" [value]="d.id" [(ngModel)]="deliveryId" [disabled]="!!cycleId" />
                                                 <label class="fpms-check-label" [for]="'d' + d.id">
-                                                    <span class="fpms-choice-title">{{ d.hatcheryBatchNumber }} <span class="fpms-label badge-info fpms-icon-gap">{{ ago(d.daysSinceReceived) }}</span></span>
+                                                    <span class="fpms-choice-title">{{ d.hatcheryBatchNumber }} <span class="fpms-label fpms-label-info fpms-icon-gap">{{ ago(d.daysSinceReceived) }}</span></span>
                                                     <span class="fpms-block">{{ d.hatcheryName }} <span class="fpms-pond-tag">{{ d.hatcheryShortCode }}</span> · received {{ d.deliveryDate | farmDate }}</span>
                                                     <span class="fpms-block"><strong>{{ d.plLeft | num: 0 }} PL left</strong> of {{ d.plReceived | num: 0 }} · {{ d.plAgeDays != null ? 'PL' + d.plAgeDays : 'PL age not recorded' }}</span>
                                                     <span class="fpms-block fpms-muted">{{ d.plHealthCertificateNo ? 'PL health certificate ' + d.plHealthCertificateNo : 'No PL health certificate recorded' }}</span>
@@ -91,7 +91,7 @@ interface Allocation {
                             <div class="fpms-panel">
                                 <div class="fpms-panel-head fpms-flex align-items-center">
                                     <h3 class="fpms-panel-title fpms-margin-auto-end">Ponds and PL allocation</h3>
-                                    <span [class.text-danger]="remaining < 0">Remaining: <strong>{{ remaining | num: 0 }}</strong> of {{ delivery.plLeft | num: 0 }} PL</span>
+                                    <span [class.fpms-danger]="remaining < 0">Remaining: <strong>{{ remaining | num: 0 }}</strong> of {{ delivery.plLeft | num: 0 }} PL</span>
                                 </div>
                                 <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                                     @if (!allocations.length) {
@@ -104,9 +104,9 @@ interface Allocation {
                                             <thead><tr><th>Pond</th><th>Prepared</th><th style="width: 10rem">Stocking count (PL)</th><th class="fpms-align-end" style="width: 13rem">Density</th></tr></thead>
                                             <tbody>
                                                 @for (a of allocations; track a.pond.id) {
-                                                    <tr [class.table-active]="a.selected">
+                                                    <tr [class.fpms-row-selected]="a.selected">
                                                         <td>
-                                                            <div class="fpms-check custom-checkbox">
+                                                            <div class="fpms-check fpms-check-box">
                                                                 <input type="checkbox" class="fpms-check-input" [id]="'al' + a.pond.id" [(ngModel)]="a.selected" />
                                                                 <label class="fpms-check-label" [for]="'al' + a.pond.id"><span class="fpms-pond-tag">{{ a.pond.pondCode }}</span> {{ a.pond.name }}</label>
                                                             </div>
@@ -116,7 +116,7 @@ interface Allocation {
                                                         <td><input type="number" min="1" step="1" class="fpms-control" [(ngModel)]="a.plCount" [disabled]="!a.selected" [attr.aria-label]="'PL for ' + a.pond.pondCode" /></td>
                                                         <td class="fpms-align-end">
                                                             @if (a.selected && a.plCount) {
-                                                                <span class="fpms-nowrap" [class.text-warning-dark]="densityState(a) !== 'within'" [class.font-weight-bold]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i> }</span>
+                                                                <span class="fpms-nowrap" [class.fpms-warning-text]="densityState(a) !== 'within'" [class.fpms-weight-bold]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i> }</span>
                                                                 @if (densityState(a) !== 'within') {
                                                                     <div class="fpms-warning-text fpms-wrap-text">{{ densityState(a) === 'above' ? 'Above' : 'Below' }} the {{ bandText(a.pond) }}</div>
                                                                     <div class="fpms-muted fpms-wrap-text">You can still save.</div>
@@ -183,7 +183,7 @@ interface Allocation {
                                             <div class="fpms-field fpms-col-md-6">
                                                 <label [for]="'sa' + a.pond.id">Stocking date and time <span class="fpms-danger">*</span></label>
                                                 <input [id]="'sa' + a.pond.id" type="datetime-local" class="fpms-control" [(ngModel)]="a.stockedAt" [min]="windowMin" [max]="windowMax" required />
-                                                <small class="fpms-help" [class.text-danger]="!inWindow(a)" [class.text-muted]="inWindow(a)">
+                                                <small class="fpms-help" [class.fpms-danger]="!inWindow(a)" [class.fpms-muted]="inWindow(a)">
                                                     From {{ delivery.deliveryDate | farmDate }} (received) to now.
                                                 </small>
                                             </div>
@@ -192,7 +192,7 @@ interface Allocation {
                                                     <legend [id]="'tu' + a.pond.id" class="fpms-group-label">Looked after by</legend>
                                                     <div class="fpms-people">
                                                         @for (p of people; track p.id) {
-                                                            <div class="fpms-check custom-checkbox">
+                                                            <div class="fpms-check fpms-check-box">
                                                                 <input type="checkbox" class="fpms-check-input" [id]="'tu' + a.pond.id + '-' + p.id" [checked]="a.technicianUserIds.includes(p.id)" (change)="toggleTech(a, p.id)"
                                                                     [disabled]="!a.technicianUserIds.includes(p.id) && a.technicianUserIds.length >= 4" />
                                                                 <label class="fpms-check-label" [for]="'tu' + a.pond.id + '-' + p.id">{{ p.name }}</label>
@@ -217,7 +217,7 @@ interface Allocation {
                                                         <input [id]="'wq' + p.code + a.pond.id" type="number" step="any" class="fpms-control" [(ngModel)]="a.readings[p.code]" required [min]="p.physicalMin" [max]="p.physicalMax" />
                                                         <div class="input-group-append"><span class="input-group-text">{{ p.unitCode }}</span></div>
                                                     </div>
-                                                    <small class="fpms-help" [class.text-muted]="state(p, a) === 'ok' || state(p, a) === 'empty'" [class.text-warning-dark]="state(p, a) === 'out'" [class.text-danger]="state(p, a) === 'invalid'">
+                                                    <small class="fpms-help" [class.fpms-muted]="state(p, a) === 'ok' || state(p, a) === 'empty'" [class.fpms-warning-text]="state(p, a) === 'out'" [class.fpms-danger]="state(p, a) === 'invalid'">
                                                         @switch (state(p, a)) {
                                                             @case ('out') { <i class="fas fa-exclamation-triangle fpms-icon-gap"></i>Outside {{ p.optimalRange }}; saved and flagged. {{ advice(p, a) }} }
                                                             @case ('invalid') { Not physically possible ({{ p.physicalMin }}–{{ p.physicalMax }}). }
@@ -267,7 +267,7 @@ interface Allocation {
                                             received <strong>{{ delivery.deliveryDate | farmDate }}</strong> ({{ ago(delivery.daysSinceReceived) }}),
                                             {{ delivery.plAgeDays != null ? 'PL' + delivery.plAgeDays : 'PL age not recorded' }}.
                                         </div>
-                                        <div class="fpms-check custom-checkbox fpms-space-top-2">
+                                        <div class="fpms-check fpms-check-box fpms-space-top-2">
                                             <input type="checkbox" class="fpms-check-input" id="confirmDelivery" [(ngModel)]="confirmDelivery" />
                                             <label class="fpms-check-label" for="confirmDelivery">These are the fry from this delivery.</label>
                                         </div>
@@ -285,7 +285,7 @@ interface Allocation {
                                                     <td>{{ a.targetHarvestAbwG != null ? (a.targetHarvestAbwG | num: 1) + ' g ABW' : 'ABW not set' }}<div class="fpms-muted">Max {{ a.maxCultureDays }} DOC</div></td>
                                                     <td class="fpms-align-end">
                                                         {{ a.plCount | num: 0 }}
-                                                        <div class="fpms-nowrap" [class.text-muted]="densityState(a) === 'within'" [class.text-warning-dark]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i><span class="sr-only">outside the range</span> }</div>
+                                                        <div class="fpms-nowrap" [class.fpms-muted]="densityState(a) === 'within'" [class.fpms-warning-text]="densityState(a) !== 'within'">{{ a.plCount / a.pond.areaM2 | num: 1 }} PL/m²@if (densityState(a) !== 'within') { <i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i><span class="fpms-visually-hidden">outside the range</span> }</div>
                                                     </td>
                                                     <td class="fpms-align-end">{{ a.deadAtStocking != null ? (a.deadAtStocking | num: 0) : '—' }}</td>
                                                     <td>{{ readingsLine(a) }}</td>
