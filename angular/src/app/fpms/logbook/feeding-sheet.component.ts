@@ -36,16 +36,16 @@ const MINE = 'mine';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header [narrow]="true" title="Feeding" subtitle="Each feeding in the farm's schedule, for every stocked pond on one day.">
-            <a class="btn btn-default" [routerLink]="['/app/logbook/sheets']" [queryParams]="{ sheet: 'feeding' }">Print log sheet</a>
+            <a class="fpms-button fpms-button-secondary" [routerLink]="['/app/logbook/sheets']" [queryParams]="{ sheet: 'feeding' }">Print log sheet</a>
         </fpms-page-header>
         <section class="fpms-page">
-            <div class="container-fluid fpms-narrow">
+            <div class="fpms-page-inner fpms-narrow">
                 <!-- One line of filters on the page ground (DEC-105), not a box of its own. -->
                 <div class="fpms-filter-row">
                     @if (!inWizard) {
                         <label class="sl-field">
                             <span>Pond</span>
-                            <select class="form-control form-control-sm" [(ngModel)]="batchFilter" (ngModelChange)="load()">
+                            <select class="fpms-control fpms-control-compact" [(ngModel)]="batchFilter" (ngModelChange)="load()">
                                 <option [ngValue]="null">All stocked ponds</option>
                                 @if (mineCount() > 1) {
                                     <option [ngValue]="MINE">Your ponds ({{ mineCount() }})</option>
@@ -58,43 +58,43 @@ const MINE = 'mine';
                     }
                     <label class="sl-field">
                         <span>Date</span>
-                        <input type="date" class="form-control form-control-sm" [(ngModel)]="feedDate" (ngModelChange)="load()" [max]="today" />
+                        <input type="date" class="fpms-control fpms-control-compact" [(ngModel)]="feedDate" (ngModelChange)="load()" [max]="today" />
                     </label>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="feedDate = today; load()" [disabled]="feedDate === today">Today</button>
+                    <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="feedDate = today; load()" [disabled]="feedDate === today">Today</button>
                 </div>
                 @if (!batches.length && !loading) {
-                    <p class="text-muted">No pond is stocked. Stock a batch first (Production → Stock a batch).</p>
+                    <p class="fpms-muted">No pond is stocked. Stock a batch first (Production → Stock a batch).</p>
                 }
 
                 @if (restoredAt) {
-                    <div class="alert alert-info d-flex align-items-center" role="status">
-                        <i class="fas fa-history mr-2"></i>
-                        <span class="mr-auto">Your unsaved feeding entries from {{ restoredAt | farmDateTime }} were restored.</span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="discardDraft()">Discard them</button>
+                    <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                        <i class="fas fa-history fpms-icon-gap"></i>
+                        <span class="fpms-margin-auto-end">Your unsaved feeding entries from {{ restoredAt | farmDateTime }} were restored.</span>
+                        <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="discardDraft()">Discard them</button>
                     </div>
                 }
 
                 @if (keptCount) {
-                    <div class="alert alert-info d-flex align-items-center" role="status">
-                        <i class="fas fa-cloud-upload-alt mr-2" aria-hidden="true"></i>
-                        <span class="mr-auto">
+                    <div class="fpms-alert fpms-alert-info fpms-flex align-items-center" role="status">
+                        <i class="fas fa-cloud-upload-alt fpms-icon-gap" aria-hidden="true"></i>
+                        <span class="fpms-margin-auto-end">
                             {{ keptCount }} feeding{{ keptCount === 1 ? ' is' : 's are' }} kept on this tablet: the farm server could not be reached.
                             {{ keptCount === 1 ? 'It is' : 'They are' }} sent by {{ keptCount === 1 ? 'itself' : 'themselves' }} when the connection is back; until then the sheet does not show {{ keptCount === 1 ? 'it' : 'them' }}.
                         </span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openOutbox()">See kept entries</button>
+                        <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="openOutbox()">See kept entries</button>
                     </div>
                 }
 
                 @if (results.length) {
                     <!-- After saving (DEC-118): what was saved, one feeding per row, and anything to check. Each saved tile is marked too. -->
-                    <section class="card fpms-saved" [class.fpms-saved-warn]="hasWarnings" aria-labelledby="fs-saved-h">
-                        <div class="card-body">
+                    <section class="fpms-panel fpms-saved" [class.fpms-saved-warn]="hasWarnings" aria-labelledby="fs-saved-h">
+                        <div class="fpms-panel-body">
                             <h3 id="fs-saved-h" class="fpms-saved-h">
                                 <i class="fas fa-check-circle" aria-hidden="true"></i>
                                 Saved {{ results.length }} feeding{{ results.length === 1 ? '' : 's' }}
                                 <span class="fpms-saved-when">{{ feedDate | farmDate }} · {{ savedKg | num: 3 : true }} kg from stock</span>
                             </h3>
-                            <dl class="fpms-facts mb-0">
+                            <dl class="fpms-facts fpms-no-bottom">
                                 @for (r of results; track $index) {
                                     <div>
                                         <dt>{{ r.session.pondCode }} · {{ r.session.session | label: L.FeedingSessions }}{{ r.wasUpdate ? ' (corrected)' : '' }}</dt>
@@ -103,7 +103,7 @@ const MINE = 'mine';
                                 }
                             </dl>
                             @if (hasWarnings) {
-                                <h4 class="fpms-section-h mt-3">Check this</h4>
+                                <h4 class="fpms-section-h fpms-space-top-3">Check this</h4>
                                 <ul class="fpms-notices fpms-saved-notices">
                                     @for (r of results; track $index) {
                                         @for (w of r.warnings; track $index) {
@@ -117,22 +117,22 @@ const MINE = 'mine';
                 }
 
                 @if (!feedLots.length && !loading) {
-                    <div class="alert alert-info small">No feed lots in stock records. Ask a Farm Owner to record a feed receipt under Inventory.</div>
+                    <div class="fpms-alert fpms-alert-info fpms-small">No feed lots in stock records. Ask a Farm Owner to record a feed receipt under Inventory.</div>
                 }
 
                 @if (loading) {
                     <fpms-loading></fpms-loading>
                 } @else if (sheet) {
                     @for (row of sheet.rows; track row.batchId) {
-                        <div class="card" [class.card-outline]="row.batchId === focusBatchId" [class.card-primary]="row.batchId === focusBatchId">
-                            <div class="card-header d-flex align-items-center">
-                                <h3 class="card-title mr-auto">
+                        <div class="fpms-panel" [class.fpms-panel-outline]="row.batchId === focusBatchId" [class.fpms-panel-primary]="row.batchId === focusBatchId">
+                            <div class="fpms-panel-head fpms-flex align-items-center">
+                                <h3 class="fpms-panel-title fpms-margin-auto-end">
                                     <a [routerLink]="['/app/production/batches', row.batchId]" [title]="row.batchCode"><span class="fpms-pond-tag">{{ row.pondCode }}</span> {{ batchShort(row.batchCode) }}</a>
                                 </h3>
-                                <span class="text-muted">{{ fedCount(row) }} of {{ slots(row).length }} entered · {{ fedKg(row) | num: 3 : true }} kg</span>
-                                @if (row.status !== 2) { <fpms-badge class="ml-2" [text]="row.status | label: L.BatchStatuses"></fpms-badge> }
+                                <span class="fpms-muted">{{ fedCount(row) }} of {{ slots(row).length }} entered · {{ fedKg(row) | num: 3 : true }} kg</span>
+                                @if (row.status !== 2) { <fpms-badge class="fpms-space-start-2" [text]="row.status | label: L.BatchStatuses"></fpms-badge> }
                             </div>
-                            <div class="card-body">
+                            <div class="fpms-panel-body">
                                 <!-- A tile per feeding (DEC-96); each keeps its own height, so an open one does not stretch its neighbour (DEC-105). -->
                                 <div class="fpms-slots">
                                     @for (s of slots(row); track s) {
@@ -140,26 +140,26 @@ const MINE = 'mine';
                                             @let existing = row.sessions[s - 1];
                                             @let e = entry(row.batchId, s);
                                             <div class="fpms-slot" [class.fpms-slot-justsaved]="!e.open && !!justSaved[row.batchId + '.' + s]" [class.fpms-slot-open]="e.open" [class.fpms-slot-now]="!existing && !e.open && currentSlot(row) === s" [class.fpms-slot-later]="!existing && !e.open && isLater(s)" [class.fpms-slot-fed]="existing && existing.status !== 2 && !e.open" [class.fpms-slot-skipped]="existing && existing.status === 2 && !e.open">
-                                                <div class="d-flex align-items-center mb-1">
+                                                <div class="fpms-flex align-items-center fpms-space-bottom-1">
                                                     @if (!existing) {
-                                                        <div class="custom-control custom-checkbox mr-auto">
-                                                            <input type="checkbox" class="custom-control-input" [id]="'fed' + row.batchId + s" [(ngModel)]="e.open" (ngModelChange)="keepDraft()" [disabled]="!canCreate || !feedLots.length" />
-                                                            <label class="custom-control-label font-weight-bold" [for]="'fed' + row.batchId + s">Record {{ s | label: L.FeedingSessions }}</label>
+                                                        <div class="fpms-check fpms-check-box fpms-margin-auto-end">
+                                                            <input type="checkbox" class="fpms-check-input" [id]="'fed' + row.batchId + s" [(ngModel)]="e.open" (ngModelChange)="keepDraft()" [disabled]="!canCreate || !feedLots.length" />
+                                                            <label class="fpms-check-label fpms-weight-bold" [for]="'fed' + row.batchId + s">Record {{ s | label: L.FeedingSessions }}</label>
                                                         </div>
                                                         @if (usualTime(s)) {
                                                             <span class="fpms-slot-time" title="Usual time"><i class="far fa-clock" aria-hidden="true"></i><span class="sr-only">usually </span>{{ usualTime(s) }}</span>
                                                         }
                                                     } @else if (existing.status === 2) {
-                                                        <strong class="mr-auto">{{ s | label: L.FeedingSessions }}: <span class="text-muted">Not fed</span></strong>
+                                                        <strong class="fpms-margin-auto-end">{{ s | label: L.FeedingSessions }}: <span class="fpms-muted">Not fed</span></strong>
                                                     } @else {
-                                                        <strong class="mr-auto">{{ s | label: L.FeedingSessions }}: {{ existing.kg | num: 3 : true }} kg</strong>
+                                                        <strong class="fpms-margin-auto-end">{{ s | label: L.FeedingSessions }}: {{ existing.kg | num: 3 : true }} kg</strong>
                                                     }
                                                     @if (existing) {
                                                         @if (existing.canEdit && !e.open) {
-                                                            <button type="button" class="btn btn-sm btn-outline-primary mr-1" (click)="startEdit(row.batchId, s, existing)">Correct</button>
+                                                            <button type="button" class="fpms-button fpms-button-compact fpms-button-outline fpms-icon-gap" (click)="startEdit(row.batchId, s, existing)">Correct</button>
                                                         }
                                                         @if (existing.canVoid && !e.open && voiding?.id !== existing.id) {
-                                                            <button type="button" class="btn btn-sm btn-outline-danger" (click)="voiding = { id: existing.id, reason: '' }">Void</button>
+                                                            <button type="button" class="fpms-button fpms-button-compact fpms-button-danger" (click)="voiding = { id: existing.id, reason: '' }">Void</button>
                                                         }
                                                     }
                                                 </div>
@@ -170,47 +170,47 @@ const MINE = 'mine';
                                                 @if (existing && !e.open && justSaved[row.batchId + '.' + s]; as w) {
                                                     <div class="fpms-slot-saved" role="status"><i class="fas fa-check" aria-hidden="true"></i>Saved just now</div>
                                                     @for (m of w.warnings; track $index) {
-                                                        <div class="fpms-slot-warn"><i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ m }}</div>
+                                                        <div class="fpms-slot-warn"><i class="fas fa-exclamation-triangle fpms-icon-gap" aria-hidden="true"></i>{{ m }}</div>
                                                     }
                                                 }
                                                 @if (existing && !e.open) {
-                                                    <div class="small">
+                                                    <div class="fpms-small">
                                                         @for (l of existing.lines; track l.lotId) {
                                                             <div>{{ l.label }}{{ existing.lines.length > 1 ? ': ' + (l.kg | num: 3 : true) + ' kg' : '' }}</div>
                                                         }
                                                         @if (existing.notes) { <div>{{ existing.notes }}</div> }
-                                                        <div class="text-muted">{{ existing.fedAtTime ? 'Fed ' + existing.fedAtTime + ' · ' : '' }}{{ existing.recordedBy }}, {{ existing.creationTime | farmDateTime }}</div>
+                                                        <div class="fpms-muted">{{ existing.fedAtTime ? 'Fed ' + existing.fedAtTime + ' · ' : '' }}{{ existing.recordedBy }}, {{ existing.creationTime | farmDateTime }}</div>
                                                     </div>
                                                     @if (voiding?.id === existing.id) {
-                                                        <div class="mt-2">
-                                                            <label class="small mb-1" [for]="'vr' + existing.id">Reason for voiding <span class="text-danger">*</span></label>
-                                                            <input [id]="'vr' + existing.id" class="form-control form-control-sm mb-1" [(ngModel)]="voiding.reason" maxlength="500" placeholder="e.g. entered on the wrong pond" />
-                                                            <button type="button" class="btn btn-sm btn-danger mr-1" (click)="voidSession(existing)" [disabled]="busy() || !voiding.reason.trim()">Void feeding</button>
-                                                            <button type="button" class="btn btn-sm btn-default" (click)="voiding = null">Cancel</button>
-                                                            <small class="d-block text-muted mt-1">Its feed is returned to stock with reversing movements.</small>
+                                                        <div class="fpms-space-top-2">
+                                                            <label class="fpms-small fpms-space-bottom-1" [for]="'vr' + existing.id">Reason for voiding <span class="fpms-danger">*</span></label>
+                                                            <input [id]="'vr' + existing.id" class="fpms-control fpms-control-compact fpms-space-bottom-1" [(ngModel)]="voiding.reason" maxlength="500" placeholder="e.g. entered on the wrong pond" />
+                                                            <button type="button" class="fpms-button fpms-button-compact fpms-button-danger-solid fpms-icon-gap" (click)="voidSession(existing)" [disabled]="busy() || !voiding.reason.trim()">Void feeding</button>
+                                                            <button type="button" class="fpms-button fpms-button-compact fpms-button-secondary" (click)="voiding = null">Cancel</button>
+                                                            <small class="fpms-block fpms-muted fpms-space-top-1">Its feed is returned to stock with reversing movements.</small>
                                                         </div>
                                                     }
                                                 }
 
                                                 @if (e.open) {
-                                                    <div class="btn-group btn-group-toggle mb-2" role="group" aria-label="Fed or not fed">
-                                                        <button type="button" class="btn" [class.btn-primary]="e.status === 1" [class.btn-outline-primary]="e.status !== 1" [attr.aria-pressed]="e.status === 1" (click)="setFed(e)">Fed</button>
-                                                        <button type="button" class="btn" [class.btn-secondary]="e.status === 2" [class.btn-outline-secondary]="e.status !== 2" [attr.aria-pressed]="e.status === 2" (click)="e.status = 2; keepDraft()">Not fed</button>
+                                                    <div class="fpms-button-group fpms-button-group-toggle fpms-space-bottom-2" role="group" aria-label="Fed or not fed">
+                                                        <button type="button" class="fpms-button" [class.fpms-button-primary]="e.status === 1" [class.fpms-button-outline]="e.status !== 1" [attr.aria-pressed]="e.status === 1" (click)="setFed(e)">Fed</button>
+                                                        <button type="button" class="fpms-button" [class.fpms-button-secondary]="e.status === 2" [class.fpms-button-secondary]="e.status !== 2" [attr.aria-pressed]="e.status === 2" (click)="e.status = 2; keepDraft()">Not fed</button>
                                                     </div>
                                                     @if (e.status === 1 && previousFed(row, s); as prev) {
                                                         <!-- DEC-127: the day's routine repeats; one tap copies the last feeding's lot and kilos, to adjust. -->
-                                                        <button type="button" class="btn btn-sm btn-outline-primary fpms-same-as mb-2" (click)="sameAs(e, prev)">
-                                                            <i class="fas fa-redo mr-1" aria-hidden="true"></i>Same as {{ prev.session | label: L.FeedingSessions }} · {{ kgOf(prev) | num: 1 }} kg
+                                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-outline fpms-same-as fpms-space-bottom-2" (click)="sameAs(e, prev)">
+                                                            <i class="fas fa-redo fpms-icon-gap" aria-hidden="true"></i>Same as {{ prev.session | label: L.FeedingSessions }} · {{ kgOf(prev) | num: 1 }} kg
                                                         </button>
                                                     }
                                                     @if (e.status === 2) {
-                                                        <small class="d-block text-muted mb-1">Saved as a deliberate skip (for example a molt, a treatment or bad weather). No stock is drawn.</small>
+                                                        <small class="fpms-block fpms-muted fpms-space-bottom-1">Saved as a deliberate skip (for example a molt, a treatment or bad weather). No stock is drawn.</small>
                                                     }
                                                     @for (l of (e.status === 1 ? e.lines : []); track l.key) {
                                                         <!-- The lot on its own line, so its name is never cut off; its kg under it. -->
-                                                        <div class="fpms-feed-line mb-1">
+                                                        <div class="fpms-feed-line fpms-space-bottom-1">
                                                             <div class="lot">
-                                                                <select class="form-control form-control-sm" [(ngModel)]="l.lotId" (ngModelChange)="keepDraft()" aria-label="Feed lot">
+                                                                <select class="fpms-control fpms-control-compact" [(ngModel)]="l.lotId" (ngModelChange)="keepDraft()" aria-label="Feed lot">
                                                                     @for (o of feedLots; track o.lotId) {
                                                                         <option [value]="o.lotId">{{ o.label }}</option>
                                                                     }
@@ -218,44 +218,44 @@ const MINE = 'mine';
                                                             </div>
                                                             <div class="kg">
                                                                 <div class="input-group input-group-sm">
-                                                                    <input type="number" min="0.001" max="1000" step="0.001" inputmode="decimal" class="form-control" [(ngModel)]="l.kg" (ngModelChange)="keepDraft()" aria-label="Kilograms fed" />
+                                                                    <input type="number" min="0.001" max="1000" step="0.001" inputmode="decimal" class="fpms-control" [(ngModel)]="l.kg" (ngModelChange)="keepDraft()" aria-label="Kilograms fed" />
                                                                     <div class="input-group-append"><span class="input-group-text">kg</span></div>
                                                                 </div>
                                                             </div>
                                                             <div class="rm">
                                                                 @if (e.lines.length > 1) {
-                                                                    <button type="button" class="btn btn-sm btn-link text-danger px-0" (click)="removeLine(e, l)" aria-label="Remove lot"><i class="fas fa-times"></i></button>
+                                                                    <button type="button" class="fpms-button fpms-button-compact fpms-button-link fpms-danger px-0" (click)="removeLine(e, l)" aria-label="Remove lot"><i class="fas fa-times"></i></button>
                                                                 }
                                                             </div>
                                                         </div>
                                                         @if (short(l)) {
-                                                            <small class="d-block text-warning-dark mb-1"><i class="fas fa-exclamation-triangle mr-1"></i>More than this lot's stock on hand; it will save and the lot will be flagged.</small>
+                                                            <small class="fpms-block fpms-warning-text fpms-space-bottom-1"><i class="fas fa-exclamation-triangle fpms-icon-gap"></i>More than this lot's stock on hand; it will save and the lot will be flagged.</small>
                                                         }
                                                     }
                                                     @if (e.status === 1) {
-                                                        <button type="button" class="btn btn-sm btn-link px-0" (click)="addLine(e)"><i class="fas fa-plus mr-1"></i>Another lot</button>
+                                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-link px-0" (click)="addLine(e)"><i class="fas fa-plus fpms-icon-gap"></i>Another lot</button>
                                                     }
                                                     @if (e.status === 1) {
-                                                        <div class="form-row align-items-center mt-1">
-                                                            <label class="col-auto mb-0" [for]="'fat' + row.batchId + s">Time fed <span class="font-weight-normal text-muted">(optional)</span></label>
-                                                            <div class="col-auto">
-                                                                <input type="time" class="form-control form-control-sm" [id]="'fat' + row.batchId + s" [(ngModel)]="e.fedAt" (ngModelChange)="keepDraft()" />
+                                                        <div class="fpms-grid-row align-items-center fpms-space-top-1">
+                                                            <label class="fpms-col-auto fpms-no-bottom" [for]="'fat' + row.batchId + s">Time fed <span class="fpms-weight-normal fpms-muted">(optional)</span></label>
+                                                            <div class="fpms-col-auto">
+                                                                <input type="time" class="fpms-control fpms-control-compact" [id]="'fat' + row.batchId + s" [(ngModel)]="e.fedAt" (ngModelChange)="keepDraft()" />
                                                             </div>
                                                         </div>
                                                     }
                                                     @if (e.status === 2) {
-                                                        <div class="mt-1" role="group" aria-label="Common reasons">
+                                                        <div class="fpms-space-top-1" role="group" aria-label="Common reasons">
                                                             @for (r of notFedReasons; track r) {
-                                                                <button type="button" class="btn btn-xs btn-sm py-0 px-2 mr-1 mb-1" [class.btn-secondary]="e.notes === r" [class.btn-outline-secondary]="e.notes !== r" [attr.aria-pressed]="e.notes === r" (click)="e.notes = r; keepDraft()">{{ r }}</button>
+                                                                <button type="button" class="fpms-button fpms-button-compact fpms-button-compact fpms-space-y-0 px-2 fpms-icon-gap fpms-space-bottom-1" [class.fpms-button-secondary]="e.notes === r" [class.fpms-button-secondary]="e.notes !== r" [attr.aria-pressed]="e.notes === r" (click)="e.notes = r; keepDraft()">{{ r }}</button>
                                                             }
                                                         </div>
                                                     }
-                                                    <input class="form-control form-control-sm mt-1" [(ngModel)]="e.notes" (ngModelChange)="keepDraft()" maxlength="500" [placeholder]="e.status === 2 ? 'Reason (optional): pick one above or type your own' : 'Notes (optional)'" aria-label="Notes" />
+                                                    <input class="fpms-control fpms-control-compact fpms-space-top-1" [(ngModel)]="e.notes" (ngModelChange)="keepDraft()" maxlength="500" [placeholder]="e.status === 2 ? 'Reason (optional): pick one above or type your own' : 'Notes (optional)'" aria-label="Notes" />
                                                     @if (existing) {
-                                                        <button type="button" class="btn btn-sm btn-link px-0" (click)="cancelEdit(row.batchId, s)">Cancel correction</button>
+                                                        <button type="button" class="fpms-button fpms-button-compact fpms-button-link px-0" (click)="cancelEdit(row.batchId, s)">Cancel correction</button>
                                                     }
                                                     @if (e.status === 1 && total(e) > 1000) {
-                                                        <small class="d-block text-danger">More than 1,000 kg in one feeding is not allowed.</small>
+                                                        <small class="fpms-block fpms-danger">More than 1,000 kg in one feeding is not allowed.</small>
                                                     }
                                                 }
                                             </div>
@@ -269,12 +269,12 @@ const MINE = 'mine';
                     }
 
                     @if (canCreate && sheet.rows.length) {
-                        <div class="d-flex align-items-center mb-3 fpms-savebar" [class.fpms-savebar-sticky]="!inWizard">
-                            <button type="button" class="btn btn-primary btn-lg mr-3 text-nowrap" (click)="save()" [disabled]="busy() || !pending().length || !valid()">
-                                @if (busy()) { <i class="fas fa-spinner fa-spin mr-1"></i> }
+                        <div class="fpms-flex align-items-center fpms-space-bottom-3 fpms-savebar" [class.fpms-savebar-sticky]="!inWizard">
+                            <button type="button" class="fpms-button fpms-button-primary fpms-button-large fpms-space-end-3 fpms-nowrap" (click)="save()" [disabled]="busy() || !pending().length || !valid()">
+                                @if (busy()) { <i class="fas fa-spinner fa-spin fpms-icon-gap"></i> }
                                 Save {{ pending().length || '' }} feeding{{ pending().length === 1 ? '' : 's' }}
                             </button>
-                            <span class="small text-muted">Only ticked or corrected feedings are saved; fed ones draw stock from their lots.</span>
+                            <span class="fpms-small fpms-muted">Only ticked or corrected feedings are saved; fed ones draw stock from their lots.</span>
                         </div>
                     }
                 }
