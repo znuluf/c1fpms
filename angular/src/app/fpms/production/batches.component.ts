@@ -31,8 +31,8 @@ const CLOSED = 5;
                 </button>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 <!-- Filters on the page ground, the list in one panel; six columns so the list fits 1,000 px (DEC-113). -->
                 <div class="fpms-list-filters">
                     <fpms-list-toolbar
