@@ -101,7 +101,7 @@ a:hover {
     margin-bottom: 0.25rem;
 }
 .fpms-empty i {
-    color: #b6c2c9;
+    color: var(--fpms-muted);
 }
 .fpms-scroll {
     max-height: 480px;
@@ -151,7 +151,7 @@ a:hover {
 }
 .fpms-pond {
     display: block;
-    border: 1px solid #dfe5e8;
+    border: 1px solid var(--fpms-line);
     border-radius: 0.35rem;
     padding: 0.65rem 0.75rem;
     background: var(--paper);
@@ -195,12 +195,12 @@ a:hover {
     span {
         padding: 0.1rem 0.5rem;
         margin-right: 2px;
-        background: #eef1f2;
+        background: var(--fpms-ground-muted);
         color: var(--fpms-muted);
         clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%, 6px 50%);
         padding-left: 0.7rem;
         &.done {
-            background: #d6ecec;
+            background: var(--fpms-soft-action-hover-bg);
             color: var(--fpms-primary);
         }
         &.current {
@@ -283,14 +283,14 @@ ol.fpms-steps {
 // ---- Paper log sheets, sales record and signatures
 .fpms-paper {
     background: var(--paper);
-    border: 1px solid #dfe5e8;
+    border: 1px solid var(--fpms-line);
     padding: 1.25rem 1.5rem;
     margin-bottom: 1.5rem;
 }
 .fpms-paper-table {
     th {
-        font-size: 12px !important;
-        background: #f1f4f5;
+        font-size: 0.875rem !important;
+        background: var(--fpms-table-stripe-bg);
     }
     td {
         height: 2rem;
@@ -299,14 +299,14 @@ ol.fpms-steps {
 .fpms-blank {
     display: inline-block;
     min-width: 9rem;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--ink-2);
     text-align: center;
     &.short {
         min-width: 3rem;
     }
 }
 .fpms-sign {
-    border-top: 1px solid #333;
+    border-top: 1px solid var(--ink-2);
     padding-top: 0.25rem;
     text-align: center;
     margin: 0 1rem;
@@ -345,7 +345,7 @@ select:focus-visible {
     width: 100%;
     text-align: left;
     background: var(--paper);
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--fpms-line);
     border-left: 4px solid var(--fpms-muted);
     border-radius: 0.25rem;
     padding: 0.5rem 0.75rem;
@@ -484,7 +484,7 @@ select:focus-visible {
         min-height: 1.25rem;
     }
     > div.blank {
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid var(--ink-2);
     }
 }
 .fpms-lot-box {
@@ -952,7 +952,7 @@ select:focus-visible {
         display: inline-block;
         min-width: 4rem;
         margin: 0 0.5rem 0 0.25rem;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid var(--ink-2);
         &.short {
             min-width: 2.5rem;
         }
