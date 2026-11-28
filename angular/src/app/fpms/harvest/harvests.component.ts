@@ -32,8 +32,8 @@ import { ToolbarChip } from '@shared/fpms/ui';
                 </a>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 <!-- Filters on the page ground, the list in one panel (DEC-107). -->
                 <div class="fpms-list-filters">
                         <fpms-list-toolbar
