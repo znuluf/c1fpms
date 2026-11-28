@@ -41,9 +41,9 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                             </div>
                                             <div class="fpms-field fpms-col-md-6">
                                                 <label for="mcd">Maximum culture duration (DOC)</label>
-                                                <div class="input-group">
+                                                <div class="fpms-input-group">
                                                     <input id="mcd" type="number" min="1" max="180" step="1" class="fpms-control" name="defaultMaxCultureDays" [(ngModel)]="p.defaultMaxCultureDays" required />
-                                                    <div class="input-group-append"><span class="input-group-text">days</span></div>
+                                                    <div class="fpms-input-group-append"><span class="fpms-input-group-addon">days</span></div>
                                                 </div>
                                                 <small class="fpms-help fpms-muted">Default is 90 days. This is a maximum time limit, not a minimum harvest age.</small>
                                             </div>
@@ -68,7 +68,7 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                     </div>
                                 </div>
                                 <div class="fpms-panel">
-                                    <div class="fpms-panel-head fpms-flex align-items-center">
+                                    <div class="fpms-panel-head fpms-flex fpms-align-center-items">
                                         <h3 class="fpms-panel-title fpms-margin-auto-end">Base ABW pricing</h3>
                                         <button type="button" class="fpms-button fpms-button-compact fpms-button-outline" (click)="addAbwScheme()">Add scheme</button>
                                     </div>
@@ -76,7 +76,7 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                         <p class="fpms-small fpms-muted">Create reusable pricing presets for sales. Each sale copies the selected terms, so later changes here do not alter saved sales. The base price applies at the stated ABW; the per-gram adjustment works above and below that ABW.</p>
                                         @for (s of p.baseAbwPricingSchemes; track s.id; let i = $index) {
                                             <div class="fpms-border rounded fpms-space-2 fpms-space-bottom-2">
-                                                <div class="fpms-grid-row align-items-end">
+                                                <div class="fpms-grid-row fpms-align-end-items">
                                                     <div class="fpms-field fpms-col-md-3">
                                                         <label [for]="'abwn' + i">Scheme name</label>
                                                         <input [id]="'abwn' + i" class="fpms-control" [name]="'abwn' + i" [(ngModel)]="s.name" required maxlength="60" placeholder="e.g. Base 10g" />
@@ -117,17 +117,17 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                                         <div class="fpms-grid-row">
                                             <div class="fpms-field fpms-col-md-6">
                                                 <label for="alert">Permit expiry reminder</label>
-                                                <div class="input-group">
+                                                <div class="fpms-input-group">
                                                     <input id="alert" type="number" min="1" max="365" class="fpms-control" name="documentExpiryAlertDays" [(ngModel)]="p.documentExpiryAlertDays" required />
-                                                    <div class="input-group-append"><span class="input-group-text">days before expiry</span></div>
+                                                    <div class="fpms-input-group-append"><span class="fpms-input-group-addon">days before expiry</span></div>
                                                 </div>
                                                 <small class="fpms-help fpms-muted">Permits expiring within this period are marked as expiring soon.</small>
                                             </div>
                                             <div class="fpms-field fpms-col-md-6">
                                                 <label for="ufu">Follow up unsold shrimp</label>
-                                                <div class="input-group">
+                                                <div class="fpms-input-group">
                                                     <input id="ufu" type="number" min="1" max="60" step="1" class="fpms-control" name="unsoldFollowUpDays" [(ngModel)]="p.unsoldFollowUpDays" required />
-                                                    <div class="input-group-append"><span class="input-group-text">days after harvest</span></div>
+                                                    <div class="fpms-input-group-append"><span class="fpms-input-group-addon">days after harvest</span></div>
                                                 </div>
                                                 <small class="fpms-help fpms-muted">Shrimp not yet sold or accounted for are listed on the dashboard after this many days. Each harvest can use its own day.</small>
                                             </div>
@@ -184,7 +184,7 @@ import { TimeListComponent } from '@shared/fpms/time-list.component';
                             <div class="fpms-panel-body">
                                 @if (p.baseAbwPricingSchemes.length) {
                                     @for (s of p.baseAbwPricingSchemes; track s.id) {
-                                        <div class="fpms-flex justify-content-between border-bottom fpms-space-y-2">
+                                        <div class="fpms-flex fpms-justify-between border-bottom fpms-space-y-2">
                                             <span>{{ s.name }} · {{ s.baseAbwG }}g</span>
                                             <span>{{ s.basePricePerKg | php }}/kg + {{ s.stepPerG | php }}/g {{ s.isActive ? '' : '· inactive' }}</span>
                                         </div>
