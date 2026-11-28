@@ -17,8 +17,8 @@ import { FPMS_IMPORTS } from '../shared-imports';
                 <button class="btn btn-primary" (click)="edit(null)"><i class="fas fa-plus mr-1"></i>New price table</button>
             }
         </fpms-page-header>
-        <section class="content px-2 pb-3">
-            <div class="container-fluid">
+        <section class="fpms-page">
+            <div class="fpms-page-inner">
                 @if (editing) {
                     <div class="card card-outline card-primary">
                         <div class="card-header"><h3 class="card-title">{{ editing.id === emptyId ? 'New price table' : 'Edit ' + editing.name }}</h3></div>
