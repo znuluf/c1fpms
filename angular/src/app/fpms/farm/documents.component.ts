@@ -16,15 +16,15 @@ const CUSTOM = 'custom';
     imports: FPMS_IMPORTS,
     template: `
         <fpms-page-header title="Permits and licenses" subtitle="Tracked by reference number and expiry date, soonest-expiring first.">
-            <button class="btn btn-primary mr-1" (click)="startCreate()"><i class="fas fa-plus mr-1"></i>Add permit</button>
-            <button class="btn btn-outline-secondary" [class.active]="showConfig" (click)="showConfig = !showConfig"><i class="fas fa-tags mr-1"></i>Presets</button>
+            <button class="fpms-button fpms-button-primary fpms-icon-gap" (click)="startCreate()"><i class="fas fa-plus fpms-icon-gap"></i>Add permit</button>
+            <button class="fpms-button fpms-button-secondary" [class.active]="showConfig" (click)="showConfig = !showConfig"><i class="fas fa-tags fpms-icon-gap"></i>Presets</button>
         </fpms-page-header>
         <section class="fpms-page">
             <div class="fpms-page-inner">
                 @if (status(); as s) {
-                    <div class="row">
+                    <div class="fpms-grid-row">
                         @for (t of tiles; track t.value) {
-                            <div class="col-6 col-md-3">
+                            <div class="fpms-col-6 fpms-col-md-3">
                                 <button type="button" class="fpms-status-tile t-{{ t.tone }}" [class.active]="filterStatus === t.value" [attr.aria-pressed]="filterStatus === t.value" (click)="toggleStatus(t.value)">
                                     <div class="v">{{ s[t.count] }}</div>
                                     <div class="l">{{ t.label }}</div>
@@ -33,18 +33,18 @@ const CUSTOM = 'custom';
                         }
                     </div>
 
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title">Required permits</h3></div>
-                        <div class="card-body py-2">
+                    <div class="fpms-panel">
+                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Required permits</h3></div>
+                        <div class="fpms-panel-body fpms-space-y-2">
                             @if (!s.requiredPermits.length) {
-                                <span class="text-muted small">No preset is marked "Required". Mark one under Categories &amp; presets to get reminders.</span>
+                                <span class="fpms-muted fpms-small">No preset is marked "Required". Mark one under Categories &amp; presets to get reminders.</span>
                             }
-                            <div class="d-flex flex-wrap">
+                            <div class="fpms-flex flex-wrap">
                                 @for (r of s.requiredPermits; track r.presetId) {
-                                    <div class="mr-4 mb-1">
-                                        <i class="fas mr-1" [class.fa-check-circle]="r.isSatisfied" [class.text-success]="r.isSatisfied" [class.fa-exclamation-circle]="!r.isSatisfied" [class.text-warning]="!r.isSatisfied" aria-hidden="true"></i>
+                                    <div class="fpms-space-end-5 fpms-space-bottom-1">
+                                        <i class="fas fpms-icon-gap" [class.fa-check-circle]="r.isSatisfied" [class.fpms-success]="r.isSatisfied" [class.fa-exclamation-circle]="!r.isSatisfied" [class.fpms-warning-text]="!r.isSatisfied" aria-hidden="true"></i>
                                         {{ r.name }}
-                                        <span class="small text-muted">
+                                        <span class="fpms-small fpms-muted">
                                             @if (r.isSatisfied) {
                                                 {{ r.validUntil ? 'valid until ' + (r.validUntil | farmDate) : 'no expiry' }}
                                             } @else {
@@ -56,8 +56,8 @@ const CUSTOM = 'custom';
                                 }
                             </div>
                             @if (s.missingPermits.length) {
-                                <p class="small text-muted mb-0 mt-1">
-                                    <i class="fas fa-info-circle mr-1"></i>Reminder only: production is never blocked. Stocking the first batch of a cycle repeats this reminder.
+                                <p class="fpms-small fpms-muted fpms-no-bottom fpms-space-top-1">
+                                    <i class="fas fa-info-circle fpms-icon-gap"></i>Reminder only: production is never blocked. Stocking the first batch of a cycle repeats this reminder.
                                 </p>
                             }
                         </div>
@@ -65,109 +65,109 @@ const CUSTOM = 'custom';
                 }
 
                 @if (showConfig) {
-                    <div class="card card-outline card-primary">
-                        <div class="card-header"><h3 class="card-title">Categories and preset titles</h3></div>
-                        <div class="card-body p-0">
+                    <div class="fpms-panel fpms-panel-outline fpms-panel-primary">
+                        <div class="fpms-panel-head"><h3 class="fpms-panel-title">Categories and preset titles</h3></div>
+                        <div class="fpms-panel-body fpms-space-0">
                             @for (c of categories(); track c.id) {
-                                <div class="border-bottom p-2">
-                                    <div class="form-row align-items-center">
-                                        <div class="col-md-5 mb-1">
-                                            <input class="form-control form-control-sm font-weight-bold" [(ngModel)]="c.name" maxlength="100" [attr.aria-label]="'Category name'" />
+                                <div class="border-bottom fpms-space-2">
+                                    <div class="fpms-grid-row align-items-center">
+                                        <div class="fpms-col-md-5 fpms-space-bottom-1">
+                                            <input class="fpms-control fpms-control-compact fpms-weight-bold" [(ngModel)]="c.name" maxlength="100" [attr.aria-label]="'Category name'" />
                                         </div>
-                                        <div class="col-auto mb-1">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" [id]="'rx-' + c.id" [(ngModel)]="c.requiresExpiryDate" />
-                                                <label class="custom-control-label small" [attr.for]="'rx-' + c.id">Requires expiry date</label>
+                                        <div class="fpms-col-auto fpms-space-bottom-1">
+                                            <div class="fpms-check fpms-check-box">
+                                                <input type="checkbox" class="fpms-check-input" [id]="'rx-' + c.id" [(ngModel)]="c.requiresExpiryDate" />
+                                                <label class="fpms-check-label fpms-small" [attr.for]="'rx-' + c.id">Requires expiry date</label>
                                             </div>
                                         </div>
-                                        <div class="col-auto mb-1">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" [id]="'ca-' + c.id" [(ngModel)]="c.isActive" />
-                                                <label class="custom-control-label small" [attr.for]="'ca-' + c.id">Active</label>
+                                        <div class="fpms-col-auto fpms-space-bottom-1">
+                                            <div class="fpms-check fpms-check-box">
+                                                <input type="checkbox" class="fpms-check-input" [id]="'ca-' + c.id" [(ngModel)]="c.isActive" />
+                                                <label class="fpms-check-label fpms-small" [attr.for]="'ca-' + c.id">Active</label>
                                             </div>
                                         </div>
-                                        <div class="col-auto mb-1 small text-muted">{{ c.documentCount }} current</div>
-                                        <div class="col text-right mb-1">
-                                            <button class="btn btn-sm btn-outline-primary" [disabled]="busy() || !c.name" (click)="saveCategory(c)">Save category</button>
+                                        <div class="fpms-col-auto fpms-space-bottom-1 fpms-small fpms-muted">{{ c.documentCount }} current</div>
+                                        <div class="col fpms-align-end fpms-space-bottom-1">
+                                            <button class="fpms-button fpms-button-compact fpms-button-outline" [disabled]="busy() || !c.name" (click)="saveCategory(c)">Save category</button>
                                         </div>
                                     </div>
-                                    <div class="table-responsive">
-                                    <table class="table table-sm mb-0 mt-1">
-                                        <thead class="small text-muted">
+                                    <div class="fpms-table-scroll">
+                                    <table class="fpms-data-table fpms-table-compact fpms-no-bottom fpms-space-top-1">
+                                        <thead class="fpms-small fpms-muted">
                                             <tr><th>Preset title</th><th>Default issuing agency</th><th title="Show a reminder when there is no active record">Required</th><th>Active</th><th><span class="sr-only">Actions</span></th></tr>
                                         </thead>
                                         <tbody>
                                             @for (p of c.presets; track p.id) {
                                                 <tr>
-                                                    <td><input class="form-control form-control-sm" [(ngModel)]="p.name" maxlength="200" aria-label="Preset title" /></td>
-                                                    <td><input class="form-control form-control-sm" [(ngModel)]="p.defaultIssuingAgency" maxlength="200" aria-label="Default issuing agency" /></td>
+                                                    <td><input class="fpms-control fpms-control-compact" [(ngModel)]="p.name" maxlength="200" aria-label="Preset title" /></td>
+                                                    <td><input class="fpms-control fpms-control-compact" [(ngModel)]="p.defaultIssuingAgency" maxlength="200" aria-label="Default issuing agency" /></td>
                                                     <td><input type="checkbox" [(ngModel)]="p.isRequired" [attr.aria-label]="'Required: ' + p.name" /></td>
                                                     <td><input type="checkbox" [(ngModel)]="p.isActive" [attr.aria-label]="'Active: ' + p.name" /></td>
-                                                    <td class="text-right"><button class="btn btn-sm btn-outline-primary" [disabled]="busy() || !p.name" (click)="savePreset(p)">Save</button></td>
+                                                    <td class="fpms-align-end"><button class="fpms-button fpms-button-compact fpms-button-outline" [disabled]="busy() || !p.name" (click)="savePreset(p)">Save</button></td>
                                                 </tr>
                                             }
                                             <tr>
-                                                <td><input class="form-control form-control-sm" placeholder="New preset title" [(ngModel)]="newPreset[c.id].name" maxlength="200" aria-label="New preset title" /></td>
-                                                <td><input class="form-control form-control-sm" placeholder="Agency (optional)" [(ngModel)]="newPreset[c.id].defaultIssuingAgency" maxlength="200" aria-label="New preset agency" /></td>
+                                                <td><input class="fpms-control fpms-control-compact" placeholder="New preset title" [(ngModel)]="newPreset[c.id].name" maxlength="200" aria-label="New preset title" /></td>
+                                                <td><input class="fpms-control fpms-control-compact" placeholder="Agency (optional)" [(ngModel)]="newPreset[c.id].defaultIssuingAgency" maxlength="200" aria-label="New preset agency" /></td>
                                                 <td><input type="checkbox" [(ngModel)]="newPreset[c.id].isRequired" aria-label="New preset required" /></td>
                                                 <td></td>
-                                                <td class="text-right"><button class="btn btn-sm btn-primary" [disabled]="busy() || !newPreset[c.id].name" (click)="savePreset(newPreset[c.id], true)">Add</button></td>
+                                                <td class="fpms-align-end"><button class="fpms-button fpms-button-compact fpms-button-primary" [disabled]="busy() || !newPreset[c.id].name" (click)="savePreset(newPreset[c.id], true)">Add</button></td>
                                             </tr>
                                         </tbody>
                                     </table>
                                     </div>
                                 </div>
                             }
-                            <div class="p-2 form-row align-items-center">
-                                <div class="col-md-5 mb-1"><input class="form-control form-control-sm" placeholder="New category name" aria-label="New category name" [(ngModel)]="newCategory.name" maxlength="100" /></div>
-                                <div class="col-auto mb-1">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="rx-new" [(ngModel)]="newCategory.requiresExpiryDate" />
-                                        <label class="custom-control-label small" for="rx-new">Requires expiry date</label>
+                            <div class="fpms-space-2 fpms-grid-row align-items-center">
+                                <div class="fpms-col-md-5 fpms-space-bottom-1"><input class="fpms-control fpms-control-compact" placeholder="New category name" aria-label="New category name" [(ngModel)]="newCategory.name" maxlength="100" /></div>
+                                <div class="fpms-col-auto fpms-space-bottom-1">
+                                    <div class="fpms-check fpms-check-box">
+                                        <input type="checkbox" class="fpms-check-input" id="rx-new" [(ngModel)]="newCategory.requiresExpiryDate" />
+                                        <label class="fpms-check-label fpms-small" for="rx-new">Requires expiry date</label>
                                     </div>
                                 </div>
-                                <div class="col text-right mb-1"><button class="btn btn-sm btn-primary" [disabled]="busy() || !newCategory.name" (click)="saveCategory(newCategory, true)">Add category</button></div>
+                                <div class="col fpms-align-end fpms-space-bottom-1"><button class="fpms-button fpms-button-compact fpms-button-primary" [disabled]="busy() || !newCategory.name" (click)="saveCategory(newCategory, true)">Add category</button></div>
                             </div>
                         </div>
-                        <div class="card-footer small text-muted">"Requires expiry date" stops records in that category from being marked perpetual. "Required" presets show a reminder when no active record exists. Changes are recorded in the activity log.</div>
+                        <div class="fpms-panel-foot fpms-small fpms-muted">"Requires expiry date" stops records in that category from being marked perpetual. "Required" presets show a reminder when no active record exists. Changes are recorded in the activity log.</div>
                     </div>
                 }
 
                 <!-- Filters on the page ground, the list in one panel; five columns so it fits 1,000 px (DEC-115). -->
                 <div class="fpms-list-filters">
-                        <div class="form-row align-items-center">
-                            <div class="col-md-6 mb-2">
-                                <input type="search" class="form-control" placeholder="Search title, reference number or agency" aria-label="Search" [(ngModel)]="search" (ngModelChange)="searchChanged()" />
+                        <div class="fpms-grid-row align-items-center">
+                            <div class="fpms-col-md-6 fpms-space-bottom-2">
+                                <input type="search" class="fpms-control" placeholder="Search title, reference number or agency" aria-label="Search" [(ngModel)]="search" (ngModelChange)="searchChanged()" />
                             </div>
-                            <div class="col-6 col-md-3 mb-2">
-                                <select class="form-control" aria-label="Filter by category" [(ngModel)]="filterCategory" (ngModelChange)="loadDocuments()">
+                            <div class="fpms-col-6 fpms-col-md-3 fpms-space-bottom-2">
+                                <select class="fpms-control" aria-label="Filter by category" [(ngModel)]="filterCategory" (ngModelChange)="loadDocuments()">
                                     <option [ngValue]="null">All categories</option>
                                     @for (c of categories(); track c.id) {
                                         <option [ngValue]="c.id">{{ c.name }}</option>
                                     }
                                 </select>
                             </div>
-                            <div class="col-6 col-md-3 mb-2">
-                                <select class="form-control" aria-label="Filter by status" [(ngModel)]="filterStatus" (ngModelChange)="loadDocuments()">
+                            <div class="fpms-col-6 fpms-col-md-3 fpms-space-bottom-2">
+                                <select class="fpms-control" aria-label="Filter by status" [(ngModel)]="filterStatus" (ngModelChange)="loadDocuments()">
                                     <option [ngValue]="null">All statuses</option>
                                     @for (t of tiles; track t.value) {
                                         <option [ngValue]="t.value">{{ t.label }}</option>
                                     }
                                 </select>
                             </div>
-                            <div class="col-auto mb-1">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="arch" [(ngModel)]="includeArchived" (ngModelChange)="loadDocuments()" />
-                                    <label class="custom-control-label" for="arch">Show archived</label>
+                            <div class="fpms-col-auto fpms-space-bottom-1">
+                                <div class="fpms-check fpms-check-box">
+                                    <input type="checkbox" class="fpms-check-input" id="arch" [(ngModel)]="includeArchived" (ngModelChange)="loadDocuments()" />
+                                    <label class="fpms-check-label" for="arch">Show archived</label>
                                 </div>
                             </div>
                             @if (filtered) {
-                                <div class="col-auto mb-1"><button class="btn btn-sm btn-link" (click)="clearFilters()">Clear filters</button></div>
+                                <div class="fpms-col-auto fpms-space-bottom-1"><button class="fpms-button fpms-button-compact fpms-button-link" (click)="clearFilters()">Clear filters</button></div>
                             }
                         </div>
                 </div>
-                <div class="card">
-                    <div class="card-body p-0 table-responsive">
+                <div class="fpms-panel">
+                    <div class="fpms-panel-body fpms-space-0 fpms-table-scroll">
                         @if (!documents()) {
                             <fpms-loading></fpms-loading>
                         } @else if (!documents()!.length) {
@@ -175,24 +175,24 @@ const CUSTOM = 'custom';
                                 <fpms-empty text="No records match these filters." icon="fas fa-filter"></fpms-empty>
                             } @else {
                                 <fpms-empty text="No permits or licenses recorded yet." icon="far fa-file-alt">
-                                    <button class="btn btn-sm btn-primary" (click)="startCreate()">Add the first permit</button>
+                                    <button class="fpms-button fpms-button-compact fpms-button-primary" (click)="startCreate()">Add the first permit</button>
                                 </fpms-empty>
                             }
                         } @else {
-                            <table class="table table-hover mb-0">
+                            <table class="fpms-data-table fpms-table-hover fpms-no-bottom">
                                 <thead>
                                     <tr><th>Document</th><th>Issued by</th><th>Status · expires</th><th><span class="sr-only">Actions</span></th></tr>
                                 </thead>
                                 <tbody>
                                     @for (d of documents(); track d.id) {
-                                        <tr [class.text-muted]="d.isArchived">
+                                        <tr [class.fpms-muted]="d.isArchived">
                                             <td>
-                                                <a href="javascript:;" class="font-weight-bold" (click)="view(d)">{{ d.title }}</a>
-                                                <div class="text-muted">{{ d.categoryName }} · <span class="text-nowrap">{{ d.documentNumber }}</span></div>
+                                                <a href="javascript:;" class="fpms-weight-bold" (click)="view(d)">{{ d.title }}</a>
+                                                <div class="fpms-muted">{{ d.categoryName }} · <span class="fpms-nowrap">{{ d.documentNumber }}</span></div>
                                             </td>
                                             <td>
                                                 {{ d.issuingAgency || '—' }}
-                                                <div class="text-muted text-nowrap">{{ d.issueDate ? 'Issued ' + (d.issueDate | farmDate) : 'Issue date not given' }}</div>
+                                                <div class="fpms-muted fpms-nowrap">{{ d.issueDate ? 'Issued ' + (d.issueDate | farmDate) : 'Issue date not given' }}</div>
                                             </td>
                                             <td>
                                                 <div class="fpms-badge-stack">
@@ -200,22 +200,22 @@ const CUSTOM = 'custom';
                                                     @if (d.isArchived) { <fpms-badge text="Archived" tone="secondary"></fpms-badge> }
                                                 </div>
                                                 @if (d.isPerpetual) {
-                                                    <div class="text-muted">Perpetual</div>
+                                                    <div class="fpms-muted">Perpetual</div>
                                                 } @else {
-                                                    <div class="text-nowrap">{{ d.expiryDate | farmDate }}</div>
-                                                    <div class="text-muted text-nowrap">{{ relative(d.daysToExpiry) }}</div>
+                                                    <div class="fpms-nowrap">{{ d.expiryDate | farmDate }}</div>
+                                                    <div class="fpms-muted fpms-nowrap">{{ relative(d.daysToExpiry) }}</div>
                                                 }
                                             </td>
-                                            <td class="text-right">
+                                            <td class="fpms-align-end">
                                                 <div class="fpms-actions-stack">
-                                                    <button class="btn btn-sm btn-outline-primary" (click)="view(d)" [attr.aria-label]="'View ' + d.title">View</button>
+                                                    <button class="fpms-button fpms-button-compact fpms-button-outline" (click)="view(d)" [attr.aria-label]="'View ' + d.title">View</button>
                                                     @if (!d.isArchived) {
-                                                        <button class="btn btn-sm btn-outline-secondary" (click)="startEdit(d)" [attr.aria-label]="'Edit ' + d.title">Edit</button>
+                                                        <button class="fpms-button fpms-button-compact fpms-button-secondary" (click)="startEdit(d)" [attr.aria-label]="'Edit ' + d.title">Edit</button>
                                                         @if (!d.isPerpetual) {
-                                                            <button class="btn btn-sm" [class.btn-warning]="d.expiryStatus >= 2" [class.btn-outline-secondary]="d.expiryStatus < 2" (click)="startRenew(d)" [attr.aria-label]="'Renew ' + d.title">Renew</button>
+                                                            <button class="fpms-button fpms-button-compact" [class.fpms-button-warning]="d.expiryStatus >= 2" [class.fpms-button-secondary]="d.expiryStatus < 2" (click)="startRenew(d)" [attr.aria-label]="'Renew ' + d.title">Renew</button>
                                                         }
                                                     }
-                                                    <button class="btn btn-sm btn-outline-secondary" [disabled]="busy()" (click)="archive(d)" [attr.aria-label]="(d.isArchived ? 'Restore ' : 'Archive ') + d.title">{{ d.isArchived ? 'Restore' : 'Archive' }}</button>
+                                                    <button class="fpms-button fpms-button-compact fpms-button-secondary" [disabled]="busy()" (click)="archive(d)" [attr.aria-label]="(d.isArchived ? 'Restore ' : 'Archive ') + d.title">{{ d.isArchived ? 'Restore' : 'Archive' }}</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -233,39 +233,39 @@ const CUSTOM = 'custom';
             <div class="fpms-dialog-backdrop" (click)="closeView()">
                 <div class="fpms-dialog fpms-dialog-sm" role="dialog" aria-modal="true" aria-labelledby="viewTitle" (click)="$event.stopPropagation()">
                     <div class="fpms-dialog-head">
-                        <h2 id="viewTitle" class="mr-auto">{{ v.title }}</h2>
+                        <h2 id="viewTitle" class="fpms-margin-auto-end">{{ v.title }}</h2>
                         <button type="button" class="fpms-dialog-close" aria-label="Close" (click)="closeView()"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <div class="fpms-dialog-body">
-                        <div class="mb-3">
+                        <div class="fpms-space-bottom-3">
                             <fpms-badge [text]="v.expiryStatus | label: L.ExpiryStatuses"></fpms-badge>
                             @if (v.isArchived) { <fpms-badge text="Archived" tone="secondary"></fpms-badge> }
-                            @if (!v.isPerpetual) { <span class="small text-muted ml-1">{{ relative(v.daysToExpiry) }}</span> }
+                            @if (!v.isPerpetual) { <span class="fpms-small fpms-muted fpms-icon-gap">{{ relative(v.daysToExpiry) }}</span> }
                         </div>
-                        <dl class="row fpms-dl mb-0">
-                            <dt class="col-sm-4">Category</dt><dd class="col-sm-8">{{ v.categoryName }}</dd>
-                            <dt class="col-sm-4">Reference no.</dt><dd class="col-sm-8"><strong>{{ v.documentNumber }}</strong></dd>
-                            <dt class="col-sm-4">Issuing agency</dt><dd class="col-sm-8">{{ v.issuingAgency || '—' }}</dd>
-                            <dt class="col-sm-4">Issue date</dt><dd class="col-sm-8">{{ (v.issueDate | farmDate) || '—' }}</dd>
-                            <dt class="col-sm-4">Expiry date</dt><dd class="col-sm-8">{{ v.isPerpetual ? 'Perpetual / no expiry date' : (v.expiryDate | farmDate) }}</dd>
-                            <dt class="col-sm-4">Notes / location</dt><dd class="col-sm-8" style="white-space: pre-line">{{ v.notes || '—' }}</dd>
+                        <dl class="fpms-grid-row fpms-dl fpms-no-bottom">
+                            <dt class="fpms-col-sm-4">Category</dt><dd class="fpms-col-sm-8">{{ v.categoryName }}</dd>
+                            <dt class="fpms-col-sm-4">Reference no.</dt><dd class="fpms-col-sm-8"><strong>{{ v.documentNumber }}</strong></dd>
+                            <dt class="fpms-col-sm-4">Issuing agency</dt><dd class="fpms-col-sm-8">{{ v.issuingAgency || '—' }}</dd>
+                            <dt class="fpms-col-sm-4">Issue date</dt><dd class="fpms-col-sm-8">{{ (v.issueDate | farmDate) || '—' }}</dd>
+                            <dt class="fpms-col-sm-4">Expiry date</dt><dd class="fpms-col-sm-8">{{ v.isPerpetual ? 'Perpetual / no expiry date' : (v.expiryDate | farmDate) }}</dd>
+                            <dt class="fpms-col-sm-4">Notes / location</dt><dd class="fpms-col-sm-8" style="white-space: pre-line">{{ v.notes || '—' }}</dd>
                             @if (v.renewedFromId) {
-                                <dt class="col-sm-4">Renewal of</dt><dd class="col-sm-8"><a href="javascript:;" (click)="openById(v.renewedFromId)">earlier record</a></dd>
+                                <dt class="fpms-col-sm-4">Renewal of</dt><dd class="fpms-col-sm-8"><a href="javascript:;" (click)="openById(v.renewedFromId)">earlier record</a></dd>
                             }
-                            <dt class="col-sm-4">Recorded</dt><dd class="col-sm-8 small">{{ v.creationTime | farmDateTime }} by {{ v.recordedBy || '—' }}</dd>
+                            <dt class="fpms-col-sm-4">Recorded</dt><dd class="fpms-col-sm-8 fpms-small">{{ v.creationTime | farmDateTime }} by {{ v.recordedBy || '—' }}</dd>
                             @if (v.lastModificationTime) {
-                                <dt class="col-sm-4">Last changed</dt><dd class="col-sm-8 small">{{ v.lastModificationTime | farmDateTime }} by {{ v.lastModifiedBy || '—' }}</dd>
+                                <dt class="fpms-col-sm-4">Last changed</dt><dd class="fpms-col-sm-8 fpms-small">{{ v.lastModificationTime | farmDateTime }} by {{ v.lastModifiedBy || '—' }}</dd>
                             }
                         </dl>
                     </div>
                     <div class="fpms-dialog-foot">
                         @if (!v.isArchived) {
-                            <button class="btn btn-outline-secondary mr-auto" (click)="closeView(); startEdit(v)"><i class="fas fa-pen mr-1"></i>Edit</button>
+                            <button class="fpms-button fpms-button-secondary fpms-margin-auto-end" (click)="closeView(); startEdit(v)"><i class="fas fa-pen fpms-icon-gap"></i>Edit</button>
                             @if (!v.isPerpetual) {
-                                <button class="btn btn-outline-primary" (click)="closeView(); startRenew(v)"><i class="fas fa-redo mr-1"></i>Renew</button>
+                                <button class="fpms-button fpms-button-outline" (click)="closeView(); startRenew(v)"><i class="fas fa-redo fpms-icon-gap"></i>Renew</button>
                             }
                         }
-                        <button class="btn btn-primary" (click)="closeView()">Close</button>
+                        <button class="fpms-button fpms-button-primary" (click)="closeView()">Close</button>
                     </div>
                 </div>
             </div>
@@ -276,29 +276,29 @@ const CUSTOM = 'custom';
             <div class="fpms-dialog-backdrop">
                 <div class="fpms-dialog" role="dialog" aria-modal="true" aria-labelledby="formTitle">
                     <div class="fpms-dialog-head">
-                        <h2 id="formTitle" class="mr-auto">{{ formTitle }}</h2>
+                        <h2 id="formTitle" class="fpms-margin-auto-end">{{ formTitle }}</h2>
                         <button type="button" class="fpms-dialog-close" aria-label="Close" (click)="closeForm()"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <form #df="ngForm" (ngSubmit)="saveForm()" fpmsReview="permit" [fpmsReviewNew]="form.mode !== 'edit'" novalidate autocomplete="off">
                         <div class="fpms-dialog-body">
                             @if (form.mode === 'renew') {
-                                <div class="alert alert-info py-2 small">
-                                    <i class="fas fa-info-circle mr-1"></i>Enter the renewed permit's details. The current record ({{ form.renewedFromNumber }}) will be archived when you save, so it stops sending expiry reminders.
+                                <div class="fpms-alert fpms-alert-info fpms-space-y-2 fpms-small">
+                                    <i class="fas fa-info-circle fpms-icon-gap"></i>Enter the renewed permit's details. The current record ({{ form.renewedFromNumber }}) will be archived when you save, so it stops sending expiry reminders.
                                 </div>
                             }
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="f-cat">Category <span class="text-danger">*</span></label>
-                                    <select id="f-cat" class="form-control" name="categoryId" [(ngModel)]="form.categoryId" (ngModelChange)="categoryChanged()" required>
+                            <div class="fpms-grid-row">
+                                <div class="fpms-field fpms-col-md-6">
+                                    <label for="f-cat">Category <span class="fpms-danger">*</span></label>
+                                    <select id="f-cat" class="fpms-control" name="categoryId" [(ngModel)]="form.categoryId" (ngModelChange)="categoryChanged()" required>
                                         <option [ngValue]="null" disabled>Select a category</option>
                                         @for (c of formCategories; track c.id) {
                                             <option [ngValue]="c.id">{{ c.name }}</option>
                                         }
                                     </select>
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label for="f-preset">Document title <span class="text-danger">*</span></label>
-                                    <select id="f-preset" class="form-control" name="presetChoice" [(ngModel)]="form.presetChoice" (ngModelChange)="presetChanged()" [disabled]="!form.categoryId" required>
+                                <div class="fpms-field fpms-col-md-6">
+                                    <label for="f-preset">Document title <span class="fpms-danger">*</span></label>
+                                    <select id="f-preset" class="fpms-control" name="presetChoice" [(ngModel)]="form.presetChoice" (ngModelChange)="presetChanged()" [disabled]="!form.categoryId" required>
                                         <option [ngValue]="null" disabled>{{ form.categoryId ? 'Select a title' : 'Choose a category first' }}</option>
                                         @for (p of formPresets; track p.id) {
                                             <option [ngValue]="p.id">{{ p.name }}</option>
@@ -310,68 +310,68 @@ const CUSTOM = 'custom';
                                 </div>
                             </div>
                             @if (form.presetChoice === CUSTOM) {
-                                <div class="form-group">
-                                    <label for="f-title">Title <span class="text-danger">*</span></label>
-                                    <input id="f-title" class="form-control" name="title" [(ngModel)]="form.title" required maxlength="200" />
+                                <div class="fpms-field">
+                                    <label for="f-title">Title <span class="fpms-danger">*</span></label>
+                                    <input id="f-title" class="fpms-control" name="title" [(ngModel)]="form.title" required maxlength="200" />
                                 </div>
                             }
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="f-num">Reference number <span class="text-danger">*</span></label>
-                                    <input id="f-num" class="form-control" name="documentNumber" [(ngModel)]="form.documentNumber" required maxlength="100" autocomplete="off" placeholder="e.g. ECC-R12-2026-8891" />
-                                    <small class="form-text text-muted">Copy it as written on the paper.</small>
+                            <div class="fpms-grid-row">
+                                <div class="fpms-field fpms-col-md-6">
+                                    <label for="f-num">Reference number <span class="fpms-danger">*</span></label>
+                                    <input id="f-num" class="fpms-control" name="documentNumber" [(ngModel)]="form.documentNumber" required maxlength="100" autocomplete="off" placeholder="e.g. ECC-R12-2026-8891" />
+                                    <small class="fpms-help fpms-muted">Copy it as written on the paper.</small>
                                     @if (form.mode === 'renew') {
                                         @if (form.numberYearUpdated) {
-                                            <small class="form-text text-muted">The year in the number is updated for you. Check it against the new paper and fix it if the agency gave a different number.</small>
+                                            <small class="fpms-help fpms-muted">The year in the number is updated for you. Check it against the new paper and fix it if the agency gave a different number.</small>
                                         } @else {
-                                            <small class="form-text text-muted">Carried over from the current record. Change it if the agency issued a new number.</small>
+                                            <small class="fpms-help fpms-muted">Carried over from the current record. Change it if the agency issued a new number.</small>
                                         }
                                     }
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label for="f-exp">Expiry date @if (!form.isPerpetual) { <span class="text-danger">*</span> }</label>
-                                    <input id="f-exp" type="date" class="form-control" name="expiryDate" [(ngModel)]="form.expiryDate" [disabled]="form.isPerpetual" [required]="!form.isPerpetual" [min]="form.issueDate || ''" />
+                                <div class="fpms-field fpms-col-md-6">
+                                    <label for="f-exp">Expiry date @if (!form.isPerpetual) { <span class="fpms-danger">*</span> }</label>
+                                    <input id="f-exp" type="date" class="fpms-control" name="expiryDate" [(ngModel)]="form.expiryDate" [disabled]="form.isPerpetual" [required]="!form.isPerpetual" [min]="form.issueDate || ''" />
                                     @if (dateError) {
-                                        <small class="text-danger">{{ dateError }}</small>
+                                        <small class="fpms-danger">{{ dateError }}</small>
                                     } @else if (form.expiryHint && form.expiryDate === form.suggestedExpiry) {
-                                        <small class="form-text text-muted">{{ form.expiryHint }}</small>
+                                        <small class="fpms-help fpms-muted">{{ form.expiryHint }}</small>
                                     }
-                                    <div class="custom-control custom-checkbox mt-2">
-                                        <input type="checkbox" class="custom-control-input" id="f-perp" name="isPerpetual" [(ngModel)]="form.isPerpetual" [disabled]="requiresExpiry" />
-                                        <label class="custom-control-label" for="f-perp">No expiry date (perpetual)</label>
+                                    <div class="fpms-check fpms-check-box fpms-space-top-2">
+                                        <input type="checkbox" class="fpms-check-input" id="f-perp" name="isPerpetual" [(ngModel)]="form.isPerpetual" [disabled]="requiresExpiry" />
+                                        <label class="fpms-check-label" for="f-perp">No expiry date (perpetual)</label>
                                     </div>
                                     @if (requiresExpiry) {
-                                        <small class="form-text text-muted mt-0">Records in this category must have an expiry date.</small>
+                                        <small class="fpms-help fpms-muted fpms-space-top-0">Records in this category must have an expiry date.</small>
                                     }
                                 </div>
                             </div>
                             <!-- Optional details fold away (DEC-96); they open by themselves when a preset or the record fills one. -->
-                            <details class="fpms-fold mb-0" [open]="!!form.issuingAgency || !!form.issueDate || !!form.notes">
+                            <details class="fpms-fold fpms-no-bottom" [open]="!!form.issuingAgency || !!form.issueDate || !!form.notes">
                                 <summary>More details <span class="fpms-fold-hint">issuing agency, issue date, where the paper copy is kept</span></summary>
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
+                                <div class="fpms-grid-row">
+                                    <div class="fpms-field fpms-col-md-6">
                                         <label for="f-agency">Issuing agency</label>
-                                        <input id="f-agency" class="form-control" name="issuingAgency" [(ngModel)]="form.issuingAgency" maxlength="200" autocomplete="off" />
+                                        <input id="f-agency" class="fpms-control" name="issuingAgency" [(ngModel)]="form.issuingAgency" maxlength="200" autocomplete="off" />
                                     </div>
-                                    <div class="form-group col-md-6">
+                                    <div class="fpms-field fpms-col-md-6">
                                         <label for="f-issue">Issue date</label>
-                                        <input id="f-issue" type="date" class="form-control" name="issueDate" [(ngModel)]="form.issueDate" [max]="today" />
+                                        <input id="f-issue" type="date" class="fpms-control" name="issueDate" [(ngModel)]="form.issueDate" [max]="today" />
                                     </div>
                                 </div>
-                                <div class="form-group mb-0">
+                                <div class="fpms-field fpms-no-bottom">
                                     <label for="f-notes">Notes or location</label>
-                                    <textarea id="f-notes" rows="2" class="form-control" name="notes" [(ngModel)]="form.notes" maxlength="500" placeholder="e.g. hard copy in binder 2 at the farm office"></textarea>
+                                    <textarea id="f-notes" rows="2" class="fpms-control" name="notes" [(ngModel)]="form.notes" maxlength="500" placeholder="e.g. hard copy in binder 2 at the farm office"></textarea>
                                 </div>
                             </details>
                         </div>
                         <div class="fpms-dialog-foot">
-                            <button type="submit" class="btn btn-primary" [disabled]="busy() || !df.form.valid || !!dateError">
+                            <button type="submit" class="fpms-button fpms-button-primary" [disabled]="busy() || !df.form.valid || !!dateError">
                                 @if (busy()) {
-                                    <i class="fas fa-spinner fa-spin mr-1"></i>
+                                    <i class="fas fa-spinner fa-spin fpms-icon-gap"></i>
                                 }
                                 {{ form.mode === 'renew' ? 'Save renewal' : 'Save' }}
                             </button>
-                            <button type="button" class="btn btn-default" (click)="closeForm()">Cancel</button>
+                            <button type="button" class="fpms-button fpms-button-secondary" (click)="closeForm()">Cancel</button>
                             <fpms-form-hint [form]="df"></fpms-form-hint>
                         </div>
                     </form>
